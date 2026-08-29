@@ -26,60 +26,86 @@
     --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
     --gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
     --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-    --glass-bg: var(--tg-theme-bg-color, rgba(255, 255, 255, 0.7));
-    --glass-border: var(--tg-theme-secondary-bg-color, rgba(255, 255, 255, 0.3));
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.15);
+    --glass-bg: var(--tg-theme-bg-color, rgba(255, 255, 255, 0.85));
+    --glass-border: var(--tg-theme-secondary-bg-color, rgba(0, 0, 0, 0.06));
+}
+[data-theme="dark"] {
+    --bg-primary: var(--tg-theme-bg-color, #0f172a);
+    --bg-secondary: var(--tg-theme-secondary-bg-color, #1e293b);
+    --bg-tertiary: var(--tg-theme-secondary-bg-color, #334155);
+    --text-primary: var(--tg-theme-text-color, #f1f5f9);
+    --text-secondary: var(--tg-theme-hint-color, #94a3b8);
+    --text-tertiary: var(--tg-theme-hint-color, #64748b);
+    --border: var(--tg-theme-secondary-bg-color, #334155);
+    --glass-bg: var(--tg-theme-bg-color, rgba(30, 41, 59, 0.85));
+    --glass-border: var(--tg-theme-secondary-bg-color, rgba(255, 255, 255, 0.06));
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5);
+    --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.6);
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+html, body { overscroll-behavior-y: none; }
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
-    overscroll-behavior: none;
     min-height: 100vh;
+    overflow-x: hidden;
 }
-.app { max-width: 500px; margin: 0 auto; background: var(--bg-primary); min-height: 100vh; position: relative; padding-bottom: 80px; }
+.app { max-width: 500px; margin: 0 auto; background: var(--bg-primary); min-height: 100vh; position: relative; padding-bottom: 140px; }
+
+/* HEADER - максимально компактный, только иконка профиля */
 .header {
     background: var(--glass-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-    padding: 12px 20px;
+    border-bottom: 1px solid var(--glass-border);
+    padding: 8px 16px;
     position: sticky; top: 0; z-index: 10;
-    display: flex; justify-content: space-between; align-items: center;
+    display: flex; justify-content: flex-end; align-items: center;
+    min-height: 44px;
 }
-.header-actions { display: flex; gap: 8px; }
 .icon-btn {
     width: 36px; height: 36px; border-radius: 10px;
     background: var(--bg-tertiary); border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     color: var(--text-primary); transition: all 0.2s;
 }
-.icon-btn:hover { background: var(--border); transform: scale(1.05); }
+.icon-btn:hover { transform: scale(1.05); }
 .icon-btn svg { width: 18px; height: 18px; }
-.content { padding: 16px; }
-.tab { display: none; animation: slideIn 0.3s ease; }
-.tab.active { display: block; }
-@keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.content { padding: 16px; position: relative; }
+
+/* TABS с анимациями */
+.tab { display: none; }
+.tab.active { display: block; animation: tabSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+@keyframes tabSlideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-@keyframes wave { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes wave { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
 .nav {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: var(--glass-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--glass-border);
     max-width: 500px; margin: 0 auto;
     display: flex; justify-content: space-around;
-    padding: 8px 4px; z-index: 10;
+    padding: 6px 4px 10px; z-index: 10;
 }
 .nav-btn {
-    background: none; border: none; padding: 8px 10px; cursor: pointer;
+    background: none; border: none; padding: 6px 8px; cursor: pointer;
     display: flex; flex-direction: column; align-items: center;
     color: var(--text-tertiary); font-size: 10px; font-weight: 500;
     transition: all 0.2s; border-radius: 10px; min-width: 50px;
@@ -90,7 +116,7 @@ body {
 
 .card {
     background: var(--bg-secondary);
-    border: 1px solid var(--border);
+    border: 1px solid var(--glass-border);
     border-radius: 16px; padding: 14px;
     margin-bottom: 10px; cursor: pointer;
     transition: all 0.2s; box-shadow: var(--shadow-sm);
@@ -99,6 +125,15 @@ body {
 .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .card-title { font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 8px; }
 .card-sub { font-size: 13px; color: var(--text-secondary); margin-top: 4px; display: flex; align-items: center; gap: 6px; }
+.card-desc {
+    font-size: 12px; color: var(--text-tertiary);
+    margin-top: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+}
 
 .card-menu-btn {
     position: absolute; top: 10px; right: 10px;
@@ -107,7 +142,6 @@ body {
     display: none; align-items: center; justify-content: center;
     color: var(--text-secondary); transition: all 0.2s; z-index: 2;
 }
-.card-menu-btn:hover { background: var(--border); }
 .card-menu-btn svg { width: 16px; height: 16px; }
 .editor-mode .card-menu-btn { display: flex; }
 
@@ -241,10 +275,7 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
 }
 .audio-controls button:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
 .audio-controls button svg { width: 22px; height: 22px; }
-.play-btn {
-    width: 64px !important; height: 64px !important;
-    background: white !important; color: var(--accent) !important;
-}
+.play-btn { width: 64px !important; height: 64px !important; background: white !important; color: var(--accent) !important; }
 .play-btn svg { width: 28px !important; height: 28px !important; }
 
 .wave-container { display: flex; align-items: center; justify-content: center; gap: 3px; height: 30px; margin: 10px 0; }
@@ -348,7 +379,7 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
 
 .quick-action {
     background: var(--bg-secondary);
-    border: 1px solid var(--border);
+    border: 1px solid var(--glass-border);
     border-radius: 16px; padding: 14px;
     display: flex; align-items: center; gap: 12px;
     cursor: pointer; transition: all 0.2s; margin-bottom: 8px;
@@ -427,7 +458,7 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
 
 .cat-stat {
     background: var(--bg-secondary);
-    border: 1px solid var(--border);
+    border: 1px solid var(--glass-border);
     border-radius: 12px; padding: 12px; margin-bottom: 8px;
 }
 .cat-stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -442,6 +473,138 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
     margin-left: 8px;
 }
 
+/* SCROLL TO TOP */
+.scroll-top-btn {
+    position: fixed;
+    bottom: 90px;
+    right: 16px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lg);
+    z-index: 50;
+    transition: all 0.3s;
+    animation: scaleIn 0.3s;
+}
+.scroll-top-btn.visible { display: flex; }
+.scroll-top-btn:hover { transform: scale(1.1); }
+.scroll-top-btn svg { width: 20px; height: 20px; }
+
+/* MINI PLAYER */
+.mini-player {
+    position: fixed;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 468px;
+    background: var(--gradient-1);
+    border-radius: 14px;
+    padding: 10px 12px;
+    color: white;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    box-shadow: var(--shadow-xl);
+    z-index: 20;
+    cursor: pointer;
+    animation: slideUp 0.3s ease;
+}
+.mini-player.visible { display: flex; }
+.mini-player-icon {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.mini-player-icon svg { width: 18px; height: 18px; }
+.mini-player-info { flex: 1; min-width: 0; }
+.mini-player-title { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mini-player-sub { font-size: 11px; opacity: 0.8; }
+.mini-player-play {
+    width: 36px; height: 36px;
+    background: white;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent);
+    flex-shrink: 0;
+}
+.mini-player-play svg { width: 16px; height: 16px; }
+
+/* SKELETON LOADING */
+.skeleton {
+    background: linear-gradient(90deg, var(--bg-tertiary) 0%, var(--border) 50%, var(--bg-tertiary) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+}
+.skeleton-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 10px;
+}
+.skeleton-line { height: 14px; margin-bottom: 8px; border-radius: 4px; }
+.skeleton-line.short { width: 60%; }
+.skeleton-line.medium { width: 80%; }
+.skeleton-circle { width: 32px; height: 32px; border-radius: 8px; }
+
+/* PULL TO REFRESH */
+.pull-indicator {
+    text-align: center;
+    padding: 12px;
+    color: var(--text-tertiary);
+    font-size: 13px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.pull-indicator.visible { display: flex; }
+.pull-indicator svg { width: 16px; height: 16px; animation: pulse 1s infinite; }
+
+/* QUOTE */
+.quote-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-left: 4px solid var(--accent);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-style: italic;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.5;
+    position: relative;
+}
+.quote-card::before {
+    content: '"';
+    position: absolute;
+    top: -8px;
+    left: 12px;
+    font-size: 32px;
+    color: var(--accent);
+    opacity: 0.3;
+    font-style: normal;
+}
+.quote-author {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: 6px;
+    font-size: 12px;
+}
+
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
 </head>
@@ -449,13 +612,14 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
 
 <div class="app" id="app">
     <div class="header">
-        <div style="flex: 1;"></div>
-        <div class="header-actions">
-            <button class="icon-btn" onclick="switchTab('profile')" title="Профиль"></button>
-        </div>
+        <button class="icon-btn" onclick="switchTab('profile')" title="Профиль"></button>
     </div>
 
-    <div class="content">
+    <div class="content" id="main-content">
+        <div class="pull-indicator" id="pull-indicator">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+            <span id="pull-text">Потяните для обновления</span>
+        </div>
         <div id="tab-home" class="tab active"></div>
         <div id="tab-lessons" class="tab"></div>
         <div id="tab-books" class="tab"></div>
@@ -466,6 +630,21 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
 
     <div class="nav" id="main-nav"></div>
 </div>
+
+<!-- Mini Player -->
+<div class="mini-player" id="mini-player" onclick="openFullPlayer()">
+    <div class="mini-player-icon"></div>
+    <div class="mini-player-info">
+        <div class="mini-player-title" id="mini-title">—</div>
+        <div class="mini-player-sub" id="mini-sub">—</div>
+    </div>
+    <button class="mini-player-play" id="mini-play-btn" onclick="event.stopPropagation(); togglePlay()"></button>
+</div>
+
+<!-- Scroll to top -->
+<button class="scroll-top-btn" id="scroll-top-btn" onclick="scrollToTop()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
 
 <div id="modal" class="modal">
     <div class="modal-content">
@@ -493,6 +672,47 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
 // ============ КОНФИГУРАЦИЯ АДМИНОВ ============
 const ADMIN_TELEGRAM_IDS = [8690178977];
 
+// ============ ЦИТАТЫ ДНЯ ============
+const QUOTES = [
+    { text: 'Образование — это самое мощное оружие, которое можно использовать для изменения мира.', author: 'Нельсон Мандела' },
+    { text: 'Живи так, будто завтра умрёшь. Учись так, будто будешь жить вечно.', author: 'Махатма Ганди' },
+    { text: 'Единственный способ делать великие дела — любить то, что делаешь.', author: 'Стив Джобс' },
+    { text: 'Знание — это сила. Информация — это свобода. Образование — это предпосылка прогресса.', author: 'Кофи Аннан' },
+    { text: 'Чтение для ума — то же, что упражнения для тела.', author: 'Джозеф Аддисон' },
+    { text: 'Никогда не поздно стать тем, кем ты мог бы быть.', author: 'Джордж Элиот' },
+    { text: 'Успех — это сумма маленьких усилий, повторяющихся изо дня в день.', author: 'Роберт Кольер' },
+    { text: 'Не считай дни, делай так, чтобы дни считались.', author: 'Мухаммед Али' },
+    { text: 'Будущее принадлежит тем, кто верит в красоту своих мечтаний.', author: 'Элеонора Рузвельт' },
+    { text: 'Каждый эксперт когда-то был новичком.', author: 'Хелен Хейс' },
+    { text: 'Терпение и труд всё перетрут.', author: 'Русская пословица' },
+    { text: 'Путь в тысячу ли начинается с первого шага.', author: 'Лао-цзы' },
+    { text: 'Учение — свет, а неучение — тьма.', author: 'Русская пословица' },
+    { text: 'Кто много читает, тот много знает.', author: 'Русская пословица' },
+    { text: 'Повторение — мать учения.', author: 'Цицерон' },
+    { text: 'Семь раз отмерь, один раз отрежь.', author: 'Русская пословица' },
+    { text: 'Дорогу осилит идущий.', author: 'Русская пословица' },
+    { text: 'Знание лучше богатства.', author: 'Русская пословица' },
+    { text: 'Век живи — век учись.', author: 'Русская пословица' },
+    { text: 'Книга — лучший подарок.', author: 'Русская пословица' },
+    { text: 'Не стыдно не знать, стыдно не учиться.', author: 'Русская пословица' },
+    { text: 'Ум хорошо, а два лучше.', author: 'Русская пословица' },
+    { text: 'Поспешишь — людей насмешишь.', author: 'Русская пословица' },
+    { text: 'Тише едешь — дальше будешь.', author: 'Русская пословица' },
+    { text: 'Без труда не выловишь и рыбку из пруда.', author: 'Русская пословица' },
+    { text: 'Делу время, потехе час.', author: 'Русская пословица' },
+    { text: 'Семь бед — один ответ.', author: 'Русская пословица' },
+    { text: 'Глаза боятся, а руки делают.', author: 'Русская пословица' },
+    { text: 'Кто рано встаёт, тому бог подаёт.', author: 'Русская пословица' },
+    { text: 'Одна голова хорошо, а две лучше.', author: 'Русская пословица' },
+    { text: 'Слово не воробей, вылетит — не поймаешь.', author: 'Русская пословица' }
+];
+
+function getQuoteOfDay() {
+    const today = new Date();
+    const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+    return QUOTES[dayOfYear % QUOTES.length];
+}
+
 // ============ SVG ИКОНКИ ============
 const ICONS = {
     home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
@@ -513,7 +733,6 @@ const ICONS = {
     edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
     trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
     fire: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
-    trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
     x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
     chevronLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
@@ -529,7 +748,9 @@ const ICONS = {
     moreVertical: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>',
     skipForward: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>',
     shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
-    settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'
+    settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+    refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>',
+    quote: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>'
 };
 
 const icon = (name, size = 20) => `<span style="display:inline-flex;width:${size}px;height:${size}px;">${ICONS[name] || ''}</span>`;
@@ -563,11 +784,43 @@ const state = {
     editorMode: false,
     audioSpeed: 1,
     playlist: [],
-    playlistIndex: -1
+    playlistIndex: -1,
+    isPlaying: false,
+    theme: null, // null = системная
+    pullStartY: 0,
+    pullCurrentY: 0,
+    isPulling: false
 };
+
+// ============ THEME ============
+function getSystemTheme() {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function applyTheme() {
+    const theme = state.theme || getSystemTheme();
+    document.documentElement.setAttribute('data-theme', theme);
+}
+
+function toggleTheme() {
+    const current = state.theme || getSystemTheme();
+    state.theme = current === 'dark' ? 'light' : 'dark';
+    DB.set('theme', state.theme);
+    applyTheme();
+    if (state.currentTab === 'profile') renderProfile();
+}
+
+function initTheme() {
+    state.theme = DB.get('theme', null);
+    applyTheme();
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (!state.theme) applyTheme();
+    });
+}
 
 // ============ INIT ============
 function init() {
+    initTheme();
     checkAdminAccess();
     
     let user = DB.get('user', null);
@@ -580,27 +833,30 @@ function init() {
     state.user = user;
     
     renderNav();
-    renderTab();
+    showSkeleton();
+    setTimeout(() => {
+        renderTab();
+    }, 400);
+    
+    setupPullToRefresh();
+    setupScrollListener();
+    setupMiniPlayer();
 }
 
 function checkAdminAccess() {
     const tg = window.Telegram?.WebApp;
-    
     if (tg) {
         tg.ready();
         tg.expand();
         const tgUser = tg.initDataUnsafe?.user;
-        
         if (tgUser && ADMIN_TELEGRAM_IDS.includes(tgUser.id)) {
             state.editorMode = true;
         } else {
             state.editorMode = false;
         }
     } else {
-        // Для локального тестирования
         state.editorMode = DB.get('editorMode', false);
     }
-    
     updateEditorMode();
 }
 
@@ -608,6 +864,21 @@ function updateEditorMode() {
     const app = document.getElementById('app');
     if (state.editorMode) app.classList.add('editor-mode');
     else app.classList.remove('editor-mode');
+}
+
+// ============ SKELETON ============
+function showSkeleton() {
+    const container = document.getElementById('tab-home');
+    container.innerHTML = `
+        <div class="skeleton-card" style="height: 180px; border-radius: 20px;"></div>
+        <div class="skeleton-line" style="height: 14px; width: 40%; margin-bottom: 12px;"></div>
+        <div class="skeleton-card" style="height: 70px;"></div>
+        <div class="skeleton-line" style="height: 14px; width: 40%; margin: 16px 0 12px;"></div>
+        <div class="skeleton-card" style="height: 70px;"></div>
+        <div class="skeleton-card" style="height: 70px;"></div>
+        <div class="skeleton-card" style="height: 70px;"></div>
+    `;
+    container.classList.add('active');
 }
 
 // ============ NAV ============
@@ -635,6 +906,7 @@ function switchTab(tab) {
     document.getElementById('tab-' + tab).classList.add('active');
     renderNav();
     renderTab();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function renderTab() {
@@ -787,7 +1059,6 @@ function hideContextMenu() {
     document.getElementById('context-menu').style.display = 'none';
 }
 
-// ============ CONFIRM MODAL ============
 function showConfirm(title, text, onConfirm) {
     const modal = document.getElementById('modal');
     const body = document.getElementById('modal-body');
@@ -815,6 +1086,105 @@ function closeModal() {
     document.getElementById('modal').classList.remove('active');
 }
 
+// ============ SCROLL TO TOP ============
+function setupScrollListener() {
+    window.addEventListener('scroll', () => {
+        const btn = document.getElementById('scroll-top-btn');
+        if (window.scrollY > 300) {
+            btn.classList.add('visible');
+        } else {
+            btn.classList.remove('visible');
+        }
+    });
+}
+
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============ PULL TO REFRESH ============
+function setupPullToRefresh() {
+    const content = document.getElementById('main-content');
+    
+    content.addEventListener('touchstart', (e) => {
+        if (window.scrollY === 0) {
+            state.pullStartY = e.touches[0].clientY;
+            state.isPulling = true;
+        }
+    }, { passive: true });
+    
+    content.addEventListener('touchmove', (e) => {
+        if (!state.isPulling) return;
+        state.pullCurrentY = e.touches[0].clientY;
+        const diff = state.pullCurrentY - state.pullStartY;
+        
+        if (diff > 0 && window.scrollY === 0) {
+            const indicator = document.getElementById('pull-indicator');
+            indicator.classList.add('visible');
+            if (diff > 80) {
+                document.getElementById('pull-text').textContent = 'Отпустите для обновления';
+            } else {
+                document.getElementById('pull-text').textContent = 'Потяните для обновления';
+            }
+            content.style.transform = `translateY(${Math.min(diff / 2, 60)}px)`;
+        }
+    }, { passive: true });
+    
+    content.addEventListener('touchend', () => {
+        if (!state.isPulling) return;
+        state.isPulling = false;
+        const diff = state.pullCurrentY - state.pullStartY;
+        const indicator = document.getElementById('pull-indicator');
+        
+        if (diff > 80 && window.scrollY === 0) {
+            document.getElementById('pull-text').textContent = 'Обновление...';
+            setTimeout(() => {
+                renderTab();
+                indicator.classList.remove('visible');
+                content.style.transform = '';
+                showToast('✨ Обновлено');
+            }, 500);
+        } else {
+            indicator.classList.remove('visible');
+            content.style.transform = '';
+        }
+    });
+}
+
+// ============ MINI PLAYER ============
+function setupMiniPlayer() {
+    const miniPlayer = document.getElementById('mini-player');
+    const miniTitle = document.getElementById('mini-title');
+    const miniSub = document.getElementById('mini-sub');
+    const miniPlayBtn = document.getElementById('mini-play-btn');
+    
+    state.audio.addEventListener('play', () => {
+        state.isPlaying = true;
+        miniPlayBtn.innerHTML = icon('pause', 16);
+        if (state.currentLesson && !document.getElementById('audio-modal').classList.contains('active')) {
+            miniPlayer.classList.add('visible');
+            miniTitle.textContent = state.currentLesson.title;
+            miniSub.textContent = state.currentLesson.categoryName || 'Урок';
+        }
+    });
+    
+    state.audio.addEventListener('pause', () => {
+        state.isPlaying = false;
+        miniPlayBtn.innerHTML = icon('play', 16);
+    });
+    
+    state.audio.addEventListener('ended', () => {
+        state.isPlaying = false;
+        miniPlayBtn.innerHTML = icon('play', 16);
+    });
+}
+
+function openFullPlayer() {
+    if (state.currentLesson) {
+        openLesson(state.currentLesson.id);
+    }
+}
+
 // ============ ГЛАВНАЯ ============
 function renderHome() {
     const container = document.getElementById('tab-home');
@@ -830,11 +1200,17 @@ function renderHome() {
     }
     
     const streak = calculateStreak();
+    const quote = getQuoteOfDay();
     
     const recentLessons = [...lessons].sort((a, b) => new Date(b.created || 0) - new Date(a.created || 0)).slice(0, 3);
     const recentBooks = [...books].sort((a, b) => new Date(b.created || 0) - new Date(a.created || 0)).slice(0, 3);
     
     let html = `
+        <div class="quote-card">
+            ${escapeHtml(quote.text)}
+            <div class="quote-author">— ${escapeHtml(quote.author)}</div>
+        </div>
+        
         <div class="gradient-card" style="background: var(--gradient-1); margin-bottom: 16px;">
             <div style="position: relative; z-index: 1;">
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
@@ -975,6 +1351,7 @@ function renderLessonCard(l) {
                 ${icon('clock', 12)} ${formatDuration(l.duration)}
                 ${l.categoryName ? `• ${l.categoryEmoji || ''} ${escapeHtml(l.categoryName)}` : ''}
             </div>
+            ${l.description ? `<div class="card-desc">${escapeHtml(l.description)}</div>` : ''}
             ${pct > 0 && !p?.completed ? `<div class="progress-bar"><div class="progress-fill" style="width: ${pct}%"></div></div>` : ''}
         </div>
     `;
@@ -997,6 +1374,7 @@ function renderBookCard(b) {
                 ${icon('pages', 12)} ${b.pages} стр.
                 ${b.author ? '• ' + escapeHtml(b.author) : ''}
             </div>
+            ${b.description ? `<div class="card-desc">${escapeHtml(b.description)}</div>` : ''}
             ${pct > 0 && !p?.completed ? `<div class="progress-bar"><div class="progress-fill" style="width: ${pct}%"></div></div>` : ''}
         </div>
     `;
@@ -1051,45 +1429,33 @@ function showCategoryMenu(event, id) {
 
 function confirmDeleteLesson(id) {
     const lesson = getLessons().find(l => l.id === id);
-    showConfirm(
-        'Удалить урок?',
-        `Урок "${lesson?.title}" будет удалён.`,
-        () => {
-            DB.set('lessons', getLessons().filter(l => l.id !== id));
-            renderTab();
-            showToast(' Урок удалён');
-        }
-    );
+    showConfirm('Удалить урок?', `Урок "${lesson?.title}" будет удалён.`, () => {
+        DB.set('lessons', getLessons().filter(l => l.id !== id));
+        renderTab();
+        showToast('🗑 Урок удалён');
+    });
 }
 
 function confirmDeleteBook(id) {
     const book = getBooks().find(b => b.id === id);
-    showConfirm(
-        'Удалить книгу?',
-        `Книга "${book?.title}" будет удалена.`,
-        () => {
-            DB.set('books', getBooks().filter(b => b.id !== id));
-            renderTab();
-            showToast('🗑 Книга удалена');
-        }
-    );
+    showConfirm('Удалить книгу?', `Книга "${book?.title}" будет удалена.`, () => {
+        DB.set('books', getBooks().filter(b => b.id !== id));
+        renderTab();
+        showToast('🗑 Книга удалена');
+    });
 }
 
 function confirmDeleteCat(id) {
     const cat = findCategory(id);
     const ids = getAllDescendantIds(id);
-    showConfirm(
-        'Удалить раздел?',
-        `Раздел "${cat?.title}" и всё его содержимое будет удалено.`,
-        () => {
-            DB.set('categories', getCategories().filter(c => !ids.includes(c.id)));
-            DB.set('lessons', getLessons().filter(l => !ids.includes(l.categoryId)));
-            DB.set('books', getBooks().filter(b => !ids.includes(b.categoryId)));
-            state.currentCategory = null;
-            renderTab();
-            showToast('🗑 Раздел удалён');
-        }
-    );
+    showConfirm('Удалить раздел?', `Раздел "${cat?.title}" и всё его содержимое будет удалено.`, () => {
+        DB.set('categories', getCategories().filter(c => !ids.includes(c.id)));
+        DB.set('lessons', getLessons().filter(l => !ids.includes(l.categoryId)));
+        DB.set('books', getBooks().filter(b => !ids.includes(b.categoryId)));
+        state.currentCategory = null;
+        renderTab();
+        showToast('🗑 Раздел удалён');
+    });
 }
 
 // ============ УРОКИ ============
@@ -1131,7 +1497,6 @@ function renderContentList(container, type) {
         </div>
     `;
     
-    // Прогресс по разделам (только для Уроков)
     if (type === 'lesson') {
         const catStats = getCategoryStats();
         if (catStats.length > 0) {
@@ -1192,11 +1557,11 @@ function renderContentList(container, type) {
                     <div class="card" onclick="openCategory(${cat.id})">
                         <button class="card-menu-btn" onclick="event.stopPropagation(); showCategoryMenu(event, ${cat.id})">${icon('moreVertical', 16)}</button>
                         <div class="card-title">
-                            <span style="font-size: 20px;">${cat.emoji || '📂'}</span>
+                            <span style="font-size: 20px;">${cat.emoji || ''}</span>
                             <span style="flex: 1; padding-right: 30px;" class="truncate">${escapeHtml(cat.title)}</span>
                             <span class="badge">${total}</span>
                         </div>
-                        ${cat.description ? `<div class="card-sub">${escapeHtml(cat.description.substring(0, 60))}${cat.description.length > 60 ? '...' : ''}</div>` : ''}
+                        ${cat.description ? `<div class="card-desc">${escapeHtml(cat.description)}</div>` : ''}
                     </div>
                 `;
             });
@@ -1441,6 +1806,7 @@ function openLesson(id) {
     `;
     
     document.getElementById('audio-modal').classList.add('active');
+    document.getElementById('mini-player').classList.remove('visible');
     updateAudioTime();
     updateMediaSession();
 }
@@ -1681,12 +2047,12 @@ function addBookmark() {
     if (existing >= 0) {
         bookmarks.splice(existing, 1);
         DB.set(key, bookmarks);
-        showToast(' Закладка удалена');
+        showToast('🔖 Закладка удалена');
     } else {
         bookmarks.push({ page: state.pdfPage, date: new Date().toISOString() });
         bookmarks.sort((a, b) => a.page - b.page);
         DB.set(key, bookmarks);
-        showToast(' Закладка добавлена');
+        showToast('🔖 Закладка добавлена');
     }
     openBook(state.currentBook.id);
 }
@@ -1725,7 +2091,7 @@ function completeBook() {
     if (!state.currentBook) return;
     saveProgress('book', state.currentBook.id, 100, state.currentBook.pages, true);
     closePdf();
-    showToast('🎉 Книга прочитана!');
+    showToast(' Книга прочитана!');
 }
 
 function closePdf() {
@@ -1875,6 +2241,7 @@ function renderProfile() {
     const h = Math.floor(totalSec / 3600);
     const m = Math.floor((totalSec % 3600) / 60);
     const streak = calculateStreak().count;
+    const currentTheme = state.theme || getSystemTheme();
     
     container.innerHTML = `
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
@@ -1913,6 +2280,10 @@ function renderProfile() {
         
         <div class="card" style="cursor: default; margin-top: 12px;">
             <div class="section-title">${icon('settings', 14)} Настройки</div>
+            <div class="setting-row">
+                <div class="setting-label">${currentTheme === 'dark' ? icon('moon', 18) : icon('sun', 18)}<span>Тёмная тема</span></div>
+                <div class="toggle ${currentTheme === 'dark' ? 'active' : ''}" onclick="toggleTheme()"></div>
+            </div>
             ${state.editorMode ? `
             <div class="setting-row">
                 <div class="setting-label">${icon('shield', 18)}<span>Режим редактора</span></div>
@@ -1932,18 +2303,13 @@ function renderProfile() {
         </div>
         
         <div style="text-align: center; color: var(--text-tertiary); font-size: 12px; margin-top: 20px; padding: 16px;">
-            <div>Уроки и Книги v4.0</div>
+            <div>Уроки и Книги v4.1</div>
             <div style="margin-top: 4px;">Сделано с ❤️</div>
         </div>
     `;
 }
 
 function toggleEditorMode() {
-    // Только для админов
-    if (!state.editorMode) {
-        showToast('🔒 Режим редактора доступен только администраторам');
-        return;
-    }
     state.editorMode = !state.editorMode;
     DB.set('editorMode', state.editorMode);
     updateEditorMode();
@@ -2174,7 +2540,7 @@ function showToast(message) {
     const toast = document.createElement('div');
     toast.className = 'toast';
     toast.style.cssText = `
-        position: fixed; bottom: 100px; left: 50%;
+        position: fixed; bottom: 160px; left: 50%;
         transform: translateX(-50%);
         background: var(--text-primary); color: var(--bg-primary);
         padding: 12px 20px; border-radius: 12px;
