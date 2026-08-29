@@ -1,1251 +1,1131 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Уроки и Книги</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <style>
-        * {
-            -webkit-tap-highlight-color: transparent;
-        }
-        body {
-            overscroll-behavior: none;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .fade-in {
-            animation: fadeIn 0.3s ease-in;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .progress-ring {
-            transform: rotate(-90deg);
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal.active {
-            display: flex;
-        }
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            max-width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 20px;
-        }
-        .category-item:hover {
-            background: #f3f4f6;
-        }
-        .btn-primary {
-            background: #3b82f6;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-        .btn-secondary {
-            background: #e5e7eb;
-            color: #374151;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .btn-secondary:hover {
-            background: #d1d5db;
-        }
-        input, textarea, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #3b82f6;
-        }
-        .heat-cell {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-            margin: 1px;
-        }
-        .heat-0 { background: #ebedf0; }
-        .heat-1 { background: #9be9a8; }
-        .heat-2 { background: #40c463; }
-        .heat-3 { background: #30a14e; }
-        .heat-4 { background: #216e39; }
-        .audio-player {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 16px;
-            padding: 24px;
-            color: white;
-        }
-        .pdf-viewer {
-            background: #525659;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .achievement-card {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            border-radius: 12px;
-            padding: 16px;
-            color: white;
-        }
-        .achievement-card.locked {
-            background: #e5e7eb;
-            color: #9ca3af;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Уроки и Книги</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+body { 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f3f4f6; 
+    overscroll-behavior: none;
+}
+.app { max-width: 500px; margin: 0 auto; background: white; min-height: 100vh; position: relative; padding-bottom: 70px; }
+.header { background: white; border-bottom: 1px solid #e5e7eb; padding: 16px; position: sticky; top: 0; z-index: 10; }
+.header h1 { font-size: 20px; font-weight: 700; }
+.header p { font-size: 13px; color: #6b7280; margin-top: 2px; }
+.content { padding: 16px; }
+.tab { display: none; }
+.tab.active { display: block; }
+.nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; max-width: 500px; margin: 0 auto; display: flex; justify-content: space-around; padding: 8px 0; z-index: 10; }
+.nav-btn { background: none; border: none; padding: 8px 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; color: #6b7280; font-size: 11px; }
+.nav-btn.active { color: #3b82f6; }
+.nav-btn span:first-child { font-size: 22px; margin-bottom: 2px; }
+.card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+.card:hover { background: #f9fafb; }
+.card-title { font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.card-sub { font-size: 13px; color: #6b7280; margin-top: 4px; }
+.progress-bar { background: #e5e7eb; height: 4px; border-radius: 2px; margin-top: 8px; overflow: hidden; }
+.progress-fill { background: #3b82f6; height: 100%; transition: width 0.3s; }
+.btn { padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; width: 100%; margin-bottom: 8px; }
+.btn-primary { background: #3b82f6; color: white; }
+.btn-success { background: #10b981; color: white; }
+.btn-purple { background: #8b5cf6; color: white; }
+.btn-danger { background: #ef4444; color: white; }
+.btn-secondary { background: #e5e7eb; color: #374151; }
+input, textarea, select { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit; margin-bottom: 12px; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: #3b82f6; }
+label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: #374151; }
+.modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; padding: 16px; }
+.modal.active { display: flex; }
+.modal-content { background: white; border-radius: 12px; padding: 20px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; }
+.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+.close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #6b7280; }
+.audio-player { background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 16px; padding: 20px; color: white; }
+.audio-controls { display: flex; justify-content: center; align-items: center; gap: 20px; margin: 20px 0; }
+.audio-controls button { background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
+.play-btn { font-size: 48px !important; }
+.achievement { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #f9fafb; border-radius: 8px; margin-bottom: 8px; }
+.achievement.earned { background: linear-gradient(135deg, #fef3c7, #fde68a); }
+.heat-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.heat-cell { aspect-ratio: 1; border-radius: 2px; background: #ebedf0; }
+.heat-1 { background: #9be9a8; }
+.heat-2 { background: #40c463; }
+.heat-3 { background: #30a14e; }
+.heat-4 { background: #216e39; }
+.ring-container { display: flex; justify-content: center; margin: 20px 0; }
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; text-align: center; }
+.stat-value { font-size: 24px; font-weight: 700; color: #3b82f6; }
+.stat-label { font-size: 12px; color: #6b7280; }
+.editor-tree-item { background: #f9fafb; border-radius: 8px; padding: 10px; margin-bottom: 6px; }
+.editor-actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.editor-actions button { padding: 6px 10px; font-size: 12px; border: none; border-radius: 6px; cursor: pointer; background: #e5e7eb; }
+.editor-actions button:hover { background: #d1d5db; }
+.pdf-viewer { background: #525659; min-height: 400px; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.pdf-controls { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #1f2937; color: white; }
+.pdf-controls button { background: #374151; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+.empty { text-align: center; padding: 40px 20px; color: #9ca3af; }
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.badge { display: inline-block; background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.completed-badge { background: #d1fae5; color: #065f46; }
+</style>
 </head>
-<body class="bg-gray-50">
-    <div id="app" class="max-w-md mx-auto bg-white min-h-screen flex flex-col">
-        <!-- Header -->
-        <header class="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-10">
-            <h1 id="header-title" class="text-xl font-bold text-gray-900">Уроки и Книги</h1>
-            <p id="header-subtitle" class="text-sm text-gray-500">Добро пожаловать!</p>
-        </header>
+<body>
 
-        <!-- Main Content -->
-        <main id="main-content" class="flex-1 overflow-y-auto pb-20">
-            <!-- Уроки -->
-            <div id="tab-lessons" class="tab-content active p-4">
-                <div class="mb-4">
-                    <input type="text" id="search-lessons" placeholder="🔍 Поиск уроков..." class="w-full">
-                </div>
-                <div id="lessons-tree"></div>
-            </div>
-
-            <!-- Книги -->
-            <div id="tab-books" class="tab-content p-4">
-                <div class="mb-4">
-                    <input type="text" id="search-books" placeholder="🔍 Поиск книг..." class="w-full">
-                </div>
-                <div id="books-tree"></div>
-            </div>
-
-            <!-- Прогресс -->
-            <div id="tab-progress" class="tab-content p-4">
-                <div id="progress-content"></div>
-            </div>
-
-            <!-- Профиль -->
-            <div id="tab-profile" class="tab-content p-4">
-                <div id="profile-content"></div>
-            </div>
-
-            <!-- Редактор -->
-            <div id="tab-editor" class="tab-content p-4">
-                <div id="editor-content"></div>
-            </div>
-        </main>
-
-        <!-- Bottom Navigation -->
-        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 max-w-md mx-auto">
-            <div class="flex justify-around items-center">
-                <button onclick="switchTab('lessons')" class="tab-btn flex flex-col items-center p-2" data-tab="lessons">
-                    <span class="text-2xl">🎧</span>
-                    <span class="text-xs mt-1">Уроки</span>
-                </button>
-                <button onclick="switchTab('books')" class="tab-btn flex flex-col items-center p-2" data-tab="books">
-                    <span class="text-2xl">📚</span>
-                    <span class="text-xs mt-1">Книги</span>
-                </button>
-                <button onclick="switchTab('progress')" class="tab-btn flex flex-col items-center p-2" data-tab="progress">
-                    <span class="text-2xl">📊</span>
-                    <span class="text-xs mt-1">Прогресс</span>
-                </button>
-                <button onclick="switchTab('profile')" class="tab-btn flex flex-col items-center p-2" data-tab="profile">
-                    <span class="text-2xl">👤</span>
-                    <span class="text-xs mt-1">Профиль</span>
-                </button>
-                <button id="editor-btn" onclick="switchTab('editor')" class="tab-btn flex flex-col items-center p-2 hidden" data-tab="editor">
-                    <span class="text-2xl">⚙️</span>
-                    <span class="text-xs mt-1">Редактор</span>
-                </button>
-            </div>
-        </nav>
+<div class="app">
+    <div class="header">
+        <h1 id="header-title">Уроки и Книги</h1>
+        <p id="header-sub">Добро пожаловать!</p>
     </div>
 
-    <!-- Модальные окна -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <div id="modal-body"></div>
+    <div class="content">
+        <!-- УРОКИ -->
+        <div id="tab-lessons" class="tab active">
+            <div id="lessons-content"></div>
+        </div>
+
+        <!-- КНИГИ -->
+        <div id="tab-books" class="tab">
+            <div id="books-content"></div>
+        </div>
+
+        <!-- ПРОГРЕСС -->
+        <div id="tab-progress" class="tab">
+            <div id="progress-content"></div>
+        </div>
+
+        <!-- ПРОФИЛЬ -->
+        <div id="tab-profile" class="tab">
+            <div id="profile-content"></div>
+        </div>
+
+        <!-- РЕДАКТОР -->
+        <div id="tab-editor" class="tab">
+            <div id="editor-content"></div>
         </div>
     </div>
 
-    <!-- Аудиоплеер -->
-    <div id="audio-player-modal" class="modal">
-        <div class="modal-content w-full max-w-md">
-            <div id="audio-player-content"></div>
-        </div>
+    <div class="nav">
+        <button class="nav-btn active" onclick="switchTab('lessons')"><span>🎧</span><span>Уроки</span></button>
+        <button class="nav-btn" onclick="switchTab('books')"><span>📚</span><span>Книги</span></button>
+        <button class="nav-btn" onclick="switchTab('progress')"><span>📊</span><span>Прогресс</span></button>
+        <button class="nav-btn" onclick="switchTab('profile')"><span>👤</span><span>Профиль</span></button>
+        <button class="nav-btn" onclick="switchTab('editor')"><span>⚙️</span><span>Редактор</span></button>
     </div>
+</div>
 
-    <!-- PDF читалка -->
-    <div id="pdf-reader-modal" class="modal">
-        <div class="modal-content w-full max-w-4xl h-full max-h-full p-0">
-            <div id="pdf-reader-content"></div>
-        </div>
+<!-- Модалка общая -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div id="modal-body"></div>
     </div>
-
-    <script>
-        // ============ STATE ============
-        const state = {
-            user: null,
-            currentTab: 'lessons',
-            categories: [],
-            progress: {},
-            favorites: [],
-            achievements: [],
-            currentCategory: null,
-            currentLesson: null,
-            currentBook: null,
-            audio: new Audio(),
-            pdfDoc: null,
-            pdfPage: 1
-        };
-
-        // ============ INIT ============
-        const tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.ready();
-            tg.expand();
-        }
-
-        // ============ API ============
-        const API_BASE = window.location.origin;
-
-        async function api(endpoint, options = {}) {
-            const response = await fetch(`${API_BASE}${endpoint}`, {
-                headers: { 'Content-Type': 'application/json' },
-                ...options
-            });
-            return response.json();
-        }
-
-        // ============ AUTH ============
-        async function initUser() {
-            if (tg) {
-                const user = tg.initDataUnsafe?.user;
-                if (user) {
-                    state.user = await api('/api/auth', {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            telegram_id: user.id,
-                            username: user.username,
-                            first_name: user.first_name
-                        })
-                    });
-                    
-                    if (state.user.is_admin) {
-                        document.getElementById('editor-btn').classList.remove('hidden');
-                    }
-                    
-                    updateHeader();
-                    loadCategories();
-                    loadProgress();
-                    loadFavorites();
-                    loadAchievements();
-                }
-            } else {
-                // Для тестирования без Telegram
-                state.user = { id: 1, telegram_id: 123456789, first_name: 'Тест', is_admin: 1 };
-                document.getElementById('editor-btn').classList.remove('hidden');
-                updateHeader();
-                loadCategories();
-                loadProgress();
-                loadFavorites();
-                loadAchievements();
-            }
-        }
-
-        function updateHeader() {
-            document.getElementById('header-subtitle').textContent = `Привет, ${state.user.first_name}!`;
-        }
-
-        // ============ TABS ============
-        function switchTab(tabName) {
-            state.currentTab = tabName;
-            
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById(`tab-${tabName}`).classList.add('active');
-            
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('text-blue-500');
-                btn.classList.add('text-gray-500');
-            });
-            document.querySelector(`[data-tab="${tabName}"]`).classList.remove('text-gray-500');
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add('text-blue-500');
-
-            if (tabName === 'progress') renderProgress();
-            if (tabName === 'profile') renderProfile();
-            if (tabName === 'editor') renderEditor();
-        }
-
-        // ============ CATEGORIES ============
-        async function loadCategories() {
-            state.categories = await api('/api/categories/tree');
-            renderLessonsTree();
-            renderBooksTree();
-        }
-
-        function renderLessonsTree() {
-            const container = document.getElementById('lessons-tree');
-            container.innerHTML = renderCategoryTree(state.categories, 'lesson');
-        }
-
-        function renderBooksTree() {
-            const container = document.getElementById('books-tree');
-            container.innerHTML = renderCategoryTree(state.categories, 'book');
-        }
-
-        function renderCategoryTree(categories, contentType) {
-            if (!categories || categories.length === 0) {
-                return '<p class="text-gray-500 text-center py-8">Нет контента</p>';
-            }
-
-            return categories.map(cat => `
-                <div class="mb-2">
-                    <div class="category-item bg-white rounded-lg p-4 border border-gray-200 cursor-pointer" 
-                         onclick="openCategory(${cat.id}, '${contentType}')">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <span class="text-2xl mr-3">${cat.emoji || '📂'}</span>
-                                <div>
-                                    <h3 class="font-semibold text-gray-900">${cat.title}</h3>
-                                    <p class="text-sm text-gray-500">${cat.description || ''}</p>
-                                </div>
-                            </div>
-                            <span class="text-gray-400">→</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        async function openCategory(categoryId, contentType) {
-            const category = findCategory(state.categories, categoryId);
-            if (!category) return;
-
-            state.currentCategory = category;
-            
-            const lessons = await api(`/api/categories/${categoryId}/lessons`);
-            const books = await api(`/api/categories/${categoryId}/books`);
-
-            const modal = document.getElementById('modal');
-            const modalBody = document.getElementById('modal-body');
-
-            let content = `
-                <div class="fade-in">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-bold">${category.emoji || '📂'} ${category.title}</h2>
-                        <button onclick="closeModal()" class="text-2xl text-gray-400">×</button>
-                    </div>
-                    ${category.description ? `<p class="text-gray-600 mb-4">${category.description}</p>` : ''}
-            `;
-
-            if (contentType === 'lesson' || contentType === 'all') {
-                if (lessons.length > 0) {
-                    content += `
-                        <h3 class="font-semibold text-gray-700 mb-2">🎧 Уроки</h3>
-                        <div class="space-y-2 mb-4">
-                            ${lessons.map(lesson => {
-                                const progress = state.progress[`lesson_${lesson.id}`];
-                                const percent = progress ? progress.progress_percent : 0;
-                                const completed = progress?.is_completed;
-                                return `
-                                    <div class="bg-gray-50 rounded-lg p-3 cursor-pointer hover:bg-gray-100" 
-                                         onclick="openLesson(${lesson.id})">
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex-1">
-                                                <h4 class="font-medium">${lesson.title}</h4>
-                                                <p class="text-sm text-gray-500">⏱ ${formatDuration(lesson.duration)}</p>
-                                            </div>
-                                            <div class="text-right">
-                                                ${completed ? '<span class="text-green-500 text-xl">✓</span>' : 
-                                                  percent > 0 ? `<span class="text-sm text-blue-500">${Math.round(percent)}%</span>` : ''}
-                                            </div>
-                                        </div>
-                                        ${percent > 0 && !completed ? `
-                                            <div class="mt-2 bg-gray-200 rounded-full h-1">
-                                                <div class="bg-blue-500 h-1 rounded-full" style="width: ${percent}%"></div>
-                                            </div>
-                                        ` : ''}
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    `;
-                }
-            }
-
-            if (contentType === 'book' || contentType === 'all') {
-                if (books.length > 0) {
-                    content += `
-                        <h3 class="font-semibold text-gray-700 mb-2">📚 Книги</h3>
-                        <div class="space-y-2">
-                            ${books.map(book => {
-                                const progress = state.progress[`book_${book.id}`];
-                                const percent = progress ? progress.progress_percent : 0;
-                                const completed = progress?.is_completed;
-                                return `
-                                    <div class="bg-gray-50 rounded-lg p-3 cursor-pointer hover:bg-gray-100" 
-                                         onclick="openBook(${book.id})">
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex-1">
-                                                <h4 class="font-medium">${book.title}</h4>
-                                                <p class="text-sm text-gray-500">${book.author || ''} • 📄 ${book.pages} стр.</p>
-                                            </div>
-                                            <div class="text-right">
-                                                ${completed ? '<span class="text-green-500 text-xl">✓</span>' : 
-                                                  percent > 0 ? `<span class="text-sm text-blue-500">${Math.round(percent)}%</span>` : ''}
-                                            </div>
-                                        </div>
-                                        ${percent > 0 && !completed ? `
-                                            <div class="mt-2 bg-gray-200 rounded-full h-1">
-                                                <div class="bg-blue-500 h-1 rounded-full" style="width: ${percent}%"></div>
-                                            </div>
-                                        ` : ''}
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    `;
-                }
-            }
-
-            if (category.children && category.children.length > 0) {
-                content += `
-                    <h3 class="font-semibold text-gray-700 mb-2">📂 Подразделы</h3>
-                    <div class="space-y-2">
-                        ${category.children.map(child => `
-                            <div class="bg-gray-50 rounded-lg p-3 cursor-pointer hover:bg-gray-100" 
-                                 onclick="openCategory(${child.id}, '${contentType}')">
-                                <div class="flex items-center">
-                                    <span class="text-xl mr-2">${child.emoji || '📂'}</span>
-                                    <div>
-                                        <h4 class="font-medium">${child.title}</h4>
-                                        <p class="text-sm text-gray-500">${child.description || ''}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-
-            content += '</div>';
-            modalBody.innerHTML = content;
-            modal.classList.add('active');
-        }
-
-        function findCategory(categories, id) {
-            for (const cat of categories) {
-                if (cat.id === id) return cat;
-                if (cat.children) {
-                    const found = findCategory(cat.children, id);
-                    if (found) return found;
-                }
-            }
-            return null;
-        }
-
-        // ============ LESSON PLAYER ============
-        async function openLesson(lessonId) {
-            const lessons = await api(`/api/categories/${state.currentCategory.id}/lessons`);
-            const lesson = lessons.find(l => l.id === lessonId);
-            if (!lesson) return;
-
-            state.currentLesson = lesson;
-            state.audio.src = lesson.audio_url;
-
-            const progress = state.progress[`lesson_${lessonId}`];
-            if (progress) {
-                state.audio.currentTime = progress.position;
-            }
-
-            const modal = document.getElementById('audio-player-modal');
-            const content = document.getElementById('audio-player-content');
-
-            content.innerHTML = `
-                <div class="audio-player">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-bold">${lesson.title}</h2>
-                        <button onclick="closeAudioPlayer()" class="text-2xl">×</button>
-                    </div>
-                    ${lesson.description ? `<p class="text-white/80 mb-4">${lesson.description}</p>` : ''}
-                    
-                    <div class="mb-4">
-                        <div class="flex justify-between text-sm mb-2">
-                            <span id="current-time">0:00</span>
-                            <span id="total-time">${formatDuration(lesson.duration)}</span>
-                        </div>
-                        <input type="range" id="audio-seek" min="0" max="${lesson.duration}" value="0" 
-                               class="w-full" onchange="seekAudio(this.value)">
-                    </div>
-
-                    <div class="flex justify-center items-center space-x-6 mb-4">
-                        <button onclick="skipAudio(-15)" class="text-3xl">⏪</button>
-                        <button onclick="toggleAudio()" id="play-btn" class="text-5xl">▶️</button>
-                        <button onclick="skipAudio(15)" class="text-3xl">⏩</button>
-                    </div>
-
-                    <div class="flex justify-center space-x-4">
-                        <button onclick="toggleFavorite('lesson', ${lesson.id})" 
-                                class="bg-white/20 px-4 py-2 rounded-lg">
-                            ❤️ В избранное
-                        </button>
-                        <button onclick="completeLesson(${lesson.id})" 
-                                class="bg-white/20 px-4 py-2 rounded-lg">
-                            ✓ Завершить
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            modal.classList.add('active');
-            updateAudioUI();
-        }
-
-        function toggleAudio() {
-            if (state.audio.paused) {
-                state.audio.play();
-                document.getElementById('play-btn').textContent = '⏸️';
-            } else {
-                state.audio.pause();
-                document.getElementById('play-btn').textContent = '▶️';
-            }
-        }
-
-        function seekAudio(time) {
-            state.audio.currentTime = time;
-            updateAudioUI();
-        }
-
-        function skipAudio(seconds) {
-            state.audio.currentTime += seconds;
-            updateAudioUI();
-        }
-
-        function updateAudioUI() {
-            const currentTime = Math.floor(state.audio.currentTime);
-            const duration = state.audio.duration || 0;
-            
-            document.getElementById('current-time').textContent = formatDuration(currentTime);
-            document.getElementById('audio-seek').value = currentTime;
-
-            // Сохраняем прогресс
-            if (state.currentLesson && duration > 0) {
-                const percent = (currentTime / duration) * 100;
-                saveProgress('lesson', state.currentLesson.id, percent, currentTime, false);
-            }
-        }
-
-        state.audio.addEventListener('timeupdate', updateAudioUI);
-
-        async function completeLesson(lessonId) {
-            await saveProgress('lesson', lessonId, 100, state.currentLesson.duration, true);
-            closeAudioPlayer();
-            checkAchievements();
-        }
-
-        function closeAudioPlayer() {
-            state.audio.pause();
-            document.getElementById('audio-player-modal').classList.remove('active');
-        }
-
-        // ============ PDF READER ============
-        async function openBook(bookId) {
-            const books = await api(`/api/categories/${state.currentCategory.id}/books`);
-            const book = books.find(b => b.id === bookId);
-            if (!book) return;
-
-            state.currentBook = book;
-
-            const progress = state.progress[`book_${bookId}`];
-            state.pdfPage = progress ? progress.position : 1;
-
-            const modal = document.getElementById('pdf-reader-modal');
-            const content = document.getElementById('pdf-reader-content');
-
-            content.innerHTML = `
-                <div class="h-screen flex flex-col bg-gray-800">
-                    <div class="bg-gray-900 text-white p-4 flex items-center justify-between">
-                        <div>
-                            <h2 class="font-bold">${book.title}</h2>
-                            <p class="text-sm text-gray-400">${book.author || ''}</p>
-                        </div>
-                        <button onclick="closePdfReader()" class="text-2xl">×</button>
-                    </div>
-                    
-                    <div id="pdf-container" class="flex-1 overflow-auto flex items-center justify-center p-4">
-                        <canvas id="pdf-canvas"></canvas>
-                    </div>
-
-                    <div class="bg-gray-900 text-white p-4 flex items-center justify-between">
-                        <button onclick="prevPage()" class="px-4 py-2 bg-gray-700 rounded">← Назад</button>
-                        <div class="text-center">
-                            <span id="pdf-page-num">${state.pdfPage}</span> / <span id="pdf-page-total">${book.pages}</span>
-                        </div>
-                        <button onclick="nextPage()" class="px-4 py-2 bg-gray-700 rounded">Вперёд →</button>
-                    </div>
-
-                    <div class="bg-gray-900 p-4 flex justify-center space-x-4">
-                        <button onclick="toggleFavorite('book', ${book.id})" 
-                                class="bg-gray-700 text-white px-4 py-2 rounded">
-                            ❤️ В избранное
-                        </button>
-                        <button onclick="completeBook(${book.id})" 
-                                class="bg-gray-700 text-white px-4 py-2 rounded">
-                            ✓ Прочитано
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            modal.classList.add('active');
-            await loadPdf(book.pdf_url);
-        }
-
-        async function loadPdf(url) {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-            
-            state.pdfDoc = await pdfjsLib.getDocument(url).promise;
-            document.getElementById('pdf-page-total').textContent = state.pdfDoc.numPages;
-            renderPdfPage();
-        }
-
-        async function renderPdfPage() {
-            const page = await state.pdfDoc.getPage(state.pdfPage);
-            const viewport = page.getViewport({ scale: 1.5 });
-            
-            const canvas = document.getElementById('pdf-canvas');
-            const context = canvas.getContext('2d');
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-
-            await page.render({
-                canvasContext: context,
-                viewport: viewport
-            }).promise;
-
-            document.getElementById('pdf-page-num').textContent = state.pdfPage;
-
-            // Сохраняем прогресс
-            if (state.currentBook) {
-                const percent = (state.pdfPage / state.currentBook.pages) * 100;
-                saveProgress('book', state.currentBook.id, percent, state.pdfPage, false);
-            }
-        }
-
-        function nextPage() {
-            if (state.pdfPage < state.pdfDoc.numPages) {
-                state.pdfPage++;
-                renderPdfPage();
-            }
-        }
-
-        function prevPage() {
-            if (state.pdfPage > 1) {
-                state.pdfPage--;
-                renderPdfPage();
-            }
-        }
-
-        async function completeBook(bookId) {
-            await saveProgress('book', bookId, 100, state.currentBook.pages, true);
-            closePdfReader();
-            checkAchievements();
-        }
-
-        function closePdfReader() {
-            document.getElementById('pdf-reader-modal').classList.remove('active');
-            state.pdfDoc = null;
-        }
-
-        // ============ PROGRESS ============
-        async function loadProgress() {
-            if (!state.user) return;
-            const progress = await api(`/api/progress/${state.user.id}`);
-            progress.forEach(p => {
-                state.progress[`${p.content_type}_${p.content_id}`] = p;
-            });
-        }
-
-        async function saveProgress(contentType, contentId, percent, position, completed) {
-            if (!state.user) return;
-
-            await api('/api/progress', {
-                method: 'POST',
-                body: JSON.stringify({
-                    user_id: state.user.id,
-                    content_type: contentType,
-                    content_id: contentId,
-                    progress_percent: percent,
-                    position: position,
-                    is_completed: completed
-                })
-            });
-
-            state.progress[`${contentType}_${contentId}`] = {
-                progress_percent: percent,
-                position: position,
-                is_completed: completed
-            };
-
-            if (completed) {
-                checkAchievements();
-            }
-        }
-
-        function renderProgress() {
-            const container = document.getElementById('progress-content');
-            
-            const totalLessons = Object.values(state.progress).filter(p => p.content_type === 'lesson').length;
-            const totalBooks = Object.values(state.progress).filter(p => p.content_type === 'book').length;
-            const completedLessons = Object.values(state.progress).filter(p => p.content_type === 'lesson' && p.is_completed).length;
-            const completedBooks = Object.values(state.progress).filter(p => p.content_type === 'book' && p.is_completed).length;
-            
-            const avgProgress = Object.values(state.progress).reduce((sum, p) => sum + p.progress_percent, 0) / 
-                               Math.max(Object.values(state.progress).length, 1);
-
-            container.innerHTML = `
-                <div class="fade-in">
-                    <div class="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-6 text-white mb-6">
-                        <h2 class="text-2xl font-bold mb-4">🏆 Общий прогресс</h2>
-                        
-                        <div class="flex justify-center mb-4">
-                            <svg width="150" height="150" class="progress-ring">
-                                <circle cx="75" cy="75" r="60" stroke="rgba(255,255,255,0.2)" stroke-width="12" fill="none"/>
-                                <circle cx="75" cy="75" r="60" stroke="white" stroke-width="12" fill="none"
-                                        stroke-dasharray="${2 * Math.PI * 60}"
-                                        stroke-dashoffset="${2 * Math.PI * 60 * (1 - avgProgress / 100)}"
-                                        stroke-linecap="round"/>
-                                <text x="75" y="75" text-anchor="middle" dy=".3em" 
-                                      font-size="24" font-weight="bold" fill="white"
-                                      transform="rotate(90 75 75)">${Math.round(avgProgress)}%</text>
-                            </svg>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4 text-center">
-                            <div>
-                                <div class="text-3xl font-bold">${completedLessons}</div>
-                                <div class="text-sm opacity-80">Уроков</div>
-                            </div>
-                            <div>
-                                <div class="text-3xl font-bold">${completedBooks}</div>
-                                <div class="text-sm opacity-80">Книг</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-xl p-4 border border-gray-200 mb-6">
-                        <h3 class="font-bold text-lg mb-3">📈 Активность</h3>
-                        <div class="grid grid-cols-7 gap-1">
-                            ${generateHeatmap()}
-                        </div>
-                        <div class="flex justify-between text-xs text-gray-500 mt-2">
-                            <span>Пн</span>
-                            <span>Вт</span>
-                            <span>Ср</span>
-                            <span>Чт</span>
-                            <span>Пт</span>
-                            <span>Сб</span>
-                            <span>Вс</span>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-xl p-4 border border-gray-200">
-                        <h3 class="font-bold text-lg mb-3">🎖 Достижения</h3>
-                        <div class="space-y-2">
-                            ${renderAchievementsList()}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function generateHeatmap() {
-            const cells = [];
-            for (let i = 0; i < 28; i++) {
-                const level = Math.floor(Math.random() * 5);
-                cells.push(`<div class="heat-cell heat-${level}"></div>`);
-            }
-            return cells.join('');
-        }
-
-        function renderAchievementsList() {
-            const allAchievements = [
-                { type: 'first_lesson', title: '🌱 Первые шаги', condition: 'Пройти 1 урок' },
-                { type: 'first_book', title: '📖 Первая книга', condition: 'Завершить 1 книгу' },
-                { type: 'ten_lessons', title: '🎯 Десятка', condition: 'Завершить 10 уроков' },
-                { type: 'five_books', title: '📚 Книжный червь', condition: 'Прочитать 5 книг' },
-                { type: 'hour_listened', title: '⏱ Час знаний', condition: '1 час прослушано' }
-            ];
-
-            return allAchievements.map(ach => {
-                const earned = state.achievements.find(a => a.achievement_type === ach.type);
+</div>
+
+<!-- Аудиоплеер -->
+<div id="audio-modal" class="modal">
+    <div class="modal-content" style="padding: 0; overflow: hidden;">
+        <div id="audio-body"></div>
+    </div>
+</div>
+
+<!-- PDF ридер -->
+<div id="pdf-modal" class="modal">
+    <div class="modal-content" style="padding: 0; overflow: hidden; max-width: 100%; max-height: 100vh;">
+        <div id="pdf-body"></div>
+    </div>
+</div>
+
+<audio id="audio-player"></audio>
+
+<script>
+// ============ LOCALSTORAGE ХРАНИЛИЩЕ ============
+const DB = {
+    get(key, def = []) {
+        try { return JSON.parse(localStorage.getItem('la_' + key)) || def; }
+        catch { return def; }
+    },
+    set(key, val) {
+        localStorage.setItem('la_' + key, JSON.stringify(val));
+    },
+    nextId(key) {
+        const items = this.get(key);
+        return items.length ? Math.max(...items.map(i => i.id)) + 1 : 1;
+    }
+};
+
+// ============ СОСТОЯНИЕ ============
+const state = {
+    user: null,
+    currentTab: 'lessons',
+    currentCategory: null,
+    currentLesson: null,
+    currentBook: null,
+    audio: document.getElementById('audio-player'),
+    pdfDoc: null,
+    pdfPage: 1
+};
+
+// ============ ИНИЦИАЛИЗАЦИЯ ============
+function init() {
+    let user = DB.get('user', null);
+    if (!user) {
+        const name = prompt('Как тебя зовут?') || 'Пользователь';
+        user = { id: 1, name: name, created: new Date().toISOString() };
+        DB.set('user', user);
+    }
+    state.user = user;
+    document.getElementById('header-sub').textContent = `Привет, ${user.name}!`;
+    renderTab();
+}
+
+// ============ НАВИГАЦИЯ ============
+function switchTab(tab) {
+    state.currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach((b, i) => {
+        b.classList.toggle('active', ['lessons','books','progress','profile','editor'][i] === tab);
+    });
+    renderTab();
+}
+
+function renderTab() {
+    if (state.currentTab === 'lessons') renderLessons();
+    if (state.currentTab === 'books') renderBooks();
+    if (state.currentTab === 'progress') renderProgress();
+    if (state.currentTab === 'profile') renderProfile();
+    if (state.currentTab === 'editor') renderEditor();
+}
+
+// ============ УТИЛИТЫ ============
+function formatDuration(sec) {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function getProgress(type, id) {
+    const all = DB.get('progress');
+    return all.find(p => p.type === type && p.contentId === id);
+}
+
+function saveProgress(type, id, percent, position, completed) {
+    const all = DB.get('progress');
+    const idx = all.findIndex(p => p.type === type && p.contentId === id);
+    const data = {
+        type, contentId: id, percent, position,
+        completed: completed || false,
+        lastAccess: new Date().toISOString(),
+        date: new Date().toISOString().split('T')[0]
+    };
+    if (idx >= 0) all[idx] = { ...all[idx], ...data };
+    else all.push(data);
+    DB.set('progress', all);
+    checkAchievements();
+}
+
+function isFavorite(type, id) {
+    return DB.get('favorites').some(f => f.type === type && f.contentId === id);
+}
+
+function toggleFavorite(type, id) {
+    let favs = DB.get('favorites');
+    const idx = favs.findIndex(f => f.type === type && f.contentId === id);
+    if (idx >= 0) favs.splice(idx, 1);
+    else favs.push({ type, contentId: id, added: new Date().toISOString() });
+    DB.set('favorites', favs);
+}
+
+// ============ КАТЕГОРИИ / ДЕРЕВО ============
+function getCategories() { return DB.get('categories'); }
+function getLessons() { return DB.get('lessons'); }
+function getBooks() { return DB.get('books'); }
+
+function buildTree(parentId = null) {
+    const cats = getCategories();
+    return cats
+        .filter(c => (c.parentId || null) === parentId)
+        .sort((a, b) => (a.order || 0) - (b.order || 0))
+        .map(c => ({
+            ...c,
+            children: buildTree(c.id),
+            lessons: getLessons().filter(l => l.categoryId === c.id),
+            books: getBooks().filter(b => b.categoryId === c.id)
+        }));
+}
+
+function findCategory(id) {
+    return getCategories().find(c => c.id === id);
+}
+
+function getAllDescendantIds(catId) {
+    const cats = getCategories();
+    const result = [catId];
+    const children = cats.filter(c => c.parentId === catId);
+    children.forEach(ch => result.push(...getAllDescendantIds(ch.id)));
+    return result;
+}
+
+function getCategoryPath(catId) {
+    const path = [];
+    let cur = findCategory(catId);
+    while (cur) {
+        path.unshift(cur);
+        cur = cur.parentId ? findCategory(cur.parentId) : null;
+    }
+    return path;
+}
+
+// ============ РЕНДЕР УРОКОВ ============
+function renderLessons() {
+    const container = document.getElementById('lessons-content');
+    if (state.currentCategory) {
+        renderCategoryView(container, 'lesson');
+    } else {
+        renderRootList(container, 'lesson');
+    }
+}
+
+function renderBooks() {
+    const container = document.getElementById('books-content');
+    if (state.currentCategory) {
+        renderCategoryView(container, 'book');
+    } else {
+        renderRootList(container, 'book');
+    }
+}
+
+function renderRootList(container, type) {
+    const tree = buildTree(null);
+    const title = type === 'lesson' ? '🎧 Уроки' : '📚 Книги';
+    
+    // Избранное
+    const favs = DB.get('favorites').filter(f => f.type === type);
+    
+    let html = `<h2 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">${title}</h2>`;
+    
+    if (favs.length > 0) {
+        html += `<div class="card" onclick="showFavorites('${type}')" style="background: linear-gradient(135deg, #fef3c7, #fde68a);">
+            <div class="card-title">❤️ Избранное <span class="badge">${favs.length}</span></div>
+        </div>`;
+    }
+    
+    if (tree.length === 0) {
+        html += `<div class="empty"><div class="empty-icon">📭</div>Пока нет разделов.<br>Перейди в Редактор, чтобы создать.</div>`;
+    } else {
+        html += renderTreeList(tree, type);
+    }
+    
+    container.innerHTML = html;
+}
+
+function renderTreeList(tree, type, depth = 0) {
+    return tree.map(cat => {
+        const items = type === 'lesson' ? cat.lessons : cat.books;
+        const totalItems = countItemsInTree(cat, type);
+        const indent = depth * 16;
+        return `
+            <div class="card" style="margin-left: ${indent}px;" onclick="openCategory(${cat.id}, '${type}')">
+                <div class="card-title">${cat.emoji || '📂'} ${escapeHtml(cat.title)}</div>
+                <div class="card-sub">${totalItems} ${type === 'lesson' ? 'уроков' : 'книг'}${cat.children.length ? ` • ${cat.children.length} подразделов` : ''}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function countItemsInTree(cat, type) {
+    let count = (type === 'lesson' ? cat.lessons : cat.books).length;
+    cat.children.forEach(ch => count += countItemsInTree(ch, type));
+    return count;
+}
+
+function openCategory(id, type) {
+    state.currentCategory = id;
+    renderTab();
+}
+
+function renderCategoryView(container, type) {
+    const cat = findCategory(state.currentCategory);
+    if (!cat) { state.currentCategory = null; renderTab(); return; }
+    
+    const path = getCategoryPath(cat.id);
+    const lessons = getLessons().filter(l => l.categoryId === cat.id);
+    const books = getBooks().filter(b => b.categoryId === cat.id);
+    const subcats = getCategories().filter(c => c.parentId === cat.id);
+    
+    let html = `
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <button onclick="goBack()" style="background: none; border: none; font-size: 20px; cursor: pointer;">←</button>
+            <div style="font-size: 13px; color: #6b7280;">
+                ${path.map(p => escapeHtml(p.title)).join(' / ')}
+            </div>
+        </div>
+        <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">${cat.emoji || '📂'} ${escapeHtml(cat.title)}</h2>
+        ${cat.description ? `<p style="color: #6b7280; font-size: 14px; margin-bottom: 16px;">${escapeHtml(cat.description)}</p>` : '<div style="height: 16px;"></div>'}
+    `;
+    
+    if (type === 'lesson' || type === 'all') {
+        if (lessons.length > 0) {
+            html += `<h3 style="font-size: 14px; font-weight: 600; color: #6b7280; margin: 12px 0 8px;">🎧 УРОКИ</h3>`;
+            html += lessons.map(l => {
+                const p = getProgress('lesson', l.id);
+                const pct = p ? p.percent : 0;
+                const fav = isFavorite('lesson', l.id);
                 return `
-                    <div class="flex items-center justify-between p-3 ${earned ? 'bg-green-50' : 'bg-gray-50'} rounded-lg">
-                        <div>
-                            <div class="font-medium">${ach.title}</div>
-                            <div class="text-sm text-gray-500">${ach.condition}</div>
+                    <div class="card" onclick="openLesson(${l.id})">
+                        <div class="card-title">
+                            ${escapeHtml(l.title)}
+                            ${p?.completed ? '<span class="badge completed-badge">✓</span>' : ''}
+                            ${fav ? '❤️' : ''}
                         </div>
-                        ${earned ? '<span class="text-2xl">✅</span>' : '<span class="text-2xl">🔒</span>'}
+                        <div class="card-sub">⏱ ${formatDuration(l.duration)}${p && !p.completed ? ` • ${Math.round(pct)}%` : ''}</div>
+                        ${pct > 0 && !p?.completed ? `<div class="progress-bar"><div class="progress-fill" style="width: ${pct}%"></div></div>` : ''}
                     </div>
                 `;
             }).join('');
         }
+    }
+    
+    if (type === 'book' || type === 'all') {
+        if (books.length > 0) {
+            html += `<h3 style="font-size: 14px; font-weight: 600; color: #6b7280; margin: 12px 0 8px;">📚 КНИГИ</h3>`;
+            html += books.map(b => {
+                const p = getProgress('book', b.id);
+                const pct = p ? p.percent : 0;
+                const fav = isFavorite('book', b.id);
+                return `
+                    <div class="card" onclick="openBook(${b.id})">
+                        <div class="card-title">
+                            ${escapeHtml(b.title)}
+                            ${p?.completed ? '<span class="badge completed-badge">✓</span>' : ''}
+                            ${fav ? '❤️' : ''}
+                        </div>
+                        <div class="card-sub">${b.author ? escapeHtml(b.author) + ' • ' : ''}📄 ${b.pages} стр.${p && !p.completed ? ` • ${Math.round(pct)}%` : ''}</div>
+                        ${pct > 0 && !p?.completed ? `<div class="progress-bar"><div class="progress-fill" style="width: ${pct}%"></div></div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+    
+    if (subcats.length > 0) {
+        html += `<h3 style="font-size: 14px; font-weight: 600; color: #6b7280; margin: 12px 0 8px;">📂 ПОДРАЗДЕЛЫ</h3>`;
+        const subTree = subcats.map(c => ({
+            ...c,
+            children: buildTree(c.id).map(ch => ({...ch, lessons: getLessons().filter(l => l.categoryId === ch.id), books: getBooks().filter(b => b.categoryId === ch.id)})),
+            lessons: getLessons().filter(l => l.categoryId === c.id),
+            books: getBooks().filter(b => b.categoryId === c.id)
+        }));
+        html += renderTreeList(subTree, type, 0);
+    }
+    
+    if (lessons.length === 0 && books.length === 0 && subcats.length === 0) {
+        html += `<div class="empty"><div class="empty-icon">📭</div>Раздел пуст</div>`;
+    }
+    
+    container.innerHTML = html;
+}
 
-        // ============ PROFILE ============
-        function renderProfile() {
-            const container = document.getElementById('profile-content');
+function goBack() {
+    const cat = findCategory(state.currentCategory);
+    state.currentCategory = cat?.parentId || null;
+    renderTab();
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// ============ ИЗБРАННОЕ ============
+function showFavorites(type) {
+    const favs = DB.get('favorites').filter(f => f.type === type);
+    const items = type === 'lesson' ? getLessons() : getBooks();
+    const favItems = favs.map(f => items.find(i => i.id === f.contentId)).filter(Boolean);
+    
+    const title = type === 'lesson' ? '❤️ Избранные уроки' : '❤️ Избранные книги';
+    let html = `
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <button onclick="renderTab()" style="background: none; border: none; font-size: 20px; cursor: pointer;">←</button>
+            <h2 style="font-size: 18px; font-weight: 700;">${title}</h2>
+        </div>
+    `;
+    
+    if (favItems.length === 0) {
+        html += `<div class="empty"><div class="empty-icon">💔</div>Нет избранных</div>`;
+    } else {
+        favItems.forEach(item => {
+            const p = getProgress(type, item.id);
+            const pct = p ? p.percent : 0;
+            html += `
+                <div class="card" onclick="${type === 'lesson' ? `openLesson(${item.id})` : `openBook(${item.id})`}">
+                    <div class="card-title">${escapeHtml(item.title)} ${p?.completed ? '<span class="badge completed-badge">✓</span>' : ''}</div>
+                    <div class="card-sub">${type === 'lesson' ? '⏱ ' + formatDuration(item.duration) : '📄 ' + item.pages + ' стр.'}</div>
+                    ${pct > 0 && !p?.completed ? `<div class="progress-bar"><div class="progress-fill" style="width: ${pct}%"></div></div>` : ''}
+                </div>
+            `;
+        });
+    }
+    
+    document.getElementById(state.currentTab === 'lessons' ? 'lessons-content' : 'books-content').innerHTML = html;
+}
+
+// ============ АУДИОПЛЕЕР ============
+function openLesson(id) {
+    const lesson = getLessons().find(l => l.id === id);
+    if (!lesson) return;
+    state.currentLesson = lesson;
+    
+    const p = getProgress('lesson', id);
+    state.audio.src = lesson.audioUrl;
+    if (p) state.audio.currentTime = p.position || 0;
+    
+    const fav = isFavorite('lesson', id);
+    
+    document.getElementById('audio-body').innerHTML = `
+        <div class="audio-player">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 style="font-size: 18px; font-weight: 700;">${escapeHtml(lesson.title)}</h2>
+                <button onclick="closeAudio()" style="background: none; border: none; color: white; font-size: 28px; cursor: pointer;">×</button>
+            </div>
+            ${lesson.description ? `<p style="opacity: 0.9; margin-bottom: 16px; font-size: 14px;">${escapeHtml(lesson.description)}</p>` : ''}
+            <div style="margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+                    <span id="cur-time">0:00</span>
+                    <span>${formatDuration(lesson.duration)}</span>
+                </div>
+                <input type="range" id="seek" min="0" max="${lesson.duration}" value="0" 
+                       style="width: 100%; margin: 0;" oninput="seekAudio(this.value)">
+            </div>
+            <div class="audio-controls">
+                <button onclick="skipAudio(-15)">⏪</button>
+                <button class="play-btn" id="play-btn" onclick="togglePlay()">▶️</button>
+                <button onclick="skipAudio(15)">⏩</button>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="handleFav('lesson', ${id})" class="btn" style="background: rgba(255,255,255,0.2); color: white; margin: 0;">
+                    ${fav ? '💔 Убрать' : '❤️ В избранное'}
+                </button>
+                <button onclick="completeLesson()" class="btn" style="background: rgba(255,255,255,0.2); color: white; margin: 0;">
+                    ✓ Завершить
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('audio-modal').classList.add('active');
+    updateAudioTime();
+}
+
+function togglePlay() {
+    if (state.audio.paused) {
+        state.audio.play().catch(e => alert('Не удалось воспроизвести. Возможно, ссылка недоступна или нужен HTTP-сервер (не file://).'));
+        document.getElementById('play-btn').textContent = '⏸️';
+    } else {
+        state.audio.pause();
+        document.getElementById('play-btn').textContent = '▶️';
+    }
+}
+
+function seekAudio(v) {
+    state.audio.currentTime = parseFloat(v);
+}
+
+function skipAudio(sec) {
+    state.audio.currentTime = Math.max(0, state.audio.currentTime + sec);
+}
+
+function updateAudioTime() {
+    const ct = document.getElementById('cur-time');
+    const seek = document.getElementById('seek');
+    if (ct) ct.textContent = formatDuration(state.audio.currentTime);
+    if (seek && !seek.matches(':active')) seek.value = state.audio.currentTime;
+    
+    if (state.currentLesson && state.audio.duration) {
+        const pct = (state.audio.currentTime / state.audio.duration) * 100;
+        saveProgress('lesson', state.currentLesson.id, pct, state.audio.currentTime, false);
+    }
+}
+
+state.audio.addEventListener('timeupdate', updateAudioTime);
+state.audio.addEventListener('ended', () => {
+    if (state.currentLesson) {
+        saveProgress('lesson', state.currentLesson.id, 100, state.currentLesson.duration, true);
+        document.getElementById('play-btn').textContent = '▶️';
+    }
+});
+
+function completeLesson() {
+    if (!state.currentLesson) return;
+    saveProgress('lesson', state.currentLesson.id, 100, state.currentLesson.duration, true);
+    closeAudio();
+    alert('🎉 Урок завершён!');
+}
+
+function closeAudio() {
+    state.audio.pause();
+    document.getElementById('audio-modal').classList.remove('active');
+    renderTab();
+}
+
+// ============ PDF РИДЕР ============
+async function openBook(id) {
+    const book = getBooks().find(b => b.id === id);
+    if (!book) return;
+    state.currentBook = book;
+    
+    const p = getProgress('book', id);
+    state.pdfPage = p ? (p.position || 1) : 1;
+    
+    const fav = isFavorite('book', id);
+    
+    document.getElementById('pdf-body').innerHTML = `
+        <div style="display: flex; flex-direction: column; height: 100vh;">
+            <div style="padding: 12px; background: #1f2937; color: white; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-weight: 700;">${escapeHtml(book.title)}</div>
+                    <div style="font-size: 12px; opacity: 0.7;">${book.author ? escapeHtml(book.author) : ''}</div>
+                </div>
+                <button onclick="closePdf()" style="background: none; border: none; color: white; font-size: 28px; cursor: pointer;">×</button>
+            </div>
+            <div class="pdf-viewer" id="pdf-viewer" style="flex: 1; overflow: auto;">
+                <canvas id="pdf-canvas"></canvas>
+            </div>
+            <div class="pdf-controls">
+                <button onclick="pdfPrev()">← Назад</button>
+                <div><span id="p-cur">${state.pdfPage}</span> / <span id="p-total">${book.pages}</span></div>
+                <button onclick="pdfNext()">Вперёд →</button>
+            </div>
+            <div style="padding: 12px; background: #1f2937; display: flex; gap: 8px;">
+                <button onclick="handleFav('book', ${id})" style="flex: 1; padding: 10px; background: #374151; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    ${fav ? '💔 Убрать' : '❤️ Избранное'}
+                </button>
+                <button onclick="completeBook()" style="flex: 1; padding: 10px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    ✓ Прочитано
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('pdf-modal').classList.add('active');
+    
+    try {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        state.pdfDoc = await pdfjsLib.getDocument(book.pdfUrl).promise;
+        document.getElementById('p-total').textContent = state.pdfDoc.numPages;
+        renderPdfPage();
+    } catch (e) {
+        document.getElementById('pdf-viewer').innerHTML = `<div style="color: white; text-align: center; padding: 20px;">Не удалось загрузить PDF.<br>Возможно, нужен HTTP-сервер (не file://).<br><br><small>${e.message}</small></div>`;
+    }
+}
+
+async function renderPdfPage() {
+    if (!state.pdfDoc) return;
+    const page = await state.pdfDoc.getPage(state.pdfPage);
+    const scale = 1.5;
+    const viewport = page.getViewport({ scale });
+    const canvas = document.getElementById('pdf-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    document.getElementById('p-cur').textContent = state.pdfPage;
+    
+    if (state.currentBook) {
+        const pct = (state.pdfPage / state.currentBook.pages) * 100;
+        saveProgress('book', state.currentBook.id, pct, state.pdfPage, false);
+    }
+}
+
+function pdfNext() {
+    if (state.pdfDoc && state.pdfPage < state.pdfDoc.numPages) {
+        state.pdfPage++;
+        renderPdfPage();
+    }
+}
+
+function pdfPrev() {
+    if (state.pdfPage > 1) {
+        state.pdfPage--;
+        renderPdfPage();
+    }
+}
+
+function completeBook() {
+    if (!state.currentBook) return;
+    saveProgress('book', state.currentBook.id, 100, state.currentBook.pages, true);
+    closePdf();
+    alert('🎉 Книга прочитана!');
+}
+
+function closePdf() {
+    document.getElementById('pdf-modal').classList.remove('active');
+    state.pdfDoc = null;
+    renderTab();
+}
+
+// ============ ИЗБРАННОЕ (toggle) ============
+function handleFav(type, id) {
+    toggleFavorite(type, id);
+    if (type === 'lesson' && state.currentLesson) openLesson(id);
+    if (type === 'book' && state.currentBook) openBook(id);
+}
+
+// ============ ПРОГРЕСС ============
+function renderProgress() {
+    const progress = DB.get('progress');
+    const lessons = getLessons();
+    const books = getBooks();
+    
+    const totalL = lessons.length;
+    const totalB = books.length;
+    const doneL = progress.filter(p => p.type === 'lesson' && p.completed).length;
+    const doneB = progress.filter(p => p.type === 'book' && p.completed).length;
+    
+    const avgPct = progress.length ? progress.reduce((s, p) => s + (p.percent || 0), 0) / progress.length : 0;
+    
+    const totalTime = progress.reduce((s, p) => s + (p.position || 0), 0);
+    const hours = Math.floor(totalTime / 3600);
+    
+    // Тепловая карта (последние 28 дней)
+    const heatData = {};
+    progress.forEach(p => {
+        if (p.date) heatData[p.date] = (heatData[p.date] || 0) + 1;
+    });
+    
+    let heatCells = '';
+    for (let i = 27; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().split('T')[0];
+        const count = heatData[key] || 0;
+        const level = count === 0 ? 0 : count === 1 ? 1 : count === 2 ? 2 : count <= 4 ? 3 : 4;
+        heatCells += `<div class="heat-cell heat-${level}" title="${key}: ${count}"></div>`;
+    }
+    
+    // Достижения
+    const achievements = getAchievementsList();
+    const earned = DB.get('achievements').map(a => a.type);
+    
+    document.getElementById('progress-content').innerHTML = `
+        <div style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 16px; padding: 20px; color: white; margin-bottom: 16px;">
+            <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">🏆 Общий прогресс</h2>
+            <div class="ring-container">
+                <svg width="140" height="140" style="transform: rotate(-90deg);">
+                    <circle cx="70" cy="70" r="55" stroke="rgba(255,255,255,0.2)" stroke-width="12" fill="none"/>
+                    <circle cx="70" cy="70" r="55" stroke="white" stroke-width="12" fill="none"
+                            stroke-dasharray="${2 * Math.PI * 55}"
+                            stroke-dashoffset="${2 * Math.PI * 55 * (1 - avgPct / 100)}"
+                            stroke-linecap="round"/>
+                    <text x="70" y="70" text-anchor="middle" dy=".3em" font-size="24" font-weight="bold" fill="white" transform="rotate(90 70 70)">${Math.round(avgPct)}%</text>
+                </svg>
+            </div>
+            <div class="stats-grid">
+                <div><div class="stat-value" style="color: white;">${doneL}/${totalL}</div><div class="stat-label" style="color: rgba(255,255,255,0.8);">Уроков</div></div>
+                <div><div class="stat-value" style="color: white;">${doneB}/${totalB}</div><div class="stat-label" style="color: rgba(255,255,255,0.8);">Книг</div></div>
+                <div><div class="stat-value" style="color: white;">${hours}ч</div><div class="stat-label" style="color: rgba(255,255,255,0.8);">Время</div></div>
+            </div>
+        </div>
+        
+        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+            <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 12px;">📈 Активность (28 дней)</h3>
+            <div class="heat-grid">${heatCells}</div>
+            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #9ca3af; margin-top: 6px;">
+                <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+            </div>
+        </div>
+        
+        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px;">
+            <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 12px;">🎖 Достижения (${earned.length}/${achievements.length})</h3>
+            ${achievements.map(a => `
+                <div class="achievement ${earned.includes(a.type) ? 'earned' : ''}">
+                    <div>
+                        <div style="font-weight: 600;">${a.icon} ${a.title}</div>
+                        <div style="font-size: 12px; color: #6b7280;">${a.desc}</div>
+                    </div>
+                    <div style="font-size: 22px;">${earned.includes(a.type) ? '✅' : '🔒'}</div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+// ============ ДОСТИЖЕНИЯ ============
+function getAchievementsList() {
+    const progress = DB.get('progress');
+    const doneL = progress.filter(p => p.type === 'lesson' && p.completed).length;
+    const doneB = progress.filter(p => p.type === 'book' && p.completed).length;
+    const totalSec = progress.reduce((s, p) => s + (p.position || 0), 0);
+    
+    return [
+        { type: 'first_lesson', icon: '🌱', title: 'Первые шаги', desc: 'Пройти 1 урок', cond: doneL >= 1 },
+        { type: 'first_book', icon: '📖', title: 'Первая книга', desc: 'Завершить 1 книгу', cond: doneB >= 1 },
+        { type: 'ten_lessons', icon: '🎯', title: 'Десятка', desc: '10 уроков', cond: doneL >= 10 },
+        { type: 'five_books', icon: '📚', title: 'Книжный червь', desc: '5 книг', cond: doneB >= 5 },
+        { type: 'ten_books', icon: '🏆', title: 'Марафонец', desc: '10 книг', cond: doneB >= 10 },
+        { type: 'hour', icon: '⏱', title: 'Час знаний', desc: '1 час прослушано', cond: totalSec >= 3600 },
+        { type: 'ten_hours', icon: '🎧', title: 'Аудиофил', desc: '10 часов', cond: totalSec >= 36000 }
+    ];
+}
+
+function checkAchievements() {
+    const list = getAchievementsList();
+    const earned = DB.get('achievements').map(a => a.type);
+    let newOnes = [];
+    list.forEach(a => {
+        if (a.cond && !earned.includes(a.type)) {
+            DB.set('achievements', [...DB.get('achievements'), { type: a.type, date: new Date().toISOString() }]);
+            newOnes.push(a);
+        }
+    });
+    if (newOnes.length > 0) {
+        setTimeout(() => {
+            alert('🎉 Новое достижение!\n\n' + newOnes.map(a => `${a.icon} ${a.title}`).join('\n'));
+        }, 100);
+    }
+}
+
+// ============ ПРОФИЛЬ ============
+function renderProfile() {
+    const progress = DB.get('progress');
+    const doneL = progress.filter(p => p.type === 'lesson' && p.completed).length;
+    const doneB = progress.filter(p => p.type === 'book' && p.completed).length;
+    const totalSec = progress.reduce((s, p) => s + (p.position || 0), 0);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    
+    document.getElementById('profile-content').innerHTML = `
+        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 12px; text-align: center;">
+            <div style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; font-size: 28px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                ${state.user.name[0].toUpperCase()}
+            </div>
+            <h2 style="font-size: 20px; font-weight: 700;">${escapeHtml(state.user.name)}</h2>
+            <p style="color: #6b7280; font-size: 13px;">С нами с ${new Date(state.user.created).toLocaleDateString('ru')}</p>
+        </div>
+        
+        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+            <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 12px;">📊 Моя статистика</h3>
+            <div class="stats-grid">
+                <div><div class="stat-value">${doneL}</div><div class="stat-label">Уроков</div></div>
+                <div><div class="stat-value">${doneB}</div><div class="stat-label">Книг</div></div>
+                <div><div class="stat-value">${h}ч ${m}м</div><div class="stat-label">Время</div></div>
+            </div>
+        </div>
+        
+        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+            <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 12px;">⚙️ Действия</h3>
+            <button onclick="changeName()" class="btn btn-secondary">✏️ Изменить имя</button>
+            <button onclick="resetData()" class="btn btn-danger">🗑 Сбросить все данные</button>
+        </div>
+        
+        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; text-align: center; color: #6b7280; font-size: 13px;">
+            <div>📱 Уроки и Книги v1.0</div>
+            <div style="margin-top: 4px;">Telegram Mini App (прототип)</div>
+        </div>
+    `;
+}
+
+function changeName() {
+    const name = prompt('Новое имя:', state.user.name);
+    if (name) {
+        state.user.name = name;
+        DB.set('user', state.user);
+        document.getElementById('header-sub').textContent = `Привет, ${name}!`;
+        renderProfile();
+    }
+}
+
+function resetData() {
+    if (confirm('Удалить ВСЕ данные? Это нельзя отменить!')) {
+        if (confirm('Точно-точно? Все уроки, книги, прогресс — всё пропадёт!')) {
+            ['categories', 'lessons', 'books', 'progress', 'favorites', 'achievements'].forEach(k => localStorage.removeItem('la_' + k));
+            alert('Данные сброшены');
+            location.reload();
+        }
+    }
+}
+
+// ============ РЕДАКТОР ============
+function renderEditor() {
+    const tree = buildTree(null);
+    
+    let html = `
+        <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">⚙️ Редактор</h2>
+        
+        <button onclick="showCatForm()" class="btn btn-primary">📂 Создать корневой раздел</button>
+        <button onclick="showLessonForm()" class="btn btn-success">🎧 Создать урок</button>
+        <button onclick="showBookForm()" class="btn btn-purple">📚 Создать книгу</button>
+        
+        <h3 style="font-size: 15px; font-weight: 700; margin: 20px 0 12px;">📂 Структура контента</h3>
+    `;
+    
+    if (tree.length === 0) {
+        html += `<div class="empty"><div class="empty-icon">🌱</div>Создай первый раздел!</div>`;
+    } else {
+        html += renderEditorTree(tree);
+    }
+    
+    document.getElementById('editor-content').innerHTML = html;
+}
+
+function renderEditorTree(tree) {
+    return tree.map(cat => {
+        const lessons = getLessons().filter(l => l.categoryId === cat.id);
+        const books = getBooks().filter(b => b.categoryId === cat.id);
+        
+        let html = `
+            <div class="editor-tree-item">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div style="font-weight: 600;">${cat.emoji || '📂'} ${escapeHtml(cat.title)}</div>
+                        <div style="font-size: 12px; color: #6b7280; margin-top: 2px;">
+                            🎧 ${lessons.length} уроков • 📚 ${books.length} книг
+                        </div>
+                    </div>
+                </div>
+                <div class="editor-actions">
+                    <button onclick="showCatForm(${cat.id})">✏️ Ред.</button>
+                    <button onclick="showCatForm(null, ${cat.id})">➕ Подраздел</button>
+                    <button onclick="showLessonForm(${cat.id})">🎧 Урок</button>
+                    <button onclick="showBookForm(${cat.id})">📚 Книга</button>
+                    <button onclick="deleteCat(${cat.id})" style="background: #fee2e2; color: #991b1b;">🗑</button>
+                </div>
+                ${lessons.length ? '<div style="margin-top: 8px; font-size: 12px; color: #6b7280;"><b>Уроки:</b> ' + lessons.map(l => `<span style="cursor: pointer; color: #3b82f6;" onclick="showLessonForm(null, ${l.id})">${escapeHtml(l.title)}</span>`).join(', ') + '</div>' : ''}
+                ${books.length ? '<div style="margin-top: 4px; font-size: 12px; color: #6b7280;"><b>Книги:</b> ' + books.map(b => `<span style="cursor: pointer; color: #8b5cf6;" onclick="showBookForm(null, ${b.id})">${escapeHtml(b.title)}</span>`).join(', ') + '</div>' : ''}
+            </div>
+        `;
+        
+        if (cat.children.length > 0) {
+            html += `<div style="margin-left: 16px;">${renderEditorTree(cat.children)}</div>`;
+        }
+        
+        return html;
+    }).join('');
+}
+
+// ============ ФОРМЫ РЕДАКТОРА ============
+function showCatForm(editId = null, parentId = null) {
+    const cat = editId ? findCategory(editId) : null;
+    const title = cat ? 'Редактировать раздел' : 'Новый раздел';
+    
+    const allCats = getCategories();
+    const parentOptions = '<option value="">— Корневой —</option>' + 
+        allCats.filter(c => c.id !== editId).map(c => 
+            `<option value="${c.id}" ${(cat?.parentId || parentId) === c.id ? 'selected' : ''}>${c.emoji || '📂'} ${escapeHtml(c.title)}</option>`
+        ).join('');
+    
+    document.getElementById('modal-body').innerHTML = `
+        <div class="modal-title">${title} <button class="close-btn" onclick="closeModal()">×</button></div>
+        <form onsubmit="saveCat(event, ${editId || 'null'})">
+            <label>Название *</label>
+            <input type="text" id="f-title" value="${cat ? escapeHtml(cat.title) : ''}" required>
             
-            const totalLessons = Object.values(state.progress).filter(p => p.content_type === 'lesson' && p.is_completed).length;
-            const totalBooks = Object.values(state.progress).filter(p => p.content_type === 'book' && p.is_completed).length;
-            const totalTime = Object.values(state.progress).reduce((sum, p) => sum + (p.position || 0), 0);
-
-            container.innerHTML = `
-                <div class="fade-in">
-                    <div class="bg-white rounded-xl p-6 border border-gray-200 mb-4">
-                        <div class="flex items-center mb-4">
-                            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                                ${state.user.first_name?.[0] || 'U'}
-                            </div>
-                            <div class="ml-4">
-                                <h2 class="text-xl font-bold">${state.user.first_name || 'Пользователь'}</h2>
-                                <p class="text-gray-500">@${state.user.username || 'user'}</p>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-4 text-center">
-                            <div>
-                                <div class="text-2xl font-bold text-blue-500">${totalLessons}</div>
-                                <div class="text-sm text-gray-500">Уроков</div>
-                            </div>
-                            <div>
-                                <div class="text-2xl font-bold text-purple-500">${totalBooks}</div>
-                                <div class="text-sm text-gray-500">Книг</div>
-                            </div>
-                            <div>
-                                <div class="text-2xl font-bold text-green-500">${Math.floor(totalTime / 3600)}ч</div>
-                                <div class="text-sm text-gray-500">Время</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-xl p-4 border border-gray-200 mb-4">
-                        <h3 class="font-bold mb-3">⚙️ Настройки</h3>
-                        <div class="space-y-3">
-                            <label class="flex items-center justify-between">
-                                <span>🔔 Уведомления</span>
-                                <input type="checkbox" checked class="w-5 h-5">
-                            </label>
-                            <label class="flex items-center justify-between">
-                                <span>🌙 Тёмная тема</span>
-                                <input type="checkbox" class="w-5 h-5">
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-xl p-4 border border-gray-200">
-                        <h3 class="font-bold mb-3">ℹ️ О приложении</h3>
-                        <p class="text-gray-600 text-sm">
-                            Версия 1.0.0<br>
-                            Telegram Mini App для прослушивания уроков и чтения книг
-                        </p>
-                    </div>
-                </div>
-            `;
-        }
-
-        // ============ FAVORITES ============
-        async function loadFavorites() {
-            if (!state.user) return;
-            state.favorites = await api(`/api/favorites/${state.user.id}`);
-        }
-
-        async function toggleFavorite(contentType, contentId) {
-            if (!state.user) return;
-
-            const existing = state.favorites.find(f => 
-                f.content_type === contentType && f.content_id === contentId
-            );
-
-            if (existing) {
-                await api(`/api/favorites/${state.user.id}/${contentType}/${contentId}`, {
-                    method: 'DELETE'
-                });
-                state.favorites = state.favorites.filter(f => f.id !== existing.id);
-            } else {
-                await api('/api/favorites', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        user_id: state.user.id,
-                        content_type: contentType,
-                        content_id: contentId
-                    })
-                });
-                state.favorites.push({ content_type: contentType, content_id: contentId });
-            }
-        }
-
-        // ============ ACHIEVEMENTS ============
-        async function loadAchievements() {
-            if (!state.user) return;
-            state.achievements = await api(`/api/achievements/${state.user.id}`);
-        }
-
-        async function checkAchievements() {
-            if (!state.user) return;
-
-            const completedLessons = Object.values(state.progress).filter(p => 
-                p.content_type === 'lesson' && p.is_completed
-            ).length;
-
-            const completedBooks = Object.values(state.progress).filter(p => 
-                p.content_type === 'book' && p.is_completed
-            ).length;
-
-            const achievements = [
-                { type: 'first_lesson', condition: completedLessons >= 1 },
-                { type: 'first_book', condition: completedBooks >= 1 },
-                { type: 'ten_lessons', condition: completedLessons >= 10 },
-                { type: 'five_books', condition: completedBooks >= 5 }
-            ];
-
-            for (const ach of achievements) {
-                if (ach.condition && !state.achievements.find(a => a.achievement_type === ach.type)) {
-                    await api('/api/achievements', {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            user_id: state.user.id,
-                            achievement_type: ach.type
-                        })
-                    });
-                    state.achievements.push({ achievement_type: ach.type });
-                    
-                    if (tg) {
-                        tg.showPopup({
-                            title: '🎉 Достижение!',
-                            message: `Вы получили новое достижение!`,
-                            buttons: [{ type: 'ok' }]
-                        });
-                    }
-                }
-            }
-        }
-
-        // ============ EDITOR ============
-        function renderEditor() {
-            const container = document.getElementById('editor-content');
+            <label>Эмодзи</label>
+            <input type="text" id="f-emoji" value="${cat?.emoji || ''}" maxlength="4" placeholder="📂">
             
-            container.innerHTML = `
-                <div class="fade-in">
-                    <h2 class="text-xl font-bold mb-4">⚙️ Панель редактора</h2>
-                    
-                    <div class="space-y-3">
-                        <button onclick="showCreateCategoryModal()" class="w-full bg-blue-500 text-white p-4 rounded-lg font-semibold">
-                            ➕ Создать раздел
-                        </button>
-                        
-                        <button onclick="showCreateLessonModal()" class="w-full bg-green-500 text-white p-4 rounded-lg font-semibold">
-                            🎧 Создать урок
-                        </button>
-                        
-                        <button onclick="showCreateBookModal()" class="w-full bg-purple-500 text-white p-4 rounded-lg font-semibold">
-                            📚 Создать книгу
-                        </button>
-                    </div>
-
-                    <div class="mt-6">
-                        <h3 class="font-bold mb-3">📂 Управление контентом</h3>
-                        <div id="editor-tree"></div>
-                    </div>
-                </div>
-            `;
-
-            renderEditorTree();
-        }
-
-        function renderEditorTree() {
-            const container = document.getElementById('editor-tree');
-            container.innerHTML = renderEditorCategoryTree(state.categories);
-        }
-
-        function renderEditorCategoryTree(categories) {
-            if (!categories || categories.length === 0) {
-                return '<p class="text-gray-500 text-center py-4">Нет разделов</p>';
-            }
-
-            return categories.map(cat => `
-                <div class="mb-2">
-                    <div class="bg-white rounded-lg p-3 border border-gray-200">
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center">
-                                <span class="text-xl mr-2">${cat.emoji || '📂'}</span>
-                                <span class="font-medium">${cat.title}</span>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button onclick="editCategory(${cat.id})" class="text-blue-500">✏️</button>
-                                <button onclick="deleteCategory(${cat.id})" class="text-red-500">🗑️</button>
-                            </div>
-                        </div>
-                        <div class="flex space-x-2 text-sm">
-                            <button onclick="showCreateCategoryModal(${cat.id})" class="text-gray-500 hover:text-gray-700">
-                                ➕ Подраздел
-                            </button>
-                        </div>
-                    </div>
-                    ${cat.children && cat.children.length > 0 ? `
-                        <div class="ml-4 mt-2">
-                            ${renderEditorCategoryTree(cat.children)}
-                        </div>
-                    ` : ''}
-                </div>
-            `).join('');
-        }
-
-        function showCreateCategoryModal(parentId = null) {
-            const modal = document.getElementById('modal');
-            const modalBody = document.getElementById('modal-body');
-
-            modalBody.innerHTML = `
-                <div class="fade-in">
-                    <h2 class="text-xl font-bold mb-4">Создать раздел</h2>
-                    <form onsubmit="createCategory(event, ${parentId})">
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Название</label>
-                            <input type="text" id="cat-title" required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Эмодзи</label>
-                            <input type="text" id="cat-emoji" placeholder="📂" maxlength="2">
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Описание</label>
-                            <textarea id="cat-description" rows="3"></textarea>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button type="submit" class="btn-primary flex-1">Создать</button>
-                            <button type="button" onclick="closeModal()" class="btn-secondary flex-1">Отмена</button>
-                        </div>
-                    </form>
-                </div>
-            `;
-
-            modal.classList.add('active');
-        }
-
-        async function createCategory(event, parentId) {
-            event.preventDefault();
-
-            await api('/api/categories', {
-                method: 'POST',
-                body: JSON.stringify({
-                    parent_id: parentId,
-                    title: document.getElementById('cat-title').value,
-                    emoji: document.getElementById('cat-emoji').value,
-                    description: document.getElementById('cat-description').value
-                })
-            });
-
-            closeModal();
-            loadCategories();
-            renderEditorTree();
-        }
-
-        function showCreateLessonModal() {
-            const modal = document.getElementById('modal');
-            const modalBody = document.getElementById('modal-body');
-
-            const categoryOptions = flattenCategories(state.categories).map(cat => 
-                `<option value="${cat.id}">${cat.emoji || '📂'} ${cat.title}</option>`
-            ).join('');
-
-            modalBody.innerHTML = `
-                <div class="fade-in">
-                    <h2 class="text-xl font-bold mb-4">Создать урок</h2>
-                    <form onsubmit="createLesson(event)">
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Раздел</label>
-                            <select id="lesson-category" required>
-                                <option value="">Выберите раздел</option>
-                                ${categoryOptions}
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Название</label>
-                            <input type="text" id="lesson-title" required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Описание</label>
-                            <textarea id="lesson-description" rows="3"></textarea>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Ссылка на аудио</label>
-                            <input type="url" id="lesson-audio-url" required placeholder="https://...">
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Длительность (секунды)</label>
-                            <input type="number" id="lesson-duration" required min="1">
-                        </div>
-                        <div class="flex space-x-2">
-                            <button type="submit" class="btn-primary flex-1">Создать</button>
-                            <button type="button" onclick="closeModal()" class="btn-secondary flex-1">Отмена</button>
-                        </div>
-                    </form>
-                </div>
-            `;
-
-            modal.classList.add('active');
-        }
-
-        async function createLesson(event) {
-            event.preventDefault();
-
-            await api('/api/lessons', {
-                method: 'POST',
-                body: JSON.stringify({
-                    category_id: document.getElementById('lesson-category').value,
-                    title: document.getElementById('lesson-title').value,
-                    description: document.getElementById('lesson-description').value,
-                    audio_url: document.getElementById('lesson-audio-url').value,
-                    duration: parseInt(document.getElementById('lesson-duration').value)
-                })
-            });
-
-            closeModal();
-            loadCategories();
-        }
-
-        function showCreateBookModal() {
-            const modal = document.getElementById('modal');
-            const modalBody = document.getElementById('modal-body');
-
-            const categoryOptions = flattenCategories(state.categories).map(cat => 
-                `<option value="${cat.id}">${cat.emoji || '📂'} ${cat.title}</option>`
-            ).join('');
-
-            modalBody.innerHTML = `
-                <div class="fade-in">
-                    <h2 class="text-xl font-bold mb-4">Создать книгу</h2>
-                    <form onsubmit="createBook(event)">
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Раздел</label>
-                            <select id="book-category" required>
-                                <option value="">Выберите раздел</option>
-                                ${categoryOptions}
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Название</label>
-                            <input type="text" id="book-title" required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Автор</label>
-                            <input type="text" id="book-author">
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Описание</label>
-                            <textarea id="book-description" rows="3"></textarea>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Ссылка на PDF</label>
-                            <input type="url" id="book-pdf-url" required placeholder="https://...">
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Количество страниц</label>
-                            <input type="number" id="book-pages" required min="1">
-                        </div>
-                        <div class="flex space-x-2">
-                            <button type="submit" class="btn-primary flex-1">Создать</button>
-                            <button type="button" onclick="closeModal()" class="btn-secondary flex-1">Отмена</button>
-                        </div>
-                    </form>
-                </div>
-            `;
-
-            modal.classList.add('active');
-        }
-
-        async function createBook(event) {
-            event.preventDefault();
-
-            await api('/api/books', {
-                method: 'POST',
-                body: JSON.stringify({
-                    category_id: document.getElementById('book-category').value,
-                    title: document.getElementById('book-title').value,
-                    author: document.getElementById('book-author').value,
-                    description: document.getElementById('book-description').value,
-                    pdf_url: document.getElementById('book-pdf-url').value,
-                    pages: parseInt(document.getElementById('book-pages').value)
-                })
-            });
-
-            closeModal();
-            loadCategories();
-        }
-
-        function flattenCategories(categories, result = []) {
-            for (const cat of categories) {
-                result.push(cat);
-                if (cat.children) {
-                    flattenCategories(cat.children, result);
-                }
-            }
-            return result;
-        }
-
-        async function deleteCategory(id) {
-            if (!confirm('Удалить этот раздел и всё его содержимое?')) return;
+            <label>Родитель</label>
+            <select id="f-parent">${parentOptions}</select>
             
-            await api(`/api/categories/${id}`, { method: 'DELETE' });
-            loadCategories();
-            renderEditorTree();
-        }
+            <label>Описание</label>
+            <textarea id="f-desc" rows="3">${cat?.description || ''}</textarea>
+            
+            <button type="submit" class="btn btn-primary">💾 Сохранить</button>
+            <button type="button" onclick="closeModal()" class="btn btn-secondary">Отмена</button>
+        </form>
+    `;
+    document.getElementById('modal').classList.add('active');
+}
 
-        // ============ UTILS ============
-        function formatDuration(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
-        }
+function saveCat(e, editId) {
+    e.preventDefault();
+    const cats = getCategories();
+    const data = {
+        title: document.getElementById('f-title').value.trim(),
+        emoji: document.getElementById('f-emoji').value.trim(),
+        parentId: document.getElementById('f-parent').value ? parseInt(document.getElementById('f-parent').value) : null,
+        description: document.getElementById('f-desc').value.trim()
+    };
+    
+    if (editId) {
+        const idx = cats.findIndex(c => c.id === editId);
+        cats[idx] = { ...cats[idx], ...data };
+    } else {
+        cats.push({ id: DB.nextId('categories'), ...data, order: cats.length });
+    }
+    
+    DB.set('categories', cats);
+    closeModal();
+    renderEditor();
+}
 
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
-        }
+function deleteCat(id) {
+    if (!confirm('Удалить раздел и ВСЁ его содержимое (подразделы, уроки, книги)?')) return;
+    
+    const ids = getAllDescendantIds(id);
+    DB.set('categories', getCategories().filter(c => !ids.includes(c.id)));
+    DB.set('lessons', getLessons().filter(l => !ids.includes(l.categoryId)));
+    DB.set('books', getBooks().filter(b => !ids.includes(b.categoryId)));
+    renderEditor();
+}
 
-        // ============ INIT ============
-        initUser();
-        switchTab('lessons');
-    </script>
+function showLessonForm(catId = null, editId = null) {
+    const lesson = editId ? getLessons().find(l => l.id === editId) : null;
+    const title = lesson ? 'Редактировать урок' : 'Новый урок';
+    
+    const allCats = getCategories();
+    if (allCats.length === 0) {
+        alert('Сначала создай хотя бы один раздел!');
+        return;
+    }
+    
+    const catOptions = allCats.map(c => 
+        `<option value="${c.id}" ${(lesson?.categoryId || catId) === c.id ? 'selected' : ''}>${c.emoji || '📂'} ${escapeHtml(c.title)}</option>`
+    ).join('');
+    
+    document.getElementById('modal-body').innerHTML = `
+        <div class="modal-title">${title} <button class="close-btn" onclick="closeModal()">×</button></div>
+        <form onsubmit="saveLesson(event, ${editId || 'null'})">
+            <label>Раздел *</label>
+            <select id="f-cat" required>${catOptions}</select>
+            
+            <label>Название *</label>
+            <input type="text" id="f-title" value="${lesson ? escapeHtml(lesson.title) : ''}" required>
+            
+            <label>Описание</label>
+            <textarea id="f-desc" rows="3">${lesson?.description || ''}</textarea>
+            
+            <label>Ссылка на аудио (mp3) *</label>
+            <input type="url" id="f-url" value="${lesson?.audioUrl || ''}" required placeholder="https://...">
+            <div style="font-size: 11px; color: #6b7280; margin: -8px 0 12px;">
+                Пример: https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3
+            </div>
+            
+            <label>Длительность (секунды) *</label>
+            <input type="number" id="f-dur" value="${lesson?.duration || ''}" required min="1" placeholder="300">
+            
+            ${editId ? '<button type="button" onclick="deleteLesson(' + editId + ')" class="btn btn-danger">🗑 Удалить</button>' : ''}
+            <button type="submit" class="btn btn-success">💾 Сохранить</button>
+            <button type="button" onclick="closeModal()" class="btn btn-secondary">Отмена</button>
+        </form>
+    `;
+    document.getElementById('modal').classList.add('active');
+}
+
+function saveLesson(e, editId) {
+    e.preventDefault();
+    const lessons = getLessons();
+    const data = {
+        categoryId: parseInt(document.getElementById('f-cat').value),
+        title: document.getElementById('f-title').value.trim(),
+        description: document.getElementById('f-desc').value.trim(),
+        audioUrl: document.getElementById('f-url').value.trim(),
+        duration: parseInt(document.getElementById('f-dur').value)
+    };
+    
+    if (editId) {
+        const idx = lessons.findIndex(l => l.id === editId);
+        lessons[idx] = { ...lessons[idx], ...data };
+    } else {
+        lessons.push({ id: DB.nextId('lessons'), ...data, created: new Date().toISOString() });
+    }
+    
+    DB.set('lessons', lessons);
+    closeModal();
+    renderEditor();
+}
+
+function deleteLesson(id) {
+    if (!confirm('Удалить урок?')) return;
+    DB.set('lessons', getLessons().filter(l => l.id !== id));
+    closeModal();
+    renderEditor();
+}
+
+function showBookForm(catId = null, editId = null) {
+    const book = editId ? getBooks().find(b => b.id === editId) : null;
+    const title = book ? 'Редактировать книгу' : 'Новая книга';
+    
+    const allCats = getCategories();
+    if (allCats.length === 0) {
+        alert('Сначала создай хотя бы один раздел!');
+        return;
+    }
+    
+    const catOptions = allCats.map(c => 
+        `<option value="${c.id}" ${(book?.categoryId || catId) === c.id ? 'selected' : ''}>${c.emoji || '📂'} ${escapeHtml(c.title)}</option>`
+    ).join('');
+    
+    document.getElementById('modal-body').innerHTML = `
+        <div class="modal-title">${title} <button class="close-btn" onclick="closeModal()">×</button></div>
+        <form onsubmit="saveBook(event, ${editId || 'null'})">
+            <label>Раздел *</label>
+            <select id="f-cat" required>${catOptions}</select>
+            
+            <label>Название *</label>
+            <input type="text" id="f-title" value="${book ? escapeHtml(book.title) : ''}" required>
+            
+            <label>Автор</label>
+            <input type="text" id="f-author" value="${book?.author || ''}">
+            
+            <label>Описание</label>
+            <textarea id="f-desc" rows="3">${book?.description || ''}</textarea>
+            
+            <label>Ссылка на PDF *</label>
+            <input type="url" id="f-url" value="${book?.pdfUrl || ''}" required placeholder="https://...">
+            <div style="font-size: 11px; color: #6b7280; margin: -8px 0 12px;">
+                Пример: https://www.africau.edu/images/default/sample.pdf
+            </div>
+            
+            <label>Количество страниц *</label>
+            <input type="number" id="f-pages" value="${book?.pages || ''}" required min="1">
+            
+            ${editId ? '<button type="button" onclick="deleteBook(' + editId + ')" class="btn btn-danger">🗑 Удалить</button>' : ''}
+            <button type="submit" class="btn btn-purple">💾 Сохранить</button>
+            <button type="button" onclick="closeModal()" class="btn btn-secondary">Отмена</button>
+        </form>
+    `;
+    document.getElementById('modal').classList.add('active');
+}
+
+function saveBook(e, editId) {
+    e.preventDefault();
+    const books = getBooks();
+    const data = {
+        categoryId: parseInt(document.getElementById('f-cat').value),
+        title: document.getElementById('f-title').value.trim(),
+        author: document.getElementById('f-author').value.trim(),
+        description: document.getElementById('f-desc').value.trim(),
+        pdfUrl: document.getElementById('f-url').value.trim(),
+        pages: parseInt(document.getElementById('f-pages').value)
+    };
+    
+    if (editId) {
+        const idx = books.findIndex(b => b.id === editId);
+        books[idx] = { ...books[idx], ...data };
+    } else {
+        books.push({ id: DB.nextId('books'), ...data, created: new Date().toISOString() });
+    }
+    
+    DB.set('books', books);
+    closeModal();
+    renderEditor();
+}
+
+function deleteBook(id) {
+    if (!confirm('Удалить книгу?')) return;
+    DB.set('books', getBooks().filter(b => b.id !== id));
+    closeModal();
+    renderEditor();
+}
+
+function closeModal() {
+    document.getElementById('modal').classList.remove('active');
+}
+
+// ============ СТАРТ ============
+init();
+</script>
 </body>
 </html>
