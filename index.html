@@ -1,13 +1,2107 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>condition-miniapp</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Требуй знания!</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --tg-theme-bg-color: #ffffff;
+            --tg-theme-secondary-bg-color: #f4f4f5;
+            --tg-theme-text-color: #000000;
+            --tg-theme-hint-color: #8e8e93;
+            --tg-theme-button-color: #007aff;
+            --tg-theme-accent-text-color: #007aff;
+            --tg-theme-destructive-text-color: #ff3b30;
+            --nav-height: 64px;
+            --mini-player-height: 64px;
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-area-top: env(safe-area-inset-top, 0px);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color);
+            overflow: hidden; height: 100%; width: 100%;
+            -webkit-font-smoothing: antialiased;
+        }
+        button, input, textarea { font-family: inherit; }
+        #app { display: flex; flex-direction: column; height: 100%; }
+
+        .content-area {
+            flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+            padding-bottom: calc(var(--nav-height) + var(--safe-area-bottom) + 16px);
+            transition: padding-bottom 0.25s ease;
+        }
+        .content-area.player-active {
+            padding-bottom: calc(var(--nav-height) + var(--mini-player-height) + var(--safe-area-bottom) + 16px);
+        }
+
+        .page { display: none; padding: 16px; animation: fadeIn 0.3s ease-out; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.5px; }
+        h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
+        .subtitle { color: var(--tg-theme-hint-color); font-size: 15px; margin-bottom: 20px; }
+        .block { background: var(--tg-theme-secondary-bg-color); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+
+        /* NAV */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            height: calc(var(--nav-height) + var(--safe-area-bottom));
+            padding-bottom: var(--safe-area-bottom);
+            background: var(--tg-theme-secondary-bg-color);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            display: flex; justify-content: space-around; align-items: center;
+            border-top: 0.5px solid rgba(128,128,128,0.2); z-index: 90;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            flex: 1; height: 100%; background: none; border: none;
+            color: var(--tg-theme-hint-color); font-size: 10px; font-weight: 500;
+            cursor: pointer; gap: 4px; transition: color 0.2s, transform 0.15s;
+        }
+        .nav-item:active { transform: scale(0.9); }
+        .nav-item.active { color: var(--tg-theme-accent-text-color); }
+        .nav-item svg { width: 24px; height: 24px; }
+
+        /* CARDS */
+        .tma-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+        .tma-card {
+            display: flex; flex-direction: column;
+            background: var(--tg-theme-secondary-bg-color);
+            border-radius: 16px; overflow: hidden;
+            transition: transform 0.15s ease; cursor: pointer;
+        }
+        .tma-card:active { transform: scale(0.96); }
+        .tma-card__cover {
+            width: 100%; aspect-ratio: 1 / 1;
+            background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 48px; color: #fff; position: relative;
+        }
+        .tma-card__cover .play-badge {
+            position: absolute; bottom: 8px; right: 8px;
+            width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(0,0,0,0.6); color: #fff;
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+        }
+        .tma-card__body { display: flex; flex-direction: column; flex-grow: 1; padding: 10px 12px 12px; gap: 4px; }
+        .tma-card__title {
+            font-size: 14px; font-weight: 600; line-height: 1.3;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .tma-card__meta { font-size: 12px; color: var(--tg-theme-hint-color); margin-top: auto; }
+        .tma-card__actions { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+        .chip {
+            font-size: 11px; padding: 3px 8px;
+            background: var(--tg-theme-bg-color);
+            color: var(--tg-theme-accent-text-color);
+            border-radius: 8px; font-weight: 600;
+            border: none; cursor: pointer;
+        }
+        .heart {
+            background: none; border: none;
+            color: var(--tg-theme-hint-color); font-size: 20px; cursor: pointer;
+            padding: 4px; line-height: 1; transition: transform 0.2s;
+        }
+        .heart:active { transform: scale(0.8); }
+        .heart.active { color: var(--tg-theme-destructive-text-color); }
+        .premium-badge {
+            position: absolute; top: 8px; left: 8px;
+            background: rgba(0,0,0,0.6); color: #ffd700;
+            padding: 3px 8px; border-radius: 8px;
+            font-size: 11px; font-weight: 600;
+        }
+
+        /* CATEGORIES TREE */
+        .cat-tabs {
+            display: flex; gap: 8px; overflow-x: auto;
+            padding-bottom: 4px; margin-bottom: 16px;
+            scrollbar-width: none;
+        }
+        .cat-tabs::-webkit-scrollbar { display: none; }
+        .cat-tab {
+            padding: 8px 14px; border-radius: 20px;
+            background: var(--tg-theme-secondary-bg-color);
+            color: var(--tg-theme-text-color);
+            font-size: 14px; font-weight: 500;
+            white-space: nowrap; cursor: pointer;
+            border: none; transition: all 0.2s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .cat-tab.active { background: var(--tg-theme-button-color); color: #fff; }
+        .cat-tab .emoji { font-size: 16px; }
+
+        .subcat-row {
+            display: flex; gap: 8px; overflow-x: auto;
+            padding-bottom: 8px; margin-bottom: 16px;
+            scrollbar-width: none;
+        }
+        .subcat-row::-webkit-scrollbar { display: none; }
+        .subcat-chip {
+            padding: 6px 12px; border-radius: 12px;
+            background: var(--tg-theme-bg-color);
+            border: 1.5px solid var(--tg-theme-secondary-bg-color);
+            color: var(--tg-theme-text-color);
+            font-size: 13px; cursor: pointer;
+            white-space: nowrap;
+        }
+        .subcat-chip.active { border-color: var(--tg-theme-button-color); color: var(--tg-theme-accent-text-color); font-weight: 600; }
+
+        /* SEARCH */
+        .search-bar {
+            width: 100%; padding: 12px 16px;
+            border-radius: 12px; border: none;
+            background: var(--tg-theme-secondary-bg-color);
+            color: var(--tg-theme-text-color);
+            font-size: 16px; margin-bottom: 12px; outline: none;
+        }
+        .search-bar::placeholder { color: var(--tg-theme-hint-color); }
+
+        /* CALENDAR */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 12px; }
+        .day-cell {
+            aspect-ratio: 1; border-radius: 6px;
+            background: var(--tg-theme-bg-color);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; color: var(--tg-theme-hint-color);
+        }
+        .day-cell.active { background: var(--tg-theme-button-color); color: #fff; font-weight: 600; }
+        .day-cell.today { border: 2px solid var(--tg-theme-accent-text-color); }
+
+        /* PROFILE */
+        .profile-avatar {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 32px; font-weight: 700; margin: 0 auto 16px;
+        }
+        .profile-name { text-align: center; font-size: 22px; font-weight: 600; margin-bottom: 24px;}
+        .settings-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 0;
+            border-bottom: 0.5px solid rgba(128,128,128,0.2);
+            font-size: 16px; cursor: pointer;
+        }
+        .settings-item:last-child { border-bottom: none; }
+        .settings-item span:last-child { color: var(--tg-theme-hint-color); }
+
+        /* MINI PLAYER */
+        .mini-player {
+            position: fixed;
+            bottom: calc(var(--nav-height) + var(--safe-area-bottom));
+            left: 8px; right: 8px;
+            height: var(--mini-player-height);
+            background: var(--tg-theme-secondary-bg-color);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 14px;
+            display: flex; align-items: center;
+            padding: 8px; gap: 10px;
+            z-index: 80;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transform: translateY(120%);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+        }
+        .mini-player.visible { transform: translateY(0); }
+        .mini-player__cover {
+            width: 48px; height: 48px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; flex-shrink: 0;
+        }
+        .mini-player__info { flex: 1; min-width: 0; }
+        .mini-player__title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-player__author { font-size: 12px; color: var(--tg-theme-hint-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-player__btn {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: none; border: none;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--tg-theme-text-color); font-size: 20px; cursor: pointer; flex-shrink: 0;
+        }
+        .mini-player__btn:active { transform: scale(0.85); }
+        .mini-player__progress {
+            position: absolute; bottom: 0; left: 8px; right: 8px;
+            height: 3px; background: rgba(128,128,128,0.2);
+            border-radius: 2px; overflow: hidden;
+        }
+        .mini-player__progress-bar { height: 100%; background: var(--tg-theme-button-color); width: 0%; transition: width 0.3s linear; }
+
+        /* FULL PLAYER */
+        .full-player {
+            position: fixed; inset: 0; background: var(--tg-theme-bg-color);
+            z-index: 200; display: flex; flex-direction: column;
+            padding: calc(var(--safe-area-top) + 16px) 20px calc(var(--safe-area-bottom) + 20px);
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        .full-player.visible { transform: translateY(0); }
+        .full-player__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .full-player__close, .full-player__more {
+            width: 32px; height: 32px; background: none; border: none;
+            color: var(--tg-theme-text-color); font-size: 24px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .full-player__header-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--tg-theme-hint-color); }
+        .full-player__cover {
+            width: 100%; max-width: 320px; aspect-ratio: 1;
+            margin: 0 auto 32px; border-radius: 20px;
+            background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
+            display: flex; align-items: center; justify-content: center; font-size: 100px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .full-player__title { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 4px; letter-spacing: -0.3px; }
+        .full-player__author { font-size: 15px; color: var(--tg-theme-hint-color); text-align: center; margin-bottom: 24px; }
+        .full-player__seek { width: 100%; height: 4px; background: rgba(128,128,128,0.2); border-radius: 2px; cursor: pointer; position: relative; margin-bottom: 8px; }
+        .full-player__seek-fill { height: 100%; background: var(--tg-theme-button-color); border-radius: 2px; width: 0%; position: relative; }
+        .full-player__seek-fill::after { content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--tg-theme-button-color); }
+        .full-player__time { display: flex; justify-content: space-between; font-size: 12px; color: var(--tg-theme-hint-color); margin-bottom: 24px; }
+        .full-player__controls { display: flex; justify-content: space-around; align-items: center; margin-bottom: 24px; }
+        .fp-btn { background: none; border: none; color: var(--tg-theme-text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .fp-btn:active { transform: scale(0.85); }
+        .fp-btn.small { font-size: 24px; width: 44px; height: 44px; }
+        .fp-btn.play { width: 72px; height: 72px; border-radius: 50%; background: var(--tg-theme-button-color); color: #fff; font-size: 32px; }
+        .full-player__speed { text-align: center; font-size: 14px; font-weight: 600; color: var(--tg-theme-accent-text-color); cursor: pointer; padding: 8px 16px; background: var(--tg-theme-secondary-bg-color); border-radius: 20px; border: none; margin: 0 auto; }
+
+        /* READER */
+        .reader { position: fixed; inset: 0; background: var(--tg-theme-bg-color); z-index: 200; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1); }
+        .reader.visible { transform: translateY(0); }
+        .reader.theme-sepia { --tg-theme-bg-color: #f4ecd8; --tg-theme-text-color: #5b4636; --tg-theme-secondary-bg-color: #e8dcc4; --tg-theme-hint-color: #8b7355; }
+        .reader.theme-dark { --tg-theme-bg-color: #1c1c1e; --tg-theme-text-color: #ffffff; --tg-theme-secondary-bg-color: #2c2c2e; --tg-theme-hint-color: #8e8e93; }
+        .reader__header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: calc(var(--safe-area-top) + 12px) 12px 12px;
+            border-bottom: 0.5px solid rgba(128,128,128,0.2);
+            background: var(--tg-theme-bg-color); z-index: 2;
+        }
+        .reader__btn {
+            width: 40px; height: 40px; background: none; border: none;
+            color: var(--tg-theme-accent-text-color); font-size: 20px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .reader__title { flex: 1; text-align: center; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px; }
+        .reader__content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 24px 20px; font-size: 17px; line-height: 1.6; }
+        .reader__content p { margin-bottom: 16px; }
+        .reader__content .chapter-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.3px; }
+        .reader__footer { padding: 12px 16px calc(var(--safe-area-bottom) + 12px); border-top: 0.5px solid rgba(128,128,128,0.2); background: var(--tg-theme-bg-color); display: flex; align-items: center; gap: 12px; }
+        .reader__progress-bar { flex: 1; height: 4px; background: rgba(128,128,128,0.2); border-radius: 2px; overflow: hidden; }
+        .reader__progress-fill { height: 100%; background: var(--tg-theme-button-color); width: 0%; transition: width 0.3s; }
+        .reader__progress-text { font-size: 12px; color: var(--tg-theme-hint-color); font-weight: 600; min-width: 40px; text-align: right; }
+
+        .reader__settings-panel {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: var(--tg-theme-secondary-bg-color);
+            padding: 20px 16px calc(var(--safe-area-bottom) + 20px);
+            border-radius: 20px 20px 0 0;
+            transform: translateY(100%); transition: transform 0.3s ease; z-index: 3;
+        }
+        .reader__settings-panel.visible { transform: translateY(0); }
+        .settings-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .settings-row:last-child { margin-bottom: 0; }
+        .settings-label { font-size: 14px; font-weight: 600; }
+        .font-controls, .theme-controls { display: flex; gap: 8px; }
+        .font-btn, .theme-btn {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: var(--tg-theme-bg-color); border: 2px solid transparent;
+            color: var(--tg-theme-text-color); font-size: 16px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-weight: 600;
+        }
+        .font-btn.active, .theme-btn.active { border-color: var(--tg-theme-button-color); }
+
+        /* NOTES PANEL (боковая панель заметок) */
+        .notes-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 85%; max-width: 360px;
+            background: var(--tg-theme-bg-color);
+            z-index: 210;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+            display: flex; flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+        }
+        .notes-panel.visible { transform: translateX(0); }
+        .notes-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 205; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .notes-overlay.visible { opacity: 1; pointer-events: auto; }
+        .notes-panel__header {
+            padding: calc(var(--safe-area-top) + 16px) 16px 16px;
+            border-bottom: 0.5px solid rgba(128,128,128,0.2);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .notes-panel__title { font-size: 18px; font-weight: 700; }
+        .notes-panel__close { background: none; border: none; color: var(--tg-theme-accent-text-color); font-size: 24px; cursor: pointer; }
+        .notes-panel__content { flex: 1; overflow-y: auto; padding: 16px; }
+        .notes-panel__empty { text-align: center; color: var(--tg-theme-hint-color); padding: 40px 20px; font-size: 14px; }
+        .note-item {
+            background: var(--tg-theme-secondary-bg-color);
+            border-radius: 12px; padding: 12px;
+            margin-bottom: 10px; position: relative;
+        }
+        .note-item__chapter { font-size: 11px; color: var(--tg-theme-accent-text-color); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .note-item__text { font-size: 14px; line-height: 1.5; margin-bottom: 8px; white-space: pre-wrap; word-break: break-word; }
+        .note-item__date { font-size: 11px; color: var(--tg-theme-hint-color); }
+        .note-item__delete {
+            position: absolute; top: 8px; right: 8px;
+            background: none; border: none;
+            color: var(--tg-theme-destructive-text-color);
+            font-size: 16px; cursor: pointer;
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .notes-panel__add {
+            padding: 16px;
+            border-top: 0.5px solid rgba(128,128,128,0.2);
+            background: var(--tg-theme-bg-color);
+        }
+        .notes-panel__textarea {
+            width: 100%; min-height: 80px; max-height: 150px;
+            padding: 12px; border-radius: 12px;
+            background: var(--tg-theme-secondary-bg-color);
+            color: var(--tg-theme-text-color);
+            border: none; outline: none;
+            font-size: 14px; resize: vertical;
+            margin-bottom: 10px;
+        }
+        .notes-panel__textarea::placeholder { color: var(--tg-theme-hint-color); }
+        .notes-panel__submit {
+            width: 100%; padding: 12px;
+            background: var(--tg-theme-button-color);
+            color: #fff; border: none; border-radius: 12px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+        }
+        .notes-panel__submit:active { transform: scale(0.98); }
+        .notes-badge {
+            position: absolute; top: -4px; right: -4px;
+            background: var(--tg-theme-destructive-text-color);
+            color: #fff; font-size: 10px; font-weight: 700;
+            min-width: 16px; height: 16px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 4px;
+        }
+
+        /* ADMIN PANEL */
+        .admin-panel {
+            position: fixed; inset: 0;
+            background: var(--tg-theme-bg-color);
+            z-index: 300;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            display: flex; flex-direction: column;
+        }
+        .admin-panel.visible { transform: translateX(0); }
+        .admin-header {
+            padding: calc(var(--safe-area-top) + 16px) 16px 16px;
+            background: var(--tg-theme-secondary-bg-color);
+            border-bottom: 0.5px solid rgba(128,128,128,0.2);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .admin-title { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .admin-close { background: none; border: none; color: var(--tg-theme-accent-text-color); font-size: 24px; cursor: pointer; }
+        .admin-tabs {
+            display: flex; background: var(--tg-theme-secondary-bg-color);
+            border-bottom: 0.5px solid rgba(128,128,128,0.2);
+        }
+        .admin-tab {
+            flex: 1; padding: 12px; background: none; border: none;
+            color: var(--tg-theme-hint-color); font-size: 13px; font-weight: 600;
+            cursor: pointer; border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .admin-tab.active { color: var(--tg-theme-accent-text-color); border-bottom-color: var(--tg-theme-button-color); }
+        .admin-content { flex: 1; overflow-y: auto; padding: 16px; }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+
+        .admin-item {
+            background: var(--tg-theme-secondary-bg-color);
+            border-radius: 12px; padding: 12px;
+            margin-bottom: 10px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .admin-item__icon { font-size: 28px; flex-shrink: 0; }
+        .admin-item__info { flex: 1; min-width: 0; }
+        .admin-item__title { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .admin-item__meta { font-size: 12px; color: var(--tg-theme-hint-color); margin-top: 2px; }
+        .admin-item__actions { display: flex; gap: 6px; }
+        .admin-btn {
+            padding: 6px 12px; border-radius: 8px;
+            border: none; font-size: 13px; font-weight: 600;
+            cursor: pointer;
+        }
+        .admin-btn.primary { background: var(--tg-theme-button-color); color: #fff; }
+        .admin-btn.danger { background: var(--tg-theme-destructive-text-color); color: #fff; }
+        .admin-btn.secondary { background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
+
+        .admin-fab {
+            position: sticky; bottom: 16px;
+            width: 56px; height: 56px; border-radius: 50%;
+            background: var(--tg-theme-button-color); color: #fff;
+            border: none; font-size: 28px; cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            margin: 16px auto 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .admin-fab:active { transform: scale(0.9); }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 400;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .modal-overlay.visible { display: flex; }
+        .modal {
+            background: var(--tg-theme-bg-color);
+            width: 100%; max-width: 500px;
+            border-radius: 20px 20px 0 0;
+            padding: 20px 16px calc(var(--safe-area-bottom) + 20px);
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; text-align: center; }
+        .form-group { margin-bottom: 14px; }
+        .form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--tg-theme-hint-color); }
+        .form-input, .form-select, .form-textarea {
+            width: 100%; padding: 12px;
+            background: var(--tg-theme-secondary-bg-color);
+            color: var(--tg-theme-text-color);
+            border: none; border-radius: 10px;
+            font-size: 15px; outline: none;
+        }
+        .form-textarea { min-height: 100px; resize: vertical; font-family: inherit; }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { box-shadow: 0 0 0 2px var(--tg-theme-button-color); }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-actions button { flex: 1; padding: 14px; border-radius: 12px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
+
+        .chapter-editor {
+            background: var(--tg-theme-secondary-bg-color);
+            border-radius: 12px; padding: 12px;
+            margin-bottom: 10px;
+        }
+        .chapter-editor__header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px;
+        }
+        .chapter-editor__title { font-size: 14px; font-weight: 600; }
+        .chapter-editor__delete { background: none; border: none; color: var(--tg-theme-destructive-text-color); font-size: 18px; cursor: pointer; }
+
+        /* TOAST */
+        .toast {
+            position: fixed; top: calc(var(--safe-area-top) + 20px);
+            left: 50%; transform: translateX(-50%) translateY(-100px);
+            background: var(--tg-theme-text-color); color: var(--tg-theme-bg-color);
+            padding: 12px 20px; border-radius: 12px;
+            font-size: 14px; font-weight: 500;
+            z-index: 500;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 90%;
+        }
+        .toast.visible { transform: translateX(-50%) translateY(0); }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--tg-theme-hint-color); }
+        .empty-state__icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state__text { font-size: 15px; }
+
+        .admin-hint {
+            background: var(--tg-theme-secondary-bg-color);
+            border-radius: 12px; padding: 12px;
+            margin-bottom: 16px; font-size: 13px;
+            color: var(--tg-theme-hint-color);
+            display: flex; gap: 10px; align-items: flex-start;
+        }
+        .admin-hint__icon { font-size: 20px; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div class="content-area" id="contentArea">
+
+        <!-- ============ ГЛАВНАЯ ============ -->
+        <div id="page-home" class="page active">
+            <h1 id="greeting">Привет! 👋</h1>
+            <p class="subtitle" id="greeting-sub">Готов продолжить обучение?</p>
+
+            <div class="block" style="display: flex; align-items: center; gap: 16px;">
+                <div style="font-size: 40px;">🔥</div>
+                <div>
+                    <div style="font-size: 18px; font-weight: 600;" id="streak-text">0 дней подряд</div>
+                    <div style="font-size: 14px; color: var(--tg-theme-hint-color);">Не прерывай серию!</div>
+                </div>
+            </div>
+
+            <h2>Продолжить</h2>
+            <div id="continue-block"></div>
+
+            <h2>Рекомендуем</h2>
+            <div id="recommendations" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; margin: 0 -16px; padding-left: 16px; padding-right: 16px;"></div>
+        </div>
+
+        <!-- ============ УРОКИ ============ -->
+        <div id="page-lessons" class="page">
+            <h1>🎧 Уроки</h1>
+            <input type="text" class="search-bar" id="lessonsSearch" placeholder="🔍 Поиск уроков...">
+            <div id="lessonsCategories" class="cat-tabs"></div>
+            <div id="lessonsSubcategories" class="subcat-row"></div>
+            <div id="lessonsGrid" class="tma-grid"></div>
+        </div>
+
+        <!-- ============ КНИГИ ============ -->
+        <div id="page-books" class="page">
+            <h1>📚 Книги</h1>
+            <input type="text" class="search-bar" id="booksSearch" placeholder="🔍 Поиск книг...">
+            <div id="booksCategories" class="cat-tabs"></div>
+            <div id="booksSubcategories" class="subcat-row"></div>
+            <div id="booksGrid" class="tma-grid"></div>
+        </div>
+
+        <!-- ============ ПРОГРЕСС ============ -->
+        <div id="page-progress" class="page">
+            <h1>Прогресс</h1>
+            <div class="block" style="display: flex; justify-content: space-around; text-align: center;">
+                <div>
+                    <div style="font-size: 24px; font-weight: 700; color: var(--tg-theme-accent-text-color);" id="stat-hours">0</div>
+                    <div style="font-size: 13px; color: var(--tg-theme-hint-color);">Минут</div>
+                </div>
+                <div>
+                    <div style="font-size: 24px; font-weight: 700; color: var(--tg-theme-accent-text-color);" id="stat-books">0</div>
+                    <div style="font-size: 13px; color: var(--tg-theme-hint-color);">Книг</div>
+                </div>
+                <div>
+                    <div style="font-size: 24px; font-weight: 700; color: var(--tg-theme-accent-text-color);" id="stat-lessons">0</div>
+                    <div style="font-size: 13px; color: var(--tg-theme-hint-color);">Уроков</div>
+                </div>
+            </div>
+
+            <h2>Календарь активности</h2>
+            <div class="block">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; font-weight: 600;">
+                    <span id="calendar-month">Август 2026</span>
+                    <span style="color: var(--tg-theme-accent-text-color);" id="calendar-count">0 дней</span>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+
+            <h2>Достижения</h2>
+            <div id="achievements" class="block"></div>
+        </div>
+
+        <!-- ============ ПРОФИЛЬ ============ -->
+        <div id="page-profile" class="page">
+            <div style="padding-top: 20px;">
+                <div class="profile-avatar" id="user-avatar">U</div>
+                <div class="profile-name" id="user-name">Пользователь</div>
+            </div>
+
+            <div class="block">
+                <div class="settings-item" onclick="showToast('Тема следует за настройками Telegram')">
+                    <span>🌙 Тема оформления</span><span>Системная</span>
+                </div>
+                <div class="settings-item" onclick="showToast('Язык: Русский')">
+                    <span>🌍 Язык</span><span>Русский</span>
+                </div>
+                <div class="settings-item" onclick="showToast('💎 Премиум скоро!')">
+                    <span>💎 Подписка</span>
+                    <span style="color: var(--tg-theme-accent-text-color); font-weight: 600;">Оформить</span>
+                </div>
+            </div>
+
+            <div class="block">
+                <div class="settings-item" onclick="exportData()">
+                    <span>📤 Экспорт данных</span><span>JSON</span>
+                </div>
+                <div class="settings-item" onclick="document.getElementById('importFile').click()">
+                    <span>📥 Импорт данных</span><span>JSON</span>
+                </div>
+                <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+            </div>
+
+            <div class="block">
+                <div class="settings-item" onclick="resetProgress()">
+                    <span>🗑 Сбросить прогресс</span>
+                    <span style="color: var(--tg-theme-destructive-text-color);">Сброс</span>
+                </div>
+            </div>
+
+            <div class="block" style="text-align: center; color: var(--tg-theme-hint-color); font-size: 13px;">
+                <div id="versionLabel" style="cursor: pointer; user-select: none;">Требуй знания! v4.0</div>
+                <div style="margin-top: 4px; font-size: 11px;">Сделано с ❤️ для Telegram</div>
+                <div id="adminHint" style="margin-top: 8px; font-size: 10px; opacity: 0.5;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============ МИНИ-ПЛЕЕР ============ -->
+    <div class="mini-player" id="miniPlayer" onclick="openFullPlayer()">
+        <div class="mini-player__cover" id="mpCover">🎧</div>
+        <div class="mini-player__info">
+            <div class="mini-player__title" id="mpTitle">—</div>
+            <div class="mini-player__author" id="mpAuthor">—</div>
+        </div>
+        <button class="mini-player__btn" id="mpPlayBtn" onclick="togglePlay(event)">▶️</button>
+        <div class="mini-player__progress"><div class="mini-player__progress-bar" id="mpProgressBar"></div></div>
+    </div>
+
+    <!-- ============ ПОЛНОЭКРАННЫЙ ПЛЕЕР ============ -->
+    <div class="full-player" id="fullPlayer">
+        <div class="full-player__header">
+            <button class="full-player__close" onclick="closeFullPlayer()">✕</button>
+            <div class="full-player__header-title">СЕЙЧАС ИГРАЕТ</div>
+            <button class="full-player__more" onclick="showToast('Меню в разработке')">⋯</button>
+        </div>
+        <div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column;">
+            <div class="full-player__cover" id="fpCover">🎧</div>
+            <div class="full-player__title" id="fpTitle">—</div>
+            <div class="full-player__author" id="fpAuthor">—</div>
+            <div class="full-player__seek" id="fpSeek" onclick="seekAudio(event)">
+                <div class="full-player__seek-fill" id="fpSeekFill"></div>
+            </div>
+            <div class="full-player__time">
+                <span id="fpCurrentTime">0:00</span>
+                <span id="fpDuration">0:00</span>
+            </div>
+            <div class="full-player__controls">
+                <button class="fp-btn small" onclick="skipTime(-15)">⏪</button>
+                <button class="fp-btn play" id="fpPlayBtn" onclick="togglePlay()">▶️</button>
+                <button class="fp-btn small" onclick="skipTime(15)">⏩</button>
+            </div>
+            <button class="full-player__speed" id="fpSpeed" onclick="changeSpeed()">1x</button>
+        </div>
+    </div>
+
+    <!-- ============ ЧИТАЛКА ============ -->
+    <div class="reader" id="reader">
+        <div class="reader__header">
+            <button class="reader__btn" onclick="closeReader()">←</button>
+            <div class="reader__title" id="readerTitle">—</div>
+            <div style="display: flex; gap: 4px; position: relative;">
+                <button class="reader__btn" onclick="toggleNotesPanel()" id="notesBtn" style="position: relative;">
+                    📝
+                    <span class="notes-badge" id="notesBadge" style="display: none;">0</span>
+                </button>
+                <button class="reader__btn" onclick="toggleReaderSettings()">⚙️</button>
+            </div>
+        </div>
+        <div class="reader__content" id="readerContent"></div>
+        <div class="reader__footer">
+            <button class="reader__btn" onclick="prevChapter()" id="prevChBtn" style="font-size: 16px;">◀</button>
+            <div class="reader__progress-bar"><div class="reader__progress-fill" id="readerProgressFill"></div></div>
+            <div class="reader__progress-text" id="readerProgressText">0%</div>
+            <button class="reader__btn" onclick="nextChapter()" id="nextChBtn" style="font-size: 16px;">▶</button>
+        </div>
+        <div class="reader__settings-panel" id="readerSettings">
+            <div class="settings-row">
+                <span class="settings-label">Размер шрифта</span>
+                <div class="font-controls">
+                    <button class="font-btn" data-size="15" onclick="setFontSize(15)">A</button>
+                    <button class="font-btn active" data-size="17" onclick="setFontSize(17)">A</button>
+                    <button class="font-btn" data-size="20" onclick="setFontSize(20)" style="font-size: 18px;">A</button>
+                </div>
+            </div>
+            <div class="settings-row">
+                <span class="settings-label">Тема</span>
+                <div class="theme-controls">
+                    <button class="theme-btn" data-theme="light" onclick="setReaderTheme('light')" style="background:#fff;color:#000;">☀️</button>
+                    <button class="theme-btn" data-theme="sepia" onclick="setReaderTheme('sepia')" style="background:#f4ecd8;color:#5b4636;">📜</button>
+                    <button class="theme-btn" data-theme="dark" onclick="setReaderTheme('dark')" style="background:#1c1c1e;color:#fff;">🌙</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ ПАНЕЛЬ ЗАМЕТОК ============ -->
+    <div class="notes-overlay" id="notesOverlay" onclick="toggleNotesPanel()"></div>
+    <div class="notes-panel" id="notesPanel">
+        <div class="notes-panel__header">
+            <div class="notes-panel__title">📝 Мои заметки</div>
+            <button class="notes-panel__close" onclick="toggleNotesPanel()">✕</button>
+        </div>
+        <div class="notes-panel__content" id="notesContent"></div>
+        <div class="notes-panel__add">
+            <textarea class="notes-panel__textarea" id="noteInput" placeholder="Ваши мысли по текущей главе..."></textarea>
+            <button class="notes-panel__submit" onclick="addNote()">Добавить заметку</button>
+        </div>
+    </div>
+
+    <!-- ============ АДМИН-ПАНЕЛЬ ============ -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-header">
+            <div class="admin-title">⚙️ Админ-панель</div>
+            <button class="admin-close" onclick="closeAdmin()">✕</button>
+        </div>
+        <div class="admin-tabs">
+            <button class="admin-tab active" data-section="categories" onclick="switchAdminTab('categories')">📁 Разделы</button>
+            <button class="admin-tab" data-section="content" onclick="switchAdminTab('content')">📚 Контент</button>
+            <button class="admin-tab" data-section="data" onclick="switchAdminTab('data')">💾 Данные</button>
+        </div>
+        <div class="admin-content">
+            <!-- Разделы -->
+            <div class="admin-section active" id="admin-categories">
+                <div class="admin-hint">
+                    <div class="admin-hint__icon">💡</div>
+                    <div>Создавайте разделы и подразделы для организации уроков и книг. Подразделы привязываются к родительскому разделу.</div>
+                </div>
+                <div id="adminCategoriesList"></div>
+                <button class="admin-fab" onclick="openCategoryModal()">+</button>
+            </div>
+
+            <!-- Контент -->
+            <div class="admin-section" id="admin-content">
+                <div class="admin-hint">
+                    <div class="admin-hint__icon">💡</div>
+                    <div>Добавляйте аудиоуроки и книги. Для книг можно создавать главы с текстом.</div>
+                </div>
+                <div class="cat-tabs" style="margin-bottom: 12px;">
+                    <button class="cat-tab active" data-type="all" onclick="filterAdminContent('all')">Все</button>
+                    <button class="cat-tab" data-type="audio" onclick="filterAdminContent('audio')">🎧 Уроки</button>
+                    <button class="cat-tab" data-type="book" onclick="filterAdminContent('book')">📚 Книги</button>
+                </div>
+                <div id="adminContentList"></div>
+                <button class="admin-fab" onclick="openContentModal()">+</button>
+            </div>
+
+            <!-- Данные -->
+            <div class="admin-section" id="admin-data">
+                <div class="admin-hint">
+                    <div class="admin-hint__icon">💡</div>
+                    <div>Экспортируйте все данные (контент, разделы, прогресс) в JSON для резервной копии. Импортируйте для восстановления.</div>
+                </div>
+                <div class="block">
+                    <button class="admin-btn primary" style="width: 100%; padding: 14px; font-size: 15px; margin-bottom: 10px;" onclick="exportData()">📤 Экспортировать всё</button>
+                    <button class="admin-btn secondary" style="width: 100%; padding: 14px; font-size: 15px; margin-bottom: 10px;" onclick="document.getElementById('importFileAdmin').click()">📥 Импортировать данные</button>
+                    <input type="file" id="importFileAdmin" accept=".json" style="display:none" onchange="importData(event)">
+                    <button class="admin-btn danger" style="width: 100%; padding: 14px; font-size: 15px;" onclick="resetAllData()">🗑 Сбросить всё</button>
+                </div>
+                <div class="block" style="font-size: 13px; color: var(--tg-theme-hint-color);">
+                    <div>📊 Статистика:</div>
+                    <div id="adminStats" style="margin-top: 8px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА КАТЕГОРИИ ============ -->
+    <div class="modal-overlay" id="categoryModal">
+        <div class="modal">
+            <div class="modal-title" id="categoryModalTitle">Новый раздел</div>
+            <div class="form-group">
+                <label class="form-label">Название</label>
+                <input type="text" class="form-input" id="catName" placeholder="Например: Наука">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Иконка (эмодзи)</label>
+                <input type="text" class="form-input" id="catIcon" placeholder="🧪" maxlength="2">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Тип</label>
+                <select class="form-select" id="catType">
+                    <option value="category">Раздел (корневой)</option>
+                    <option value="subcategory">Подраздел</option>
+                </select>
+            </div>
+            <div class="form-group" id="catParentGroup" style="display:none;">
+                <label class="form-label">Родительский раздел</label>
+                <select class="form-select" id="catParent"></select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Применимо к</label>
+                <select class="form-select" id="catApplies">
+                    <option value="both">Уроки и книги</option>
+                    <option value="audio">Только уроки</option>
+                    <option value="book">Только книги</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="admin-btn secondary" onclick="closeCategoryModal()">Отмена</button>
+                <button class="admin-btn primary" onclick="saveCategory()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ МОДАЛКА КОНТЕНТА ============ -->
+    <div class="modal-overlay" id="contentModal">
+        <div class="modal">
+            <div class="modal-title" id="contentModalTitle">Новый контент</div>
+            <div class="form-group">
+                <label class="form-label">Тип</label>
+                <select class="form-select" id="cntType" onchange="toggleContentFields()">
+                    <option value="audio">🎧 Аудиоурок</option>
+                    <option value="book">📚 Книга</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Название</label>
+                <input type="text" class="form-input" id="cntTitle" placeholder="Название">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Автор</label>
+                <input type="text" class="form-input" id="cntAuthor" placeholder="Автор">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Иконка (эмодзи)</label>
+                <input type="text" class="form-input" id="cntEmoji" placeholder="🎧" maxlength="2">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Раздел</label>
+                <select class="form-select" id="cntCategory"></select>
+            </div>
+            <div class="form-group" id="cntSubcategoryGroup">
+                <label class="form-label">Подраздел (опционально)</label>
+                <select class="form-select" id="cntSubcategory"><option value="">—</option></select>
+            </div>
+            <div id="audioFields">
+                <div class="form-group">
+                    <label class="form-label">URL аудио (mp3)</label>
+                    <input type="text" class="form-input" id="cntAudioUrl" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Длительность (сек)</label>
+                    <input type="number" class="form-input" id="cntDuration" placeholder="1800">
+                </div>
+            </div>
+            <div id="bookFields" style="display:none;">
+                <label class="form-label">Главы книги</label>
+                <div id="chaptersList"></div>
+                <button class="admin-btn secondary" style="width: 100%; padding: 10px; margin-top: 8px;" onclick="addChapterField()">+ Добавить главу</button>
+            </div>
+            <div class="form-group" style="margin-top: 14px;">
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
+                    <input type="checkbox" id="cntPremium"> 💎 Премиум-контент
+                </label>
+            </div>
+            <div class="modal-actions">
+                <button class="admin-btn secondary" onclick="closeContentModal()">Отмена</button>
+                <button class="admin-btn primary" onclick="saveContent()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <audio id="audioPlayer" preload="metadata"></audio>
+
+    <!-- ============ НИЖНЯЯ НАВИГАЦИЯ ============ -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-target="page-home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Главная</span>
+        </button>
+        <button class="nav-item" data-target="page-lessons">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+            <span>Уроки</span>
+        </button>
+        <button class="nav-item" data-target="page-books">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+            <span>Книги</span>
+        </button>
+        <button class="nav-item" data-target="page-progress">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <span>Прогресс</span>
+        </button>
+        <button class="nav-item" data-target="page-profile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Профиль</span>
+        </button>
+    </nav>
+</div>
+
+<script>
+// ============ TELEGRAM INIT ============
+const tg = window.Telegram?.WebApp;
+if (tg) { try { tg.ready(); tg.expand(); tg.setHeaderColor(tg.themeParams?.bg_color || '#ffffff'); } catch(e) {} }
+function haptic(type = 'light') { try { tg?.HapticFeedback?.[type === 'selection' ? 'selectionChanged' : 'impactOccurred'](type === 'selection' ? undefined : type); } catch(e) {} }
+
+// ============ ДЕФОЛТНЫЕ ДАННЫЕ ============
+const DEFAULT_DATA = {
+    categories: [
+        { id: 'cat1', name: 'Наука', icon: '🧪', type: 'category', parentId: null, applies: 'both' },
+        { id: 'cat2', name: 'Физика', icon: '⚛️', type: 'subcategory', parentId: 'cat1', applies: 'audio' },
+        { id: 'cat3', name: 'Биология', icon: '🧬', type: 'subcategory', parentId: 'cat1', applies: 'both' },
+        { id: 'cat4', name: 'История', icon: '🏛', type: 'category', parentId: null, applies: 'both' },
+        { id: 'cat5', name: 'IT', icon: '💻', type: 'category', parentId: null, applies: 'both' },
+        { id: 'cat6', name: 'Психология', icon: '🧠', type: 'category', parentId: null, applies: 'both' },
+        { id: 'cat7', name: 'Саморазвитие', icon: '🚀', type: 'category', parentId: null, applies: 'both' }
+    ],
+    content: [
+        {
+            id: 1, type: 'audio', categoryId: 'cat2', subcategoryId: null,
+            emoji: '🌌', title: 'Тайны черных дыр', author: 'Алексей Иванов',
+            duration: 2700, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-1.mp3', premium: false
+        },
+        {
+            id: 2, type: 'book', categoryId: 'cat4', subcategoryId: null,
+            emoji: '🏛', title: 'История Древнего Рима', author: 'Марк Туллий', premium: false,
+            chapters: [
+                { id: 'ch1', title: 'Глава 1. Основание Рима', text: 'Согласно легенде, Рим был основан братьями Ромулом и Ремом в 753 году до нашей эры. Братья были вскормлены волчицей и выросли, чтобы основать величайшую цивилизацию древности.\n\nРомул стал первым царем Рима и дал городу свое имя. Он создал сенат из ста самых знатных людей, которые стали называться "патрициями".\n\nМаленькое поселение на Палатинском холме быстро росло. Беглые рабы, изгнанники и искатели приключений находили здесь убежище.' },
+                { id: 'ch2', title: 'Глава 2. Царский период', text: 'Римом правили семь царей: четверо латинов и сабинян и трое этрусков. Последний царь, Тарквиний Гордый, был жестоким тираном и был изгнан в 509 году до н.э.\n\nПосле изгнания царей была установлена Республика. Власть перешла к сенату и народным собраниям.\n\nЭтот период ознаменовался борьбой плебеев и патрициев. Плебеи постепенно добились равноправия.' },
+                { id: 'ch3', title: 'Глава 3. Расцвет Республики', text: 'К III веку до н.э. Рим объединил под своей властью всю Италию. Началась эпоха Пунических войн с Карфагеном.\n\nГаннибал Барка перешел Альпы со слонами и нанес римлянам несколько сокрушительных поражений. Но Рим выстоял и в итоге разрушил Карфаген в 146 году до н.э.' }
+            ]
+        },
+        {
+            id: 3, type: 'audio', categoryId: 'cat5', subcategoryId: null,
+            emoji: '💻', title: 'Python с нуля', author: 'IT Academy',
+            duration: 1800, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-2.mp3', premium: false
+        },
+        {
+            id: 4, type: 'audio', categoryId: 'cat6', subcategoryId: null,
+            emoji: '🧠', title: 'Как работает память', author: 'Доктор Нейро',
+            duration: 900, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-3.mp3', premium: false
+        },
+        {
+            id: 5, type: 'book', categoryId: 'cat1', subcategoryId: null,
+            emoji: '📖', title: 'Краткая история времени', author: 'Стивен Хокинг', premium: false,
+            chapters: [
+                { id: 'ch1', title: 'Глава 1. Наши представления о Вселенной', text: 'Древние греки считали, что Вселенная конечна и имеет сферическую форму. Земля находится в центре, а вокруг нее вращаются Солнце, Луна и планеты.\n\nЭта модель господствовала более тысячи лет. Но в 1543 году Коперник предложил гелиоцентрическую модель.' },
+                { id: 'ch2', title: 'Глава 2. Пространство и время', text: 'До Эйнштейна пространство и время считались абсолютными. Специальная теория относительности (1905) перевернула эти представления.\n\nДвижущиеся часы идут медленнее, а движущиеся линейки сокращаются.' }
+            ]
+        },
+        {
+            id: 6, type: 'audio', categoryId: 'cat6', subcategoryId: null,
+            emoji: '🎨', title: 'Психология цвета', author: 'Анна Дизайнер',
+            duration: 1200, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-5.mp3', premium: true
+        }
+    ]
+};
+
+// ============ STATE ============
+const DATA_KEY = 'tknowledge_data_v4';
+const STATE_KEY = 'tknowledge_state_v4';
+
+let data = { categories: [], content: [] };
+let state = {
+    favorites: [], audioProgress: {}, bookProgress: {},
+    listeningTime: 0, lessonsCompleted: [], booksCompleted: [],
+    activeDays: [], lastActiveDay: null, streak: 0,
+    readerSettings: { fontSize: 17, theme: 'light' },
+    playerSettings: { speed: 1 },
+    notes: {} // { bookId: [{ id, chapterId, text, timestamp }] }
+};
+
+function loadData() {
+    try {
+        const saved = localStorage.getItem(DATA_KEY);
+        if (saved) data = JSON.parse(saved);
+        else { data = JSON.parse(JSON.stringify(DEFAULT_DATA)); saveData(); }
+    } catch(e) { data = JSON.parse(JSON.stringify(DEFAULT_DATA)); saveData(); }
+}
+function saveData() { try { localStorage.setItem(DATA_KEY, JSON.stringify(data)); } catch(e) {} }
+
+function loadState() {
+    try {
+        const saved = localStorage.getItem(STATE_KEY);
+        if (saved) state = { ...state, ...JSON.parse(saved) };
+    } catch(e) {}
+}
+function saveState() { try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch(e) {} }
+
+// ============ УТИЛИТЫ ============
+function todayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function markActiveToday() {
+    const today = todayStr();
+    if (!state.activeDays.includes(today)) state.activeDays.push(today);
+    if (state.lastActiveDay) {
+        const diff = Math.round((new Date(today) - new Date(state.lastActiveDay)) / (1000*60*60*24));
+        if (diff === 1) state.streak += 1;
+        else if (diff > 1) state.streak = 1;
+    } else state.streak = 1;
+    state.lastActiveDay = today;
+    saveState();
+}
+function formatTime(sec) {
+    if (!sec || isNaN(sec)) return '0:00';
+    const m = Math.floor(sec / 60); const s = Math.floor(sec % 60);
+    return `${m}:${String(s).padStart(2,'0')}`;
+}
+function declOfNum(n, titles) {
+    const cases = [2, 0, 1, 1, 1, 2];
+    return titles[(n % 100 > 4 && n % 100 < 20) ? 2 : cases[Math.min(n % 10, 5)]];
+}
+function genId() { return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5); }
+
+function getCategoryName(id) {
+    const c = data.categories.find(c => c.id === id);
+    return c ? c.name : '—';
+}
+function getCategoryIcon(id) {
+    const c = data.categories.find(c => c.id === id);
+    return c ? c.icon : '📁';
+}
+
+// ============ TOAST ============
+let toastTimeout;
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('visible');
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => toast.classList.remove('visible'), 2500);
+}
+
+// ============ АУДИОПЛЕЕР ============
+const audio = document.getElementById('audioPlayer');
+let currentTrack = null;
+let isPlaying = false;
+let saveInterval = null;
+
+function playTrack(id) {
+    const item = data.content.find(c => c.id == id && c.type === 'audio');
+    if (!item) return;
+    if (item.premium) { showToast('💎 Трек доступен в Премиум'); haptic('medium'); return; }
+
+    const wasSameTrack = currentTrack?.id === item.id;
+    currentTrack = item;
+    audio.src = item.audioUrl;
+    const saved = state.audioProgress[item.id];
+    if (saved && !wasSameTrack) audio.currentTime = saved.position || 0;
+    audio.playbackRate = state.playerSettings.speed;
+    audio.play().then(() => {
+        isPlaying = true; updatePlayButtons(); showMiniPlayer(); markActiveToday();
+    }).catch(err => { showToast('Не удалось воспроизвести'); });
+
+    if (saveInterval) clearInterval(saveInterval);
+    saveInterval = setInterval(() => {
+        if (currentTrack && !audio.paused) {
+            state.audioProgress[currentTrack.id] = { position: audio.currentTime, duration: audio.duration || 0 };
+            state.listeningTime += 5; saveState();
+        }
+    }, 5000);
+    haptic('medium');
+}
+
+function togglePlay(e) {
+    if (e) e.stopPropagation();
+    if (!currentTrack) return;
+    if (audio.paused) { audio.play(); isPlaying = true; }
+    else { audio.pause(); isPlaying = false; }
+    updatePlayButtons(); haptic('light');
+}
+function skipTime(sec) {
+    if (!currentTrack) return;
+    audio.currentTime = Math.max(0, Math.min(audio.duration || 0, audio.currentTime + sec));
+    haptic('light');
+}
+function changeSpeed() {
+    const speeds = [0.75, 1, 1.25, 1.5, 2];
+    const idx = speeds.indexOf(state.playerSettings.speed);
+    state.playerSettings.speed = speeds[(idx + 1) % speeds.length];
+    audio.playbackRate = state.playerSettings.speed;
+    document.getElementById('fpSpeed').textContent = state.playerSettings.speed + 'x';
+    showToast('Скорость: ' + state.playerSettings.speed + 'x');
+    haptic('selection'); saveState();
+}
+function seekAudio(e) {
+    if (!currentTrack || !audio.duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const percent = (e.clientX - rect.left) / rect.width;
+    audio.currentTime = audio.duration * percent;
+    haptic('light');
+}
+function updatePlayButtons() {
+    const icon = isPlaying ? '⏸️' : '▶️';
+    document.getElementById('mpPlayBtn').textContent = icon;
+    document.getElementById('fpPlayBtn').textContent = icon;
+}
+function showMiniPlayer() {
+    if (!currentTrack) return;
+    document.getElementById('mpCover').textContent = currentTrack.emoji;
+    document.getElementById('mpTitle').textContent = currentTrack.title;
+    document.getElementById('mpAuthor').textContent = currentTrack.author;
+    document.getElementById('miniPlayer').classList.add('visible');
+    document.getElementById('contentArea').classList.add('player-active');
+}
+function openFullPlayer() {
+    if (!currentTrack) return;
+    document.getElementById('fpCover').textContent = currentTrack.emoji;
+    document.getElementById('fpTitle').textContent = currentTrack.title;
+    document.getElementById('fpAuthor').textContent = currentTrack.author;
+    document.getElementById('fpSpeed').textContent = state.playerSettings.speed + 'x';
+    document.getElementById('fullPlayer').classList.add('visible');
+    haptic('light');
+}
+function closeFullPlayer() {
+    document.getElementById('fullPlayer').classList.remove('visible');
+    haptic('light');
+}
+
+audio.addEventListener('timeupdate', () => {
+    if (!currentTrack) return;
+    const percent = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+    document.getElementById('mpProgressBar').style.width = percent + '%';
+    document.getElementById('fpSeekFill').style.width = percent + '%';
+    document.getElementById('fpCurrentTime').textContent = formatTime(audio.currentTime);
+    document.getElementById('fpDuration').textContent = formatTime(audio.duration);
+    state.audioProgress[currentTrack.id] = { position: audio.currentTime, duration: audio.duration || 0 };
+});
+audio.addEventListener('ended', () => {
+    isPlaying = false; updatePlayButtons();
+    if (currentTrack && !state.lessonsCompleted.includes(currentTrack.id)) {
+        state.lessonsCompleted.push(currentTrack.id);
+        markActiveToday(); saveState();
+        showToast('🎉 Урок завершен!');
+        renderProgress(); renderHome();
+    }
+});
+
+// ============ ЧИТАЛКА ============
+let currentBook = null;
+let currentChapter = 0;
+
+function openBook(id) {
+    const item = data.content.find(c => c.id == id && c.type === 'book');
+    if (!item) return;
+    if (item.premium) { showToast('💎 Книга доступна в Премиум'); haptic('medium'); return; }
+    if (!item.chapters || item.chapters.length === 0) { showToast('В книге нет глав'); return; }
+
+    currentBook = item;
+    const saved = state.bookProgress[item.id];
+    currentChapter = saved?.chapter || 0;
+    if (currentChapter >= item.chapters.length) currentChapter = 0;
+
+    document.getElementById('readerTitle').textContent = item.title;
+    document.getElementById('reader').classList.add('visible');
+    applyReaderSettings();
+    renderChapter();
+    updateNotesBadge();
+    markActiveToday();
+    haptic('medium');
+}
+
+function renderChapter() {
+    if (!currentBook) return;
+    const chapter = currentBook.chapters[currentChapter];
+    const content = document.getElementById('readerContent');
+    content.innerHTML = `
+        <div class="chapter-title">${chapter.title}</div>
+        ${chapter.text.split('\n\n').map(p => `<p>${p}</p>`).join('')}
+    `;
+    content.scrollTop = 0;
+    const saved = state.bookProgress[currentBook.id];
+    if (saved && saved.chapter === currentChapter && saved.scroll) {
+        setTimeout(() => { content.scrollTop = saved.scroll; }, 100);
+    }
+    updateReaderProgress();
+    document.getElementById('prevChBtn').style.visibility = currentChapter > 0 ? 'visible' : 'hidden';
+    document.getElementById('nextChBtn').style.visibility = currentChapter < currentBook.chapters.length - 1 ? 'visible' : 'hidden';
+}
+
+function prevChapter() {
+    if (currentChapter > 0) { saveBookProgress(); currentChapter--; renderChapter(); haptic('light'); }
+}
+function nextChapter() {
+    if (currentBook && currentChapter < currentBook.chapters.length - 1) { saveBookProgress(); currentChapter++; renderChapter(); haptic('light'); }
+}
+
+function updateReaderProgress() {
+    if (!currentBook) return;
+    const percent = Math.round(((currentChapter + 1) / currentBook.chapters.length) * 100);
+    document.getElementById('readerProgressFill').style.width = percent + '%';
+    document.getElementById('readerProgressText').textContent = percent + '%';
+}
+
+function closeReader() {
+    saveBookProgress();
+    document.getElementById('reader').classList.remove('visible');
+    document.getElementById('readerSettings').classList.remove('visible');
+    document.getElementById('notesPanel').classList.remove('visible');
+    document.getElementById('notesOverlay').classList.remove('visible');
+    currentBook = null;
+    haptic('light');
+}
+
+function saveBookProgress() {
+    if (!currentBook) return;
+    const content = document.getElementById('readerContent');
+    state.bookProgress[currentBook.id] = { chapter: currentChapter, scroll: content.scrollTop };
+    if (currentChapter === currentBook.chapters.length - 1 && !state.booksCompleted.includes(currentBook.id)) {
+        state.booksCompleted.push(currentBook.id);
+        showToast('📖 Книга прочитана!');
+    }
+    saveState();
+}
+
+function toggleReaderSettings() {
+    document.getElementById('readerSettings').classList.toggle('visible');
+    haptic('selection');
+}
+function setFontSize(size) {
+    state.readerSettings.fontSize = size;
+    applyReaderSettings();
+    document.querySelectorAll('.font-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.size) === size));
+    saveState(); haptic('selection');
+}
+function setReaderTheme(theme) {
+    state.readerSettings.theme = theme;
+    applyReaderSettings();
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.theme === theme));
+    saveState(); haptic('selection');
+}
+function applyReaderSettings() {
+    const reader = document.getElementById('reader');
+    reader.classList.remove('theme-sepia', 'theme-dark');
+    if (state.readerSettings.theme === 'sepia') reader.classList.add('theme-sepia');
+    else if (state.readerSettings.theme === 'dark') reader.classList.add('theme-dark');
+    document.getElementById('readerContent').style.fontSize = state.readerSettings.fontSize + 'px';
+}
+
+document.getElementById('readerContent').addEventListener('scroll', () => {
+    if (currentBook) {
+        clearTimeout(window.readerSaveTimeout);
+        window.readerSaveTimeout = setTimeout(saveBookProgress, 500);
+    }
+});
+
+// ============ ЗАМЕТКИ ============
+function toggleNotesPanel() {
+    const panel = document.getElementById('notesPanel');
+    const overlay = document.getElementById('notesOverlay');
+    const isVisible = panel.classList.contains('visible');
+    if (isVisible) {
+        panel.classList.remove('visible');
+        overlay.classList.remove('visible');
+    } else {
+        renderNotes();
+        panel.classList.add('visible');
+        overlay.classList.add('visible');
+    }
+    haptic('light');
+}
+
+function renderNotes() {
+    if (!currentBook) return;
+    const bookNotes = state.notes[currentBook.id] || [];
+    const content = document.getElementById('notesContent');
+    if (bookNotes.length === 0) {
+        content.innerHTML = '<div class="notes-panel__empty">📝<br><br>У вас пока нет заметок к этой книге.<br>Добавьте первую заметку ниже!</div>';
+        return;
+    }
+    content.innerHTML = bookNotes.map(note => {
+        const chapter = currentBook.chapters.find(c => c.id === note.chapterId);
+        const chapterTitle = chapter ? chapter.title : 'Удалённая глава';
+        const date = new Date(note.timestamp).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+        return `
+            <div class="note-item" onclick="goToNote('${note.chapterId}')">
+                <div class="note-item__chapter">${chapterTitle}</div>
+                <div class="note-item__text">${escapeHtml(note.text)}</div>
+                <div class="note-item__date">${date}</div>
+                <button class="note-item__delete" onclick="deleteNote(event, '${note.id}')">✕</button>
+            </div>
+        `;
+    }).join('');
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function addNote() {
+    if (!currentBook) return;
+    const input = document.getElementById('noteInput');
+    const text = input.value.trim();
+    if (!text) { showToast('Введите текст заметки'); return; }
+
+    if (!state.notes[currentBook.id]) state.notes[currentBook.id] = [];
+    const chapter = currentBook.chapters[currentChapter];
+    state.notes[currentBook.id].push({
+        id: genId(),
+        chapterId: chapter.id,
+        text: text,
+        timestamp: Date.now()
+    });
+    input.value = '';
+    saveState();
+    renderNotes();
+    updateNotesBadge();
+    showToast('✅ Заметка добавлена');
+    haptic('medium');
+}
+
+function deleteNote(e, noteId) {
+    e.stopPropagation();
+    if (!currentBook) return;
+    if (!confirm('Удалить заметку?')) return;
+    state.notes[currentBook.id] = state.notes[currentBook.id].filter(n => n.id !== noteId);
+    saveState();
+    renderNotes();
+    updateNotesBadge();
+    showToast('🗑 Заметка удалена');
+    haptic('light');
+}
+
+function goToNote(chapterId) {
+    if (!currentBook) return;
+    const idx = currentBook.chapters.findIndex(c => c.id === chapterId);
+    if (idx >= 0 && idx !== currentChapter) {
+        saveBookProgress();
+        currentChapter = idx;
+        renderChapter();
+        toggleNotesPanel();
+        showToast('📖 Переход к главе');
+    } else {
+        toggleNotesPanel();
+    }
+    haptic('light');
+}
+
+function updateNotesBadge() {
+    const badge = document.getElementById('notesBadge');
+    if (!currentBook) { badge.style.display = 'none'; return; }
+    const count = (state.notes[currentBook.id] || []).length;
+    if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+// ============ РЕНДЕРИНГ БИБЛИОТЕК ============
+let lessonsFilter = { category: 'all', subcategory: 'all', search: '' };
+let booksFilter = { category: 'all', subcategory: 'all', search: '' };
+
+function renderLessons() {
+    renderCategoryTabs('lessons', 'audio');
+    renderSubcategoryTabs('lessons', 'audio');
+    renderContentGrid('lessonsGrid', 'audio', lessonsFilter);
+}
+
+function renderBooks() {
+    renderCategoryTabs('books', 'book');
+    renderSubcategoryTabs('books', 'book');
+    renderContentGrid('booksGrid', 'book', booksFilter);
+}
+
+function renderCategoryTabs(prefix, type) {
+    const container = document.getElementById(prefix + 'Categories');
+    const cats = data.categories.filter(c => c.type === 'category' && (c.applies === 'both' || c.applies === type));
+    const filter = prefix === 'lessons' ? lessonsFilter : booksFilter;
+
+    let html = `<button class="cat-tab ${filter.category === 'all' ? 'active' : ''}" onclick="setCategory('${prefix}', 'all')"><span class="emoji">📋</span> Все</button>`;
+    cats.forEach(c => {
+        html += `<button class="cat-tab ${filter.category === c.id ? 'active' : ''}" onclick="setCategory('${prefix}', '${c.id}')"><span class="emoji">${c.icon}</span> ${c.name}</button>`;
+    });
+    container.innerHTML = html;
+}
+
+function renderSubcategoryTabs(prefix, type) {
+    const container = document.getElementById(prefix + 'Subcategories');
+    const filter = prefix === 'lessons' ? lessonsFilter : booksFilter;
+
+    if (filter.category === 'all') {
+        container.innerHTML = '';
+        return;
+    }
+
+    const subcats = data.categories.filter(c => c.type === 'subcategory' && c.parentId === filter.category && (c.applies === 'both' || c.applies === type));
+    if (subcats.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
+    let html = `<button class="subcat-chip ${filter.subcategory === 'all' ? 'active' : ''}" onclick="setSubcategory('${prefix}', 'all')">Все</button>`;
+    subcats.forEach(c => {
+        html += `<button class="subcat-chip ${filter.subcategory === c.id ? 'active' : ''}" onclick="setSubcategory('${prefix}', '${c.id}')">${c.icon} ${c.name}</button>`;
+    });
+    container.innerHTML = html;
+}
+
+function setCategory(prefix, catId) {
+    if (prefix === 'lessons') { lessonsFilter.category = catId; lessonsFilter.subcategory = 'all'; renderLessons(); }
+    else { booksFilter.category = catId; booksFilter.subcategory = 'all'; renderBooks(); }
+    haptic('selection');
+}
+
+function setSubcategory(prefix, subId) {
+    if (prefix === 'lessons') { lessonsFilter.subcategory = subId; renderLessons(); }
+    else { booksFilter.subcategory = subId; renderBooks(); }
+    haptic('selection');
+}
+
+function renderContentGrid(gridId, type, filter) {
+    const grid = document.getElementById(gridId);
+    let items = data.content.filter(c => c.type === type);
+
+    if (filter.category !== 'all') {
+        items = items.filter(i => i.categoryId === filter.category);
+    }
+    if (filter.subcategory !== 'all') {
+        items = items.filter(i => i.subcategoryId === filter.subcategory);
+    }
+    if (filter.search) {
+        const s = filter.search.toLowerCase();
+        items = items.filter(i => i.title.toLowerCase().includes(s) || i.author.toLowerCase().includes(s));
+    }
+
+    if (items.length === 0) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><div class="empty-state__icon">📭</div><div class="empty-state__text">Ничего не найдено</div></div>';
+        return;
+    }
+
+    grid.innerHTML = items.map(item => {
+        const isFav = state.favorites.includes(item.id);
+        const meta = item.type === 'audio' ? `Аудио • ${formatTime(item.duration)}` : `Книга • ${(item.chapters || []).length} глав`;
+        const playBadge = item.type === 'audio' ? '<div class="play-badge">▶</div>' : '';
+        const premium = item.premium ? '<div class="premium-badge">💎</div>' : '';
+        const catName = getCategoryName(item.categoryId);
+        return `
+            <div class="tma-card" onclick="openContent(${item.id})">
+                <div class="tma-card__cover">${premium}${item.emoji}${playBadge}</div>
+                <div class="tma-card__body">
+                    <div class="tma-card__title">${escapeHtml(item.title)}</div>
+                    <div class="tma-card__meta">${escapeHtml(item.author)}</div>
+                    <div class="tma-card__meta">${meta}</div>
+                    <div class="tma-card__actions">
+                        <span class="chip">${catName}</span>
+                        <button class="heart ${isFav ? 'active' : ''}" onclick="toggleFav(event, ${item.id})">${isFav ? '♥' : '♡'}</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function openContent(id) {
+    const item = data.content.find(c => c.id == id);
+    if (!item) return;
+    if (item.type === 'audio') playTrack(id);
+    else openBook(id);
+}
+
+function toggleFav(e, id) {
+    e.stopPropagation();
+    const idx = state.favorites.indexOf(id);
+    if (idx >= 0) state.favorites.splice(idx, 1);
+    else { state.favorites.push(id); showToast('❤️ Добавлено в избранное'); }
+    saveState();
+    renderLessons(); renderBooks();
+    haptic('light');
+}
+
+// ============ ГЛАВНАЯ ============
+function renderHome() {
+    const user = tg?.initDataUnsafe?.user;
+    const name = user?.first_name || 'Друг';
+    document.getElementById('greeting').textContent = `Привет, ${name}! 👋`;
+    document.getElementById('streak-text').textContent = `${state.streak} ${declOfNum(state.streak, ['день', 'дня', 'дней'])} подряд`;
+
+    const continueBlock = document.getElementById('continue-block');
+    let continueHtml = '';
+    const lastAudioId = Object.keys(state.audioProgress).find(id => state.audioProgress[id].position > 10);
+    const lastBookId = Object.keys(state.bookProgress).find(id => state.bookProgress[id].chapter >= 0);
+
+    if (lastAudioId) {
+        const item = data.content.find(c => c.id == lastAudioId);
+        if (item) {
+            const prog = state.audioProgress[lastAudioId];
+            const remaining = Math.max(0, Math.round((prog.duration - prog.position) / 60));
+            continueHtml += `
+                <div class="block" style="display: flex; gap: 12px; align-items: center; cursor: pointer;" onclick="playTrack(${item.id})">
+                    <div style="width: 60px; height: 60px; border-radius: 12px; background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6); display:flex; align-items:center; justify-content:center; font-size: 28px; flex-shrink:0;">${item.emoji}</div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(item.title)}</div>
+                        <div style="font-size: 13px; color: var(--tg-theme-hint-color); margin-top: 4px;">Осталось ~${remaining} мин</div>
+                    </div>
+                    <div style="font-size: 24px;">▶️</div>
+                </div>
+            `;
+        }
+    }
+    if (lastBookId && !lastAudioId) {
+        const item = data.content.find(c => c.id == lastBookId);
+        if (item) {
+            const prog = state.bookProgress[lastBookId];
+            continueHtml += `
+                <div class="block" style="display: flex; gap: 12px; align-items: center; cursor: pointer;" onclick="openBook(${item.id})">
+                    <div style="width: 60px; height: 60px; border-radius: 12px; background: linear-gradient(135deg, #5856d6, #af52de); display:flex; align-items:center; justify-content:center; font-size: 28px; flex-shrink:0;">${item.emoji}</div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(item.title)}</div>
+                        <div style="font-size: 13px; color: var(--tg-theme-hint-color); margin-top: 4px;">Глава ${prog.chapter + 1} из ${(item.chapters || []).length}</div>
+                    </div>
+                    <div style="font-size: 24px;">📖</div>
+                </div>
+            `;
+        }
+    }
+    if (!continueHtml) {
+        continueHtml = '<div class="block" style="text-align: center; color: var(--tg-theme-hint-color); padding: 24px;">Пока ничего не начато. Выберите контент в Уроках или Книгах!</div>';
+    }
+    continueBlock.innerHTML = continueHtml;
+
+    const recs = document.getElementById('recommendations');
+    const recommended = data.content.filter(c => !state.favorites.includes(c.id)).slice(0, 6);
+    if (recommended.length === 0) {
+        recs.innerHTML = '<div style="color: var(--tg-theme-hint-color); font-size: 14px; padding: 20px;">Добавьте контент через админ-панель</div>';
+    } else {
+        recs.innerHTML = recommended.map(item => `
+            <div class="tma-card" style="min-width: 140px; max-width: 140px;" onclick="openContent(${item.id})">
+                <div class="tma-card__cover">${item.emoji}</div>
+                <div class="tma-card__body">
+                    <div class="tma-card__title">${escapeHtml(item.title)}</div>
+                    <div class="tma-card__meta">${item.type === 'audio' ? formatTime(item.duration) : (item.chapters || []).length + ' глав'}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+// ============ ПРОГРЕСС ============
+function renderProgress() {
+    document.getElementById('stat-hours').textContent = Math.round(state.listeningTime / 60);
+    document.getElementById('stat-books').textContent = state.booksCompleted.length;
+    document.getElementById('stat-lessons').textContent = state.lessonsCompleted.length;
+
+    const now = new Date();
+    const year = now.getFullYear(); const month = now.getMonth();
+    const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+    document.getElementById('calendar-month').textContent = `${monthNames[month]} ${year}`;
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startWeekday = (firstDay.getDay() + 6) % 7;
+    const daysInMonth = lastDay.getDate();
+    const today = now.getDate();
+
+    let activeCount = 0;
+    let html = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(d =>
+        `<div style="font-size:11px; text-align:center; color:var(--tg-theme-hint-color); padding: 4px 0;">${d}</div>`
+    ).join('');
+
+    for (let i = 0; i < startWeekday; i++) html += '<div class="day-cell"></div>';
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const isActive = state.activeDays.includes(dateStr);
+        const isToday = d === today;
+        if (isActive) activeCount++;
+        html += `<div class="day-cell ${isActive ? 'active' : ''} ${isToday ? 'today' : ''}">${d}</div>`;
+    }
+    document.getElementById('calendarGrid').innerHTML = html;
+    document.getElementById('calendar-count').textContent = `${activeCount} ${declOfNum(activeCount, ['день', 'дня', 'дней'])}`;
+
+    const achievements = [
+        { icon: '🎯', title: 'Первые шаги', desc: 'Начать первый урок', done: state.lessonsCompleted.length > 0 || state.booksCompleted.length > 0 },
+        { icon: '🔥', title: 'Неделя знаний', desc: '7 дней подряд', done: state.streak >= 7 },
+        { icon: '📚', title: 'Книголюб', desc: 'Прочитать книгу', done: state.booksCompleted.length > 0 },
+        { icon: '🎧', title: 'Меломан', desc: '5 аудиоуроков', done: state.lessonsCompleted.length >= 5 },
+        { icon: '💎', title: 'Коллекционер', desc: '10 в избранном', done: state.favorites.length >= 10 },
+        { icon: '📝', title: 'Писатель', desc: '5 заметок', done: Object.values(state.notes).reduce((s, n) => s + n.length, 0) >= 5 },
+        { icon: '🏆', title: 'Марафонец', desc: '30 дней подряд', done: state.streak >= 30 }
+    ];
+    document.getElementById('achievements').innerHTML = achievements.map(a => `
+        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; ${a.done ? '' : 'opacity: 0.4;'}">
+            <div style="font-size: 32px;">${a.icon}</div>
+            <div style="flex: 1;">
+                <div style="font-weight: 600; font-size: 15px;">${a.title}</div>
+                <div style="font-size: 13px; color: var(--tg-theme-hint-color);">${a.desc}</div>
+            </div>
+            ${a.done ? '<div style="color: #34c759; font-size: 20px;">✓</div>' : '<div style="color: var(--tg-theme-hint-color); font-size: 14px;">🔒</div>'}
+        </div>
+    `).join('');
+}
+
+// ============ АДМИН-ПАНЕЛЬ ============
+let adminTapCount = 0;
+let adminTapTimer = null;
+
+document.getElementById('versionLabel').addEventListener('click', () => {
+    adminTapCount++;
+    clearTimeout(adminTapTimer);
+    adminTapTimer = setTimeout(() => { adminTapCount = 0; }, 2000);
+    if (adminTapCount >= 5) {
+        adminTapCount = 0;
+        openAdmin();
+        haptic('medium');
+    }
+});
+
+function openAdmin() {
+    document.getElementById('adminPanel').classList.add('visible');
+    renderAdminCategories();
+    renderAdminContent();
+    renderAdminStats();
+    showToast('⚙️ Админ-панель открыта');
+}
+function closeAdmin() {
+    document.getElementById('adminPanel').classList.remove('visible');
+    renderAll();
+}
+
+function switchAdminTab(section) {
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.toggle('active', t.dataset.section === section));
+    document.querySelectorAll('.admin-section').forEach(s => s.classList.toggle('active', s.id === 'admin-' + section));
+    if (section === 'data') renderAdminStats();
+    haptic('selection');
+}
+
+function renderAdminCategories() {
+    const list = document.getElementById('adminCategoriesList');
+    if (data.categories.length === 0) {
+        list.innerHTML = '<div class="empty-state"><div class="empty-state__icon">📁</div><div class="empty-state__text">Нет разделов. Создайте первый!</div></div>';
+        return;
+    }
+
+    const roots = data.categories.filter(c => c.type === 'category');
+    let html = '';
+    roots.forEach(root => {
+        const subs = data.categories.filter(c => c.parentId === root.id);
+        const contentCount = data.content.filter(c => c.categoryId === root.id || subs.some(s => s.id === c.subcategoryId)).length;
+        html += `
+            <div class="admin-item" style="border-left: 4px solid var(--tg-theme-button-color);">
+                <div class="admin-item__icon">${root.icon}</div>
+                <div class="admin-item__info">
+                    <div class="admin-item__title">${escapeHtml(root.name)}</div>
+                    <div class="admin-item__meta">Раздел • ${root.applies === 'both' ? 'Уроки и книги' : root.applies === 'audio' ? 'Только уроки' : 'Только книги'} • ${contentCount} ед.</div>
+                </div>
+                <div class="admin-item__actions">
+                    <button class="admin-btn secondary" onclick="editCategory('${root.id}')">✏️</button>
+                    <button class="admin-btn danger" onclick="deleteCategory('${root.id}')">🗑</button>
+                </div>
+            </div>
+        `;
+        subs.forEach(sub => {
+            const subCount = data.content.filter(c => c.subcategoryId === sub.id).length;
+            html += `
+                <div class="admin-item" style="margin-left: 24px; border-left: 4px solid var(--tg-theme-hint-color);">
+                    <div class="admin-item__icon">${sub.icon}</div>
+                    <div class="admin-item__info">
+                        <div class="admin-item__title">${escapeHtml(sub.name)}</div>
+                        <div class="admin-item__meta">Подраздел • ${subCount} ед.</div>
+                    </div>
+                    <div class="admin-item__actions">
+                        <button class="admin-btn secondary" onclick="editCategory('${sub.id}')">✏️</button>
+                        <button class="admin-btn danger" onclick="deleteCategory('${sub.id}')">🗑</button>
+                    </div>
+                </div>
+            `;
+        });
+    });
+    list.innerHTML = html;
+}
+
+let editingCategoryId = null;
+function openCategoryModal(id = null) {
+    editingCategoryId = id;
+    document.getElementById('categoryModalTitle').textContent = id ? 'Редактировать раздел' : 'Новый раздел';
+    const catType = document.getElementById('catType');
+    const parentGroup = document.getElementById('catParentGroup');
+    const parentSelect = document.getElementById('catParent');
+
+    if (id) {
+        const cat = data.categories.find(c => c.id === id);
+        document.getElementById('catName').value = cat.name;
+        document.getElementById('catIcon').value = cat.icon;
+        catType.value = cat.type;
+        document.getElementById('catApplies').value = cat.applies;
+    } else {
+        document.getElementById('catName').value = '';
+        document.getElementById('catIcon').value = '';
+        catType.value = 'category';
+        document.getElementById('catApplies').value = 'both';
+    }
+
+    const roots = data.categories.filter(c => c.type === 'category');
+    parentSelect.innerHTML = roots.map(r => `<option value="${r.id}">${r.icon} ${escapeHtml(r.name)}</option>`).join('');
+
+    updateParentVisibility();
+    document.getElementById('categoryModal').classList.add('visible');
+}
+
+function closeCategoryModal() {
+    document.getElementById('categoryModal').classList.remove('visible');
+    editingCategoryId = null;
+}
+
+document.getElementById('catType').addEventListener('change', updateParentVisibility);
+function updateParentVisibility() {
+    const isSub = document.getElementById('catType').value === 'subcategory';
+    document.getElementById('catParentGroup').style.display = isSub ? 'block' : 'none';
+}
+
+function saveCategory() {
+    const name = document.getElementById('catName').value.trim();
+    const icon = document.getElementById('catIcon').value.trim() || '📁';
+    const type = document.getElementById('catType').value;
+    const applies = document.getElementById('catApplies').value;
+    const parentId = type === 'subcategory' ? document.getElementById('catParent').value : null;
+
+    if (!name) { showToast('Введите название'); return; }
+
+    if (editingCategoryId) {
+        const cat = data.categories.find(c => c.id === editingCategoryId);
+        cat.name = name; cat.icon = icon; cat.type = type; cat.applies = applies; cat.parentId = parentId;
+    } else {
+        data.categories.push({ id: genId(), name, icon, type, parentId, applies });
+    }
+    saveData();
+    closeCategoryModal();
+    renderAdminCategories();
+    showToast('✅ Раздел сохранён');
+    haptic('medium');
+}
+
+function editCategory(id) { openCategoryModal(id); }
+
+function deleteCategory(id) {
+    const cat = data.categories.find(c => c.id === id);
+    const subs = data.categories.filter(c => c.parentId === id);
+    const contentCount = data.content.filter(c => c.categoryId === id || subs.some(s => s.id === c.subcategoryId)).length;
+
+    if (!confirm(`Удалить "${cat.name}"${subs.length ? ` и ${subs.length} подраздел(ов)` : ''}?${contentCount ? `\n\n⚠️ Будет удалён ${contentCount} элемент(ов) контента!` : ''}`)) return;
+
+    const idsToDelete = [id, ...subs.map(s => s.id)];
+    data.categories = data.categories.filter(c => !idsToDelete.includes(c.id));
+    data.content = data.content.filter(c => !idsToDelete.includes(c.categoryId) && !idsToDelete.includes(c.subcategoryId));
+    saveData();
+    renderAdminCategories();
+    renderAdminContent();
+    showToast('🗑 Раздел удалён');
+    haptic('light');
+}
+
+// ============ АДМИН: КОНТЕНТ ============
+let adminContentFilter = 'all';
+function filterAdminContent(type) {
+    adminContentFilter = type;
+    document.querySelectorAll('#admin-content .cat-tab').forEach(t => t.classList.toggle('active', t.dataset.type === type));
+    renderAdminContent();
+    haptic('selection');
+}
+
+function renderAdminContent() {
+    const list = document.getElementById('adminContentList');
+    let items = data.content;
+    if (adminContentFilter !== 'all') items = items.filter(c => c.type === adminContentFilter);
+
+    if (items.length === 0) {
+        list.innerHTML = '<div class="empty-state"><div class="empty-state__icon">📭</div><div class="empty-state__text">Нет контента. Добавьте первый!</div></div>';
+        return;
+    }
+
+    list.innerHTML = items.map(item => `
+        <div class="admin-item">
+            <div class="admin-item__icon">${item.emoji}</div>
+            <div class="admin-item__info">
+                <div class="admin-item__title">${escapeHtml(item.title)}${item.premium ? ' 💎' : ''}</div>
+                <div class="admin-item__meta">${item.type === 'audio' ? '🎧 Аудио' : '📚 Книга'} • ${getCategoryName(item.categoryId)} • ${escapeHtml(item.author)}</div>
+            </div>
+            <div class="admin-item__actions">
+                <button class="admin-btn secondary" onclick="editContent(${item.id})">✏️</button>
+                <button class="admin-btn danger" onclick="deleteContent(${item.id})">🗑</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+let editingContentId = null;
+let tempChapters = [];
+
+function openContentModal(id = null) {
+    editingContentId = id;
+    document.getElementById('contentModalTitle').textContent = id ? 'Редактировать контент' : 'Новый контент';
+
+    const catSelect = document.getElementById('cntCategory');
+    const subSelect = document.getElementById('cntSubcategory');
+    const cats = data.categories.filter(c => c.type === 'category');
+    catSelect.innerHTML = '<option value="">— Выберите раздел —</option>' + cats.map(c => `<option value="${c.id}">${c.icon} ${escapeHtml(c.name)}</option>`).join('');
+
+    if (id) {
+        const item = data.content.find(c => c.id === id);
+        document.getElementById('cntType').value = item.type;
+        document.getElementById('cntTitle').value = item.title;
+        document.getElementById('cntAuthor').value = item.author;
+        document.getElementById('cntEmoji').value = item.emoji;
+        document.getElementById('cntCategory').value = item.categoryId || '';
+        document.getElementById('cntPremium').checked = !!item.premium;
+        if (item.type === 'audio') {
+            document.getElementById('cntAudioUrl').value = item.audioUrl || '';
+            document.getElementById('cntDuration').value = item.duration || '';
+        } else {
+            tempChapters = JSON.parse(JSON.stringify(item.chapters || []));
+        }
+    } else {
+        document.getElementById('cntType').value = 'audio';
+        document.getElementById('cntTitle').value = '';
+        document.getElementById('cntAuthor').value = '';
+        document.getElementById('cntEmoji').value = '';
+        document.getElementById('cntCategory').value = '';
+        document.getElementById('cntPremium').checked = false;
+        document.getElementById('cntAudioUrl').value = '';
+        document.getElementById('cntDuration').value = '';
+        tempChapters = [];
+    }
+
+    toggleContentFields();
+    updateSubcategoryOptions();
+    document.getElementById('contentModal').classList.add('visible');
+}
+
+function closeContentModal() {
+    document.getElementById('contentModal').classList.remove('visible');
+    editingContentId = null;
+    tempChapters = [];
+}
+
+document.getElementById('cntCategory').addEventListener('change', updateSubcategoryOptions);
+function updateSubcategoryOptions() {
+    const catId = document.getElementById('cntCategory').value;
+    const subSelect = document.getElementById('cntSubcategory');
+    const type = document.getElementById('cntType').value;
+    const subs = data.categories.filter(c => c.type === 'subcategory' && c.parentId === catId && (c.applies === 'both' || c.applies === type));
+    subSelect.innerHTML = '<option value="">—</option>' + subs.map(s => `<option value="${s.id}">${s.icon} ${escapeHtml(s.name)}</option>`).join('');
+}
+
+function toggleContentFields() {
+    const type = document.getElementById('cntType').value;
+    document.getElementById('audioFields').style.display = type === 'audio' ? 'block' : 'none';
+    document.getElementById('bookFields').style.display = type === 'book' ? 'block' : 'none';
+    if (type === 'book') renderChaptersEditor();
+    updateSubcategoryOptions();
+}
+
+function renderChaptersEditor() {
+    const list = document.getElementById('chaptersList');
+    if (tempChapters.length === 0) {
+        list.innerHTML = '<div style="color: var(--tg-theme-hint-color); font-size: 13px; text-align: center; padding: 12px;">Нет глав. Добавьте первую!</div>';
+        return;
+    }
+    list.innerHTML = tempChapters.map((ch, idx) => `
+        <div class="chapter-editor">
+            <div class="chapter-editor__header">
+                <div class="chapter-editor__title">Глава ${idx + 1}</div>
+                <button class="chapter-editor__delete" onclick="removeChapterField(${idx})">✕</button>
+            </div>
+            <input type="text" class="form-input" style="margin-bottom: 8px;" placeholder="Название главы" value="${escapeHtml(ch.title)}" onchange="tempChapters[${idx}].title = this.value">
+            <textarea class="form-textarea" placeholder="Текст главы..." onchange="tempChapters[${idx}].text = this.value">${escapeHtml(ch.text)}</textarea>
+        </div>
+    `).join('');
+}
+
+function addChapterField() {
+    tempChapters.push({ id: genId(), title: '', text: '' });
+    renderChaptersEditor();
+    haptic('light');
+}
+
+function removeChapterField(idx) {
+    tempChapters.splice(idx, 1);
+    renderChaptersEditor();
+    haptic('light');
+}
+
+function saveContent() {
+    const type = document.getElementById('cntType').value;
+    const title = document.getElementById('cntTitle').value.trim();
+    const author = document.getElementById('cntAuthor').value.trim();
+    const emoji = document.getElementById('cntEmoji').value.trim() || (type === 'audio' ? '🎧' : '📚');
+    const categoryId = document.getElementById('cntCategory').value;
+    const subcategoryId = document.getElementById('cntSubcategory').value || null;
+    const premium = document.getElementById('cntPremium').checked;
+
+    if (!title) { showToast('Введите название'); return; }
+    if (!categoryId) { showToast('Выберите раздел'); return; }
+
+    const item = {
+        id: editingContentId || (Math.max(0, ...data.content.map(c => typeof c.id === 'number' ? c.id : 0)) + 1),
+        type, title, author, emoji, categoryId, subcategoryId, premium
+    };
+
+    if (type === 'audio') {
+        item.audioUrl = document.getElementById('cntAudioUrl').value.trim();
+        item.duration = parseInt(document.getElementById('cntDuration').value) || 0;
+    } else {
+        if (tempChapters.length === 0) { showToast('Добавьте хотя бы одну главу'); return; }
+        const invalid = tempChapters.some(ch => !ch.title.trim() || !ch.text.trim());
+        if (invalid) { showToast('Заполните все главы'); return; }
+        item.chapters = tempChapters.map(ch => ({ id: ch.id || genId(), title: ch.title.trim(), text: ch.text.trim() }));
+    }
+
+    if (editingContentId) {
+        const idx = data.content.findIndex(c => c.id === editingContentId);
+        if (idx >= 0) data.content[idx] = item;
+    } else {
+        data.content.push(item);
+    }
+
+    saveData();
+    closeContentModal();
+    renderAdminContent();
+    showToast('✅ Контент сохранён');
+    haptic('medium');
+}
+
+function editContent(id) { openContentModal(id); }
+
+function deleteContent(id) {
+    const item = data.content.find(c => c.id === id);
+    if (!confirm(`Удалить "${item.title}"?`)) return;
+    data.content = data.content.filter(c => c.id !== id);
+    saveData();
+    renderAdminContent();
+    showToast('🗑 Контент удалён');
+    haptic('light');
+}
+
+// ============ ДАННЫЕ: ЭКСПОРТ/ИМПОРТ ============
+function renderAdminStats() {
+    const stats = document.getElementById('adminStats');
+    const cats = data.categories.length;
+    const roots = data.categories.filter(c => c.type === 'category').length;
+    const subs = data.categories.filter(c => c.type === 'subcategory').length;
+    const audio = data.content.filter(c => c.type === 'audio').length;
+    const books = data.content.filter(c => c.type === 'book').length;
+    const notesCount = Object.values(state.notes).reduce((s, n) => s + n.length, 0);
+
+    stats.innerHTML = `
+        <div>📁 Разделов: ${cats} (корневых: ${roots}, подразделов: ${subs})</div>
+        <div>🎧 Аудиоуроков: ${audio}</div>
+        <div>📚 Книг: ${books}</div>
+        <div>📝 Заметок у пользователя: ${notesCount}</div>
+        <div>❤️ В избранном: ${state.favorites.length}</div>
+        <div>✅ Пройдено уроков: ${state.lessonsCompleted.length}</div>
+        <div>📖 Прочитано книг: ${state.booksCompleted.length}</div>
+    `;
+}
+
+function exportData() {
+    const exportObj = { version: 4, data, state, exportedAt: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tknowledge_backup_${todayStr()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('📤 Данные экспортированы');
+    haptic('medium');
+}
+
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const obj = JSON.parse(e.target.result);
+            if (!obj.data || !obj.state) throw new Error('Invalid format');
+            if (!confirm('Импорт заменит все текущие данные. Продолжить?')) return;
+            data = obj.data;
+            state = { ...state, ...obj.state };
+            saveData(); saveState();
+            renderAll();
+            if (document.getElementById('adminPanel').classList.contains('visible')) {
+                renderAdminCategories();
+                renderAdminContent();
+                renderAdminStats();
+            }
+            showToast('📥 Данные импортированы');
+            haptic('medium');
+        } catch(err) {
+            showToast('❌ Ошибка импорта: ' + err.message);
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+function resetAllData() {
+    if (!confirm('⚠️ Удалить ВСЕ данные (контент, разделы, прогресс, заметки)?\nЭто действие нельзя отменить!')) return;
+    if (!confirm('Точно уверены?')) return;
+    localStorage.removeItem(DATA_KEY);
+    localStorage.removeItem(STATE_KEY);
+    data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    state = { favorites: [], audioProgress: {}, bookProgress: {}, listeningTime: 0, lessonsCompleted: [], booksCompleted: [], activeDays: [], lastActiveDay: null, streak: 0, readerSettings: { fontSize: 17, theme: 'light' }, playerSettings: { speed: 1 }, notes: {} };
+    saveData(); saveState();
+    renderAll();
+    renderAdminCategories();
+    renderAdminContent();
+    renderAdminStats();
+    showToast('🗑 Все данные сброшены');
+    haptic('medium');
+}
+
+function resetProgress() {
+    if (!confirm('Сбросить прогресс пользователя (заметки, избранное, статистику)?\nКонтент и разделы останутся.')) return;
+    state = { favorites: [], audioProgress: {}, bookProgress: {}, listeningTime: 0, lessonsCompleted: [], booksCompleted: [], activeDays: [], lastActiveDay: null, streak: 0, readerSettings: state.readerSettings, playerSettings: state.playerSettings, notes: {} };
+    saveState();
+    showToast('✅ Прогресс сброшен');
+    renderAll();
+}
+
+// ============ НАВИГАЦИЯ ============
+const navItems = document.querySelectorAll('.nav-item');
+const pages = document.querySelectorAll('.page');
+
+navItems.forEach(item => {
+    item.addEventListener('click', () => {
+        haptic('selection');
+        navItems.forEach(i => i.classList.remove('active'));
+        pages.forEach(p => p.classList.remove('active'));
+        item.classList.add('active');
+        const targetId = item.getAttribute('data-target');
+        document.getElementById(targetId).classList.add('active');
+        document.getElementById('contentArea').scrollTop = 0;
+        if (targetId === 'page-home') renderHome();
+        if (targetId === 'page-lessons') renderLessons();
+        if (targetId === 'page-books') renderBooks();
+        if (targetId === 'page-progress') renderProgress();
+    });
+});
+
+document.getElementById('lessonsSearch').addEventListener('input', (e) => {
+    lessonsFilter.search = e.target.value;
+    renderLessons();
+});
+document.getElementById('booksSearch').addEventListener('input', (e) => {
+    booksFilter.search = e.target.value;
+    renderBooks();
+});
+
+// ============ ПОЛЬЗОВАТЕЛЬ ============
+const user = tg?.initDataUnsafe?.user;
+if (user) {
+    const name = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+}
+
+// ============ ИНИЦИАЛИЗАЦИЯ ============
+loadData();
+loadState();
+
+function renderAll() {
+    renderHome();
+    renderLessons();
+    renderBooks();
+    renderProgress();
+    if (currentTrack) showMiniPlayer();
+
+    // Восстановление настроек читалки
+    document.querySelectorAll('.font-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.size) === state.readerSettings.fontSize));
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.theme === state.readerSettings.theme));
+}
+
+renderAll();
+
+// Подсказка про админку
+document.getElementById('adminHint').textContent = '💡 Подсказка: 5 тапов на версию';
+</script>
+
+</body>
 </html>
