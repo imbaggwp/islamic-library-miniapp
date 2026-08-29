@@ -6,15 +6,20 @@
 <title>Требуй знания!</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoi0JLRgNCw0LnRgdC+0YLRjyDQvNC+0LIg0LIg0LLRgdC60L7Qs9C+Iiwic2hvcnRfbmFtZSI6ItCU0LDQtdGB0L3Rg9C2Iiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwMDZkMzQiLCJ0aGVtZV9jb2xvciI6IiMwMDZkMzQiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sLCUzQ3N2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCcgZmlsbD0nJTIzMDA2ZDM0JyUzRSUzQ3BhdGggZD0nTTEyIDJMMTQuMzkgOC4yNkwyMSA5LjI3TDE2IDE0LjE0TDE4LjE4IDIxLjAyTDEyIDE3Ljc3TDUuODIgMjEuMDJMNyAxNC4xNEwyIDkuMjdMOC42MSA4LjI2TDEyIDJaJy8lM0U8L3N2Zz4iLCJzaXplcyI6IjE5MngxOTIiLCJ0eXBlIjoiaW1hZ2Uvc3ZnK3htbCJ9XX0=">
+<meta name="theme-color" content="#006d34">
 <style>
 :root {
     --tg-theme-bg-color: #ffffff;
     --tg-theme-secondary-bg-color: #f4f4f5;
     --tg-theme-text-color: #000000;
     --tg-theme-hint-color: #8e8e93;
-    --tg-theme-button-color: #007aff;
-    --tg-theme-accent-text-color: #007aff;
-    --tg-theme-destructive-text-color: #ff3b30;
+    --tg-theme-button-color: #006d34;
+    --tg-theme-accent-text-color: #006d34;
+    --tg-theme-destructive-text-color: #d32f2f;
+    --islamic-gold: #c9a227;
+    --islamic-green: #006d34;
+    --islamic-deep: #004d25;
     --nav-height: 64px;
     --mini-player-height: 64px;
     --safe-area-bottom: env(safe-area-inset-bottom, 0px);
@@ -25,16 +30,17 @@ body[data-theme="light"] {
     --tg-theme-secondary-bg-color: #f4f4f5;
     --tg-theme-text-color: #000000;
     --tg-theme-hint-color: #8e8e93;
-    --tg-theme-button-color: #007aff;
-    --tg-theme-accent-text-color: #007aff;
+    --tg-theme-button-color: #006d34;
+    --tg-theme-accent-text-color: #006d34;
 }
 body[data-theme="dark"] {
-    --tg-theme-bg-color: #1c1c1e;
-    --tg-theme-secondary-bg-color: #2c2c2e;
+    --tg-theme-bg-color: #121a14;
+    --tg-theme-secondary-bg-color: #1c2a20;
     --tg-theme-text-color: #ffffff;
-    --tg-theme-hint-color: #8e8e93;
-    --tg-theme-button-color: #0a84ff;
-    --tg-theme-accent-text-color: #0a84ff;
+    --tg-theme-hint-color: #8e9e90;
+    --tg-theme-button-color: #2fa85a;
+    --tg-theme-accent-text-color: #4fc77a;
+    --islamic-gold: #e0b93c;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body {
@@ -60,7 +66,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .page.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
+h1 { font-size: 26px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
 h1 .h-icon { width: 28px; height: 28px; color: var(--tg-theme-accent-text-color); }
 h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
 .subtitle { color: var(--tg-theme-hint-color); font-size: 15px; margin-bottom: 20px; }
@@ -99,33 +105,42 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
 .tma-card:active { transform: scale(0.96); }
 .tma-card__cover {
     width: 100%; aspect-ratio: 1 / 1;
-    background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
+    background: linear-gradient(135deg, var(--islamic-green), var(--islamic-deep));
     display: flex; align-items: center; justify-content: center;
-    color: #fff; position: relative;
+    color: var(--islamic-gold); position: relative;
+    overflow: hidden;
 }
-.tma-card__cover svg { width: 56px; height: 56px; }
+.tma-card__cover::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: radial-gradient(circle at 20% 30%, rgba(201,162,39,0.15) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 70%, rgba(201,162,39,0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+.tma-card__cover svg { width: 56px; height: 56px; position: relative; z-index: 1; }
 .tma-card__cover .play-badge {
     position: absolute; bottom: 8px; right: 8px;
     width: 32px; height: 32px; border-radius: 50%;
-    background: rgba(0,0,0,0.6); color: #fff;
+    background: rgba(0,0,0,0.6); color: var(--islamic-gold);
     display: flex; align-items: center; justify-content: center;
+    z-index: 2;
 }
 .tma-card__cover .play-badge svg { width: 14px; height: 14px; }
 .tma-card__cover .pdf-badge {
     position: absolute; top: 8px; right: 8px;
-    background: rgba(255,59,48,0.9); color: #fff;
+    background: rgba(211,47,47,0.9); color: #fff;
     padding: 3px 8px; border-radius: 8px;
     font-size: 10px; font-weight: 700;
     display: flex; align-items: center; gap: 3px;
+    z-index: 2;
 }
 .tma-card__cover .pdf-badge svg { width: 10px; height: 10px; }
 .tma-card__edit-btn {
     position: absolute; top: 6px; right: 6px;
     width: 28px; height: 28px; border-radius: 50%;
-    background: rgba(0,0,0,0.5); color: #fff;
+    background: rgba(0,0,0,0.5); color: var(--islamic-gold);
     border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    z-index: 2;
+    z-index: 3;
 }
 .tma-card__edit-btn svg { width: 14px; height: 14px; }
 .tma-card__body { display: flex; flex-direction: column; flex-grow: 1; padding: 10px 12px 12px; gap: 4px; }
@@ -171,6 +186,7 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
     display: flex; align-items: center; gap: 6px;
 }
 .cat-tab.active { background: var(--tg-theme-button-color); color: #fff; }
+.cat-tab.active svg { color: #fff; }
 .cat-tab svg { width: 16px; height: 16px; }
 
 .subcat-row {
@@ -192,20 +208,20 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
 .subcat-chip.active { border-color: var(--tg-theme-button-color); color: var(--tg-theme-accent-text-color); font-weight: 600; }
 
 /* SEARCH */
-.search-bar {
-    width: 100%; padding: 12px 16px 12px 44px;
-    border-radius: 12px; border: none;
-    background: var(--tg-theme-secondary-bg-color);
-    color: var(--tg-theme-text-color);
-    font-size: 16px; margin-bottom: 12px; outline: none;
-    transition: background 0.3s;
-}
-.search-bar::placeholder { color: var(--tg-theme-hint-color); }
 .search-wrap { position: relative; margin-bottom: 12px; }
 .search-wrap svg {
     position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
     width: 18px; height: 18px; color: var(--tg-theme-hint-color);
 }
+.search-bar {
+    width: 100%; padding: 12px 16px 12px 44px;
+    border-radius: 12px; border: none;
+    background: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+    font-size: 16px; outline: none;
+    transition: background 0.3s;
+}
+.search-bar::placeholder { color: var(--tg-theme-hint-color); }
 
 /* CALENDAR */
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 12px; }
@@ -217,17 +233,34 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
     transition: background 0.3s;
 }
 .day-cell.active { background: var(--tg-theme-button-color); color: #fff; font-weight: 600; }
-.day-cell.today { border: 2px solid var(--tg-theme-accent-text-color); }
+.day-cell.today { border: 2px solid var(--islamic-gold); }
 
 /* PROFILE */
 .profile-avatar {
     width: 80px; height: 80px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
-    color: #fff; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--islamic-green), var(--islamic-deep));
+    color: var(--islamic-gold); display: flex; align-items: center; justify-content: center;
     font-size: 32px; font-weight: 700; margin: 0 auto 16px;
     user-select: none;
 }
 .profile-name { text-align: center; font-size: 22px; font-weight: 600; margin-bottom: 24px;}
+.level-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 20px;
+    background: linear-gradient(135deg, var(--islamic-gold), #e0b93c);
+    color: #fff; font-size: 13px; font-weight: 700;
+    margin: 0 auto 16px;
+}
+.level-badge svg { width: 14px; height: 14px; }
+.level-progress {
+    height: 6px; background: var(--tg-theme-secondary-bg-color);
+    border-radius: 3px; overflow: hidden; margin: 0 20px 16px;
+}
+.level-progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--islamic-gold), var(--islamic-green));
+    transition: width 0.5s;
+}
+.level-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--tg-theme-hint-color); margin: -10px 20px 16px; }
 .settings-item {
     display: flex; justify-content: space-between; align-items: center;
     padding: 14px 0;
@@ -259,9 +292,9 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
 .mini-player.visible { transform: translateY(0); }
 .mini-player__cover {
     width: 48px; height: 48px; border-radius: 10px;
-    background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
+    background: linear-gradient(135deg, var(--islamic-green), var(--islamic-deep));
     display: flex; align-items: center; justify-content: center;
-    color: #fff; flex-shrink: 0;
+    color: var(--islamic-gold); flex-shrink: 0;
 }
 .mini-player__cover svg { width: 24px; height: 24px; }
 .mini-player__info { flex: 1; min-width: 0; }
@@ -280,7 +313,7 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
     height: 3px; background: rgba(128,128,128,0.2);
     border-radius: 2px; overflow: hidden;
 }
-.mini-player__progress-bar { height: 100%; background: var(--tg-theme-button-color); width: 0%; transition: width 0.3s linear; }
+.mini-player__progress-bar { height: 100%; background: var(--islamic-gold); width: 0%; transition: width 0.3s linear; }
 
 /* FULL PLAYER */
 .full-player {
@@ -302,18 +335,18 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
 .full-player__cover {
     width: 100%; max-width: 320px; aspect-ratio: 1;
     margin: 0 auto 32px; border-radius: 20px;
-    background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
-    display: flex; align-items: center; justify-content: center; color: #fff;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    background: linear-gradient(135deg, var(--islamic-green), var(--islamic-deep));
+    display: flex; align-items: center; justify-content: center; color: var(--islamic-gold);
+    box-shadow: 0 20px 60px rgba(0,109,52,0.3);
 }
 .full-player__cover svg { width: 100px; height: 100px; }
 .full-player__title { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 4px; letter-spacing: -0.3px; }
 .full-player__author { font-size: 15px; color: var(--tg-theme-hint-color); text-align: center; margin-bottom: 24px; }
 .full-player__seek { width: 100%; height: 4px; background: rgba(128,128,128,0.2); border-radius: 2px; cursor: pointer; position: relative; margin-bottom: 8px; }
-.full-player__seek-fill { height: 100%; background: var(--tg-theme-button-color); border-radius: 2px; width: 0%; position: relative; }
-.full-player__seek-fill::after { content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--tg-theme-button-color); }
+.full-player__seek-fill { height: 100%; background: var(--islamic-gold); border-radius: 2px; width: 0%; position: relative; }
+.full-player__seek-fill::after { content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--islamic-gold); }
 .full-player__time { display: flex; justify-content: space-between; font-size: 12px; color: var(--tg-theme-hint-color); margin-bottom: 24px; }
-.full-player__controls { display: flex; justify-content: space-around; align-items: center; margin-bottom: 24px; }
+.full-player__controls { display: flex; justify-content: space-around; align-items: center; margin-bottom: 20px; }
 .fp-btn { background: none; border: none; color: var(--tg-theme-text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .fp-btn svg { width: 28px; height: 28px; }
 .fp-btn:active { transform: scale(0.85); }
@@ -321,19 +354,29 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
 .fp-btn.small { width: 44px; height: 44px; }
 .fp-btn.play {
     width: 72px; height: 72px; border-radius: 50%;
-    background: var(--tg-theme-button-color); color: #fff;
+    background: var(--tg-theme-button-color); color: var(--islamic-gold);
 }
 .fp-btn.play svg { width: 32px; height: 32px; }
+.full-player__extras { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; }
+.fp-extra-btn {
+    padding: 8px 14px; border-radius: 20px;
+    background: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+    border: none; font-size: 13px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+}
+.fp-extra-btn svg { width: 14px; height: 14px; }
+.fp-extra-btn.active { background: var(--islamic-gold); color: #fff; }
 .full-player__speed { text-align: center; font-size: 14px; font-weight: 600; color: var(--tg-theme-accent-text-color); cursor: pointer; padding: 8px 16px; background: var(--tg-theme-secondary-bg-color); border-radius: 20px; border: none; margin: 0 auto; }
 
 /* READER */
 .reader { position: fixed; inset: 0; background: var(--tg-theme-bg-color); z-index: 200; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1), background 0.3s; }
 .reader.visible { transform: translateY(0); }
 .reader.theme-sepia { --tg-theme-bg-color: #f4ecd8; --tg-theme-text-color: #5b4636; --tg-theme-secondary-bg-color: #e8dcc4; --tg-theme-hint-color: #8b7355; }
-.reader.theme-dark { --tg-theme-bg-color: #1c1c1e; --tg-theme-text-color: #ffffff; --tg-theme-secondary-bg-color: #2c2c2e; --tg-theme-hint-color: #8e8e93; }
+.reader.theme-dark { --tg-theme-bg-color: #121a14; --tg-theme-text-color: #ffffff; --tg-theme-secondary-bg-color: #1c2a20; --tg-theme-hint-color: #8e9e90; }
 .reader__header {
     display: flex; justify-content: space-between; align-items: center;
-    padding: calc(var(--safe-area-top) + 12px) 12px 12px;
+    padding: calc(var(--safe-area-top) + 12px) 8px 12px;
     border-bottom: 0.5px solid rgba(128,128,128,0.2);
     background: var(--tg-theme-bg-color); z-index: 2;
 }
@@ -341,15 +384,17 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
     width: 40px; height: 40px; background: none; border: none;
     color: var(--tg-theme-accent-text-color); cursor: pointer;
     display: flex; align-items: center; justify-content: center;
+    position: relative;
 }
 .reader__btn svg { width: 22px; height: 22px; }
 .reader__title { flex: 1; text-align: center; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px; }
 .reader__content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 24px 20px; font-size: 17px; line-height: 1.6; }
 .reader__content p { margin-bottom: 16px; }
-.reader__content .chapter-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.3px; }
+.reader__content .chapter-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.3px; color: var(--islamic-green); }
+.reader__content .bismillah { text-align: center; font-size: 20px; color: var(--islamic-gold); margin-bottom: 24px; font-style: italic; }
 .reader__footer { padding: 12px 16px calc(var(--safe-area-bottom) + 12px); border-top: 0.5px solid rgba(128,128,128,0.2); background: var(--tg-theme-bg-color); display: flex; align-items: center; gap: 12px; }
 .reader__progress-bar { flex: 1; height: 4px; background: rgba(128,128,128,0.2); border-radius: 2px; overflow: hidden; }
-.reader__progress-fill { height: 100%; background: var(--tg-theme-button-color); width: 0%; transition: width 0.3s; }
+.reader__progress-fill { height: 100%; background: var(--islamic-gold); width: 0%; transition: width 0.3s; }
 .reader__progress-text { font-size: 12px; color: var(--tg-theme-hint-color); font-weight: 600; min-width: 40px; text-align: right; }
 
 .reader__settings-panel {
@@ -370,20 +415,20 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
     color: var(--tg-theme-text-color); font-size: 16px; cursor: pointer;
     display: flex; align-items: center; justify-content: center; font-weight: 600;
 }
-.font-btn.active, .theme-btn.active { border-color: var(--tg-theme-button-color); }
+.font-btn.active, .theme-btn.active { border-color: var(--islamic-gold); }
 
 /* PDF VIEWER */
 .pdf-viewer { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 12px; background: #525659; }
 .pdf-viewer canvas { max-width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 12px; background: #fff; }
-.pdf-controls { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 8px; }
+.pdf-controls { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 8px; flex: 1; }
 .pdf-controls button { width: 40px; height: 40px; border-radius: 50%; background: var(--tg-theme-secondary-bg-color); border: none; color: var(--tg-theme-text-color); display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .pdf-controls button svg { width: 18px; height: 18px; }
 .pdf-controls .pdf-page-info { font-size: 13px; color: var(--tg-theme-hint-color); min-width: 80px; text-align: center; }
 
-/* NOTES PANEL */
-.notes-panel {
+/* SIDE PANEL (NOTES + BOOKMARKS) */
+.side-panel {
     position: fixed; top: 0; right: 0; bottom: 0;
-    width: 85%; max-width: 360px;
+    width: 88%; max-width: 380px;
     background: var(--tg-theme-bg-color);
     z-index: 210;
     transform: translateX(100%);
@@ -391,35 +436,44 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
     display: flex; flex-direction: column;
     box-shadow: -10px 0 30px rgba(0,0,0,0.2);
 }
-.notes-panel.visible { transform: translateX(0); }
-.notes-overlay {
+.side-panel.visible { transform: translateX(0); }
+.side-overlay {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.4);
     z-index: 205; opacity: 0; pointer-events: none;
     transition: opacity 0.3s;
 }
-.notes-overlay.visible { opacity: 1; pointer-events: auto; }
-.notes-panel__header {
-    padding: calc(var(--safe-area-top) + 16px) 16px 16px;
+.side-overlay.visible { opacity: 1; pointer-events: auto; }
+.side-panel__header {
+    padding: calc(var(--safe-area-top) + 12px) 16px 0;
     border-bottom: 0.5px solid rgba(128,128,128,0.2);
-    display: flex; justify-content: space-between; align-items: center;
 }
-.notes-panel__title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-.notes-panel__title svg { width: 20px; height: 20px; color: var(--tg-theme-accent-text-color); }
-.notes-panel__close { background: none; border: none; color: var(--tg-theme-accent-text-color); cursor: pointer; display: flex; }
-.notes-panel__close svg { width: 22px; height: 22px; }
-.notes-panel__content { flex: 1; overflow-y: auto; padding: 16px; }
-.notes-panel__empty { text-align: center; color: var(--tg-theme-hint-color); padding: 40px 20px; font-size: 14px; }
-.notes-panel__empty svg { width: 48px; height: 48px; margin: 0 auto 12px; opacity: 0.5; display: block; }
-.note-item {
+.side-panel__tabs { display: flex; gap: 4px; margin-bottom: 8px; }
+.side-tab {
+    flex: 1; padding: 10px; background: none; border: none;
+    color: var(--tg-theme-hint-color); font-size: 14px; font-weight: 600;
+    cursor: pointer; border-bottom: 2px solid transparent;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.side-tab svg { width: 16px; height: 16px; }
+.side-tab.active { color: var(--tg-theme-accent-text-color); border-bottom-color: var(--islamic-gold); }
+.side-panel__close-wrap { display: flex; justify-content: flex-end; padding: 4px 0; }
+.side-panel__close { background: none; border: none; color: var(--tg-theme-accent-text-color); cursor: pointer; display: flex; }
+.side-panel__close svg { width: 22px; height: 22px; }
+.side-panel__content { flex: 1; overflow-y: auto; padding: 16px; }
+.side-panel__empty { text-align: center; color: var(--tg-theme-hint-color); padding: 40px 20px; font-size: 14px; }
+.side-panel__empty svg { width: 48px; height: 48px; margin: 0 auto 12px; opacity: 0.5; display: block; color: var(--islamic-gold); }
+.note-item, .bookmark-item {
     background: var(--tg-theme-secondary-bg-color);
     border-radius: 12px; padding: 12px;
     margin-bottom: 10px; position: relative;
+    cursor: pointer;
 }
-.note-item__chapter { font-size: 11px; color: var(--tg-theme-accent-text-color); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+.bookmark-item { border-left: 3px solid var(--islamic-gold); }
+.note-item__chapter, .bookmark-item__chapter { font-size: 11px; color: var(--islamic-gold); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
 .note-item__text { font-size: 14px; line-height: 1.5; margin-bottom: 8px; white-space: pre-wrap; word-break: break-word; }
-.note-item__date { font-size: 11px; color: var(--tg-theme-hint-color); }
-.note-item__delete {
+.note-item__date, .bookmark-item__date { font-size: 11px; color: var(--tg-theme-hint-color); }
+.item-delete {
     position: absolute; top: 8px; right: 8px;
     background: none; border: none;
     color: var(--tg-theme-destructive-text-color);
@@ -427,13 +481,13 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
     width: 28px; height: 28px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
 }
-.note-item__delete svg { width: 14px; height: 14px; }
-.notes-panel__add {
+.item-delete svg { width: 14px; height: 14px; }
+.side-panel__add {
     padding: 16px;
     border-top: 0.5px solid rgba(128,128,128,0.2);
     background: var(--tg-theme-bg-color);
 }
-.notes-panel__textarea {
+.side-panel__textarea {
     width: 100%; min-height: 80px; max-height: 150px;
     padding: 12px; border-radius: 12px;
     background: var(--tg-theme-secondary-bg-color);
@@ -442,19 +496,19 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
     font-size: 14px; resize: vertical;
     margin-bottom: 10px;
 }
-.notes-panel__textarea::placeholder { color: var(--tg-theme-hint-color); }
-.notes-panel__submit {
+.side-panel__textarea::placeholder { color: var(--tg-theme-hint-color); }
+.side-panel__submit {
     width: 100%; padding: 12px;
     background: var(--tg-theme-button-color);
     color: #fff; border: none; border-radius: 12px;
     font-size: 15px; font-weight: 600; cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 6px;
 }
-.notes-panel__submit svg { width: 16px; height: 16px; }
-.notes-panel__submit:active { transform: scale(0.98); }
-.notes-badge {
+.side-panel__submit svg { width: 16px; height: 16px; }
+.side-panel__submit:active { transform: scale(0.98); }
+.side-badge {
     position: absolute; top: -2px; right: -2px;
-    background: var(--tg-theme-destructive-text-color);
+    background: var(--islamic-gold);
     color: #fff; font-size: 10px; font-weight: 700;
     min-width: 16px; height: 16px; border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
@@ -478,7 +532,7 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
     display: flex; justify-content: space-between; align-items: center;
 }
 .admin-title { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-.admin-title svg { width: 22px; height: 22px; color: var(--tg-theme-accent-text-color); }
+.admin-title svg { width: 22px; height: 22px; color: var(--islamic-gold); }
 .admin-close { background: none; border: none; color: var(--tg-theme-accent-text-color); cursor: pointer; display: flex; }
 .admin-close svg { width: 22px; height: 22px; }
 .admin-tabs {
@@ -487,16 +541,83 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
 }
 .admin-tab {
     flex: 1; padding: 12px; background: none; border: none;
-    color: var(--tg-theme-hint-color); font-size: 13px; font-weight: 600;
+    color: var(--tg-theme-hint-color); font-size: 12px; font-weight: 600;
     cursor: pointer; border-bottom: 2px solid transparent;
     transition: all 0.2s;
     display: flex; align-items: center; justify-content: center; gap: 5px;
 }
 .admin-tab svg { width: 14px; height: 14px; }
-.admin-tab.active { color: var(--tg-theme-accent-text-color); border-bottom-color: var(--tg-theme-button-color); }
+.admin-tab.active { color: var(--tg-theme-accent-text-color); border-bottom-color: var(--islamic-gold); }
 .admin-content { flex: 1; overflow-y: auto; padding: 16px; }
 .admin-section { display: none; }
 .admin-section.active { display: block; }
+
+/* ADMIN CATEGORY TREE — inline edit */
+.admin-cat-tree { padding-bottom: 80px; }
+.admin-cat-item {
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 14px; padding: 12px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--islamic-gold);
+}
+.admin-cat-item.sub {
+    margin-left: 20px;
+    border-left-color: var(--tg-theme-hint-color);
+    background: var(--tg-theme-bg-color);
+}
+.admin-cat-row {
+    display: flex; align-items: center; gap: 10px;
+}
+.admin-cat-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--tg-theme-bg-color);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--islamic-gold); flex-shrink: 0;
+}
+.admin-cat-item.sub .admin-cat-icon { background: var(--tg-theme-secondary-bg-color); }
+.admin-cat-icon svg { width: 22px; height: 22px; }
+.admin-cat-info { flex: 1; min-width: 0; }
+.admin-cat-name {
+    font-size: 15px; font-weight: 600;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    cursor: text; padding: 2px 4px; border-radius: 4px;
+}
+.admin-cat-name:hover { background: rgba(128,128,128,0.1); }
+.admin-cat-name.editing {
+    background: var(--tg-theme-bg-color);
+    outline: 2px solid var(--islamic-gold);
+    white-space: normal; overflow: visible;
+}
+.admin-cat-meta { font-size: 12px; color: var(--tg-theme-hint-color); margin-top: 2px; }
+.admin-cat-actions { display: flex; gap: 4px; }
+.admin-icon-btn {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--tg-theme-bg-color); border: none;
+    color: var(--tg-theme-text-color); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+}
+.admin-icon-btn svg { width: 16px; height: 16px; }
+.admin-icon-btn.danger { color: var(--tg-theme-destructive-text-color); }
+.admin-icon-btn.primary { color: var(--islamic-gold); }
+.admin-icon-btn:active { transform: scale(0.9); }
+.admin-cat-children { margin-top: 8px; }
+.admin-add-sub {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; margin-top: 6px;
+    background: none; border: 1.5px dashed rgba(128,128,128,0.3);
+    border-radius: 10px; cursor: pointer;
+    color: var(--tg-theme-hint-color); font-size: 13px;
+    width: 100%; font-weight: 500;
+}
+.admin-add-sub svg { width: 14px; height: 14px; }
+.admin-add-root {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px; margin: 16px 0;
+    background: var(--tg-theme-button-color); color: #fff;
+    border: none; border-radius: 14px; cursor: pointer;
+    font-size: 15px; font-weight: 600; width: 100%;
+}
+.admin-add-root svg { width: 18px; height: 18px; }
 
 .admin-item {
     background: var(--tg-theme-secondary-bg-color);
@@ -504,7 +625,7 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
     margin-bottom: 10px;
     display: flex; align-items: center; gap: 12px;
 }
-.admin-item__icon { width: 36px; height: 36px; border-radius: 10px; background: var(--tg-theme-bg-color); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--tg-theme-accent-text-color); }
+.admin-item__icon { width: 36px; height: 36px; border-radius: 10px; background: var(--tg-theme-bg-color); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--islamic-gold); }
 .admin-item__icon svg { width: 20px; height: 20px; }
 .admin-item__info { flex: 1; min-width: 0; }
 .admin-item__title { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -519,18 +640,6 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
 .admin-btn.primary { background: var(--tg-theme-button-color); color: #fff; }
 .admin-btn.danger { background: var(--tg-theme-destructive-text-color); color: #fff; }
 .admin-btn.secondary { background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
-
-.admin-fab {
-    position: sticky; bottom: 16px;
-    width: 56px; height: 56px; border-radius: 50%;
-    background: var(--tg-theme-button-color); color: #fff;
-    border: none; cursor: pointer;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-    margin: 16px auto 0;
-    display: flex; align-items: center; justify-content: center;
-}
-.admin-fab svg { width: 24px; height: 24px; }
-.admin-fab:active { transform: scale(0.9); }
 
 /* MODAL */
 .modal-overlay {
@@ -563,7 +672,7 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
     font-size: 15px; outline: none;
 }
 .form-textarea { min-height: 100px; resize: vertical; font-family: inherit; }
-.form-input:focus, .form-select:focus, .form-textarea:focus { box-shadow: 0 0 0 2px var(--tg-theme-button-color); }
+.form-input:focus, .form-select:focus, .form-textarea:focus { box-shadow: 0 0 0 2px var(--islamic-gold); }
 .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
 .modal-actions button { flex: 1; padding: 14px; border-radius: 12px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .modal-actions button svg { width: 16px; height: 16px; }
@@ -584,7 +693,7 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
 /* ICON PICKER */
 .icon-picker {
     display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px;
-    max-height: 200px; overflow-y: auto;
+    max-height: 220px; overflow-y: auto;
     padding: 8px; background: var(--tg-theme-secondary-bg-color);
     border-radius: 10px;
 }
@@ -594,14 +703,14 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
     border: 2px solid transparent;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    color: var(--tg-theme-text-color);
+    color: var(--islamic-gold);
     transition: all 0.15s;
 }
 .icon-picker-item svg { width: 20px; height: 20px; }
-.icon-picker-item.active { border-color: var(--tg-theme-button-color); background: var(--tg-theme-button-color); color: #fff; }
+.icon-picker-item.active { border-color: var(--islamic-gold); background: var(--islamic-green); color: var(--islamic-gold); }
 .icon-picker-item:active { transform: scale(0.9); }
 
-/* BOTTOM SHEET (inline edit menu) */
+/* BOTTOM SHEET */
 .bottom-sheet-overlay {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.5);
@@ -630,7 +739,7 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
     border: none; background: none; width: 100%;
     color: var(--tg-theme-text-color); text-align: left;
 }
-.bottom-sheet__item svg { width: 22px; height: 22px; color: var(--tg-theme-accent-text-color); }
+.bottom-sheet__item svg { width: 22px; height: 22px; color: var(--islamic-gold); }
 .bottom-sheet__item.danger { color: var(--tg-theme-destructive-text-color); }
 .bottom-sheet__item.danger svg { color: var(--tg-theme-destructive-text-color); }
 .bottom-sheet__item:active { background: var(--tg-theme-secondary-bg-color); }
@@ -652,7 +761,7 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
 .toast.visible { transform: translateX(-50%) translateY(0); }
 
 .empty-state { text-align: center; padding: 40px 20px; color: var(--tg-theme-hint-color); }
-.empty-state svg { width: 56px; height: 56px; margin: 0 auto 12px; opacity: 0.5; display: block; }
+.empty-state svg { width: 56px; height: 56px; margin: 0 auto 12px; opacity: 0.5; display: block; color: var(--islamic-gold); }
 .empty-state__text { font-size: 15px; }
 
 .admin-hint {
@@ -662,7 +771,7 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
     color: var(--tg-theme-hint-color);
     display: flex; gap: 10px; align-items: flex-start;
 }
-.admin-hint svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--tg-theme-accent-text-color); }
+.admin-hint svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--islamic-gold); }
 
 .pdf-upload-area {
     border: 2px dashed rgba(128,128,128,0.3);
@@ -672,24 +781,26 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
     transition: all 0.2s;
 }
 .pdf-upload-area:active { transform: scale(0.98); }
-.pdf-upload-area svg { width: 32px; height: 32px; color: var(--tg-theme-accent-text-color); margin-bottom: 8px; }
-.pdf-upload-area.has-file { border-color: var(--tg-theme-button-color); border-style: solid; }
+.pdf-upload-area svg { width: 32px; height: 32px; color: var(--islamic-gold); margin-bottom: 8px; }
+.pdf-upload-area.has-file { border-color: var(--islamic-gold); border-style: solid; }
 .pdf-upload-area .file-info { font-size: 13px; color: var(--tg-theme-text-color); margin-top: 8px; word-break: break-all; }
 .pdf-upload-area .file-size { font-size: 11px; color: var(--tg-theme-hint-color); margin-top: 4px; }
 
+.pdf-or { text-align: center; color: var(--tg-theme-hint-color); font-size: 12px; margin: 10px 0; }
+
 .achievement-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
 .achievement-row.locked { opacity: 0.4; }
-.achievement-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--tg-theme-bg-color); display: flex; align-items: center; justify-content: center; color: var(--tg-theme-accent-text-color); flex-shrink: 0; }
+.achievement-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--tg-theme-bg-color); display: flex; align-items: center; justify-content: center; color: var(--islamic-gold); flex-shrink: 0; }
 .achievement-icon svg { width: 24px; height: 24px; }
 .achievement-info { flex: 1; }
 .achievement-title { font-weight: 600; font-size: 15px; }
 .achievement-desc { font-size: 13px; color: var(--tg-theme-hint-color); }
-.achievement-check { color: #34c759; display: flex; }
+.achievement-check { color: #2fa85a; display: flex; }
 .achievement-check svg { width: 22px; height: 22px; }
 .achievement-lock { color: var(--tg-theme-hint-color); display: flex; }
 .achievement-lock svg { width: 18px; height: 18px; }
 
-.streak-icon { color: #ff9500; display: flex; }
+.streak-icon { color: var(--islamic-gold); display: flex; }
 .streak-icon svg { width: 40px; height: 40px; }
 
 .continue-card {
@@ -697,18 +808,112 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
 }
 .continue-card__cover {
     width: 60px; height: 60px; border-radius: 12px;
-    background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
+    background: linear-gradient(135deg, var(--islamic-green), var(--islamic-deep));
     display: flex; align-items: center; justify-content: center;
-    color: #fff; flex-shrink: 0;
+    color: var(--islamic-gold); flex-shrink: 0;
 }
 .continue-card__cover svg { width: 28px; height: 28px; }
-.continue-card__cover.book { background: linear-gradient(135deg, #5856d6, #af52de); }
-.continue-card__cover.pdf { background: linear-gradient(135deg, #ff3b30, #ff6b6b); }
+.continue-card__cover.book { background: linear-gradient(135deg, #004d25, #002a14); }
+.continue-card__cover.pdf { background: linear-gradient(135deg, #8b0000, #5a0000); }
 .continue-card__info { flex: 1; min-width: 0; }
 .continue-card__title { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .continue-card__meta { font-size: 13px; color: var(--tg-theme-hint-color); margin-top: 4px; }
-.continue-card__action { display: flex; color: var(--tg-theme-accent-text-color); }
+.continue-card__action { display: flex; color: var(--islamic-gold); }
 .continue-card__action svg { width: 24px; height: 24px; }
+
+/* ONBOARDING */
+.onboarding {
+    position: fixed; inset: 0;
+    background: linear-gradient(135deg, var(--islamic-green), var(--islamic-deep));
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    color: #fff;
+}
+.onboarding.visible { display: flex; }
+.onboarding__slides { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.onboarding__slide { display: none; text-align: center; max-width: 320px; animation: fadeIn 0.4s ease; }
+.onboarding__slide.active { display: block; }
+.onboarding__icon {
+    width: 140px; height: 140px; margin: 0 auto 30px;
+    border-radius: 50%;
+    background: rgba(201,162,39,0.15);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--islamic-gold);
+    border: 2px solid var(--islamic-gold);
+}
+.onboarding__icon svg { width: 72px; height: 72px; }
+.onboarding__title { font-size: 26px; font-weight: 700; margin-bottom: 12px; }
+.onboarding__text { font-size: 16px; line-height: 1.5; opacity: 0.9; }
+.onboarding__dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+.onboarding__dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transition: all 0.3s;
+}
+.onboarding__dot.active { background: var(--islamic-gold); width: 24px; border-radius: 4px; }
+.onboarding__actions { padding: 20px; display: flex; gap: 12px; }
+.onboarding__btn {
+    flex: 1; padding: 16px;
+    border-radius: 14px; border: none;
+    font-size: 16px; font-weight: 600; cursor: pointer;
+}
+.onboarding__btn.primary { background: var(--islamic-gold); color: var(--islamic-deep); }
+.onboarding__btn.secondary { background: rgba(255,255,255,0.1); color: #fff; }
+
+/* ANALYTICS */
+.analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.analytics-card {
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 14px; padding: 14px;
+    text-align: center;
+}
+.analytics-card__value { font-size: 24px; font-weight: 700; color: var(--islamic-gold); }
+.analytics-card__label { font-size: 12px; color: var(--tg-theme-hint-color); margin-top: 4px; }
+.chart-wrap {
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 14px; padding: 16px;
+    margin-bottom: 12px;
+}
+.chart-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+.chart-canvas { width: 100%; height: 160px; display: block; }
+
+/* SLEEP TIMER */
+.sleep-timer-modal {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 450;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.sleep-timer-modal.visible { display: flex; }
+.sleep-timer-content {
+    background: var(--tg-theme-bg-color);
+    border-radius: 20px;
+    padding: 24px 20px;
+    width: 100%; max-width: 320px;
+    animation: slideUp 0.3s ease;
+}
+.sleep-timer-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.sleep-timer-title svg { width: 22px; height: 22px; color: var(--islamic-gold); }
+.sleep-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.sleep-option {
+    padding: 14px; border-radius: 12px;
+    background: var(--tg-theme-secondary-bg-color);
+    border: 2px solid transparent;
+    color: var(--tg-theme-text-color);
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    text-align: center;
+}
+.sleep-option.active { border-color: var(--islamic-gold); background: rgba(201,162,39,0.1); }
+.sleep-cancel {
+    width: 100%; padding: 12px;
+    background: none; border: none;
+    color: var(--tg-theme-destructive-text-color);
+    font-size: 15px; font-weight: 600; cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -720,9 +925,9 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
         <div id="page-home" class="page active">
             <h1 id="greeting">
                 <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <span>Привет! 👋</span>
+                <span>Ассаляму алейкум! 👋</span>
             </h1>
-            <p class="subtitle" id="greeting-sub">Готов продолжить обучение?</p>
+            <p class="subtitle" id="greeting-sub">«Проси знания от колыбели до могилы»</p>
 
             <div class="block" style="display: flex; align-items: center; gap: 16px;">
                 <div class="streak-icon">
@@ -730,7 +935,7 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
                 </div>
                 <div>
                     <div style="font-size: 18px; font-weight: 600;" id="streak-text">0 дней подряд</div>
-                    <div style="font-size: 14px; color: var(--tg-theme-hint-color);">Не прерывай серию!</div>
+                    <div style="font-size: 14px; color: var(--tg-theme-hint-color);">Постоянство — ключ к Раю</div>
                 </div>
             </div>
 
@@ -777,26 +982,41 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
                 <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                 <span>Прогресс</span>
             </h1>
-            <div class="block" style="display: flex; justify-content: space-around; text-align: center;">
-                <div>
-                    <div style="font-size: 24px; font-weight: 700; color: var(--tg-theme-accent-text-color);" id="stat-hours">0</div>
-                    <div style="font-size: 13px; color: var(--tg-theme-hint-color);">Минут</div>
+
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <div class="analytics-card__value" id="stat-hours">0</div>
+                    <div class="analytics-card__label">Минут</div>
                 </div>
-                <div>
-                    <div style="font-size: 24px; font-weight: 700; color: var(--tg-theme-accent-text-color);" id="stat-books">0</div>
-                    <div style="font-size: 13px; color: var(--tg-theme-hint-color);">Книг</div>
+                <div class="analytics-card">
+                    <div class="analytics-card__value" id="stat-books">0</div>
+                    <div class="analytics-card__label">Книг</div>
                 </div>
-                <div>
-                    <div style="font-size: 24px; font-weight: 700; color: var(--tg-theme-accent-text-color);" id="stat-lessons">0</div>
-                    <div style="font-size: 13px; color: var(--tg-theme-hint-color);">Уроков</div>
+                <div class="analytics-card">
+                    <div class="analytics-card__value" id="stat-lessons">0</div>
+                    <div class="analytics-card__label">Уроков</div>
                 </div>
+                <div class="analytics-card">
+                    <div class="analytics-card__value" id="stat-streak">0</div>
+                    <div class="analytics-card__label">Лучшая серия</div>
+                </div>
+            </div>
+
+            <div class="chart-wrap">
+                <div class="chart-title">📊 Активность за 8 недель</div>
+                <canvas class="chart-canvas" id="weekChart"></canvas>
+            </div>
+
+            <div class="chart-wrap">
+                <div class="chart-title">🕌 Изучаемые науки</div>
+                <canvas class="chart-canvas" id="catChart"></canvas>
             </div>
 
             <h2>Календарь активности</h2>
             <div class="block">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; font-weight: 600;">
                     <span id="calendar-month">Август 2026</span>
-                    <span style="color: var(--tg-theme-accent-text-color);" id="calendar-count">0 дней</span>
+                    <span style="color: var(--islamic-gold);" id="calendar-count">0 дней</span>
                 </div>
                 <div class="calendar-grid" id="calendarGrid"></div>
             </div>
@@ -810,16 +1030,25 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
             <div style="padding-top: 20px;">
                 <div class="profile-avatar" id="user-avatar">U</div>
                 <div class="profile-name" id="user-name">Пользователь</div>
+                <div style="text-align: center;">
+                    <div class="level-badge" id="levelBadge">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <span id="levelText">Новичок</span>
+                    </div>
+                </div>
+                <div class="level-progress">
+                    <div class="level-progress-fill" id="levelProgressFill" style="width: 0%;"></div>
+                </div>
+                <div class="level-labels">
+                    <span id="levelXpCurrent">0 XP</span>
+                    <span id="levelXpNext">100 XP</span>
+                </div>
             </div>
 
             <div class="block">
-                <div class="settings-item" onclick="showToast('Тема следует за настройками')">
+                <div class="settings-item" onclick="cycleTheme()">
                     <span><span class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></span>Тема оформления</span>
                     <span id="themeLabel">Системная</span>
-                </div>
-                <div class="settings-item" onclick="cycleTheme()">
-                    <span><span class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span>Сменить тему</span>
-                    <span>→</span>
                 </div>
                 <div class="settings-item" onclick="showToast('Язык: Русский')">
                     <span><span class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span>Язык</span>
@@ -847,8 +1076,8 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
             </div>
 
             <div class="block" style="text-align: center; color: var(--tg-theme-hint-color); font-size: 13px;">
-                <div id="versionLabel" style="cursor: pointer; user-select: none;">Требуй знания! v5.0</div>
-                <div style="margin-top: 4px; font-size: 11px;">Сделано с ❤️ для Telegram</div>
+                <div>Требуй знания! v6.0</div>
+                <div style="margin-top: 4px; font-size: 11px; font-style: italic;">«Кто идёт по пути в поисках знания, тому Аллах облегчает путь в Рай» (Муслим)</div>
                 <div id="adminHint" style="margin-top: 8px; font-size: 10px; opacity: 0.5;"></div>
             </div>
         </div>
@@ -905,7 +1134,35 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 17a5 5 0 0 0 1 0"/><path d="M8.16 17a5 5 0 0 1 5.81-7.97"/><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
                 </button>
             </div>
-            <button class="full-player__speed" id="fpSpeed" onclick="changeSpeed()">1x</button>
+            <div class="full-player__extras">
+                <button class="fp-extra-btn" id="sleepTimerBtn" onclick="openSleepTimer()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/></svg>
+                    <span id="sleepTimerLabel">Таймер сна</span>
+                </button>
+                <button class="fp-extra-btn" id="speedBtn" onclick="changeSpeed()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <span id="speedLabel">1x</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ ТАЙМЕР СНА ============ -->
+    <div class="sleep-timer-modal" id="sleepTimerModal">
+        <div class="sleep-timer-content">
+            <div class="sleep-timer-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/></svg>
+                Таймер сна
+            </div>
+            <div class="sleep-options">
+                <button class="sleep-option" data-min="15" onclick="setSleepTimer(15)">15 мин</button>
+                <button class="sleep-option" data-min="30" onclick="setSleepTimer(30)">30 мин</button>
+                <button class="sleep-option" data-min="45" onclick="setSleepTimer(45)">45 мин</button>
+                <button class="sleep-option" data-min="60" onclick="setSleepTimer(60)">60 мин</button>
+                <button class="sleep-option" data-min="90" onclick="setSleepTimer(90)">90 мин</button>
+                <button class="sleep-option" data-min="0" onclick="setSleepTimer(0)">Выкл</button>
+            </div>
+            <button class="sleep-cancel" onclick="closeSleepTimer()">Отмена</button>
         </div>
     </div>
 
@@ -917,9 +1174,12 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
             </button>
             <div class="reader__title" id="readerTitle">—</div>
             <div style="display: flex; gap: 4px; position: relative;">
-                <button class="reader__btn" onclick="toggleNotesPanel()" id="notesBtn" style="position: relative;">
+                <button class="reader__btn" onclick="toggleBookmark()" id="bookmarkBtn">
+                    <svg id="bookmarkIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+                </button>
+                <button class="reader__btn" onclick="openSidePanel()" id="sideBtn" style="position: relative;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                    <span class="notes-badge" id="notesBadge" style="display: none;">0</span>
+                    <span class="side-badge" id="sideBadge" style="display: none;">0</span>
                 </button>
                 <button class="reader__btn" onclick="toggleReaderSettings()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -951,28 +1211,36 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
                 <div class="theme-controls">
                     <button class="theme-btn" data-theme="light" onclick="setReaderTheme('light')" style="background:#fff;color:#000;">☀️</button>
                     <button class="theme-btn" data-theme="sepia" onclick="setReaderTheme('sepia')" style="background:#f4ecd8;color:#5b4636;">📜</button>
-                    <button class="theme-btn" data-theme="dark" onclick="setReaderTheme('dark')" style="background:#1c1c1e;color:#fff;">🌙</button>
+                    <button class="theme-btn" data-theme="dark" onclick="setReaderTheme('dark')" style="background:#121a14;color:#fff;">🌙</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ============ ПАНЕЛЬ ЗАМЕТОК ============ -->
-    <div class="notes-overlay" id="notesOverlay" onclick="toggleNotesPanel()"></div>
-    <div class="notes-panel" id="notesPanel">
-        <div class="notes-panel__header">
-            <div class="notes-panel__title">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                <span>Мои заметки</span>
+    <!-- ============ БОКОВАЯ ПАНЕЛЬ (ЗАКЛАДКИ + ЗАМЕТКИ) ============ -->
+    <div class="side-overlay" id="sideOverlay" onclick="closeSidePanel()"></div>
+    <div class="side-panel" id="sidePanel">
+        <div class="side-panel__header">
+            <div class="side-panel__close-wrap">
+                <button class="side-panel__close" onclick="closeSidePanel()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
-            <button class="notes-panel__close" onclick="toggleNotesPanel()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
+            <div class="side-panel__tabs">
+                <button class="side-tab active" data-tab="bookmarks" onclick="switchSideTab('bookmarks')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+                    Закладки
+                </button>
+                <button class="side-tab" data-tab="notes" onclick="switchSideTab('notes')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    Заметки
+                </button>
+            </div>
         </div>
-        <div class="notes-panel__content" id="notesContent"></div>
-        <div class="notes-panel__add">
-            <textarea class="notes-panel__textarea" id="noteInput" placeholder="Ваши мысли по текущей главе..."></textarea>
-            <button class="notes-panel__submit" onclick="addNote()">
+        <div class="side-panel__content" id="sideContent"></div>
+        <div class="side-panel__add" id="sideAdd" style="display:none;">
+            <textarea class="side-panel__textarea" id="noteInput" placeholder="Ваши мысли..."></textarea>
+            <button class="side-panel__submit" onclick="addNote()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 <span>Добавить заметку</span>
             </button>
@@ -993,26 +1261,27 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
         <div class="admin-tabs">
             <button class="admin-tab active" data-section="categories" onclick="switchAdminTab('categories')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                <span>Разделы</span>
+                Разделы
             </button>
             <button class="admin-tab" data-section="content" onclick="switchAdminTab('content')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                <span>Контент</span>
+                Контент
             </button>
             <button class="admin-tab" data-section="data" onclick="switchAdminTab('data')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
-                <span>Данные</span>
+                Данные
             </button>
         </div>
         <div class="admin-content">
             <div class="admin-section active" id="admin-categories">
                 <div class="admin-hint">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                    <div>Создавайте разделы и подразделы для организации уроков и книг.</div>
+                    <div>Тапните на название, чтобы переименовать. Кнопка <b>+</b> под разделом — добавить подраздел.</div>
                 </div>
-                <div id="adminCategoriesList"></div>
-                <button class="admin-fab" onclick="openCategoryModal()">
+                <div id="adminCategoriesList" class="admin-cat-tree"></div>
+                <button class="admin-add-root" onclick="openCategoryModal()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Добавить новый раздел
                 </button>
             </div>
 
@@ -1033,8 +1302,9 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
                     </button>
                 </div>
                 <div id="adminContentList"></div>
-                <button class="admin-fab" onclick="openContentModal()">
+                <button class="admin-add-root" onclick="openContentModal()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Добавить контент
                 </button>
             </div>
 
@@ -1054,7 +1324,7 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
                     </button>
                     <input type="file" id="importFileAdmin" accept=".json" style="display:none" onchange="importData(event)">
                     <button class="admin-btn danger" style="width: 100%; padding: 14px; font-size: 15px;" onclick="resetAllData()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
                         Сбросить всё
                     </button>
                 </div>
@@ -1072,7 +1342,7 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
             <div class="modal-title" id="categoryModalTitle">Новый раздел</div>
             <div class="form-group">
                 <label class="form-label">Название</label>
-                <input type="text" class="form-input" id="catName" placeholder="Например: Наука">
+                <input type="text" class="form-input" id="catName" placeholder="Например: Акыда">
             </div>
             <div class="form-group">
                 <label class="form-label">Иконка</label>
@@ -1164,12 +1434,20 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
                 <label class="form-label">PDF файл</label>
                 <div class="pdf-upload-area" id="pdfUploadArea" onclick="document.getElementById('pdfFileInput').click()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                    <div style="font-size: 14px; font-weight: 600;">Нажмите для загрузки PDF</div>
-                    <div style="font-size: 12px; color: var(--tg-theme-hint-color); margin-top: 4px;">Максимум ~4 МБ (ограничение localStorage)</div>
+                    <div style="font-size: 14px; font-weight: 600;">Загрузить файл</div>
                     <div class="file-info" id="pdfFileInfo"></div>
                     <div class="file-size" id="pdfFileSize"></div>
                 </div>
                 <input type="file" id="pdfFileInput" accept="application/pdf" style="display:none" onchange="handlePdfUpload(event)">
+                <div class="pdf-or">— или —</div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">URL PDF файла</label>
+                    <input type="text" class="form-input" id="cntPdfUrl" placeholder="https://example.com/book.pdf">
+                    <button class="admin-btn secondary" style="width: 100%; padding: 10px; margin-top: 8px;" onclick="loadPdfFromUrl()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                        Загрузить по URL
+                    </button>
+                </div>
             </div>
             <div class="modal-actions">
                 <button class="admin-btn secondary" onclick="closeContentModal()">
@@ -1184,7 +1462,7 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
         </div>
     </div>
 
-    <!-- ============ BOTTOM SHEET (INLINE EDIT) ============ -->
+    <!-- ============ BOTTOM SHEET ============ -->
     <div class="bottom-sheet-overlay" id="editSheet">
         <div class="bottom-sheet">
             <div class="bottom-sheet__handle"></div>
@@ -1203,13 +1481,49 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
         </div>
     </div>
 
+    <!-- ============ ONBOARDING ============ -->
+    <div class="onboarding" id="onboarding">
+        <div class="onboarding__slides">
+            <div class="onboarding__slide active">
+                <div class="onboarding__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 2v10l6.5 3.5"/><path d="M12 12l4 2"/></svg>
+                </div>
+                <div class="onboarding__title">بِسْمِ اللّٰه</div>
+                <div class="onboarding__text">Добро пожаловать в приложение «Требуй знания!» — ваш помощник в изучении исламских наук</div>
+            </div>
+            <div class="onboarding__slide">
+                <div class="onboarding__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                </div>
+                <div class="onboarding__title">Слушай уроки</div>
+                <div class="onboarding__text">Аудиоуроки по акыде, фикху, тафсиру и другим наукам — в дороге, дома, на прогулке</div>
+            </div>
+            <div class="onboarding__slide">
+                <div class="onboarding__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                </div>
+                <div class="onboarding__title">Читай книги</div>
+                <div class="onboarding__text">Текстовые книги и PDF. Делайте закладки и заметки, отслеживайте прогресс</div>
+            </div>
+        </div>
+        <div class="onboarding__dots">
+            <div class="onboarding__dot active"></div>
+            <div class="onboarding__dot"></div>
+            <div class="onboarding__dot"></div>
+        </div>
+        <div class="onboarding__actions">
+            <button class="onboarding__btn secondary" onclick="skipOnboarding()">Пропустить</button>
+            <button class="onboarding__btn primary" id="onbNextBtn" onclick="nextOnboarding()">Далее</button>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
     <audio id="audioPlayer" preload="metadata"></audio>
 
     <!-- ============ НИЖНЯЯ НАВИГАЦИЯ ============ -->
     <nav class="bottom-nav">
         <button class="nav-item active" data-target="page-home">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             <span>Главная</span>
         </button>
         <button class="nav-item" data-target="page-lessons">
@@ -1234,7 +1548,7 @@ h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
 <script>
 // ============ TELEGRAM INIT ============
 const tg = window.Telegram?.WebApp;
-if (tg) { try { tg.ready(); tg.expand(); tg.setHeaderColor(tg.themeParams?.bg_color || '#ffffff'); } catch(e) {} }
+if (tg) { try { tg.ready(); tg.expand(); tg.setHeaderColor(tg.themeParams?.bg_color || '#006d34'); } catch(e) {} }
 function haptic(type = 'light') { try { tg?.HapticFeedback?.[type === 'selection' ? 'selectionChanged' : 'impactOccurred'](type === 'selection' ? undefined : type); } catch(e) {} }
 
 // ============ PDF.JS INIT ============
@@ -1242,29 +1556,87 @@ if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 
-// ============ НАБОР SVG ИКОНОК ============
+// ============ INDEXEDDB WRAPPER ============
+const IDB_NAME = 'tknowledge_db';
+const IDB_STORE = 'pdfs';
+let idb = null;
+
+function openIdb() {
+    return new Promise((resolve, reject) => {
+        if (idb) return resolve(idb);
+        const req = indexedDB.open(IDB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+            if (!e.target.result.objectStoreNames.contains(IDB_STORE)) {
+                e.target.result.createObjectStore(IDB_STORE);
+            }
+        };
+        req.onsuccess = (e) => { idb = e.target.result; resolve(idb); };
+        req.onerror = (e) => reject(e.target.error);
+    });
+}
+async function idbSet(key, value) {
+    const db = await openIdb();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(IDB_STORE, 'readwrite');
+        tx.objectStore(IDB_STORE).put(value, key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = (e) => reject(e.target.error);
+    });
+}
+async function idbGet(key) {
+    const db = await openIdb();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(IDB_STORE, 'readonly');
+        const req = tx.objectStore(IDB_STORE).get(key);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = (e) => reject(e.target.error);
+    });
+}
+async function idbDelete(key) {
+    const db = await openIdb();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(IDB_STORE, 'readwrite');
+        tx.objectStore(IDB_STORE).delete(key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = (e) => reject(e.target.error);
+    });
+}
+
+// Миграция: перенос PDF из localStorage в IDB
+async function migratePdfsToIdb() {
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('pdf_')) {
+            const contentId = key.replace('pdf_', '');
+            const value = localStorage.getItem(key);
+            try {
+                await idbSet(contentId, value);
+                localStorage.removeItem(key);
+            } catch(e) { console.warn('Migration failed', e); }
+        }
+    }
+}
+
+// ============ ИСЛАМСКИЕ SVG ИКОНКИ ============
 const ICONS = {
-    science: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31"/><path d="M14 9.3V1.99"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/></svg>',
-    physics: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z"/><path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z"/></svg>',
-    biology: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c.37-.8 1.36-2 3-2 2.71 0 5 2.29 5 5 0 1.64-.8 2.63-1.6 3-.84.4-1.3.8-1.4 1.42"/><path d="M12 5c-.37-.8-1.36-2-3-2-2.71 0-5 2.29-5 5 0 1.64.8 2.63 1.6 3 .84.4 1.3.8 1.4 1.42"/><path d="M12 5v14"/><path d="M5 14h14"/></svg>',
-    history: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h.01"/><path d="M9 12h.01"/><path d="M9 15h.01"/><path d="M9 18h.01"/></svg>',
-    it: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
-    psychology: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>',
-    growth: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>',
-    art: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>',
-    music: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
-    book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>',
-    globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>',
+    aqida: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.5 6.5L21 9l-5 4.5L17.5 21 12 17l-5.5 4L8 13.5 3 9l6.5-.5z"/></svg>',
+    manhaj: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M5 8l7-4 7 4"/><path d="M5 16l7 4 7-4"/><path d="M5 8v8"/><path d="M19 8v8"/></svg>',
+    fiqh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M5 8h14"/><path d="M5 8l-2 4h4"/><path d="M19 8l2 4h-4"/><circle cx="12" cy="21" r="1.5"/></svg>',
+    tafsir: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 2H20v16l-6.5-2L7 18v1.5A2.5 2.5 0 0 1 4 19.5z"/><path d="M9 7h6"/><path d="M9 11h6"/></svg>',
+    hadith: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 6h8"/><path d="M8 18h8"/><path d="M6 8v8"/><path d="M18 8v8"/></svg>',
+    seerah: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L8 6v4"/><path d="M12 2l4 4v4"/><path d="M4 22V10a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12"/><path d="M9 22v-6h6v6"/><path d="M12 2v4"/></svg>',
+    tarbiya: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M12 12c-2-2-4-3-6-3 0 3 2 5 6 5s6-2 6-5c-2 0-4 1-6 3z"/><path d="M7 22h10"/><path d="M12 8V4"/><path d="M9 6l3-2 3 2"/></svg>',
+    arabic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v18"/><path d="M6 15c3 0 5-2 5-5s-2-5-5-5"/><path d="M14 9h5"/><path d="M14 15c2 0 4-1 4-3s-2-3-4-3"/><path d="M18 21l-2-2 2-2"/></svg>',
+    quran: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 2H20v16l-6.5-2L7 18v1.5A2.5 2.5 0 0 1 4 19.5z"/><path d="M12 6v8"/><path d="M9 10h6"/></svg>',
+    mosque: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-2 2-3 4-3 6 0 1 1 2 3 2s3-1 3-2c0-2-1-4-3-6z"/><path d="M3 22V12a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10"/><path d="M9 22v-6a3 3 0 0 1 6 0v6"/><path d="M3 22h18"/></svg>',
+    crescent: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10 8 8 0 0 1-10-10z"/><path d="M18 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"/></svg>',
+    beads: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="1.5"/><circle cx="10" cy="4" r="1.5"/><circle cx="14" cy="4" r="1.5"/><circle cx="18" cy="6" r="1.5"/><circle cx="20" cy="10" r="1.5"/><circle cx="20" cy="14" r="1.5"/><circle cx="18" cy="18" r="1.5"/><circle cx="14" cy="20" r="1.5"/><circle cx="10" cy="20" r="1.5"/><circle cx="6" cy="18" r="1.5"/><path d="M4 6l2 0"/><path d="M4 6v12"/></svg>',
+    pen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>',
+    lantern: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M8 6h8l-1 4H9L8 6z"/><path d="M9 10v8a3 3 0 0 0 6 0v-8"/><path d="M10 22h4"/></svg>',
     star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
-    heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
-    zap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
-    target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
-    rocket: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>',
-    briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
-    coffee: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>'
+    book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>'
 };
 
-// Иконки для UI
 const UI_ICONS = {
     play: '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>',
     pause: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>',
@@ -1281,82 +1653,105 @@ const UI_ICONS = {
     chevronLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
     chevronRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
     zoomIn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>',
-    zoomOut: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>'
+    zoomOut: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>',
+    bookmark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>',
+    bookmarkFilled: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>',
+    edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+    trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>',
+    star: '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
 };
 
-// ============ АДМИН ID — ЗАМЕНИТЕ НА СВОЙ ============
-// Чтобы узнать свой Telegram ID: напишите боту @userinfobot в Telegram
-const ADMIN_IDS = [8690178977]; // <-- ВПИШИТЕ СЮДА СВОЙ TELEGRAM ID (число)
-
+// ============ АДМИН ID ============
+const ADMIN_IDS = [8690178977]; // <-- ВПИШИТЕ СВОЙ TELEGRAM ID
 function isAdmin() {
     const userId = tg?.initDataUnsafe?.user?.id;
     return ADMIN_IDS.includes(userId);
 }
 
-// ============ ДАННЫЕ ============
+// ============ ДЕФОЛТНЫЕ ДАННЫЕ (ИСЛАМСКАЯ ТЕМАТИКА) ============
 const DEFAULT_DATA = {
     categories: [
-        { id: 'cat1', name: 'Наука', icon: 'science', type: 'category', parentId: null, applies: 'both' },
-        { id: 'cat2', name: 'Физика', icon: 'physics', type: 'subcategory', parentId: 'cat1', applies: 'audio' },
-        { id: 'cat3', name: 'Биология', icon: 'biology', type: 'subcategory', parentId: 'cat1', applies: 'both' },
-        { id: 'cat4', name: 'История', icon: 'history', type: 'category', parentId: null, applies: 'both' },
-        { id: 'cat5', name: 'IT', icon: 'it', type: 'category', parentId: null, applies: 'both' },
-        { id: 'cat6', name: 'Психология', icon: 'psychology', type: 'category', parentId: null, applies: 'both' },
-        { id: 'cat7', name: 'Саморазвитие', icon: 'growth', type: 'category', parentId: null, applies: 'both' }
+        { id: 'cat_aqida', name: 'Акыда', icon: 'aqida', type: 'category', parentId: null, applies: 'both' },
+        { id: 'cat_tawhid', name: 'Таухид', icon: 'crescent', type: 'subcategory', parentId: 'cat_aqida', applies: 'both' },
+        { id: 'cat_names', name: 'Имена Аллаха', icon: 'star', type: 'subcategory', parentId: 'cat_aqida', applies: 'audio' },
+        { id: 'cat_fiqh', name: 'Фикх', icon: 'fiqh', type: 'category', parentId: null, applies: 'both' },
+        { id: 'cat_ibadat', name: 'Ибадат', icon: 'mosque', type: 'subcategory', parentId: 'cat_fiqh', applies: 'both' },
+        { id: 'cat_tafsir', name: 'Тафсир', icon: 'tafsir', type: 'category', parentId: null, applies: 'both' },
+        { id: 'cat_hadith', name: 'Хадис', icon: 'hadith', type: 'category', parentId: null, applies: 'both' },
+        { id: 'cat_seerah', name: 'Сира', icon: 'seerah', type: 'category', parentId: null, applies: 'both' },
+        { id: 'cat_tarbiya', name: 'Тарбия', icon: 'tarbiya', type: 'category', parentId: null, applies: 'both' },
+        { id: 'cat_arabic', name: 'Арабский язык', icon: 'arabic', type: 'category', parentId: null, applies: 'both' },
+        { id: 'cat_manhaj', name: 'Манхадж', icon: 'manhaj', type: 'category', parentId: null, applies: 'both' }
     ],
     content: [
         {
-            id: 1, type: 'audio', categoryId: 'cat2', subcategoryId: null,
-            icon: 'physics', title: 'Тайны черных дыр', author: 'Алексей Иванов',
+            id: 1, type: 'audio', categoryId: 'cat_tawhid', subcategoryId: null,
+            icon: 'crescent', title: 'Основы Таухида', author: 'Шейх Ибн Баз',
             duration: 2700, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-1.mp3'
         },
         {
-            id: 2, type: 'book', categoryId: 'cat4', subcategoryId: null,
-            icon: 'history', title: 'История Древнего Рима', author: 'Марк Туллий',
+            id: 2, type: 'book', categoryId: 'cat_seerah', subcategoryId: null,
+            icon: 'seerah', title: 'Жизнеописание Пророка ﷺ', author: 'Ибн Хишам',
             chapters: [
-                { id: 'ch1', title: 'Глава 1. Основание Рима', text: 'Согласно легенде, Рим был основан братьями Ромулом и Ремом в 753 году до нашей эры. Братья были вскормлены волчицей и выросли, чтобы основать величайшую цивилизацию древности.\n\nРомул стал первым царем Рима и дал городу свое имя. Он создал сенат из ста самых знатных людей, которые стали называться "патрициями".\n\nМаленькое поселение на Палатинском холме быстро росло. Беглые рабы, изгнанники и искатели приключений находили здесь убежище.' },
-                { id: 'ch2', title: 'Глава 2. Царский период', text: 'Римом правили семь царей: четверо латинов и сабинян и трое этрусков. Последний царь, Тарквиний Гордый, был жестоким тираном и был изгнан в 509 году до н.э.\n\nПосле изгнания царей была установлена Республика. Власть перешла к сенату и народным собраниям.\n\nЭтот период ознаменовался борьбой плебеев и патрициев. Плебеи постепенно добились равноправия.' },
-                { id: 'ch3', title: 'Глава 3. Расцвет Республики', text: 'К III веку до н.э. Рим объединил под своей властью всю Италию. Началась эпоха Пунических войн с Карфагеном.\n\nГаннибал Барка перешел Альпы со слонами и нанес римлянам несколько сокрушительных поражений. Но Рим выстоял и в итоге разрушил Карфаген в 146 году до н.э.' }
+                { id: 'ch1', title: 'Глава 1. Рождение Пророка ﷺ', text: 'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ\n\nМухаммад ﷺ родился в Мекке в году Слона, в понедельник, в месяце Раби аль-Авваль. Его отец Абдуллах умер до его рождения, а мать Амина была из рода Бану Зухра.\n\nПророк ﷺ родился в благородной семье. Его дед Абд аль-Мутталиб был хранителем Каабы и вождем курайшитов. При рождении Пророка ﷺ произошли великие знамения: исчез трон Кисры, погасли огни персов.' },
+                { id: 'ch2', title: 'Глава 2. Детство и юность', text: 'Маленького Мухаммада ﷺ воспитывала няня Халима из племени Бану Саад, как было принято у арабов. Он рос здоровым и благочестивым ребёнком.\n\nКогда ему исполнилось шесть лет, умерла его мать Амина. После этого заботу о нём взял дед Абд аль-Мутталиб, а после его смерти — дядя Абу Талиб.\n\nЮный Мухаммад ﷺ пас овец, помогал дяде в торговле. Он был известен своей честностью и получил прозвище «аль-Амин» (Надёжный).' },
+                { id: 'ch3', title: 'Глава 3. Начало пророчества', text: 'Когда Пророку ﷺ исполнилось сорок лет, он удалился в пещеру Хира для размышлений. Именно там к нему явился ангел Джибриль с первым откровением:\n\n«Читай во имя Господа твоего, Который сотворил» (аль-Алак: 1).\n\nТак началось пророчество, которое длилось 23 года. Первые годы призыв был тайным, затем стал явным. Мекканские многобожцы начали преследовать мусульман.' }
             ]
         },
         {
-            id: 3, type: 'audio', categoryId: 'cat5', subcategoryId: null,
-            icon: 'it', title: 'Python с нуля', author: 'IT Academy',
+            id: 3, type: 'audio', categoryId: 'cat_fiqh', subcategoryId: 'cat_ibadat',
+            icon: 'mosque', title: 'Правила намаза', author: 'Шейх аль-Усаймин',
             duration: 1800, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-2.mp3'
         },
         {
-            id: 4, type: 'audio', categoryId: 'cat6', subcategoryId: null,
-            icon: 'psychology', title: 'Как работает память', author: 'Доктор Нейро',
-            duration: 900, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-3.mp3'
+            id: 4, type: 'audio', categoryId: 'cat_hadith', subcategoryId: null,
+            icon: 'hadith', title: 'Сорок хадисов ан-Навави', author: 'Имам ан-Навави',
+            duration: 3600, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-3.mp3'
         },
         {
-            id: 5, type: 'book', categoryId: 'cat1', subcategoryId: null,
-            icon: 'science', title: 'Краткая история времени', author: 'Стивен Хокинг',
+            id: 5, type: 'book', categoryId: 'cat_tafsir', subcategoryId: null,
+            icon: 'tafsir', title: 'Тафсир суры аль-Фатиха', author: 'Ибн Касир',
             chapters: [
-                { id: 'ch1', title: 'Глава 1. Наши представления о Вселенной', text: 'Древние греки считали, что Вселенная конечна и имеет сферическую форму. Земля находится в центре, а вокруг нее вращаются Солнце, Луна и планеты.\n\nЭта модель господствовала более тысячи лет. Но в 1543 году Коперник предложил гелиоцентрическую модель.' },
-                { id: 'ch2', title: 'Глава 2. Пространство и время', text: 'До Эйнштейна пространство и время считались абсолютными. Специальная теория относительности (1905) перевернула эти представления.\n\nДвижущиеся часы идут медленнее, а движущиеся линейки сокращаются.' }
+                { id: 'ch1', title: 'Введение', text: 'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ\n\nСура аль-Фатиха («Открывающая») — величайшая сура Корана. Она состоит из 7 аятов и является матерью Книги.\n\nПророк ﷺ сказал: «Недействителен намаз того, кто не прочитал Открывающую Книгу» (аль-Бухари, Муслим).' },
+                { id: 'ch2', title: 'Смысл басмалы', text: '«Во имя Аллаха Милостивого, Милосердного» — эти слова мы произносим перед каждым важным делом.\n\n«Аллах» — имя Всевышнего, указывающее на Его божественность. «Ар-Рахман» — Милостивый ко всем в этом мире. «Ар-Рахим» — Милосердный к верующим в мире вечном.\n\nИбн Аббас сказал: «Басмаля — это защита от проклятого шайтана».' }
             ]
         },
         {
-            id: 6, type: 'audio', categoryId: 'cat6', subcategoryId: null,
-            icon: 'art', title: 'Психология цвета', author: 'Анна Дизайнер',
+            id: 6, type: 'audio', categoryId: 'cat_arabic', subcategoryId: null,
+            icon: 'arabic', title: 'Основы арабской грамматики', author: 'Устаз Ахмад',
             duration: 1200, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-5.mp3'
+        },
+        {
+            id: 7, type: 'book', categoryId: 'cat_tarbiya', subcategoryId: null,
+            icon: 'tarbiya', title: 'Воспитание детей в Исламе', author: 'Лулу аль-Мутави',
+            chapters: [
+                { id: 'ch1', title: 'Глава 1. Права ребёнка', text: 'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ\n\nВ Исламе ребёнок имеет права ещё до рождения. Выбор праведной матери, хорошее имя, воспитание в вере — всё это обязанности родителей.\n\nПророк ﷺ сказал: «Каждый из вас пастырь, и каждый из вас несёт ответственность за свою паству» (аль-Бухари).' },
+                { id: 'ch2', title: 'Глава 2. Методы воспитания', text: 'Воспитание должно основываться на любви, милосердии и справедливости. Пророк ﷺ целовал своих внуков и играл с детьми.\n\nВажно учить детей намазу с 7 лет, а с 10 лет побуждать к его совершению. Также необходимо учить их Корану, хорошим манерам и честности.' }
+            ]
+        },
+        {
+            id: 8, type: 'audio', categoryId: 'cat_manhaj', subcategoryId: null,
+            icon: 'manhaj', title: 'Основы понимания религии', author: 'Шейх Салих аль-Фаузан',
+            duration: 2400, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-8.mp3'
         }
     ]
 };
 
-const DATA_KEY = 'tknowledge_data_v5';
-const STATE_KEY = 'tknowledge_state_v5';
+const DATA_KEY = 'tknowledge_data_v6';
+const STATE_KEY = 'tknowledge_state_v6';
 
 let data = { categories: [], content: [] };
 let state = {
     favorites: [], audioProgress: {}, bookProgress: {},
     listeningTime: 0, lessonsCompleted: [], booksCompleted: [],
-    activeDays: [], lastActiveDay: null, streak: 0,
+    activeDays: [], lastActiveDay: null, streak: 0, bestStreak: 0,
     readerSettings: { fontSize: 17, theme: 'light' },
     playerSettings: { speed: 1 },
     notes: {},
-    appTheme: 'system' // 'system' | 'light' | 'dark'
+    bookmarks: {},
+    appTheme: 'system',
+    xp: 0,
+    onboardingDone: false
 };
 
 function loadData() {
@@ -1366,7 +1761,7 @@ function loadData() {
         else { data = JSON.parse(JSON.stringify(DEFAULT_DATA)); saveData(); }
     } catch(e) { data = JSON.parse(JSON.stringify(DEFAULT_DATA)); saveData(); }
 }
-function saveData() { try { localStorage.setItem(DATA_KEY, JSON.stringify(data)); } catch(e) { showToast('Ошибка сохранения. Возможно, файл PDF слишком большой.'); } }
+function saveData() { try { localStorage.setItem(DATA_KEY, JSON.stringify(data)); } catch(e) { showToast('⚠️ Ошибка сохранения'); } }
 
 function loadState() {
     try {
@@ -1375,6 +1770,50 @@ function loadState() {
     } catch(e) {}
 }
 function saveState() { try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch(e) {} }
+
+// ============ XP & LEVELS ============
+const LEVELS = [
+    { name: 'Новичок', min: 0 },
+    { name: 'Ученик', min: 100 },
+    { name: 'Знаток', min: 300 },
+    { name: 'Мудрец', min: 700 },
+    { name: 'Гуру', min: 1500 },
+    { name: 'Мастер', min: 3000 }
+];
+
+function addXp(amount) {
+    state.xp += amount;
+    saveState();
+    updateLevelUI();
+}
+
+function getCurrentLevel() {
+    let lvl = LEVELS[0];
+    for (const l of LEVELS) {
+        if (state.xp >= l.min) lvl = l;
+    }
+    return lvl;
+}
+
+function getNextLevel() {
+    const idx = LEVELS.findIndex(l => l.min === getCurrentLevel().min);
+    return LEVELS[idx + 1] || null;
+}
+
+function updateLevelUI() {
+    const current = getCurrentLevel();
+    const next = getNextLevel();
+    document.getElementById('levelText').textContent = current.name;
+    document.getElementById('levelXpCurrent').textContent = state.xp + ' XP';
+    if (next) {
+        document.getElementById('levelXpNext').textContent = next.min + ' XP';
+        const progress = ((state.xp - current.min) / (next.min - current.min)) * 100;
+        document.getElementById('levelProgressFill').style.width = progress + '%';
+    } else {
+        document.getElementById('levelXpNext').textContent = 'MAX';
+        document.getElementById('levelProgressFill').style.width = '100%';
+    }
+}
 
 // ============ УТИЛИТЫ ============
 function todayStr() {
@@ -1389,6 +1828,7 @@ function markActiveToday() {
         if (diff === 1) state.streak += 1;
         else if (diff > 1) state.streak = 1;
     } else state.streak = 1;
+    if (state.streak > state.bestStreak) state.bestStreak = state.streak;
     state.lastActiveDay = today;
     saveState();
 }
@@ -1418,28 +1858,22 @@ function getCategoryName(id) {
     const c = data.categories.find(c => c.id === id);
     return c ? c.name : '—';
 }
-function getCategoryIcon(id) {
-    const c = data.categories.find(c => c.id === id);
-    return c ? (ICONS[c.icon] || ICONS.science) : ICONS.science;
-}
 
 function getContentIcon(item) {
     if (!item) return ICONS.book;
     if (item.type === 'pdf') return UI_ICONS.pdf;
-    if (item.type === 'audio') return ICONS.music;
+    if (item.type === 'audio') return ICONS[item.icon] || ICONS.mosque;
     return ICONS[item.icon] || ICONS.book;
 }
 
-// ============ ТЕМА ПРИЛОЖЕНИЯ ============
+// ============ ТЕМА ============
 function applyAppTheme() {
     const body = document.body;
     body.removeAttribute('data-theme');
     if (state.appTheme === 'light') body.setAttribute('data-theme', 'light');
     else if (state.appTheme === 'dark') body.setAttribute('data-theme', 'dark');
-    // 'system' — ничего не делаем, используем тему Telegram
     updateThemeLabel();
 }
-
 function cycleTheme() {
     const themes = ['system', 'light', 'dark'];
     const idx = themes.indexOf(state.appTheme);
@@ -1447,13 +1881,9 @@ function cycleTheme() {
     applyAppTheme();
     saveState();
     haptic('selection');
-    showToast('🎨 Тема: ' + getThemeName(state.appTheme));
+    showToast('🎨 ' + getThemeName(state.appTheme));
 }
-
-function getThemeName(theme) {
-    return { system: 'Системная', light: 'Светлая', dark: 'Тёмная' }[theme] || 'Системная';
-}
-
+function getThemeName(t) { return { system: 'Системная', light: 'Светлая', dark: 'Тёмная' }[t] || 'Системная'; }
 function updateThemeLabel() {
     const label = document.getElementById('themeLabel');
     if (label) label.textContent = getThemeName(state.appTheme);
@@ -1474,11 +1904,12 @@ const audio = document.getElementById('audioPlayer');
 let currentTrack = null;
 let isPlaying = false;
 let saveInterval = null;
+let sleepTimerId = null;
+let sleepTimerMinutes = 0;
 
 function playTrack(id) {
     const item = data.content.find(c => c.id == id && c.type === 'audio');
     if (!item) return;
-
     const wasSameTrack = currentTrack?.id === item.id;
     currentTrack = item;
     audio.src = item.audioUrl;
@@ -1516,8 +1947,8 @@ function changeSpeed() {
     const idx = speeds.indexOf(state.playerSettings.speed);
     state.playerSettings.speed = speeds[(idx + 1) % speeds.length];
     audio.playbackRate = state.playerSettings.speed;
-    document.getElementById('fpSpeed').textContent = state.playerSettings.speed + 'x';
-    showToast('⏩ Скорость: ' + state.playerSettings.speed + 'x');
+    document.getElementById('speedLabel').textContent = state.playerSettings.speed + 'x';
+    showToast('⏩ ' + state.playerSettings.speed + 'x');
     haptic('selection'); saveState();
 }
 function seekAudio(e) {
@@ -1534,7 +1965,7 @@ function updatePlayButtons() {
 }
 function showMiniPlayer() {
     if (!currentTrack) return;
-    document.getElementById('mpCover').innerHTML = ICONS.music;
+    document.getElementById('mpCover').innerHTML = ICONS.mosque;
     document.getElementById('mpTitle').textContent = currentTrack.title;
     document.getElementById('mpAuthor').textContent = currentTrack.author;
     document.getElementById('miniPlayer').classList.add('visible');
@@ -1542,11 +1973,12 @@ function showMiniPlayer() {
 }
 function openFullPlayer() {
     if (!currentTrack) return;
-    document.getElementById('fpCover').innerHTML = ICONS.music;
+    document.getElementById('fpCover').innerHTML = ICONS.mosque;
     document.getElementById('fpTitle').textContent = currentTrack.title;
     document.getElementById('fpAuthor').textContent = currentTrack.author;
-    document.getElementById('fpSpeed').textContent = state.playerSettings.speed + 'x';
+    document.getElementById('speedLabel').textContent = state.playerSettings.speed + 'x';
     document.getElementById('fullPlayer').classList.add('visible');
+    updateSleepTimerUI();
     haptic('light');
 }
 function closeFullPlayer() {
@@ -1568,10 +2000,68 @@ audio.addEventListener('ended', () => {
     if (currentTrack && !state.lessonsCompleted.includes(currentTrack.id)) {
         state.lessonsCompleted.push(currentTrack.id);
         markActiveToday(); saveState();
-        showToast('✅ Урок завершен!');
+        addXp(10);
+        showToast('✅ Урок завершен! +10 XP');
         renderProgress(); renderHome();
     }
 });
+
+// ============ ТАЙМЕР СНА ============
+function openSleepTimer() {
+    document.getElementById('sleepTimerModal').classList.add('visible');
+    document.querySelectorAll('.sleep-option').forEach(o => {
+        o.classList.toggle('active', parseInt(o.dataset.min) === sleepTimerMinutes);
+    });
+    haptic('selection');
+}
+function closeSleepTimer() {
+    document.getElementById('sleepTimerModal').classList.remove('visible');
+}
+function setSleepTimer(min) {
+    if (sleepTimerId) { clearTimeout(sleepTimerId); sleepTimerId = null; }
+    sleepTimerMinutes = min;
+    if (min > 0) {
+        sleepTimerId = setTimeout(() => {
+            if (!audio.paused) {
+                // Плавное затухание
+                let vol = 1;
+                const fadeInterval = setInterval(() => {
+                    vol -= 0.05;
+                    if (vol <= 0) {
+                        audio.pause();
+                        audio.volume = 1;
+                        clearInterval(fadeInterval);
+                        isPlaying = false;
+                        updatePlayButtons();
+                    } else {
+                        audio.volume = vol;
+                    }
+                }, 300);
+            }
+            sleepTimerId = null;
+            sleepTimerMinutes = 0;
+            updateSleepTimerUI();
+            showToast('🌙 Таймер сна сработал');
+        }, min * 60 * 1000);
+        showToast('🌙 Таймер: ' + min + ' мин');
+    } else {
+        showToast('⏰ Таймер выключен');
+    }
+    updateSleepTimerUI();
+    closeSleepTimer();
+    haptic('medium');
+}
+function updateSleepTimerUI() {
+    const btn = document.getElementById('sleepTimerBtn');
+    const label = document.getElementById('sleepTimerLabel');
+    if (sleepTimerMinutes > 0) {
+        btn.classList.add('active');
+        label.textContent = sleepTimerMinutes + ' мин';
+    } else {
+        btn.classList.remove('active');
+        label.textContent = 'Таймер сна';
+    }
+}
 
 // ============ ЧИТАЛКА ============
 let currentBook = null;
@@ -1579,11 +2069,16 @@ let currentChapter = 0;
 let currentPdfDoc = null;
 let currentPdfPage = 1;
 let pdfScale = 1.2;
+let currentSideTab = 'bookmarks';
 
-function openBook(id) {
+async function openBook(id) {
     const item = data.content.find(c => c.id == id && (c.type === 'book' || c.type === 'pdf'));
     if (!item) return;
-    if (item.type === 'pdf' && !item.pdfData) { showToast('PDF файл не найден'); return; }
+    if (item.type === 'pdf') {
+        const pdfData = await idbGet(String(item.id));
+        if (!pdfData) { showToast('PDF файл не найден'); return; }
+        item._pdfData = pdfData;
+    }
     if (item.type === 'book' && (!item.chapters || item.chapters.length === 0)) { showToast('В книге нет глав'); return; }
 
     currentBook = item;
@@ -1592,6 +2087,7 @@ function openBook(id) {
     document.getElementById('readerTitle').textContent = item.title;
     document.getElementById('reader').classList.add('visible');
     applyReaderSettings();
+    updateBookmarkIcon();
 
     if (item.type === 'pdf') {
         document.getElementById('readerContent').innerHTML = '<div class="pdf-viewer" id="pdfViewer"><canvas id="pdfCanvas"></canvas></div>';
@@ -1605,7 +2101,7 @@ function openBook(id) {
             </div>
         `;
         currentPdfPage = saved?.page || 1;
-        loadPdf(item.pdfData);
+        loadPdf(item._pdfData);
     } else {
         currentChapter = saved?.chapter || 0;
         if (currentChapter >= item.chapters.length) currentChapter = 0;
@@ -1623,7 +2119,7 @@ function openBook(id) {
         renderChapter();
     }
 
-    updateNotesBadge();
+    updateSideBadge();
     markActiveToday();
     haptic('medium');
 }
@@ -1632,9 +2128,17 @@ function renderChapter() {
     if (!currentBook || currentBook.type !== 'book') return;
     const chapter = currentBook.chapters[currentChapter];
     const content = document.getElementById('readerContent');
+    const text = chapter.text;
+    const hasBismillah = text.includes('بِسْمِ اللّٰهِ') || text.includes('بسم الله');
+    const body = hasBismillah ? text : 'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ\n\n' + text;
     content.innerHTML = `
         <div class="chapter-title">${escapeHtml(chapter.title)}</div>
-        ${chapter.text.split('\n\n').map(p => `<p>${escapeHtml(p)}</p>`).join('')}
+        ${body.split('\n\n').map(p => {
+            if (p.includes('بِسْمِ اللّٰهِ') || p.includes('بسم الله')) {
+                return `<div class="bismillah">${escapeHtml(p)}</div>`;
+            }
+            return `<p>${escapeHtml(p)}</p>`;
+        }).join('')}
     `;
     content.scrollTop = 0;
     const saved = state.bookProgress[currentBook.id];
@@ -1644,6 +2148,7 @@ function renderChapter() {
     updateReaderProgress();
     document.getElementById('prevChBtn').style.visibility = currentChapter > 0 ? 'visible' : 'hidden';
     document.getElementById('nextChBtn').style.visibility = currentChapter < currentBook.chapters.length - 1 ? 'visible' : 'hidden';
+    updateBookmarkIcon();
 }
 
 async function loadPdf(base64) {
@@ -1678,22 +2183,10 @@ async function renderPdfPage() {
     }
 }
 
-function pdfPrevPage() {
-    if (currentPdfPage > 1) { currentPdfPage--; renderPdfPage(); haptic('light'); }
-}
-function pdfNextPage() {
-    if (currentPdfDoc && currentPdfPage < currentPdfDoc.numPages) { currentPdfPage++; renderPdfPage(); haptic('light'); }
-}
-function pdfZoomIn() {
-    pdfScale = Math.min(3, pdfScale + 0.2);
-    renderPdfPage();
-    haptic('selection');
-}
-function pdfZoomOut() {
-    pdfScale = Math.max(0.5, pdfScale - 0.2);
-    renderPdfPage();
-    haptic('selection');
-}
+function pdfPrevPage() { if (currentPdfPage > 1) { currentPdfPage--; renderPdfPage(); haptic('light'); } }
+function pdfNextPage() { if (currentPdfDoc && currentPdfPage < currentPdfDoc.numPages) { currentPdfPage++; renderPdfPage(); haptic('light'); } }
+function pdfZoomIn() { pdfScale = Math.min(3, pdfScale + 0.2); renderPdfPage(); haptic('selection'); }
+function pdfZoomOut() { pdfScale = Math.max(0.5, pdfScale - 0.2); renderPdfPage(); haptic('selection'); }
 
 function prevChapter() {
     if (currentBook && currentBook.type === 'book' && currentChapter > 0) { saveBookProgress(); currentChapter--; renderChapter(); haptic('light'); }
@@ -1705,11 +2198,8 @@ function nextChapter() {
 function updateReaderProgress() {
     if (!currentBook) return;
     let percent = 0;
-    if (currentBook.type === 'book') {
-        percent = Math.round(((currentChapter + 1) / currentBook.chapters.length) * 100);
-    } else if (currentBook.type === 'pdf' && currentPdfDoc) {
-        percent = Math.round((currentPdfPage / currentPdfDoc.numPages) * 100);
-    }
+    if (currentBook.type === 'book') percent = Math.round(((currentChapter + 1) / currentBook.chapters.length) * 100);
+    else if (currentBook.type === 'pdf' && currentPdfDoc) percent = Math.round((currentPdfPage / currentPdfDoc.numPages) * 100);
     const fill = document.getElementById('readerProgressFill');
     const text = document.getElementById('readerProgressText');
     if (fill) fill.style.width = percent + '%';
@@ -1720,8 +2210,7 @@ function closeReader() {
     saveBookProgress();
     document.getElementById('reader').classList.remove('visible');
     document.getElementById('readerSettings').classList.remove('visible');
-    document.getElementById('notesPanel').classList.remove('visible');
-    document.getElementById('notesOverlay').classList.remove('visible');
+    closeSidePanel();
     currentBook = null;
     currentPdfDoc = null;
     haptic('light');
@@ -1734,13 +2223,15 @@ function saveBookProgress() {
         state.bookProgress[currentBook.id] = { chapter: currentChapter, scroll: content.scrollTop };
         if (currentChapter === currentBook.chapters.length - 1 && !state.booksCompleted.includes(currentBook.id)) {
             state.booksCompleted.push(currentBook.id);
-            showToast('📖 Книга прочитана!');
+            addXp(20);
+            showToast('📖 Книга прочитана! +20 XP');
         }
     } else if (currentBook.type === 'pdf' && currentPdfDoc) {
         state.bookProgress[currentBook.id] = { page: currentPdfPage, totalPages: currentPdfDoc.numPages };
         if (currentPdfPage === currentPdfDoc.numPages && !state.booksCompleted.includes(currentBook.id)) {
             state.booksCompleted.push(currentBook.id);
-            showToast('📖 PDF прочитан!');
+            addXp(20);
+            showToast('📖 PDF прочитан! +20 XP');
         }
     }
     saveState();
@@ -1771,67 +2262,170 @@ function applyReaderSettings() {
     if (content) content.style.fontSize = state.readerSettings.fontSize + 'px';
 }
 
-// ============ ЗАМЕТКИ ============
-function toggleNotesPanel() {
-    const panel = document.getElementById('notesPanel');
-    const overlay = document.getElementById('notesOverlay');
-    const isVisible = panel.classList.contains('visible');
-    if (isVisible) {
-        panel.classList.remove('visible');
-        overlay.classList.remove('visible');
+// ============ ЗАКЛАДКИ ============
+function toggleBookmark() {
+    if (!currentBook) return;
+    if (!state.bookmarks[currentBook.id]) state.bookmarks[currentBook.id] = [];
+    const list = state.bookmarks[currentBook.id];
+    let loc;
+    if (currentBook.type === 'book') {
+        const chapter = currentBook.chapters[currentChapter];
+        loc = { type: 'chapter', chapterId: chapter.id, chapterTitle: chapter.title };
     } else {
-        renderNotes();
-        panel.classList.add('visible');
-        overlay.classList.add('visible');
+        loc = { type: 'page', page: currentPdfPage };
     }
+    const existing = list.findIndex(b => {
+        if (loc.type === 'chapter') return b.chapterId === loc.chapterId;
+        return b.page === loc.page;
+    });
+    if (existing >= 0) {
+        list.splice(existing, 1);
+        showToast('🔖 Закладка удалена');
+    } else {
+        list.push({ id: genId(), ...loc, timestamp: Date.now() });
+        showToast('🔖 Закладка добавлена');
+        addXp(2);
+    }
+    saveState();
+    updateBookmarkIcon();
+    updateSideBadge();
+    haptic('medium');
+}
+
+function updateBookmarkIcon() {
+    if (!currentBook) return;
+    const list = state.bookmarks[currentBook.id] || [];
+    let isBookmarked = false;
+    if (currentBook.type === 'book') {
+        const chapter = currentBook.chapters[currentChapter];
+        isBookmarked = list.some(b => b.chapterId === chapter.id);
+    } else if (currentBook.type === 'pdf') {
+        isBookmarked = list.some(b => b.page === currentPdfPage);
+    }
+    document.getElementById('bookmarkIcon').outerHTML = isBookmarked
+        ? `<svg id="bookmarkIcon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>`
+        : `<svg id="bookmarkIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>`;
+}
+
+// ============ БОКОВАЯ ПАНЕЛЬ ============
+function openSidePanel() {
+    document.getElementById('sidePanel').classList.add('visible');
+    document.getElementById('sideOverlay').classList.add('visible');
+    renderSideContent();
+    haptic('light');
+}
+function closeSidePanel() {
+    document.getElementById('sidePanel').classList.remove('visible');
+    document.getElementById('sideOverlay').classList.remove('visible');
+}
+function switchSideTab(tab) {
+    currentSideTab = tab;
+    document.querySelectorAll('.side-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+    document.getElementById('sideAdd').style.display = tab === 'notes' ? 'block' : 'none';
+    renderSideContent();
+    haptic('selection');
+}
+function renderSideContent() {
+    if (!currentBook) return;
+    const content = document.getElementById('sideContent');
+    if (currentSideTab === 'bookmarks') {
+        const list = state.bookmarks[currentBook.id] || [];
+        if (list.length === 0) {
+            content.innerHTML = `<div class="side-panel__empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+                Нет закладок.<br>Нажмите 🔖 в хедере, чтобы добавить.
+            </div>`;
+            return;
+        }
+        content.innerHTML = list.map(b => {
+            const title = b.type === 'chapter' ? b.chapterTitle : `Страница ${b.page}`;
+            const date = new Date(b.timestamp).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+            return `
+                <div class="bookmark-item" onclick="goToBookmark('${b.id}')">
+                    <div class="bookmark-item__chapter">${escapeHtml(title)}</div>
+                    <div class="bookmark-item__date">${date}</div>
+                    <button class="item-delete" onclick="deleteBookmark(event, '${b.id}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+            `;
+        }).join('');
+    } else {
+        const list = state.notes[currentBook.id] || [];
+        if (list.length === 0) {
+            content.innerHTML = `<div class="side-panel__empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                Нет заметок.<br>Добавьте первую ниже.
+            </div>`;
+            return;
+        }
+        content.innerHTML = list.map(n => {
+            let chapterTitle = 'Удалённая глава';
+            if (currentBook.type === 'book') {
+                const chapter = currentBook.chapters.find(c => c.id === n.chapterId);
+                if (chapter) chapterTitle = chapter.title;
+            } else if (currentBook.type === 'pdf') {
+                chapterTitle = `Страница ${n.page || '?'}`;
+            }
+            const date = new Date(n.timestamp).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+            return `
+                <div class="note-item" onclick="goToNote('${n.id}')">
+                    <div class="note-item__chapter">${escapeHtml(chapterTitle)}</div>
+                    <div class="note-item__text">${escapeHtml(n.text)}</div>
+                    <div class="note-item__date">${date}</div>
+                    <button class="item-delete" onclick="deleteNote(event, '${n.id}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+            `;
+        }).join('');
+    }
+}
+
+function goToBookmark(bookmarkId) {
+    if (!currentBook) return;
+    const b = (state.bookmarks[currentBook.id] || []).find(x => x.id === bookmarkId);
+    if (!b) return;
+    if (currentBook.type === 'book' && b.chapterId) {
+        const idx = currentBook.chapters.findIndex(c => c.id === b.chapterId);
+        if (idx >= 0 && idx !== currentChapter) {
+            saveBookProgress();
+            currentChapter = idx;
+            renderChapter();
+            closeSidePanel();
+            showToast('🔖 Переход к закладке');
+        } else closeSidePanel();
+    } else if (currentBook.type === 'pdf' && b.page) {
+        if (b.page !== currentPdfPage) {
+            currentPdfPage = b.page;
+            renderPdfPage();
+            closeSidePanel();
+            showToast('🔖 Переход к странице');
+        } else closeSidePanel();
+    } else closeSidePanel();
     haptic('light');
 }
 
-function renderNotes() {
+function deleteBookmark(e, id) {
+    e.stopPropagation();
     if (!currentBook) return;
-    const bookNotes = state.notes[currentBook.id] || [];
-    const content = document.getElementById('notesContent');
-    if (bookNotes.length === 0) {
-        content.innerHTML = `<div class="notes-panel__empty">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            У вас пока нет заметок.<br>Добавьте первую ниже!
-        </div>`;
-        return;
-    }
-    content.innerHTML = bookNotes.map(note => {
-        let chapterTitle = 'Удалённая глава';
-        if (currentBook.type === 'book') {
-            const chapter = currentBook.chapters.find(c => c.id === note.chapterId);
-            if (chapter) chapterTitle = chapter.title;
-        } else if (currentBook.type === 'pdf') {
-            chapterTitle = `Страница ${note.page || '?'}`;
-        }
-        const date = new Date(note.timestamp).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-        return `
-            <div class="note-item" onclick="goToNote('${note.id}')">
-                <div class="note-item__chapter">${escapeHtml(chapterTitle)}</div>
-                <div class="note-item__text">${escapeHtml(note.text)}</div>
-                <div class="note-item__date">${date}</div>
-                <button class="note-item__delete" onclick="deleteNote(event, '${note.id}')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-            </div>
-        `;
-    }).join('');
+    state.bookmarks[currentBook.id] = (state.bookmarks[currentBook.id] || []).filter(b => b.id !== id);
+    saveState();
+    renderSideContent();
+    updateBookmarkIcon();
+    updateSideBadge();
+    showToast('🗑 Закладка удалена');
+    haptic('light');
 }
 
+// ============ ЗАМЕТКИ ============
 function addNote() {
     if (!currentBook) return;
     const input = document.getElementById('noteInput');
     const text = input.value.trim();
     if (!text) { showToast('Введите текст заметки'); return; }
-
     if (!state.notes[currentBook.id]) state.notes[currentBook.id] = [];
-    const note = {
-        id: genId(),
-        text: text,
-        timestamp: Date.now()
-    };
+    const note = { id: genId(), text, timestamp: Date.now() };
     if (currentBook.type === 'book') {
         const chapter = currentBook.chapters[currentChapter];
         note.chapterId = chapter.id;
@@ -1841,20 +2435,20 @@ function addNote() {
     state.notes[currentBook.id].push(note);
     input.value = '';
     saveState();
-    renderNotes();
-    updateNotesBadge();
-    showToast('✅ Заметка добавлена');
+    addXp(5);
+    renderSideContent();
+    updateSideBadge();
+    showToast('✅ Заметка добавлена +5 XP');
     haptic('medium');
 }
 
 function deleteNote(e, noteId) {
     e.stopPropagation();
     if (!currentBook) return;
-    if (!confirm('Удалить заметку?')) return;
     state.notes[currentBook.id] = state.notes[currentBook.id].filter(n => n.id !== noteId);
     saveState();
-    renderNotes();
-    updateNotesBadge();
+    renderSideContent();
+    updateSideBadge();
     showToast('🗑 Заметка удалена');
     haptic('light');
 }
@@ -1869,40 +2463,29 @@ function goToNote(noteId) {
             saveBookProgress();
             currentChapter = idx;
             renderChapter();
-            toggleNotesPanel();
+            closeSidePanel();
             showToast('📖 Переход к главе');
-        } else {
-            toggleNotesPanel();
-        }
+        } else closeSidePanel();
     } else if (currentBook.type === 'pdf' && note.page) {
         if (note.page !== currentPdfPage) {
-            saveBookProgress();
             currentPdfPage = note.page;
             renderPdfPage();
-            toggleNotesPanel();
+            closeSidePanel();
             showToast('📄 Переход к странице');
-        } else {
-            toggleNotesPanel();
-        }
-    } else {
-        toggleNotesPanel();
-    }
+        } else closeSidePanel();
+    } else closeSidePanel();
     haptic('light');
 }
 
-function updateNotesBadge() {
-    const badge = document.getElementById('notesBadge');
+function updateSideBadge() {
+    const badge = document.getElementById('sideBadge');
     if (!currentBook) { badge.style.display = 'none'; return; }
-    const count = (state.notes[currentBook.id] || []).length;
-    if (count > 0) {
-        badge.textContent = count;
-        badge.style.display = 'flex';
-    } else {
-        badge.style.display = 'none';
-    }
+    const count = (state.notes[currentBook.id] || []).length + (state.bookmarks[currentBook.id] || []).length;
+    if (count > 0) { badge.textContent = count; badge.style.display = 'flex'; }
+    else badge.style.display = 'none';
 }
 
-// ============ РЕНДЕРИНГ БИБЛИОТЕК ============
+// ============ БИБЛИОТЕКА ============
 let lessonsFilter = { category: 'all', subcategory: 'all', search: '' };
 let booksFilter = { category: 'all', subcategory: 'all', search: '' };
 
@@ -1911,7 +2494,6 @@ function renderLessons() {
     renderSubcategoryTabs('lessons', 'audio');
     renderContentGrid('lessonsGrid', 'audio', lessonsFilter);
 }
-
 function renderBooks() {
     renderCategoryTabs('books', 'book');
     renderSubcategoryTabs('books', 'book');
@@ -1922,13 +2504,12 @@ function renderCategoryTabs(prefix, type) {
     const container = document.getElementById(prefix + 'Categories');
     const cats = data.categories.filter(c => c.type === 'category' && (c.applies === 'both' || c.applies === type));
     const filter = prefix === 'lessons' ? lessonsFilter : booksFilter;
-
     let html = `<button class="cat-tab ${filter.category === 'all' ? 'active' : ''}" onclick="setCategory('${prefix}', 'all')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         Все
     </button>`;
     cats.forEach(c => {
-        html += `<button class="cat-tab ${filter.category === c.id ? 'active' : ''}" onclick="setCategory('${prefix}', '${c.id}')">${ICONS[c.icon] || ICONS.science}<span>${escapeHtml(c.name)}</span></button>`;
+        html += `<button class="cat-tab ${filter.category === c.id ? 'active' : ''}" onclick="setCategory('${prefix}', '${c.id}')">${ICONS[c.icon] || ICONS.mosque}<span>${escapeHtml(c.name)}</span></button>`;
     });
     container.innerHTML = html;
 }
@@ -1936,15 +2517,12 @@ function renderCategoryTabs(prefix, type) {
 function renderSubcategoryTabs(prefix, type) {
     const container = document.getElementById(prefix + 'Subcategories');
     const filter = prefix === 'lessons' ? lessonsFilter : booksFilter;
-
     if (filter.category === 'all') { container.innerHTML = ''; return; }
-
     const subcats = data.categories.filter(c => c.type === 'subcategory' && c.parentId === filter.category && (c.applies === 'both' || c.applies === type));
     if (subcats.length === 0) { container.innerHTML = ''; return; }
-
     let html = `<button class="subcat-chip ${filter.subcategory === 'all' ? 'active' : ''}" onclick="setSubcategory('${prefix}', 'all')">Все</button>`;
     subcats.forEach(c => {
-        html += `<button class="subcat-chip ${filter.subcategory === c.id ? 'active' : ''}" onclick="setSubcategory('${prefix}', '${c.id}')">${ICONS[c.icon] || ICONS.science}<span>${escapeHtml(c.name)}</span></button>`;
+        html += `<button class="subcat-chip ${filter.subcategory === c.id ? 'active' : ''}" onclick="setSubcategory('${prefix}', '${c.id}')">${ICONS[c.icon] || ICONS.mosque}<span>${escapeHtml(c.name)}</span></button>`;
     });
     container.innerHTML = html;
 }
@@ -1954,7 +2532,6 @@ function setCategory(prefix, catId) {
     else { booksFilter.category = catId; booksFilter.subcategory = 'all'; renderBooks(); }
     haptic('selection');
 }
-
 function setSubcategory(prefix, subId) {
     if (prefix === 'lessons') { lessonsFilter.subcategory = subId; renderLessons(); }
     else { booksFilter.subcategory = subId; renderBooks(); }
@@ -1964,14 +2541,12 @@ function setSubcategory(prefix, subId) {
 function renderContentGrid(gridId, type, filter) {
     const grid = document.getElementById(gridId);
     let items = data.content.filter(c => c.type === type || (type === 'book' && (c.type === 'book' || c.type === 'pdf')));
-
     if (filter.category !== 'all') items = items.filter(i => i.categoryId === filter.category);
     if (filter.subcategory !== 'all') items = items.filter(i => i.subcategoryId === filter.subcategory);
     if (filter.search) {
         const s = filter.search.toLowerCase();
         items = items.filter(i => i.title.toLowerCase().includes(s) || i.author.toLowerCase().includes(s));
     }
-
     if (items.length === 0) {
         grid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
@@ -1979,9 +2554,7 @@ function renderContentGrid(gridId, type, filter) {
         </div>`;
         return;
     }
-
     const adminMode = isAdmin();
-
     grid.innerHTML = items.map(item => {
         const isFav = state.favorites.includes(item.id);
         let meta = '';
@@ -2031,42 +2604,36 @@ function toggleFav(e, id) {
     haptic('light');
 }
 
-// ============ INLINE EDIT (BOTTOM SHEET) ============
+// ============ INLINE EDIT ============
 let editSheetItemId = null;
-
 function openEditSheet(e, id) {
     e.stopPropagation();
     editSheetItemId = id;
     document.getElementById('editSheet').classList.add('visible');
     haptic('selection');
 }
-
 function closeEditSheet() {
     document.getElementById('editSheet').classList.remove('visible');
     editSheetItemId = null;
 }
-
 function editFromSheet() {
     if (editSheetItemId) openContentModal(editSheetItemId);
     closeEditSheet();
 }
-
 function deleteFromSheet() {
     if (!editSheetItemId) return;
     const item = data.content.find(c => c.id === editSheetItemId);
     if (!item) return;
     if (!confirm(`Удалить "${item.title}"?`)) { closeEditSheet(); return; }
+    if (item.type === 'pdf') idbDelete(String(item.id)).catch(() => {});
     data.content = data.content.filter(c => c.id !== editSheetItemId);
     saveData();
     closeEditSheet();
-    renderLessons();
-    renderBooks();
-    renderHome();
+    renderLessons(); renderBooks(); renderHome();
     if (document.getElementById('adminPanel').classList.contains('visible')) renderAdminContent();
     showToast('🗑 Удалено');
     haptic('light');
 }
-
 document.getElementById('editSheet').addEventListener('click', (e) => {
     if (e.target.id === 'editSheet') closeEditSheet();
 });
@@ -2075,7 +2642,7 @@ document.getElementById('editSheet').addEventListener('click', (e) => {
 function renderHome() {
     const user = tg?.initDataUnsafe?.user;
     const name = user?.first_name || 'Друг';
-    document.getElementById('greeting').querySelector('span').textContent = `Привет, ${name}! 👋`;
+    document.getElementById('greeting').querySelector('span').textContent = `Ассаляму алейкум, ${name}! 👋`;
     document.getElementById('streak-text').textContent = `${state.streak} ${declOfNum(state.streak, ['день', 'дня', 'дней'])} подряд`;
 
     const continueBlock = document.getElementById('continue-block');
@@ -2090,7 +2657,7 @@ function renderHome() {
             const remaining = Math.max(0, Math.round((prog.duration - prog.position) / 60));
             continueHtml += `
                 <div class="block continue-card" onclick="playTrack(${item.id})">
-                    <div class="continue-card__cover">${ICONS.music}</div>
+                    <div class="continue-card__cover">${ICONS.mosque}</div>
                     <div class="continue-card__info">
                         <div class="continue-card__title">${escapeHtml(item.title)}</div>
                         <div class="continue-card__meta">Осталось ~${remaining} мин</div>
@@ -2106,13 +2673,8 @@ function renderHome() {
             const prog = state.bookProgress[lastBookId];
             let meta = '';
             let coverClass = 'continue-card__cover';
-            if (item.type === 'pdf') {
-                meta = `Страница ${prog.page || 1} из ${prog.totalPages || '?'}`;
-                coverClass += ' pdf';
-            } else {
-                meta = `Глава ${(prog.chapter || 0) + 1} из ${(item.chapters || []).length}`;
-                coverClass += ' book';
-            }
+            if (item.type === 'pdf') { meta = `Страница ${prog.page || 1} из ${prog.totalPages || '?'}`; coverClass += ' pdf'; }
+            else { meta = `Глава ${(prog.chapter || 0) + 1} из ${(item.chapters || []).length}`; coverClass += ' book'; }
             continueHtml += `
                 <div class="block continue-card" onclick="openBook(${item.id})">
                     <div class="${coverClass}">${getContentIcon(item)}</div>
@@ -2127,7 +2689,7 @@ function renderHome() {
     }
     if (!continueHtml) {
         continueHtml = `<div class="block" style="text-align: center; color: var(--tg-theme-hint-color); padding: 24px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 40px; height: 40px; margin: 0 auto 10px; display: block; opacity: 0.5;"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 40px; height: 40px; margin: 0 auto 10px; display: block; opacity: 0.5; color: var(--islamic-gold);"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
             Пока ничего не начато.<br>Выберите контент в Уроках или Книгах!
         </div>`;
     }
@@ -2150,28 +2712,33 @@ function renderHome() {
     }
 }
 
-// ============ ПРОГРЕСС ============
+// ============ ПРОГРЕСС + АНАЛИТИКА ============
 function renderProgress() {
     document.getElementById('stat-hours').textContent = Math.round(state.listeningTime / 60);
     document.getElementById('stat-books').textContent = state.booksCompleted.length;
     document.getElementById('stat-lessons').textContent = state.lessonsCompleted.length;
+    document.getElementById('stat-streak').textContent = state.bestStreak;
 
+    renderCalendar();
+    renderWeekChart();
+    renderCategoryChart();
+    renderAchievements();
+}
+
+function renderCalendar() {
     const now = new Date();
     const year = now.getFullYear(); const month = now.getMonth();
     const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
     document.getElementById('calendar-month').textContent = `${monthNames[month]} ${year}`;
-
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const startWeekday = (firstDay.getDay() + 6) % 7;
     const daysInMonth = lastDay.getDate();
     const today = now.getDate();
-
     let activeCount = 0;
     let html = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(d =>
         `<div style="font-size:11px; text-align:center; color:var(--tg-theme-hint-color); padding: 4px 0;">${d}</div>`
     ).join('');
-
     for (let i = 0; i < startWeekday; i++) html += '<div class="day-cell"></div>';
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
@@ -2182,15 +2749,140 @@ function renderProgress() {
     }
     document.getElementById('calendarGrid').innerHTML = html;
     document.getElementById('calendar-count').textContent = `${activeCount} ${declOfNum(activeCount, ['день', 'дня', 'дней'])}`;
+}
 
+function renderWeekChart() {
+    const canvas = document.getElementById('weekChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Собираем данные за последние 8 недель
+    const weeks = [];
+    const now = new Date();
+    for (let w = 7; w >= 0; w--) {
+        const weekStart = new Date(now);
+        weekStart.setDate(now.getDate() - now.getDay() - w * 7);
+        let count = 0;
+        for (let d = 0; d < 7; d++) {
+            const date = new Date(weekStart);
+            date.setDate(weekStart.getDate() + d);
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+            if (state.activeDays.includes(dateStr)) count++;
+        }
+        weeks.push(count);
+    }
+
+    const maxVal = 7;
+    const barWidth = (W - 40) / weeks.length - 4;
+    const chartH = H - 30;
+
+    // Оси
+    ctx.strokeStyle = 'rgba(128,128,128,0.2)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 7; i++) {
+        const y = chartH - (i / 7) * chartH + 10;
+        ctx.beginPath();
+        ctx.moveTo(20, y);
+        ctx.lineTo(W - 10, y);
+        ctx.stroke();
+    }
+
+    // Столбцы
+    weeks.forEach((val, i) => {
+        const x = 20 + i * ((W - 30) / weeks.length) + 2;
+        const barH = (val / maxVal) * chartH;
+        const y = chartH - barH + 10;
+        const gradient = ctx.createLinearGradient(0, y, 0, y + barH);
+        gradient.addColorStop(0, '#c9a227');
+        gradient.addColorStop(1, '#006d34');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.roundRect(x, y, barWidth, barH, 4);
+        ctx.fill();
+        // Подпись
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--tg-theme-hint-color').trim() || '#8e8e93';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Н-${7-i}`, x + barWidth/2, H - 5);
+    });
+}
+
+function renderCategoryChart() {
+    const canvas = document.getElementById('catChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Считаем контент по категориям
+    const catCounts = {};
+    data.content.forEach(item => {
+        const cat = data.categories.find(c => c.id === item.categoryId);
+        if (cat) {
+            catCounts[cat.name] = (catCounts[cat.name] || 0) + 1;
+        }
+    });
+
+    const entries = Object.entries(catCounts);
+    if (entries.length === 0) {
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--tg-theme-hint-color').trim() || '#8e8e93';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Нет данных', W/2, H/2);
+        return;
+    }
+
+    const total = entries.reduce((s, [, v]) => s + v, 0);
+    const colors = ['#006d34', '#c9a227', '#2fa85a', '#e0b93c', '#004d25', '#8b6914', '#4fc77a', '#d4a84a'];
+    const cx = H/2 + 10, cy = H/2, r = H/2 - 15;
+    let startAngle = -Math.PI / 2;
+
+    entries.forEach(([name, val], i) => {
+        const sliceAngle = (val / total) * 2 * Math.PI;
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, startAngle, startAngle + sliceAngle);
+        ctx.closePath();
+        ctx.fill();
+        startAngle += sliceAngle;
+    });
+
+    // Легенда
+    const legendX = H + 20;
+    ctx.font = '11px sans-serif';
+    entries.forEach(([name, val], i) => {
+        const y = 20 + i * 18;
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fillRect(legendX, y - 8, 10, 10);
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--tg-theme-text-color').trim() || '#000';
+        ctx.textAlign = 'left';
+        ctx.fillText(`${name} (${val})`, legendX + 14, y);
+    });
+}
+
+function renderAchievements() {
     const achievements = [
         { icon: UI_ICONS.trophy, title: 'Первые шаги', desc: 'Начать первый урок', done: state.lessonsCompleted.length > 0 || state.booksCompleted.length > 0 },
         { icon: UI_ICONS.fire, title: 'Неделя знаний', desc: '7 дней подряд', done: state.streak >= 7 },
-        { icon: ICONS.book, title: 'Книголюб', desc: 'Прочитать книгу', done: state.booksCompleted.length > 0 },
-        { icon: ICONS.music, title: 'Меломан', desc: '5 аудиоуроков', done: state.lessonsCompleted.length >= 5 },
+        { icon: ICONS.quran, title: 'Книголюб', desc: 'Прочитать книгу', done: state.booksCompleted.length > 0 },
+        { icon: ICONS.mosque, title: 'Усердный ученик', desc: '5 аудиоуроков', done: state.lessonsCompleted.length >= 5 },
         { icon: UI_ICONS.heartFilled, title: 'Коллекционер', desc: '10 в избранном', done: state.favorites.length >= 10 },
-        { icon: ICONS.psychology, title: 'Писатель', desc: '5 заметок', done: Object.values(state.notes).reduce((s, n) => s + n.length, 0) >= 5 },
-        { icon: ICONS.rocket, title: 'Марафонец', desc: '30 дней подряд', done: state.streak >= 30 }
+        { icon: ICONS.pen, title: 'Писатель', desc: '5 заметок', done: Object.values(state.notes).reduce((s, n) => s + n.length, 0) >= 5 },
+        { icon: UI_ICONS.bookmarkFilled, title: 'Читатель', desc: '10 закладок', done: Object.values(state.bookmarks).reduce((s, n) => s + n.length, 0) >= 10 },
+        { icon: ICONS.star, title: 'Марафонец', desc: '30 дней подряд', done: state.streak >= 30 }
     ];
     document.getElementById('achievements').innerHTML = achievements.map(a => `
         <div class="achievement-row ${a.done ? '' : 'locked'}">
@@ -2204,15 +2896,14 @@ function renderProgress() {
     `).join('');
 }
 
-// ============ АДМИН-ПАНЕЛЬ (LONG PRESS НА АВАТАР) ============
+// ============ АДМИНКА ============
 let pressTimer = null;
 let pressTriggered = false;
 
 function setupAdminAccess() {
     const avatar = document.getElementById('user-avatar');
     if (!avatar) return;
-
-    const startPress = (e) => {
+    const startPress = () => {
         if (!isAdmin()) return;
         pressTriggered = false;
         pressTimer = setTimeout(() => {
@@ -2221,17 +2912,10 @@ function setupAdminAccess() {
             openAdmin();
         }, 600);
     };
-    const cancelPress = () => {
-        clearTimeout(pressTimer);
-    };
+    const cancelPress = () => clearTimeout(pressTimer);
     const handleClick = (e) => {
-        if (pressTriggered) {
-            e.preventDefault();
-            e.stopPropagation();
-            pressTriggered = false;
-        }
+        if (pressTriggered) { e.preventDefault(); e.stopPropagation(); pressTriggered = false; }
     };
-
     avatar.addEventListener('touchstart', startPress, { passive: true });
     avatar.addEventListener('touchend', cancelPress);
     avatar.addEventListener('touchmove', cancelPress);
@@ -2261,68 +2945,132 @@ function switchAdminTab(section) {
     haptic('selection');
 }
 
+// ============ INLINE EDIT КАТЕГОРИЙ ============
 function renderAdminCategories() {
     const list = document.getElementById('adminCategoriesList');
     if (data.categories.length === 0) {
         list.innerHTML = `<div class="empty-state">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            <div class="empty-state__text">Нет разделов. Создайте первый!</div>
+            <div class="empty-state__text">Нет разделов</div>
         </div>`;
         return;
     }
-
     const roots = data.categories.filter(c => c.type === 'category');
     let html = '';
     roots.forEach(root => {
         const subs = data.categories.filter(c => c.parentId === root.id);
         const contentCount = data.content.filter(c => c.categoryId === root.id || subs.some(s => s.id === c.subcategoryId)).length;
         html += `
-            <div class="admin-item" style="border-left: 4px solid var(--tg-theme-button-color);">
-                <div class="admin-item__icon">${ICONS[root.icon] || ICONS.science}</div>
-                <div class="admin-item__info">
-                    <div class="admin-item__title">${escapeHtml(root.name)}</div>
-                    <div class="admin-item__meta">Раздел • ${root.applies === 'both' ? 'Все' : root.applies === 'audio' ? 'Уроки' : 'Книги'} • ${contentCount} ед.</div>
-                </div>
-                <div class="admin-item__actions">
-                    <button class="admin-btn secondary" onclick="editCategory('${root.id}')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                    </button>
-                    <button class="admin-btn danger" onclick="deleteCategory('${root.id}')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
-                    </button>
-                </div>
-            </div>
-        `;
-        subs.forEach(sub => {
-            const subCount = data.content.filter(c => c.subcategoryId === sub.id).length;
-            html += `
-                <div class="admin-item" style="margin-left: 24px; border-left: 4px solid var(--tg-theme-hint-color);">
-                    <div class="admin-item__icon">${ICONS[sub.icon] || ICONS.science}</div>
-                    <div class="admin-item__info">
-                        <div class="admin-item__title">${escapeHtml(sub.name)}</div>
-                        <div class="admin-item__meta">Подраздел • ${subCount} ед.</div>
+            <div class="admin-cat-item" data-id="${root.id}">
+                <div class="admin-cat-row">
+                    <div class="admin-cat-icon">${ICONS[root.icon] || ICONS.mosque}</div>
+                    <div class="admin-cat-info">
+                        <div class="admin-cat-name" onclick="startInlineEdit(this, '${root.id}')" data-id="${root.id}">${escapeHtml(root.name)}</div>
+                        <div class="admin-cat-meta">${root.applies === 'both' ? 'Все' : root.applies === 'audio' ? 'Уроки' : 'Книги'} • ${contentCount} ед.</div>
                     </div>
-                    <div class="admin-item__actions">
-                        <button class="admin-btn secondary" onclick="editCategory('${sub.id}')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    <div class="admin-cat-actions">
+                        <button class="admin-icon-btn primary" onclick="openCategoryModal('${root.id}')" title="Настройки">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                         </button>
-                        <button class="admin-btn danger" onclick="deleteCategory('${sub.id}')">
+                        <button class="admin-icon-btn danger" onclick="deleteCategory('${root.id}')" title="Удалить">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
                         </button>
                     </div>
                 </div>
-            `;
-        });
+                <div class="admin-cat-children">
+                    ${subs.map(sub => {
+                        const subCount = data.content.filter(c => c.subcategoryId === sub.id).length;
+                        return `
+                            <div class="admin-cat-item sub" data-id="${sub.id}">
+                                <div class="admin-cat-row">
+                                    <div class="admin-cat-icon">${ICONS[sub.icon] || ICONS.mosque}</div>
+                                    <div class="admin-cat-info">
+                                        <div class="admin-cat-name" onclick="startInlineEdit(this, '${sub.id}')" data-id="${sub.id}">${escapeHtml(sub.name)}</div>
+                                        <div class="admin-cat-meta">${subCount} ед.</div>
+                                    </div>
+                                    <div class="admin-cat-actions">
+                                        <button class="admin-icon-btn primary" onclick="openCategoryModal('${sub.id}')">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                                        </button>
+                                        <button class="admin-icon-btn danger" onclick="deleteCategory('${sub.id}')">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                    <button class="admin-add-sub" onclick="addSubcategoryTo('${root.id}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Добавить подраздел
+                    </button>
+                </div>
+            </div>
+        `;
     });
     list.innerHTML = html;
 }
 
+function startInlineEdit(el, catId) {
+    if (el.classList.contains('editing')) return;
+    const original = el.textContent;
+    el.classList.add('editing');
+    el.contentEditable = 'true';
+    el.focus();
+    // Выделяем весь текст
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    const finish = (save) => {
+        el.contentEditable = 'false';
+        el.classList.remove('editing');
+        const newName = el.textContent.trim();
+        if (save && newName && newName !== original) {
+            const cat = data.categories.find(c => c.id === catId);
+            if (cat) {
+                cat.name = newName;
+                saveData();
+                showToast('✅ Переименовано');
+                haptic('medium');
+            }
+        }
+        renderAdminCategories();
+    };
+
+    el.onblur = () => finish(true);
+    el.onkeydown = (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+        else if (e.key === 'Escape') { el.textContent = original; el.blur(); }
+    };
+}
+
+function addSubcategoryTo(parentId) {
+    const name = prompt('Название подраздела:');
+    if (!name || !name.trim()) return;
+    const parent = data.categories.find(c => c.id === parentId);
+    data.categories.push({
+        id: genId(),
+        name: name.trim(),
+        icon: parent?.icon || 'mosque',
+        type: 'subcategory',
+        parentId: parentId,
+        applies: parent?.applies || 'both'
+    });
+    saveData();
+    renderAdminCategories();
+    showToast('✅ Подраздел добавлен');
+    haptic('medium');
+}
+
 let editingCategoryId = null;
-let selectedCatIcon = 'science';
+let selectedCatIcon = 'mosque';
 
 function openCategoryModal(id = null) {
     editingCategoryId = id;
-    document.getElementById('categoryModalTitle').textContent = id ? 'Редактировать раздел' : 'Новый раздел';
+    document.getElementById('categoryModalTitle').textContent = id ? 'Настройки раздела' : 'Новый раздел';
     const catType = document.getElementById('catType');
     const parentGroup = document.getElementById('catParentGroup');
     const parentSelect = document.getElementById('catParent');
@@ -2335,7 +3083,7 @@ function openCategoryModal(id = null) {
         document.getElementById('catApplies').value = cat.applies;
     } else {
         document.getElementById('catName').value = '';
-        selectedCatIcon = 'science';
+        selectedCatIcon = 'mosque';
         catType.value = 'category';
         document.getElementById('catApplies').value = 'both';
     }
@@ -2347,26 +3095,20 @@ function openCategoryModal(id = null) {
     updateParentVisibility();
     document.getElementById('categoryModal').classList.add('visible');
 }
-
 function closeCategoryModal() {
     document.getElementById('categoryModal').classList.remove('visible');
     editingCategoryId = null;
 }
-
 function updateParentVisibility() {
-    const isSub = document.getElementById('catType').value === 'subcategory';
-    document.getElementById('catParentGroup').style.display = isSub ? 'block' : 'none';
+    document.getElementById('catParentGroup').style.display = document.getElementById('catType').value === 'subcategory' ? 'block' : 'none';
 }
-
 function saveCategory() {
     const name = document.getElementById('catName').value.trim();
     const icon = selectedCatIcon;
     const type = document.getElementById('catType').value;
     const applies = document.getElementById('catApplies').value;
     const parentId = type === 'subcategory' ? document.getElementById('catParent').value : null;
-
     if (!name) { showToast('Введите название'); return; }
-
     if (editingCategoryId) {
         const cat = data.categories.find(c => c.id === editingCategoryId);
         cat.name = name; cat.icon = icon; cat.type = type; cat.applies = applies; cat.parentId = parentId;
@@ -2376,30 +3118,24 @@ function saveCategory() {
     saveData();
     closeCategoryModal();
     renderAdminCategories();
-    showToast('✅ Раздел сохранён');
+    showToast('✅ Сохранено');
     haptic('medium');
 }
-
-function editCategory(id) { openCategoryModal(id); }
-
 function deleteCategory(id) {
     const cat = data.categories.find(c => c.id === id);
     const subs = data.categories.filter(c => c.parentId === id);
     const contentCount = data.content.filter(c => c.categoryId === id || subs.some(s => s.id === c.subcategoryId)).length;
-
-    if (!confirm(`Удалить "${cat.name}"${subs.length ? ` и ${subs.length} подраздел(ов)` : ''}?${contentCount ? `\n\n⚠️ Будет удалён ${contentCount} элемент(ов) контента!` : ''}`)) return;
-
+    if (!confirm(`Удалить "${cat.name}"${subs.length ? ` и ${subs.length} подраздел(ов)` : ''}?${contentCount ? `\n\n⚠️ Контент (${contentCount}) тоже будет удалён!` : ''}`)) return;
     const idsToDelete = [id, ...subs.map(s => s.id)];
     data.categories = data.categories.filter(c => !idsToDelete.includes(c.id));
     data.content = data.content.filter(c => !idsToDelete.includes(c.categoryId) && !idsToDelete.includes(c.subcategoryId));
     saveData();
     renderAdminCategories();
     renderAdminContent();
-    showToast('🗑 Раздел удалён');
+    showToast('🗑 Удалено');
     haptic('light');
 }
 
-// ============ ICON PICKER ============
 function renderIconPicker(containerId, selectedIcon, onSelect) {
     const container = document.getElementById(containerId);
     container.innerHTML = Object.keys(ICONS).map(key => `
@@ -2409,17 +3145,14 @@ function renderIconPicker(containerId, selectedIcon, onSelect) {
     `).join('');
     container._onSelect = onSelect;
 }
-
 function selectIcon(containerId, icon) {
     const container = document.getElementById(containerId);
-    container.querySelectorAll('.icon-picker-item').forEach(el => {
-        el.classList.toggle('active', el.dataset.icon === icon);
-    });
+    container.querySelectorAll('.icon-picker-item').forEach(el => el.classList.toggle('active', el.dataset.icon === icon));
     if (container._onSelect) container._onSelect(icon);
     haptic('selection');
 }
 
-// ============ АДМИН: КОНТЕНТ ============
+// ============ КОНТЕНТ ============
 let adminContentFilter = 'all';
 function filterAdminContent(type) {
     adminContentFilter = type;
@@ -2427,21 +3160,18 @@ function filterAdminContent(type) {
     renderAdminContent();
     haptic('selection');
 }
-
 function renderAdminContent() {
     const list = document.getElementById('adminContentList');
     let items = data.content;
     if (adminContentFilter === 'audio') items = items.filter(c => c.type === 'audio');
     else if (adminContentFilter === 'book') items = items.filter(c => c.type === 'book' || c.type === 'pdf');
-
     if (items.length === 0) {
         list.innerHTML = `<div class="empty-state">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
-            <div class="empty-state__text">Нет контента. Добавьте первый!</div>
+            <div class="empty-state__text">Нет контента</div>
         </div>`;
         return;
     }
-
     list.innerHTML = items.map(item => {
         const typeLabel = item.type === 'audio' ? '🎧 Аудио' : item.type === 'pdf' ? '📄 PDF' : '📚 Книга';
         return `
@@ -2472,15 +3202,14 @@ let selectedCntIcon = 'book';
 function openContentModal(id = null) {
     editingContentId = id;
     document.getElementById('contentModalTitle').textContent = id ? 'Редактировать контент' : 'Новый контент';
-
     const catSelect = document.getElementById('cntCategory');
     const cats = data.categories.filter(c => c.type === 'category');
     catSelect.innerHTML = '<option value="">— Выберите раздел —</option>' + cats.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
-
     tempPdfData = null;
     document.getElementById('pdfFileInfo').textContent = '';
     document.getElementById('pdfFileSize').textContent = '';
     document.getElementById('pdfUploadArea').classList.remove('has-file');
+    document.getElementById('cntPdfUrl').value = '';
 
     if (id) {
         const item = data.content.find(c => c.id === id);
@@ -2495,8 +3224,7 @@ function openContentModal(id = null) {
         } else if (item.type === 'book') {
             tempChapters = JSON.parse(JSON.stringify(item.chapters || []));
         } else if (item.type === 'pdf') {
-            tempPdfData = item.pdfData;
-            document.getElementById('pdfFileInfo').textContent = item.pdfName || 'PDF файл';
+            document.getElementById('pdfFileInfo').textContent = item.pdfName || 'PDF';
             document.getElementById('pdfFileSize').textContent = item.pdfSize ? formatBytes(item.pdfSize) : '';
             document.getElementById('pdfUploadArea').classList.add('has-file');
         }
@@ -2510,20 +3238,17 @@ function openContentModal(id = null) {
         document.getElementById('cntDuration').value = '';
         tempChapters = [];
     }
-
     toggleContentFields();
     updateSubcategoryOptions();
     renderIconPicker('cntIconPicker', selectedCntIcon, (icon) => { selectedCntIcon = icon; });
     document.getElementById('contentModal').classList.add('visible');
 }
-
 function closeContentModal() {
     document.getElementById('contentModal').classList.remove('visible');
     editingContentId = null;
     tempChapters = [];
     tempPdfData = null;
 }
-
 function updateSubcategoryOptions() {
     const catId = document.getElementById('cntCategory').value;
     const subSelect = document.getElementById('cntSubcategory');
@@ -2532,7 +3257,6 @@ function updateSubcategoryOptions() {
     const subs = data.categories.filter(c => c.type === 'subcategory' && c.parentId === catId && (c.applies === 'both' || c.applies === appliesType));
     subSelect.innerHTML = '<option value="">—</option>' + subs.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
 }
-
 function toggleContentFields() {
     const type = document.getElementById('cntType').value;
     document.getElementById('audioFields').style.display = type === 'audio' ? 'block' : 'none';
@@ -2541,11 +3265,10 @@ function toggleContentFields() {
     if (type === 'book') renderChaptersEditor();
     updateSubcategoryOptions();
 }
-
 function renderChaptersEditor() {
     const list = document.getElementById('chaptersList');
     if (tempChapters.length === 0) {
-        list.innerHTML = '<div style="color: var(--tg-theme-hint-color); font-size: 13px; text-align: center; padding: 12px;">Нет глав. Добавьте первую!</div>';
+        list.innerHTML = '<div style="color: var(--tg-theme-hint-color); font-size: 13px; text-align: center; padding: 12px;">Нет глав</div>';
         return;
     }
     list.innerHTML = tempChapters.map((ch, idx) => `
@@ -2556,29 +3279,19 @@ function renderChaptersEditor() {
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
-            <input type="text" class="form-input" style="margin-bottom: 8px;" placeholder="Название главы" value="${escapeHtml(ch.title)}" onchange="tempChapters[${idx}].title = this.value">
-            <textarea class="form-textarea" placeholder="Текст главы..." onchange="tempChapters[${idx}].text = this.value">${escapeHtml(ch.text)}</textarea>
+            <input type="text" class="form-input" style="margin-bottom: 8px;" placeholder="Название" value="${escapeHtml(ch.title)}" onchange="tempChapters[${idx}].title = this.value">
+            <textarea class="form-textarea" placeholder="Текст..." onchange="tempChapters[${idx}].text = this.value">${escapeHtml(ch.text)}</textarea>
         </div>
     `).join('');
 }
-
-function addChapterField() {
-    tempChapters.push({ id: genId(), title: '', text: '' });
-    renderChaptersEditor();
-    haptic('light');
-}
-
-function removeChapterField(idx) {
-    tempChapters.splice(idx, 1);
-    renderChaptersEditor();
-    haptic('light');
-}
+function addChapterField() { tempChapters.push({ id: genId(), title: '', text: '' }); renderChaptersEditor(); haptic('light'); }
+function removeChapterField(idx) { tempChapters.splice(idx, 1); renderChaptersEditor(); haptic('light'); }
 
 function handlePdfUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
-    if (file.size > 4.5 * 1024 * 1024) {
-        showToast('⚠️ Файл слишком большой (макс. ~4 МБ)');
+    if (file.size > 10 * 1024 * 1024) {
+        showToast('⚠️ Файл слишком большой (макс. 10 МБ)');
         event.target.value = '';
         return;
     }
@@ -2588,20 +3301,46 @@ function handlePdfUpload(event) {
         document.getElementById('pdfFileInfo').textContent = file.name;
         document.getElementById('pdfFileSize').textContent = formatBytes(file.size);
         document.getElementById('pdfUploadArea').classList.add('has-file');
-        document.getElementById('pdfUploadArea').querySelector('div:nth-child(2)').textContent = '✅ Файл загружен';
         haptic('medium');
     };
     reader.readAsDataURL(file);
 }
 
-function saveContent() {
+async function loadPdfFromUrl() {
+    const url = document.getElementById('cntPdfUrl').value.trim();
+    if (!url) { showToast('Введите URL'); return; }
+    showToast('⏳ Загрузка PDF...');
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const blob = await response.blob();
+        if (blob.size > 10 * 1024 * 1024) {
+            showToast('⚠️ Файл слишком большой (макс. 10 МБ)');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            tempPdfData = e.target.result;
+            const fileName = url.split('/').pop() || 'document.pdf';
+            document.getElementById('pdfFileInfo').textContent = fileName;
+            document.getElementById('pdfFileSize').textContent = formatBytes(blob.size);
+            document.getElementById('pdfUploadArea').classList.add('has-file');
+            showToast('✅ PDF загружен');
+            haptic('medium');
+        };
+        reader.readAsDataURL(blob);
+    } catch(err) {
+        showToast('❌ Ошибка загрузки: ' + err.message);
+    }
+}
+
+async function saveContent() {
     const type = document.getElementById('cntType').value;
     const title = document.getElementById('cntTitle').value.trim();
     const author = document.getElementById('cntAuthor').value.trim();
     const icon = selectedCntIcon;
     const categoryId = document.getElementById('cntCategory').value;
     const subcategoryId = document.getElementById('cntSubcategory').value || null;
-
     if (!title) { showToast('Введите название'); return; }
     if (!categoryId) { showToast('Выберите раздел'); return; }
 
@@ -2620,30 +3359,29 @@ function saveContent() {
         if (invalid) { showToast('Заполните все главы'); return; }
         item.chapters = tempChapters.map(ch => ({ id: ch.id || genId(), title: ch.title.trim(), text: ch.text.trim() }));
     } else if (type === 'pdf') {
-        if (!tempPdfData && !editingContentId) { showToast('Загрузите PDF файл'); return; }
         if (tempPdfData) {
-            item.pdfData = tempPdfData;
+            await idbSet(String(item.id), tempPdfData);
             item.pdfName = document.getElementById('pdfFileInfo').textContent;
             item.pdfSize = document.getElementById('pdfFileSize').textContent;
+        } else if (!editingContentId) {
+            showToast('Загрузите PDF');
+            return;
         } else {
             const existing = data.content.find(c => c.id === editingContentId);
-            item.pdfData = existing?.pdfData;
             item.pdfName = existing?.pdfName;
             item.pdfSize = existing?.pdfSize;
         }
         // Получаем количество страниц
-        if (window.pdfjsLib && item.pdfData) {
-            try {
-                const binary = atob(item.pdfData.split(',')[1] || item.pdfData);
+        try {
+            const pdfData = tempPdfData || await idbGet(String(item.id));
+            if (pdfData && window.pdfjsLib) {
+                const binary = atob(pdfData.split(',')[1] || pdfData);
                 const bytes = new Uint8Array(binary.length);
                 for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-                pdfjsLib.getDocument({ data: bytes }).promise.then(doc => {
-                    item.pageCount = doc.numPages;
-                    saveData();
-                    renderAdminContent();
-                }).catch(() => {});
-            } catch(e) {}
-        }
+                const doc = await pdfjsLib.getDocument({ data: bytes }).promise;
+                item.pageCount = doc.numPages;
+            }
+        } catch(e) {}
     }
 
     if (editingContentId) {
@@ -2652,23 +3390,21 @@ function saveContent() {
     } else {
         data.content.push(item);
     }
-
     saveData();
     closeContentModal();
     renderAdminContent();
-    showToast('✅ Контент сохранён');
+    showToast('✅ Сохранено');
     haptic('medium');
 }
-
 function editContent(id) { openContentModal(id); }
-
-function deleteContent(id) {
+async function deleteContent(id) {
     const item = data.content.find(c => c.id === id);
     if (!confirm(`Удалить "${item.title}"?`)) return;
+    if (item.type === 'pdf') { try { await idbDelete(String(id)); } catch(e) {} }
     data.content = data.content.filter(c => c.id !== id);
     saveData();
     renderAdminContent();
-    showToast('🗑 Контент удалён');
+    showToast('🗑 Удалено');
     haptic('light');
 }
 
@@ -2682,21 +3418,20 @@ function renderAdminStats() {
     const books = data.content.filter(c => c.type === 'book').length;
     const pdfs = data.content.filter(c => c.type === 'pdf').length;
     const notesCount = Object.values(state.notes).reduce((s, n) => s + n.length, 0);
-
+    const bookmarksCount = Object.values(state.bookmarks).reduce((s, n) => s + n.length, 0);
     stats.innerHTML = `
         <div>📁 Разделов: ${cats} (корневых: ${roots}, подразделов: ${subs})</div>
         <div>🎧 Аудиоуроков: ${audio}</div>
         <div>📚 Книг (текст): ${books}</div>
         <div>📄 Книг (PDF): ${pdfs}</div>
         <div>📝 Заметок: ${notesCount}</div>
+        <div>🔖 Закладок: ${bookmarksCount}</div>
         <div>❤️ В избранном: ${state.favorites.length}</div>
-        <div>✅ Пройдено уроков: ${state.lessonsCompleted.length}</div>
-        <div>📖 Прочитано книг: ${state.booksCompleted.length}</div>
+        <div>⭐ XP пользователя: ${state.xp}</div>
     `;
 }
-
 function exportData() {
-    const exportObj = { version: 5, data, state, exportedAt: new Date().toISOString() };
+    const exportObj = { version: 6, data, state, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -2704,10 +3439,9 @@ function exportData() {
     a.download = `tknowledge_backup_${todayStr()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast('📤 Данные экспортированы');
+    showToast('📤 Экспортировано');
     haptic('medium');
 }
-
 function importData(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -2716,7 +3450,7 @@ function importData(event) {
         try {
             const obj = JSON.parse(e.target.result);
             if (!obj.data || !obj.state) throw new Error('Invalid format');
-            if (!confirm('Импорт заменит все текущие данные. Продолжить?')) return;
+            if (!confirm('Импорт заменит все данные. Продолжить?')) return;
             data = obj.data;
             state = { ...state, ...obj.state };
             saveData(); saveState();
@@ -2727,48 +3461,99 @@ function importData(event) {
                 renderAdminContent();
                 renderAdminStats();
             }
-            showToast('📥 Данные импортированы');
+            showToast('📥 Импортировано');
             haptic('medium');
-        } catch(err) {
-            showToast('❌ Ошибка: ' + err.message);
-        }
+        } catch(err) { showToast('❌ Ошибка: ' + err.message); }
     };
     reader.readAsText(file);
     event.target.value = '';
 }
-
-function resetAllData() {
-    if (!confirm('⚠️ Удалить ВСЕ данные? Это действие нельзя отменить!')) return;
+async function resetAllData() {
+    if (!confirm('⚠️ Удалить ВСЕ данные?')) return;
     if (!confirm('Точно уверены?')) return;
     localStorage.removeItem(DATA_KEY);
     localStorage.removeItem(STATE_KEY);
+    // Очищаем IDB
+    try {
+        const db = await openIdb();
+        const tx = db.transaction(IDB_STORE, 'readwrite');
+        tx.objectStore(IDB_STORE).clear();
+    } catch(e) {}
     data = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    state = { favorites: [], audioProgress: {}, bookProgress: {}, listeningTime: 0, lessonsCompleted: [], booksCompleted: [], activeDays: [], lastActiveDay: null, streak: 0, readerSettings: { fontSize: 17, theme: 'light' }, playerSettings: { speed: 1 }, notes: {}, appTheme: 'system' };
+    state = { favorites: [], audioProgress: {}, bookProgress: {}, listeningTime: 0, lessonsCompleted: [], booksCompleted: [], activeDays: [], lastActiveDay: null, streak: 0, bestStreak: 0, readerSettings: { fontSize: 17, theme: 'light' }, playerSettings: { speed: 1 }, notes: {}, bookmarks: {}, appTheme: 'system', xp: 0, onboardingDone: false };
     saveData(); saveState();
     applyAppTheme();
     renderAll();
     renderAdminCategories();
     renderAdminContent();
     renderAdminStats();
-    showToast('🗑 Все данные сброшены');
+    showToast('🗑 Сброшено');
     haptic('medium');
 }
-
 function resetProgress() {
-    if (!confirm('Сбросить прогресс пользователя (заметки, избранное, статистику)?\nКонтент и разделы останутся.')) return;
+    if (!confirm('Сбросить прогресс пользователя?\nКонтент и разделы останутся.')) return;
     const appTheme = state.appTheme;
     const readerSettings = state.readerSettings;
     const playerSettings = state.playerSettings;
-    state = { favorites: [], audioProgress: {}, bookProgress: {}, listeningTime: 0, lessonsCompleted: [], booksCompleted: [], activeDays: [], lastActiveDay: null, streak: 0, readerSettings, playerSettings, notes: {}, appTheme };
+    state = { favorites: [], audioProgress: {}, bookProgress: {}, listeningTime: 0, lessonsCompleted: [], booksCompleted: [], activeDays: [], lastActiveDay: null, streak: 0, bestStreak: 0, readerSettings, playerSettings, notes: {}, bookmarks: {}, appTheme, xp: 0, onboardingDone: true };
     saveState();
-    showToast('✅ Прогресс сброшен');
+    showToast('✅ Сброшено');
     renderAll();
+}
+
+// ============ ONBOARDING ============
+let onboardingStep = 0;
+function showOnboarding() {
+    if (state.onboardingDone) return;
+    document.getElementById('onboarding').classList.add('visible');
+    onboardingStep = 0;
+    updateOnboardingUI();
+}
+function updateOnboardingUI() {
+    const slides = document.querySelectorAll('.onboarding__slide');
+    const dots = document.querySelectorAll('.onboarding__dot');
+    slides.forEach((s, i) => s.classList.toggle('active', i === onboardingStep));
+    dots.forEach((d, i) => d.classList.toggle('active', i === onboardingStep));
+    const btn = document.getElementById('onbNextBtn');
+    btn.textContent = onboardingStep === slides.length - 1 ? 'Начать' : 'Далее';
+}
+function nextOnboarding() {
+    const slides = document.querySelectorAll('.onboarding__slide');
+    if (onboardingStep < slides.length - 1) {
+        onboardingStep++;
+        updateOnboardingUI();
+        haptic('light');
+    } else {
+        completeOnboarding();
+    }
+}
+function skipOnboarding() { completeOnboarding(); }
+function completeOnboarding() {
+    state.onboardingDone = true;
+    saveState();
+    document.getElementById('onboarding').classList.remove('visible');
+    haptic('medium');
+}
+
+// ============ PWA ============
+function setupPWA() {
+    if ('serviceWorker' in navigator) {
+        const swCode = `
+            self.addEventListener('install', e => self.skipWaiting());
+            self.addEventListener('activate', e => self.clients.claim());
+            self.addEventListener('fetch', e => {
+                e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+            });
+        `;
+        const swBlob = new Blob([swCode], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(swBlob);
+        navigator.serviceWorker.register(swUrl).catch(() => {});
+    }
 }
 
 // ============ НАВИГАЦИЯ ============
 const navItems = document.querySelectorAll('.nav-item');
 const pages = document.querySelectorAll('.page');
-
 navItems.forEach(item => {
     item.addEventListener('click', () => {
         haptic('selection');
@@ -2782,17 +3567,11 @@ navItems.forEach(item => {
         if (targetId === 'page-lessons') renderLessons();
         if (targetId === 'page-books') renderBooks();
         if (targetId === 'page-progress') renderProgress();
+        if (targetId === 'page-profile') updateLevelUI();
     });
 });
-
-document.getElementById('lessonsSearch').addEventListener('input', (e) => {
-    lessonsFilter.search = e.target.value;
-    renderLessons();
-});
-document.getElementById('booksSearch').addEventListener('input', (e) => {
-    booksFilter.search = e.target.value;
-    renderBooks();
-});
+document.getElementById('lessonsSearch').addEventListener('input', (e) => { lessonsFilter.search = e.target.value; renderLessons(); });
+document.getElementById('booksSearch').addEventListener('input', (e) => { booksFilter.search = e.target.value; renderBooks(); });
 
 // ============ ПОЛЬЗОВАТЕЛЬ ============
 const user = tg?.initDataUnsafe?.user;
@@ -2802,9 +3581,21 @@ if (user) {
     document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
 }
 
-// ============ ИНИЦИАЛИЗАЦИЯ ============
-loadData();
-loadState();
+// ============ INIT ============
+async function init() {
+    loadData();
+    loadState();
+    await migratePdfsToIdb();
+    applyAppTheme();
+    renderAll();
+    setupAdminAccess();
+    setupPWA();
+    const adminHint = document.getElementById('adminHint');
+    if (isAdmin()) adminHint.textContent = '🔐 Долгое нажатие на аватарку → админ-панель';
+    else adminHint.textContent = '';
+    // Онбординг показываем с задержкой
+    setTimeout(() => showOnboarding(), 500);
+}
 
 function renderAll() {
     renderHome();
@@ -2813,22 +3604,28 @@ function renderAll() {
     renderProgress();
     if (currentTrack) showMiniPlayer();
     updateThemeLabel();
-
+    updateLevelUI();
     document.querySelectorAll('.font-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.size) === state.readerSettings.fontSize));
     document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.theme === state.readerSettings.theme));
 }
 
-applyAppTheme();
-renderAll();
-setupAdminAccess();
-
-// Подсказка про админку (только для админа)
-const adminHint = document.getElementById('adminHint');
-if (isAdmin()) {
-    adminHint.textContent = '🔐 Долгое нажатие на аватарку → админ-панель';
-} else {
-    adminHint.textContent = '';
+// roundRect polyfill
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+        if (w < 2 * r) r = w / 2;
+        if (h < 2 * r) r = h / 2;
+        this.beginPath();
+        this.moveTo(x + r, y);
+        this.arcTo(x + w, y, x + w, y + h, r);
+        this.arcTo(x + w, y + h, x, y + h, r);
+        this.arcTo(x, y + h, x, y, r);
+        this.arcTo(x, y, x + w, y, r);
+        this.closePath();
+        return this;
+    };
 }
+
+init();
 </script>
 
 </body>
