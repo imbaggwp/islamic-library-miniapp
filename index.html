@@ -5,235 +5,848 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Исламские уроки</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.8/index.css">
 <style>
-  * { -webkit-tap-highlight-color: transparent; }
+  :root {
+    --tg-bg: var(--tg-theme-bg-color, #ffffff);
+    --tg-secondary: var(--tg-theme-secondary-bg-color, #f0f0f0);
+    --tg-text: var(--tg-theme-text-color, #000000);
+    --tg-hint: var(--tg-theme-hint-color, #999999);
+    --tg-btn: var(--tg-theme-button-color, #3390ec);
+    --tg-btn-text: var(--tg-theme-button-text-color, #ffffff);
+    --tg-link: var(--tg-theme-link-color, #3390ec);
+    --tg-destructive: var(--tg-theme-destructive-text-color, #ec3942);
+    --tg-header: var(--tg-theme-header-bg-color, var(--tg-bg));
+    --tg-section: var(--tg-theme-section-bg-color, var(--tg-bg));
+    --tg-separator: rgba(0,0,0,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --tg-separator: rgba(255,255,255,0.08);
+    }
+  }
+  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
   body {
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    padding: 0;
-    background: var(--tg-theme-bg-color, #0f1419);
-    color: var(--tg-theme-text-color, #fff);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+    background: var(--tg-secondary);
+    color: var(--tg-text);
     overscroll-behavior: none;
     min-height: 100vh;
-    padding-bottom: 80px;
+    padding-bottom: 70px;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
   }
-  .tg-btn { background: var(--tg-theme-button-color, #2ea6ff); color: var(--tg-theme-button-text-color, #fff); }
-  .tg-btn:hover { opacity: 0.9; }
-  .tg-secondary { background: var(--tg-theme-secondary-bg-color, #1c2733); }
-  .tg-hint { color: var(--tg-theme-hint-color, #708499); }
-  .tg-link { color: var(--tg-theme-link-color, #2ea6ff); }
-  .card {
-    background: var(--tg-theme-secondary-bg-color, #1c2733);
-    border-radius: 16px;
-    transition: transform 0.15s, box-shadow 0.15s;
+  .tg-btn { background: var(--tg-btn); color: var(--tg-btn-text); border: none; font-weight: 500; cursor: pointer; }
+  .tg-btn:active { opacity: 0.8; }
+  .tg-hint { color: var(--tg-hint); }
+  .tg-link { color: var(--tg-link); }
+  .tg-destructive { color: var(--tg-destructive); }
+
+  .page { background: var(--tg-bg); min-height: 100vh; }
+  .page-header {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--tg-header);
+    padding: 12px 16px;
+    border-bottom: 0.5px solid var(--tg-separator);
+    display: flex; align-items: center; gap: 12px;
+    backdrop-filter: blur(20px);
   }
-  .card:active { transform: scale(0.98); }
-  .fade-in { animation: fadeIn 0.3s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-  .islamic-pattern {
-    background-image: radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.08) 0%, transparent 50%),
-                      radial-gradient(circle at 80% 80%, rgba(234, 179, 8, 0.06) 0%, transparent 50%);
+  .page-title { font-size: 17px; font-weight: 600; flex: 1; }
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent; border: none; color: var(--tg-link);
+    cursor: pointer; padding: 0;
   }
-  .progress-ring { transform: rotate(-90deg); }
-  .scrollbar-hide::-webkit-scrollbar { display: none; }
-  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-  .modal {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-    z-index: 100; display: flex; align-items: flex-end; justify-content: center;
+  .icon-btn:active { background: var(--tg-separator); }
+  .icon-btn svg { width: 22px; height: 22px; }
+
+  .section-group {
+    background: var(--tg-section);
+    margin: 20px 0;
+    border-top: 0.5px solid var(--tg-separator);
+    border-bottom: 0.5px solid var(--tg-separator);
   }
-  .modal-content {
-    background: var(--tg-theme-bg-color, #0f1419);
-    width: 100%; max-height: 90vh; overflow-y: auto;
-    border-radius: 24px 24px 0 0; padding: 20px;
-    animation: slideUp 0.3s ease;
+  .section-group:first-child { margin-top: 0; }
+  .section-title {
+    padding: 6px 16px 6px;
+    font-size: 13px;
+    color: var(--tg-hint);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .list-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 16px;
+    background: var(--tg-section);
+    border-bottom: 0.5px solid var(--tg-separator);
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--tg-text);
+    position: relative;
+  }
+  .list-item:last-child { border-bottom: none; }
+  .list-item:active { background: var(--tg-separator); }
+  .list-item-content { flex: 1; min-width: 0; }
+  .list-item-title { font-size: 16px; font-weight: 400; }
+  .list-item-subtitle { font-size: 13px; color: var(--tg-hint); margin-top: 2px; }
+  .list-item-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .list-item-icon svg { width: 18px; height: 18px; }
+  .chevron { color: var(--tg-hint); opacity: 0.5; flex-shrink: 0; }
+  .chevron svg { width: 16px; height: 16px; }
+
+  .icon-circle {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; color: white;
+  }
+  .icon-circle svg { width: 22px; height: 22px; }
+
+  .empty-state {
+    padding: 60px 24px; text-align: center;
+  }
+  .empty-state-icon {
+    width: 64px; height: 64px; margin: 0 auto 16px;
+    color: var(--tg-hint); opacity: 0.5;
+  }
+  .empty-state-title { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+  .empty-state-text { font-size: 14px; color: var(--tg-hint); line-height: 1.4; }
+
+  .progress-bar {
+    height: 4px; background: var(--tg-separator);
+    border-radius: 2px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; background: var(--tg-btn);
+    transition: width 0.3s;
+  }
+
+  .stat-card {
+    background: var(--tg-section);
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+  }
+  .stat-value { font-size: 24px; font-weight: 700; }
+  .stat-label { font-size: 12px; color: var(--tg-hint); margin-top: 4px; }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--tg-header);
+    border-top: 0.5px solid var(--tg-separator);
+    display: flex; justify-content: space-around;
+    padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+    z-index: 40;
+    backdrop-filter: blur(20px);
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; gap: 2px;
+    padding: 4px 2px;
+    background: transparent; border: none;
+    color: var(--tg-hint);
+    cursor: pointer;
+    font-size: 10px;
+  }
+  .nav-item svg { width: 24px; height: 24px; }
+  .nav-item.active { color: var(--tg-btn); }
+
+  /* Audio Player */
+  .audio-player {
+    position: fixed; bottom: 64px; left: 0; right: 0;
+    background: var(--tg-header);
+    border-top: 0.5px solid var(--tg-separator);
+    padding: 10px 12px;
+    z-index: 30;
+    display: none;
+  }
+  .audio-player.visible { display: block; }
+  .audio-main { display: flex; align-items: center; gap: 10px; }
+  .audio-title { font-size: 14px; font-weight: 500; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .audio-controls { display: flex; align-items: center; gap: 4px; }
+  .audio-controls button {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: transparent; border: none;
+    color: var(--tg-text); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .audio-controls button:active { background: var(--tg-separator); }
+  .audio-controls .play-btn { background: var(--tg-btn); color: var(--tg-btn-text); width: 40px; height: 40px; }
+  .audio-controls .play-btn svg { width: 18px; height: 18px; }
+  .audio-controls svg { width: 20px; height: 20px; }
+  .audio-progress-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 6px;
+  }
+  .audio-progress-row .progress-bar { flex: 1; cursor: pointer; height: 3px; }
+  .audio-time { font-size: 11px; color: var(--tg-hint); font-variant-numeric: tabular-nums; min-width: 36px; }
+  .audio-time.right { text-align: right; }
+  .audio-settings {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 8px; padding-top: 8px;
+    border-top: 0.5px solid var(--tg-separator);
+    gap: 8px;
+  }
+  .speed-btn {
+    background: var(--tg-secondary);
+    color: var(--tg-text);
+    border: none;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    min-width: 48px;
+  }
+
+  /* PDF Viewer */
+  .pdf-viewer {
+    position: fixed; inset: 0;
+    background: var(--tg-secondary);
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+  }
+  .pdf-viewer.visible { display: flex; }
+  .pdf-header {
+    background: var(--tg-header);
+    padding: 10px 12px;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 0.5px solid var(--tg-separator);
+    padding-top: calc(10px + env(safe-area-inset-top));
+  }
+  .pdf-header .page-title { font-size: 15px; }
+  .pdf-content {
+    flex: 1; overflow-y: auto;
+    padding: 8px;
+  }
+  .pdf-canvas { display: block; margin: 0 auto 8px; max-width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .pdf-bookmarks {
+    position: absolute; top: 0; right: 0; bottom: 0;
+    width: 280px; max-width: 80%;
+    background: var(--tg-bg);
+    box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+    z-index: 10;
+    transform: translateX(100%);
+    transition: transform 0.25s;
+    display: flex; flex-direction: column;
+  }
+  .pdf-bookmarks.open { transform: translateX(0); }
+  .pdf-bookmarks-header {
+    padding: 14px 16px;
+    border-bottom: 0.5px solid var(--tg-separator);
+    display: flex; align-items: center; justify-content: space-between;
+    font-weight: 600;
+  }
+  .pdf-bookmarks-list { flex: 1; overflow-y: auto; }
+  .bookmark-item {
+    padding: 12px 16px;
+    border-bottom: 0.5px solid var(--tg-separator);
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer;
+  }
+  .bookmark-item:active { background: var(--tg-separator); }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 200;
+    display: flex; align-items: flex-end; justify-content: center;
+    animation: fadeIn 0.2s;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal-sheet {
+    background: var(--tg-bg);
+    width: 100%; max-width: 500px;
+    max-height: 90vh;
+    border-radius: 14px 14px 0 0;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    animation: slideUp 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
   }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  input, textarea, select {
-    background: var(--tg-theme-secondary-bg-color, #1c2733);
-    color: var(--tg-theme-text-color, #fff);
-    border: 1px solid var(--tg-theme-hint-color, #708499);
-    border-radius: 12px;
-    padding: 12px;
+  .modal-header {
+    padding: 14px 16px;
+    border-bottom: 0.5px solid var(--tg-separator);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal-title { font-size: 17px; font-weight: 600; }
+  .modal-body { padding: 16px; overflow-y: auto; flex: 1; }
+  .modal-footer {
+    padding: 12px 16px;
+    border-top: 0.5px solid var(--tg-separator);
+    display: flex; gap: 8px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+  .modal-footer button {
+    flex: 1; padding: 12px;
+    border-radius: 10px; border: none;
+    font-size: 15px; font-weight: 500; cursor: pointer;
+  }
+  .modal-footer .cancel-btn { background: var(--tg-secondary); color: var(--tg-text); }
+  .modal-footer .save-btn { background: var(--tg-btn); color: var(--tg-btn-text); }
+
+  .form-group { margin-bottom: 14px; }
+  .form-label { display: block; font-size: 13px; color: var(--tg-hint); margin-bottom: 6px; }
+  .form-input, .form-textarea, .form-select {
     width: 100%;
+    padding: 11px 14px;
+    background: var(--tg-secondary);
+    border: none;
+    border-radius: 10px;
+    color: var(--tg-text);
+    font-size: 15px;
     font-family: inherit;
+    outline: none;
   }
-  input:focus, textarea:focus, select:focus { outline: 2px solid var(--tg-theme-button-color, #2ea6ff); }
-  .audio-player {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: var(--tg-theme-secondary-bg-color, #1c2733);
-    border-top: 1px solid var(--tg-theme-hint-color, #333);
-    padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom));
-    z-index: 50;
-  }
-  .progress-bar {
-    height: 4px; background: var(--tg-theme-hint-color, #333);
-    border-radius: 2px; overflow: hidden; cursor: pointer;
-  }
-  .progress-bar-fill { height: 100%; background: var(--tg-theme-button-color, #2ea6ff); transition: width 0.1s; }
-  .pdf-container { position: fixed; inset: 0; background: #2a2a2a; z-index: 200; overflow-y: auto; }
-  .pdf-canvas { display: block; margin: 0 auto 8px; max-width: 100%; }
-  .tab-active { color: var(--tg-theme-button-color, #2ea6ff); }
-  .tab-active svg { stroke: var(--tg-theme-button-color, #2ea6ff); }
+  .form-input:focus, .form-textarea:focus { box-shadow: 0 0 0 2px var(--tg-btn); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+
   .badge {
-    position: absolute; top: -4px; right: -4px;
-    background: #ef4444; color: white; font-size: 10px;
-    border-radius: 10px; padding: 2px 6px; font-weight: 600;
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--tg-btn);
+    color: var(--tg-btn-text);
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
   }
-  .gradient-header {
-    background: linear-gradient(135deg, #065f46 0%, #14532d 50%, #1e3a8a 100%);
+
+  .search-input-wrap {
+    padding: 8px 12px 12px;
+    background: var(--tg-header);
+  }
+  .search-input {
+    width: 100%;
+    padding: 9px 12px 9px 36px;
+    background: var(--tg-secondary);
+    border: none;
+    border-radius: 10px;
+    color: var(--tg-text);
+    font-size: 15px;
+    outline: none;
+  }
+  .search-input-wrap { position: relative; }
+  .search-icon {
+    position: absolute; left: 24px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--tg-hint);
+    pointer-events: none;
+  }
+  .search-icon svg { width: 16px; height: 16px; }
+
+  .favorite-btn {
+    background: transparent; border: none;
+    color: var(--tg-hint); cursor: pointer;
+    padding: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .favorite-btn.active { color: #ff3b30; }
+  .favorite-btn svg { width: 22px; height: 22px; }
+
+  .breadcrumb {
+    padding: 8px 16px;
+    font-size: 13px;
+    color: var(--tg-hint);
+    overflow-x: auto;
+    white-space: nowrap;
+    border-bottom: 0.5px solid var(--tg-separator);
+    background: var(--tg-bg);
+  }
+  .breadcrumb-item { cursor: pointer; }
+  .breadcrumb-item:hover { color: var(--tg-link); }
+  .breadcrumb-sep { margin: 0 4px; opacity: 0.5; }
+
+  .completed-mark {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #34c759;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .completed-mark svg { width: 12px; height: 12px; color: white; }
+
+  .fab {
+    position: fixed;
+    right: 16px;
+    bottom: 84px;
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--tg-btn);
+    color: var(--tg-btn-text);
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+  }
+  .fab:active { transform: scale(0.95); }
+  .fab svg { width: 24px; height: 24px; }
+
+  .toast {
+    position: fixed;
+    bottom: 140px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-size: 14px;
+    z-index: 300;
+    animation: toastIn 0.2s;
+  }
+  @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+  .admin-section {
+    background: var(--tg-section);
+    margin: 12px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-left: 16px; margin-right: 16px;
+  }
+  .admin-section-header {
+    padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 0.5px solid var(--tg-separator);
+  }
+  .admin-section-title { flex: 1; font-weight: 600; font-size: 15px; }
+  .admin-sub {
+    background: var(--tg-secondary);
+    margin: 8px;
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .admin-sub-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 6px;
+  }
+  .admin-sub-title { flex: 1; font-size: 14px; font-weight: 500; }
+  .admin-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px;
+    background: var(--tg-bg);
+    border-radius: 8px;
+    margin-top: 4px;
+    font-size: 13px;
+  }
+  .admin-item-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .admin-mini-btn {
+    background: transparent; border: none;
+    color: var(--tg-link); cursor: pointer;
+    padding: 4px;
+    display: flex; align-items: center;
+  }
+  .admin-mini-btn.danger { color: var(--tg-destructive); }
+  .admin-mini-btn svg { width: 16px; height: 16px; }
+
+  .progress-ring { transform: rotate(-90deg); }
+
+  .tab-switcher {
+    display: flex;
+    background: var(--tg-secondary);
+    border-radius: 10px;
+    padding: 2px;
+    margin: 12px 16px;
+  }
+  .tab-switcher button {
+    flex: 1;
+    padding: 8px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--tg-text);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .tab-switcher button.active {
+    background: var(--tg-bg);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   }
 </style>
 </head>
-<body class="islamic-pattern">
+<body>
 
 <div id="app"></div>
 
 <!-- Audio Player -->
-<div id="audioPlayer" class="audio-player hidden">
-  <div class="flex items-center gap-3">
-    <button id="playPauseBtn" class="w-12 h-12 rounded-full tg-btn flex items-center justify-center flex-shrink-0">
-      <svg id="playIcon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-      <svg id="pauseIcon" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
-    </button>
-    <div class="flex-1 min-w-0">
-      <div id="audioTitle" class="text-sm font-medium truncate"></div>
-      <div class="progress-bar mt-2" id="audioProgress">
-        <div class="progress-bar-fill" id="audioProgressFill" style="width:0%"></div>
-      </div>
-      <div class="flex justify-between text-xs tg-hint mt-1">
-        <span id="audioCurrent">0:00</span>
-        <span id="audioDuration">0:00</span>
-      </div>
+<div id="audioPlayer" class="audio-player">
+  <div class="audio-main">
+    <div class="audio-title" id="audioTitle">—</div>
+    <div class="audio-controls">
+      <button id="rewindBtn" title="-15с">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9"/><path d="M3 4v5h5"/><text x="12" y="16" font-size="7" fill="currentColor" stroke="none" text-anchor="middle" font-weight="bold">15</text></svg>
+      </button>
+      <button id="playPauseBtn" class="play-btn">
+        <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="pauseIcon" style="display:none" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
+      </button>
+      <button id="forwardBtn" title="+15с">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 4v5h-5"/><text x="12" y="16" font-size="7" fill="currentColor" stroke="none" text-anchor="middle" font-weight="bold">15</text></svg>
+      </button>
+      <button id="closeAudioBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
     </div>
-    <button id="closeAudioBtn" class="tg-hint p-2">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-    </button>
+  </div>
+  <div class="audio-progress-row">
+    <span class="audio-time" id="audioCurrent">0:00</span>
+    <div class="progress-bar" id="audioProgress">
+      <div class="progress-bar-fill" id="audioProgressFill" style="width:0%"></div>
+    </div>
+    <span class="audio-time right" id="audioDuration">0:00</span>
+  </div>
+  <div class="audio-settings">
+    <button id="speedBtn" class="speed-btn">1x</button>
+    <div class="tg-hint" style="font-size:12px" id="audioStatus">Готово</div>
   </div>
 </div>
 
 <!-- PDF Viewer -->
-<div id="pdfViewer" class="pdf-container hidden">
-  <div class="sticky top-0 bg-black/80 backdrop-blur p-3 flex items-center justify-between z-10">
-    <button id="closePdfBtn" class="tg-btn px-4 py-2 rounded-lg text-sm font-medium">Закрыть</button>
-    <div class="text-sm"><span id="pdfPageNum">1</span> / <span id="pdfPageCount">0</span></div>
-    <div class="flex gap-2">
-      <button id="prevPageBtn" class="tg-btn px-3 py-2 rounded-lg text-sm">←</button>
-      <button id="nextPageBtn" class="tg-btn px-3 py-2 rounded-lg text-sm">→</button>
+<div id="pdfViewer" class="pdf-viewer">
+  <div class="pdf-header">
+    <button class="icon-btn" id="closePdfBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="page-title" id="pdfTitle">Книга</div>
+    <button class="icon-btn" id="addBookmarkBtn" title="Закладка">
+      <svg id="bookmarkIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+    </button>
+    <button class="icon-btn" id="toggleBookmarksBtn" title="Закладки">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    </button>
+    <button class="icon-btn" id="prevPageBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div style="font-size:13px; min-width:60px; text-align:center; font-variant-numeric:tabular-nums">
+      <span id="pdfPageNum">1</span>/<span id="pdfPageCount">0</span>
     </div>
+    <button class="icon-btn" id="nextPageBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
   </div>
-  <div id="pdfContent" class="p-2"></div>
+  <div class="pdf-content" id="pdfContent"></div>
+  <div class="pdf-bookmarks" id="pdfBookmarks">
+    <div class="pdf-bookmarks-header">
+      <span>Закладки</span>
+      <button class="icon-btn" id="closeBookmarksBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="pdf-bookmarks-list" id="bookmarksList"></div>
+  </div>
 </div>
 
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 const tg = window.Telegram?.WebApp;
-if (tg) { tg.ready(); tg.expand(); }
+if (tg) {
+  try { tg.ready(); tg.expand(); } catch(e) {}
+}
+
+// ============ CONFIG ============
+const ADMIN_IDS = [8690178977]; // Добавьте сюда Telegram ID администраторов (числа)
+// В dev-режиме (без Telegram) используем флаг
+const IS_DEV_MODE = !tg?.initDataUnsafe?.user;
+const STORAGE_KEY = 'islamic_app_content_v2';
+const PROGRESS_KEY = 'islamic_app_progress_v2';
+const CLOUD_PROGRESS_KEY = 'progress';
 
 // ============ STATE ============
-const ADMIN_PASSWORD = 'admin123';
-const STORAGE_KEY = 'islamic_app_data_v1';
-
 let state = {
   view: 'home',
   sections: [],
-  progress: { completedLessons: [], readBooks: [], lessonTimes: {}, bookPages: {} },
+  progress: {
+    completedLessons: [],
+    readBooks: [],
+    lessonTimes: {},
+    bookPages: {},
+    bookBookmarks: {}, // { bookId: [{page, label, createdAt}] }
+    favorites: { lessons: [], books: [] },
+    tasbih: 0
+  },
   currentSection: null,
-  currentSubsection: null,
+  subsectionPath: [], // массив id подразделов (путь от корня)
   currentLesson: null,
   currentBook: null,
-  isAdmin: false,
-  editingSection: null,
-  editingSubsection: null,
+  searchQuery: '',
+  favoritesTab: 'all',
+  audioSpeed: 1,
+  pdfDoc: null,
+  pdfPage: 1,
+  bookmarksOpen: false,
 };
 
 let audio = new Audio();
-let pdfDoc = null, pdfPage = 1;
+
+// ============ SVG ICONS ============
+const ICONS = {
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  audio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
+  book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+  heartFill: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+  chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+  settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+  chevron: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+  play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+  pause: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+  edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  folder: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
+  mosque: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C9 5 7 7 7 10v10h10V10c0-3-2-5-5-8z"/><path d="M4 20h16"/><path d="M12 2v3"/></svg>',
+  bookmark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
+  moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+  logout: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>',
+  tasbih: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="3" r="1.5" fill="currentColor"/><circle cx="12" cy="21" r="1.5" fill="currentColor"/><circle cx="3" cy="12" r="1.5" fill="currentColor"/><circle cx="21" cy="12" r="1.5" fill="currentColor"/></svg>',
+};
 
 // ============ STORAGE ============
 function loadData() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      const d = JSON.parse(raw);
-      state.sections = d.sections || [];
-      state.progress = d.progress || { completedLessons: [], readBooks: [], lessonTimes: {}, bookPages: {} };
+      state.sections = JSON.parse(raw);
     } else {
-      // Demo data
-      state.sections = [
-        {
-          id: 's1', title: 'Основы ислама', icon: '🕌',
-          subsections: [
-            {
-              id: 'ss1', title: 'Акыда (вероубеждение)',
-              lessons: [
-                { id: 'l1', title: 'Шесть столпов веры', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', duration: '15 мин' },
-                { id: 'l2', title: 'Единобожие (Таухид)', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', duration: '20 мин' }
-              ],
-              books: [
-                { id: 'b1', title: 'Три основы', pdfUrl: 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf', pages: 10 }
-              ]
-            },
-            {
-              id: 'ss2', title: 'Фикх (правоведение)',
-              lessons: [
-                { id: 'l3', title: 'Очищение (Тахара)', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', duration: '18 мин' }
-              ],
-              books: []
-            }
-          ]
-        },
-        {
-          id: 's2', title: 'Сира Пророка ﷺ', icon: '📖',
-          subsections: [
-            {
-              id: 'ss3', title: 'Жизнь Пророка ﷺ',
-              lessons: [
-                { id: 'l4', title: 'Рождение Пророка ﷺ', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', duration: '25 мин' }
-              ],
-              books: []
-            }
-          ]
-        }
-      ];
-      saveData();
+      state.sections = getDemoData();
+      saveContent();
     }
-  } catch(e) { console.error(e); }
+  } catch(e) { console.error(e); state.sections = getDemoData(); }
+
+  // Progress: сначала Cloud, потом localStorage
+  if (tg?.CloudStorage) {
+    tg.CloudStorage.getItem(CLOUD_PROGRESS_KEY, (err, value) => {
+      if (value) {
+        try {
+          state.progress = { ...state.progress, ...JSON.parse(value) };
+          render();
+        } catch(e) {}
+      } else {
+        // Fallback на localStorage
+        try {
+          const p = localStorage.getItem(PROGRESS_KEY);
+          if (p) state.progress = { ...state.progress, ...JSON.parse(p) };
+        } catch(e) {}
+      }
+      render();
+    });
+  } else {
+    try {
+      const p = localStorage.getItem(PROGRESS_KEY);
+      if (p) state.progress = { ...state.progress, ...JSON.parse(p) };
+    } catch(e) {}
+    render();
+  }
 }
 
-function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ sections: state.sections, progress: state.progress }));
+function saveContent() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.sections));
+}
+
+function saveProgress() {
+  const data = JSON.stringify(state.progress);
+  localStorage.setItem(PROGRESS_KEY, data);
+  if (tg?.CloudStorage) {
+    tg.CloudStorage.setItem(CLOUD_PROGRESS_KEY, data, () => {});
+  }
+}
+
+function getDemoData() {
+  return [
+    {
+      id: 's1', title: 'Основы ислама', icon: 'mosque',
+      subsections: [
+        {
+          id: 'ss1', title: 'Акыда (вероубеждение)',
+          subsections: [
+            {
+              id: 'ss1-1', title: 'Шесть столпов веры',
+              subsections: [],
+              lessons: [
+                { id: 'l1', title: 'Вера в Аллаха', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', duration: '15 мин' },
+                { id: 'l2', title: 'Вера в ангелов', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', duration: '12 мин' }
+              ],
+              books: [
+                { id: 'b1', title: 'Три основы', pdfUrl: 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf' }
+              ]
+            }
+          ],
+          lessons: [
+            { id: 'l3', title: 'Единобожие (Таухид)', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', duration: '20 мин' }
+          ],
+          books: []
+        },
+        {
+          id: 'ss2', title: 'Фикх (правоведение)',
+          subsections: [],
+          lessons: [
+            { id: 'l4', title: 'Очищение (Тахара)', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', duration: '18 мин' }
+          ],
+          books: []
+        }
+      ]
+    },
+    {
+      id: 's2', title: 'Сира Пророка ﷺ', icon: 'book',
+      subsections: [
+        {
+          id: 'ss3', title: 'Жизнь Пророка ﷺ',
+          subsections: [],
+          lessons: [
+            { id: 'l5', title: 'Рождение Пророка ﷺ', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3', duration: '25 мин' }
+          ],
+          books: []
+        }
+      ]
+    }
+  ];
 }
 
 // ============ HELPERS ============
-function uid() { return Math.random().toString(36).slice(2, 10); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
 function fmtTime(s) { if (!s || isNaN(s)) return '0:00'; const m = Math.floor(s/60); const sec = Math.floor(s%60); return `${m}:${sec.toString().padStart(2,'0')}`; }
+function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-function getSectionProgress(section) {
-  let total = 0, done = 0;
-  section.subsections.forEach(ss => {
-    total += ss.lessons.length + ss.books.length;
-    ss.lessons.forEach(l => { if (state.progress.completedLessons.includes(l.id)) done++; });
-    ss.books.forEach(b => { if (state.progress.readBooks.includes(b.id)) done++; });
+function isAdmin() {
+  if (IS_DEV_MODE) return true; // в dev-режиме всегда админ
+  const user = tg?.initDataUnsafe?.user;
+  return user && ADMIN_IDS.includes(user.id);
+}
+
+// Рекурсивный обход подразделов
+function walkSubsections(subsections, callback, path = []) {
+  if (!subsections) return;
+  subsections.forEach((ss, idx) => {
+    const currentPath = [...path, ss.id];
+    callback(ss, currentPath);
+    if (ss.subsections) walkSubsections(ss.subsections, callback, currentPath);
   });
-  return total === 0 ? 0 : Math.round((done/total)*100);
+}
+
+// Найти подраздел по пути
+function findSubsectionByPath(path) {
+  if (!path || path.length === 0) return null;
+  let current = null;
+  let list = state.sections;
+  for (const id of path) {
+    const found = list.find(x => x.id === id);
+    if (!found) return null;
+    current = found;
+    list = found.subsections || [];
+  }
+  return current;
+}
+
+// Найти подраздел по ID (возвращает { subsection, path })
+function findSubsectionById(id) {
+  for (const s of state.sections) {
+    if (s.id === id) return { subsection: s, path: [id], type: 'section' };
+    let result = null;
+    walkSubsections(s.subsections, (ss, path) => {
+      if (ss.id === id) result = { subsection: ss, path, type: 'subsection' };
+    });
+    if (result) return result;
+  }
+  return null;
+}
+
+// Собрать все уроки/книги с путём
+function collectAllLessons() {
+  const result = [];
+  state.sections.forEach(s => {
+    const addLesson = (l, ss, path) => {
+      result.push({ lesson: l, subsection: ss, path, section: s });
+    };
+    walkSubsections(s.subsections, (ss, path) => {
+      (ss.lessons || []).forEach(l => addLesson(l, ss, path));
+    });
+  });
+  return result;
+}
+
+function collectAllBooks() {
+  const result = [];
+  state.sections.forEach(s => {
+    walkSubsections(s.subsections, (ss, path) => {
+      (ss.books || []).forEach(b => {
+        result.push({ book: b, subsection: ss, path, section: s });
+      });
+    });
+  });
+  return result;
+}
+
+function getSubsectionStats(ss) {
+  let lessons = 0, books = 0, completedL = 0, completedB = 0;
+  const countIn = (node) => {
+    (node.lessons || []).forEach(l => {
+      lessons++;
+      if (state.progress.completedLessons.includes(l.id)) completedL++;
+    });
+    (node.books || []).forEach(b => {
+      books++;
+      if (state.progress.readBooks.includes(b.id)) completedB++;
+    });
+    (node.subsections || []).forEach(countIn);
+  };
+  countIn(ss);
+  return { lessons, books, completedL, completedB, total: lessons + books, done: completedL + completedB };
 }
 
 function getTotalStats() {
   let lessons = 0, books = 0, completedL = 0, completedB = 0, totalTime = 0;
-  state.sections.forEach(s => s.subsections.forEach(ss => {
-    lessons += ss.lessons.length;
-    books += ss.books.length;
-    ss.lessons.forEach(l => {
-      if (state.progress.completedLessons.includes(l.id)) completedL++;
-      totalTime += (state.progress.lessonTimes[l.id] || 0);
+  state.sections.forEach(s => {
+    walkSubsections(s.subsections, ss => {
+      (ss.lessons || []).forEach(l => {
+        lessons++;
+        if (state.progress.completedLessons.includes(l.id)) completedL++;
+        totalTime += (state.progress.lessonTimes[l.id] || 0);
+      });
+      (ss.books || []).forEach(b => {
+        books++;
+        if (state.progress.readBooks.includes(b.id)) completedB++;
+      });
     });
-    ss.books.forEach(b => { if (state.progress.readBooks.includes(b.id)) completedB++; });
-  }));
+  });
   return { lessons, books, completedL, completedB, totalTime };
+}
+
+function toggleFavorite(type, id) {
+  const key = type === 'lesson' ? 'lessons' : 'books';
+  const arr = state.progress.favorites[key];
+  const idx = arr.indexOf(id);
+  if (idx >= 0) arr.splice(idx, 1);
+  else arr.push(id);
+  saveProgress();
+}
+
+function isFavorite(type, id) {
+  const key = type === 'lesson' ? 'lessons' : 'books';
+  return state.progress.favorites[key].includes(id);
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2000);
 }
 
 // ============ RENDER ============
@@ -243,8 +856,11 @@ function render() {
   switch(state.view) {
     case 'home': renderHome(app); break;
     case 'section': renderSection(app); break;
-    case 'subsection': renderSubsection(app); break;
+    case 'audio': renderAudioList(app); break;
+    case 'books': renderBooksList(app); break;
+    case 'favorites': renderFavorites(app); break;
     case 'progress': renderProgress(app); break;
+    case 'search': renderSearch(app); break;
     case 'admin': renderAdmin(app); break;
   }
   renderNav();
@@ -255,22 +871,33 @@ function renderNav() {
   if (!nav) {
     nav = document.createElement('div');
     nav.id = 'bottomNav';
-    nav.className = 'fixed bottom-0 left-0 right-0 tg-secondary border-t border-black/30 flex justify-around items-center py-2 z-40';
-    nav.style.paddingBottom = 'calc(8px + env(safe-area-inset-bottom))';
+    nav.className = 'bottom-nav';
     document.body.appendChild(nav);
   }
   const tabs = [
-    { id: 'home', label: 'Главная', icon: '<path d="M3 12l9-9 9 9v9a2 2 0 01-2 2h-4v-7h-6v7H5a2 2 0 01-2-2v-9z"/>' },
-    { id: 'progress', label: 'Прогресс', icon: '<path d="M3 3v18h18M7 14l4-4 4 4 6-6"/>' },
-    { id: 'admin', label: 'Админ', icon: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/>' }
+    { id: 'home', label: 'Главная', icon: ICONS.home },
+    { id: 'audio', label: 'Аудио', icon: ICONS.audio },
+    { id: 'books', label: 'Книги', icon: ICONS.book },
+    { id: 'favorites', label: 'Избранное', icon: ICONS.heart },
+    { id: 'progress', label: 'Прогресс', icon: ICONS.chart },
   ];
+  if (isAdmin()) {
+    tabs.push({ id: 'admin', label: 'Админ', icon: ICONS.settings });
+  }
   nav.innerHTML = tabs.map(t => `
-    <button data-nav="${t.id}" class="flex flex-col items-center gap-1 px-4 py-1 ${state.view === t.id ? 'tab-active' : 'tg-hint'}">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${t.icon}</svg>
-      <span class="text-xs">${t.label}</span>
+    <button class="nav-item ${state.view === t.id ? 'active' : ''}" data-nav="${t.id}">
+      ${t.icon}
+      <span>${t.label}</span>
     </button>
   `).join('');
-  nav.querySelectorAll('[data-nav]').forEach(b => b.onclick = () => { state.view = b.dataset.nav; render(); });
+  nav.querySelectorAll('[data-nav]').forEach(b => {
+    b.onclick = () => {
+      state.view = b.dataset.nav;
+      state.subsectionPath = [];
+      state.currentSection = null;
+      render();
+    };
+  });
 }
 
 // ============ HOME ============
@@ -281,211 +908,783 @@ function renderHome(app) {
   const overallPct = totalCount === 0 ? 0 : Math.round((completedCount/totalCount)*100);
 
   let html = `
-    <div class="gradient-header p-6 pb-8 rounded-b-3xl fade-in">
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <div class="text-xs opacity-70">Ассаляму алейкум</div>
-          <h1 class="text-2xl font-bold mt-1">Исламские знания</h1>
-        </div>
-        <div class="text-4xl">☪</div>
+    <div class="page">
+      <div class="page-header">
+        <div class="page-title">Исламские уроки</div>
+        <button class="icon-btn" id="searchBtn">${ICONS.search}</button>
       </div>
-      <div class="bg-white/10 backdrop-blur rounded-2xl p-4">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-sm">Общий прогресс</span>
-          <span class="text-lg font-bold">${overallPct}%</span>
-        </div>
-        <div class="h-2 bg-white/20 rounded-full overflow-hidden">
-          <div class="h-full bg-gradient-to-r from-green-400 to-yellow-400 transition-all" style="width:${overallPct}%"></div>
-        </div>
-        <div class="flex justify-between text-xs mt-2 opacity-80">
-          <span>Пройдено: ${completedCount} из ${totalCount}</span>
-          <span>⏱ ${fmtTime(stats.totalTime)}</span>
-        </div>
-      </div>
-    </div>
-    <div class="px-4 mt-6 fade-in">
-      <h2 class="text-lg font-bold mb-3">Разделы</h2>
-  `;
-  if (state.sections.length === 0) {
-    html += `<div class="card p-8 text-center tg-hint">Разделов пока нет. Добавьте их в админ-панели.</div>`;
-  } else {
-    state.sections.forEach(s => {
-      const pct = getSectionProgress(s);
-      const lessonCount = s.subsections.reduce((a, ss) => a + ss.lessons.length, 0);
-      const bookCount = s.subsections.reduce((a, ss) => a + ss.books.length, 0);
-      html += `
-        <div class="card p-4 mb-3 cursor-pointer" data-section="${s.id}">
-          <div class="flex items-center gap-3">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-600 to-emerald-800 flex items-center justify-center text-2xl flex-shrink-0">${s.icon || '📚'}</div>
-            <div class="flex-1 min-w-0">
-              <div class="font-semibold truncate">${s.title}</div>
-              <div class="text-xs tg-hint mt-1">${lessonCount} уроков · ${bookCount} книг</div>
-              <div class="h-1.5 bg-black/30 rounded-full mt-2 overflow-hidden">
-                <div class="h-full tg-btn" style="width:${pct}%"></div>
-              </div>
-            </div>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tg-hint flex-shrink-0"><path d="M9 18l6-6-6-6"/></svg>
+      <div style="padding: 16px">
+        <div style="background: var(--tg-section); border-radius: 14px; padding: 16px; margin-bottom: 16px">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px">
+            <div style="font-size:14px; color: var(--tg-hint)">Общий прогресс</div>
+            <div style="font-size:20px; font-weight:700">${overallPct}%</div>
           </div>
+          <div class="progress-bar">
+            <div class="progress-bar-fill" style="width:${overallPct}%"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--tg-hint); margin-top:8px">
+            <span>Пройдено ${completedCount} из ${totalCount}</span>
+            <span style="display:flex; align-items:center; gap:4px">${ICONS.clock}<span style="width:12px;height:12px;display:inline-block">${ICONS.clock}</span>${fmtTime(stats.totalTime)}</span>
+          </div>
+        </div>
+
+        <div class="section-title">Разделы</div>
+  `;
+
+  if (state.sections.length === 0) {
+    html += `
+      <div class="empty-state">
+        <div class="empty-state-icon">${ICONS.folder}</div>
+        <div class="empty-state-title">Пока пусто</div>
+        <div class="empty-state-text">Добавьте разделы в админ-панели</div>
+      </div>
+    `;
+  } else {
+    html += `<div class="section-group">`;
+    state.sections.forEach(s => {
+      const stats = getSubsectionStats(s);
+      const pct = stats.total === 0 ? 0 : Math.round((stats.done/stats.total)*100);
+      html += `
+        <div class="list-item" data-section="${s.id}">
+          <div class="icon-circle" style="background: var(--tg-btn)">
+            ${ICONS[s.icon] || ICONS.folder}
+          </div>
+          <div class="list-item-content">
+            <div class="list-item-title">${escapeHtml(s.title)}</div>
+            <div class="list-item-subtitle">${stats.lessons} уроков · ${stats.books} книг · ${pct}%</div>
+          </div>
+          <div class="chevron">${ICONS.chevron}</div>
         </div>
       `;
     });
+    html += `</div>`;
   }
-  html += `</div>`;
+
+  html += `
+    <div class="section-title" style="margin-top:20px">Быстрые действия</div>
+    <div class="section-group">
+      <div class="list-item" id="tasbihBtn">
+        <div class="icon-circle" style="background: #34c759">${ICONS.tasbih}</div>
+        <div class="list-item-content">
+          <div class="list-item-title">Тасбих</div>
+          <div class="list-item-subtitle">Счётчик зикра</div>
+        </div>
+        <div class="chevron">${ICONS.chevron}</div>
+      </div>
+    </div>
+  </div>`;
+
   app.innerHTML = html;
+
   app.querySelectorAll('[data-section]').forEach(el => {
     el.onclick = () => {
       state.currentSection = state.sections.find(s => s.id === el.dataset.section);
+      state.subsectionPath = [state.currentSection.id];
       state.view = 'section';
       render();
     };
   });
+
+  document.getElementById('searchBtn').onclick = () => { state.view = 'search'; render(); };
+  document.getElementById('tasbihBtn').onclick = () => showTasbihModal();
 }
 
-// ============ SECTION ============
+// ============ SECTION / SUBSECTION ============
 function renderSection(app) {
-  const s = state.currentSection;
-  if (!s) { state.view = 'home'; render(); return; }
-  const pct = getSectionProgress(s);
+  const current = findSubsectionByPath(state.subsectionPath);
+  if (!current) { state.view = 'home'; render(); return; }
+
+  const isRoot = state.subsectionPath.length === 1;
+  const title = current.title;
+
   let html = `
-    <div class="p-4 fade-in">
-      <button id="backBtn" class="flex items-center gap-2 tg-hint mb-3 text-sm">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-        Назад
-      </button>
-      <div class="gradient-header rounded-2xl p-5 mb-4">
-        <div class="flex items-center gap-3">
-          <div class="text-4xl">${s.icon || '📚'}</div>
-          <div class="flex-1">
-            <h1 class="text-xl font-bold">${s.title}</h1>
-            <div class="text-sm opacity-80 mt-1">Прогресс: ${pct}%</div>
-          </div>
-        </div>
-        <div class="h-2 bg-white/20 rounded-full mt-4 overflow-hidden">
-          <div class="h-full bg-gradient-to-r from-green-400 to-yellow-400" style="width:${pct}%"></div>
-        </div>
+    <div class="page">
+      <div class="page-header">
+        ${state.subsectionPath.length > 1 ? `
+          <button class="icon-btn" id="backBtn">${ICONS.back}</button>
+        ` : `
+          <button class="icon-btn" id="backBtn">${ICONS.back}</button>
+        `}
+        <div class="page-title">${escapeHtml(title)}</div>
+        ${isAdmin() ? `<button class="icon-btn" id="editBtn">${ICONS.edit}</button>` : ''}
       </div>
-      <h2 class="text-lg font-bold mb-3">Подразделы</h2>
   `;
-  if (s.subsections.length === 0) {
-    html += `<div class="card p-6 text-center tg-hint">Подразделов пока нет</div>`;
-  } else {
-    s.subsections.forEach(ss => {
-      const total = ss.lessons.length + ss.books.length;
-      const done = ss.lessons.filter(l => state.progress.completedLessons.includes(l.id)).length +
-                   ss.books.filter(b => state.progress.readBooks.includes(b.id)).length;
+
+  // Breadcrumbs
+  if (state.subsectionPath.length > 1) {
+    html += `<div class="breadcrumb">`;
+    const root = state.sections.find(s => s.id === state.subsectionPath[0]);
+    html += `<span class="breadcrumb-item" data-path-idx="0">${escapeHtml(root.title)}</span>`;
+    for (let i = 1; i < state.subsectionPath.length; i++) {
+      const ss = findSubsectionByPath(state.subsectionPath.slice(0, i+1));
+      html += `<span class="breadcrumb-sep">›</span>`;
+      if (i === state.subsectionPath.length - 1) {
+        html += `<span>${escapeHtml(ss.title)}</span>`;
+      } else {
+        html += `<span class="breadcrumb-item" data-path-idx="${i}">${escapeHtml(ss.title)}</span>`;
+      }
+    }
+    html += `</div>`;
+  }
+
+  const stats = getSubsectionStats(current);
+  const pct = stats.total === 0 ? 0 : Math.round((stats.done/stats.total)*100);
+
+  html += `
+    <div style="padding: 12px 16px; background: var(--tg-section); border-bottom: 0.5px solid var(--tg-separator)">
+      <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px">
+        <span class="tg-hint">Прогресс</span>
+        <span style="font-weight:600">${pct}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-bar-fill" style="width:${pct}%"></div>
+      </div>
+      <div style="font-size:12px; color:var(--tg-hint); margin-top:6px">
+        ${stats.completedL}/${stats.lessons} уроков · ${stats.completedB}/${stats.books} книг
+      </div>
+    </div>
+  `;
+
+  // Подразделы
+  const subsections = current.subsections || [];
+  if (subsections.length > 0) {
+    html += `
+      <div class="section-title">Подразделы</div>
+      <div class="section-group">
+    `;
+    subsections.forEach(ss => {
+      const ssStats = getSubsectionStats(ss);
       html += `
-        <div class="card p-4 mb-3 cursor-pointer" data-subsection="${ss.id}">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-800 flex items-center justify-center text-xl flex-shrink-0">📂</div>
-            <div class="flex-1 min-w-0">
-              <div class="font-semibold truncate">${ss.title}</div>
-              <div class="text-xs tg-hint mt-1">${ss.lessons.length} уроков · ${ss.books.length} книг</div>
-              <div class="text-xs tg-hint mt-0.5">Пройдено: ${done}/${total}</div>
-            </div>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tg-hint"><path d="M9 18l6-6-6-6"/></svg>
+        <div class="list-item" data-subsection="${ss.id}">
+          <div class="icon-circle" style="background: #5856d6">${ICONS.folder}</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${escapeHtml(ss.title)}</div>
+            <div class="list-item-subtitle">${ssStats.lessons} уроков · ${ssStats.books} книг</div>
           </div>
+          <div class="chevron">${ICONS.chevron}</div>
         </div>
       `;
     });
+    html += `</div>`;
   }
+
+  // Уроки
+  const lessons = current.lessons || [];
+  if (lessons.length > 0) {
+    html += `
+      <div class="section-title">Аудио уроки</div>
+      <div class="section-group">
+    `;
+    lessons.forEach(l => {
+      const done = state.progress.completedLessons.includes(l.id);
+      const fav = isFavorite('lesson', l.id);
+      const time = state.progress.lessonTimes[l.id] || 0;
+      html += `
+        <div class="list-item" data-lesson="${l.id}">
+          <div class="icon-circle" style="background: #ff9500">
+            ${done ? ICONS.check : ICONS.play}
+          </div>
+          <div class="list-item-content">
+            <div class="list-item-title">${escapeHtml(l.title)}</div>
+            <div class="list-item-subtitle">${l.duration || ''}${time > 0 ? ' · ' + fmtTime(time) : ''}</div>
+          </div>
+          <button class="favorite-btn ${fav ? 'active' : ''}" data-fav-lesson="${l.id}">
+            ${fav ? ICONS.heartFill : ICONS.heart}
+          </button>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  // Книги
+  const books = current.books || [];
+  if (books.length > 0) {
+    html += `
+      <div class="section-title">Книги</div>
+      <div class="section-group">
+    `;
+    books.forEach(b => {
+      const done = state.progress.readBooks.includes(b.id);
+      const fav = isFavorite('book', b.id);
+      const pages = state.progress.bookPages[b.id] || 0;
+      html += `
+        <div class="list-item" data-book="${b.id}">
+          <div class="icon-circle" style="background: #af52de">
+            ${done ? ICONS.check : ICONS.book}
+          </div>
+          <div class="list-item-content">
+            <div class="list-item-title">${escapeHtml(b.title)}</div>
+            <div class="list-item-subtitle">${pages > 0 ? 'Страница ' + pages : 'Не начита'}</div>
+          </div>
+          <button class="favorite-btn ${fav ? 'active' : ''}" data-fav-book="${b.id}">
+            ${fav ? ICONS.heartFill : ICONS.heart}
+          </button>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  if (subsections.length === 0 && lessons.length === 0 && books.length === 0) {
+    html += `
+      <div class="empty-state">
+        <div class="empty-state-icon">${ICONS.folder}</div>
+        <div class="empty-state-title">Пусто</div>
+        <div class="empty-state-text">В этом подразделе пока нет материалов</div>
+      </div>
+    `;
+  }
+
   html += `</div>`;
   app.innerHTML = html;
-  document.getElementById('backBtn').onclick = () => { state.view = 'home'; render(); };
+
+  document.getElementById('backBtn').onclick = () => {
+    if (state.subsectionPath.length > 1) {
+      state.subsectionPath.pop();
+      render();
+    } else {
+      state.view = 'home';
+      state.subsectionPath = [];
+      state.currentSection = null;
+      render();
+    }
+  };
+
+  app.querySelectorAll('[data-path-idx]').forEach(el => {
+    el.onclick = () => {
+      const idx = +el.dataset.pathIdx;
+      state.subsectionPath = state.subsectionPath.slice(0, idx + 1);
+      render();
+    };
+  });
+
+  if (document.getElementById('editBtn')) {
+    document.getElementById('editBtn').onclick = () => showEditSubsectionModal(current, state.subsectionPath);
+  }
+
   app.querySelectorAll('[data-subsection]').forEach(el => {
     el.onclick = () => {
-      state.currentSubsection = s.subsections.find(ss => ss.id === el.dataset.subsection);
-      state.view = 'subsection';
+      state.subsectionPath.push(el.dataset.subsection);
+      render();
+    };
+  });
+
+  app.querySelectorAll('[data-lesson]').forEach(el => {
+    const id = el.dataset.lesson;
+    const lesson = findLessonById(id);
+    if (lesson) el.onclick = (e) => {
+      if (e.target.closest('[data-fav-lesson]')) return;
+      playLesson(lesson);
+    };
+  });
+  app.querySelectorAll('[data-fav-lesson]').forEach(el => {
+    el.onclick = (e) => {
+      e.stopPropagation();
+      toggleFavorite('lesson', el.dataset.favLesson);
+      render();
+    };
+  });
+
+  app.querySelectorAll('[data-book]').forEach(el => {
+    const id = el.dataset.book;
+    const book = findBookById(id);
+    if (book) el.onclick = (e) => {
+      if (e.target.closest('[data-fav-book]')) return;
+      openBook(book);
+    };
+  });
+  app.querySelectorAll('[data-fav-book]').forEach(el => {
+    el.onclick = (e) => {
+      e.stopPropagation();
+      toggleFavorite('book', el.dataset.favBook);
       render();
     };
   });
 }
 
-// ============ SUBSECTION ============
-function renderSubsection(app) {
-  const ss = state.currentSubsection;
-  if (!ss) { state.view = 'section'; render(); return; }
+function findLessonById(id) {
+  for (const s of state.sections) {
+    let found = null;
+    walkSubsections(s.subsections, ss => {
+      const l = (ss.lessons || []).find(x => x.id === id);
+      if (l) found = { ...l, sectionTitle: s.title, subsectionTitle: ss.title };
+    });
+    if (found) return found;
+  }
+  return null;
+}
+
+function findBookById(id) {
+  for (const s of state.sections) {
+    let found = null;
+    walkSubsections(s.subsections, ss => {
+      const b = (ss.books || []).find(x => x.id === id);
+      if (b) found = { ...b, sectionTitle: s.title, subsectionTitle: ss.title };
+    });
+    if (found) return found;
+  }
+  return null;
+}
+
+// ============ AUDIO LIST ============
+function renderAudioList(app) {
+  const all = collectAllLessons();
   let html = `
-    <div class="p-4 fade-in">
-      <button id="backBtn" class="flex items-center gap-2 tg-hint mb-3 text-sm">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-        Назад
-      </button>
-      <h1 class="text-xl font-bold mb-4">${ss.title}</h1>
+    <div class="page">
+      <div class="page-header">
+        <div class="page-title">Все аудио уроки</div>
+        <button class="icon-btn" id="searchBtn">${ICONS.search}</button>
+      </div>
+      <div class="search-input-wrap">
+        <div class="search-icon">${ICONS.search}</div>
+        <input type="text" class="search-input" id="audioSearch" placeholder="Поиск уроков..." value="${escapeHtml(state.searchQuery)}">
+      </div>
   `;
-  if (ss.lessons.length > 0) {
-    html += `<h2 class="text-sm font-semibold tg-hint uppercase mb-2">🎧 Аудио уроки</h2>`;
-    ss.lessons.forEach(l => {
-      const done = state.progress.completedLessons.includes(l.id);
-      const time = state.progress.lessonTimes[l.id] || 0;
+
+  const filtered = state.searchQuery
+    ? all.filter(x => x.lesson.title.toLowerCase().includes(state.searchQuery.toLowerCase()))
+    : all;
+
+  if (filtered.length === 0) {
+    html += `
+      <div class="empty-state">
+        <div class="empty-state-icon">${ICONS.audio}</div>
+        <div class="empty-state-title">${state.searchQuery ? 'Ничего не найдено' : 'Нет уроков'}</div>
+        <div class="empty-state-text">${state.searchQuery ? 'Попробуйте другой запрос' : 'Добавьте уроки в админ-панели'}</div>
+      </div>
+    `;
+  } else {
+    html += `<div class="section-group">`;
+    filtered.forEach(({ lesson, subsection, section }) => {
+      const done = state.progress.completedLessons.includes(lesson.id);
+      const fav = isFavorite('lesson', lesson.id);
       html += `
-        <div class="card p-4 mb-2 cursor-pointer flex items-center gap-3" data-lesson="${l.id}">
-          <div class="w-11 h-11 rounded-full bg-gradient-to-br from-green-500 to-emerald-700 flex items-center justify-center flex-shrink-0">
-            ${done ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>'}
+        <div class="list-item" data-lesson="${lesson.id}">
+          <div class="icon-circle" style="background: ${done ? '#34c759' : '#ff9500'}">
+            ${done ? ICONS.check : ICONS.play}
           </div>
-          <div class="flex-1 min-w-0">
-            <div class="font-medium truncate">${l.title}</div>
-            <div class="text-xs tg-hint mt-0.5">${l.duration || ''} ${time > 0 ? '· Прослушано: '+fmtTime(time) : ''}</div>
+          <div class="list-item-content">
+            <div class="list-item-title">${escapeHtml(lesson.title)}</div>
+            <div class="list-item-subtitle">${escapeHtml(section.title)} · ${escapeHtml(subsection.title)}</div>
           </div>
+          <button class="favorite-btn ${fav ? 'active' : ''}" data-fav-lesson="${lesson.id}">
+            ${fav ? ICONS.heartFill : ICONS.heart}
+          </button>
         </div>
       `;
     });
-  }
-  if (ss.books.length > 0) {
-    html += `<h2 class="text-sm font-semibold tg-hint uppercase mb-2 mt-5">📖 Книги (PDF)</h2>`;
-    ss.books.forEach(b => {
-      const done = state.progress.readBooks.includes(b.id);
-      const pages = state.progress.bookPages[b.id] || 0;
-      html += `
-        <div class="card p-4 mb-2 cursor-pointer flex items-center gap-3" data-book="${b.id}">
-          <div class="w-11 h-11 rounded-full bg-gradient-to-br from-yellow-500 to-orange-700 flex items-center justify-center flex-shrink-0 text-white font-bold text-lg">
-            ${done ? '✓' : '📕'}
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="font-medium truncate">${b.title}</div>
-            <div class="text-xs tg-hint mt-0.5">${pages > 0 ? 'Прочитано страниц: '+pages : 'Не начата'}</div>
-          </div>
-        </div>
-      `;
-    });
-  }
-  if (ss.lessons.length === 0 && ss.books.length === 0) {
-    html += `<div class="card p-6 text-center tg-hint">Материалов пока нет</div>`;
+    html += `</div>`;
   }
   html += `</div>`;
   app.innerHTML = html;
-  document.getElementById('backBtn').onclick = () => { state.view = 'section'; render(); };
+
+  document.getElementById('searchBtn').onclick = () => { state.view = 'search'; render(); };
+  document.getElementById('audioSearch').oninput = (e) => {
+    state.searchQuery = e.target.value;
+    renderAudioList(app);
+  };
+
   app.querySelectorAll('[data-lesson]').forEach(el => {
-    el.onclick = () => {
-      const lesson = ss.lessons.find(l => l.id === el.dataset.lesson);
+    const lesson = findLessonById(el.dataset.lesson);
+    if (lesson) el.onclick = (e) => {
+      if (e.target.closest('[data-fav-lesson]')) return;
       playLesson(lesson);
     };
   });
+  app.querySelectorAll('[data-fav-lesson]').forEach(el => {
+    el.onclick = (e) => {
+      e.stopPropagation();
+      toggleFavorite('lesson', el.dataset.favLesson);
+      render();
+    };
+  });
+}
+
+// ============ BOOKS LIST ============
+function renderBooksList(app) {
+  const all = collectAllBooks();
+  let html = `
+    <div class="page">
+      <div class="page-header">
+        <div class="page-title">Все книги</div>
+        <button class="icon-btn" id="searchBtn">${ICONS.search}</button>
+      </div>
+      <div class="search-input-wrap">
+        <div class="search-icon">${ICONS.search}</div>
+        <input type="text" class="search-input" id="bookSearch" placeholder="Поиск книг..." value="${escapeHtml(state.searchQuery)}">
+      </div>
+  `;
+
+  const filtered = state.searchQuery
+    ? all.filter(x => x.book.title.toLowerCase().includes(state.searchQuery.toLowerCase()))
+    : all;
+
+  if (filtered.length === 0) {
+    html += `
+      <div class="empty-state">
+        <div class="empty-state-icon">${ICONS.book}</div>
+        <div class="empty-state-title">${state.searchQuery ? 'Ничего не найдено' : 'Нет книг'}</div>
+        <div class="empty-state-text">${state.searchQuery ? 'Попробуйте другой запрос' : 'Добавьте книги в админ-панели'}</div>
+      </div>
+    `;
+  } else {
+    html += `<div class="section-group">`;
+    filtered.forEach(({ book, subsection, section }) => {
+      const done = state.progress.readBooks.includes(book.id);
+      const fav = isFavorite('book', book.id);
+      const pages = state.progress.bookPages[book.id] || 0;
+      html += `
+        <div class="list-item" data-book="${book.id}">
+          <div class="icon-circle" style="background: ${done ? '#34c759' : '#af52de'}">
+            ${done ? ICONS.check : ICONS.book}
+          </div>
+          <div class="list-item-content">
+            <div class="list-item-title">${escapeHtml(book.title)}</div>
+            <div class="list-item-subtitle">${escapeHtml(section.title)} · ${pages > 0 ? 'стр. ' + pages : 'не начита'}</div>
+          </div>
+          <button class="favorite-btn ${fav ? 'active' : ''}" data-fav-book="${book.id}">
+            ${fav ? ICONS.heartFill : ICONS.heart}
+          </button>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+  html += `</div>`;
+  app.innerHTML = html;
+
+  document.getElementById('searchBtn').onclick = () => { state.view = 'search'; render(); };
+  document.getElementById('bookSearch').oninput = (e) => {
+    state.searchQuery = e.target.value;
+    renderBooksList(app);
+  };
+
   app.querySelectorAll('[data-book]').forEach(el => {
-    el.onclick = () => {
-      const book = ss.books.find(b => b.id === el.dataset.book);
+    const book = findBookById(el.dataset.book);
+    if (book) el.onclick = (e) => {
+      if (e.target.closest('[data-fav-book]')) return;
       openBook(book);
     };
   });
+  app.querySelectorAll('[data-fav-book]').forEach(el => {
+    el.onclick = (e) => {
+      e.stopPropagation();
+      toggleFavorite('book', el.dataset.favBook);
+      render();
+    };
+  });
+}
+
+// ============ FAVORITES ============
+function renderFavorites(app) {
+  const favLessons = collectAllLessons().filter(x => isFavorite('lesson', x.lesson.id));
+  const favBooks = collectAllBooks().filter(x => isFavorite('book', x.book.id));
+
+  let html = `
+    <div class="page">
+      <div class="page-header">
+        <div class="page-title">Избранное</div>
+      </div>
+      <div class="tab-switcher">
+        <button class="${state.favoritesTab === 'all' ? 'active' : ''}" data-tab="all">Все</button>
+        <button class="${state.favoritesTab === 'lessons' ? 'active' : ''}" data-tab="lessons">Аудио (${favLessons.length})</button>
+        <button class="${state.favoritesTab === 'books' ? 'active' : ''}" data-tab="books">Книги (${favBooks.length})</button>
+      </div>
+  `;
+
+  const showLessons = state.favoritesTab === 'all' || state.favoritesTab === 'lessons';
+  const showBooks = state.favoritesTab === 'all' || state.favoritesTab === 'books';
+
+  if (showLessons && favLessons.length > 0) {
+    if (state.favoritesTab === 'all') html += `<div class="section-title">Аудио уроки</div>`;
+    html += `<div class="section-group">`;
+    favLessons.forEach(({ lesson, section, subsection }) => {
+      const done = state.progress.completedLessons.includes(lesson.id);
+      html += `
+        <div class="list-item" data-lesson="${lesson.id}">
+          <div class="icon-circle" style="background: ${done ? '#34c759' : '#ff9500'}">
+            ${done ? ICONS.check : ICONS.play}
+          </div>
+          <div class="list-item-content">
+            <div class="list-item-title">${escapeHtml(lesson.title)}</div>
+            <div class="list-item-subtitle">${escapeHtml(section.title)}</div>
+          </div>
+          <button class="favorite-btn active" data-unfav-lesson="${lesson.id}">
+            ${ICONS.heartFill}
+          </button>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  if (showBooks && favBooks.length > 0) {
+    if (state.favoritesTab === 'all') html += `<div class="section-title" style="margin-top:16px">Книги</div>`;
+    html += `<div class="section-group">`;
+    favBooks.forEach(({ book, section }) => {
+      const done = state.progress.readBooks.includes(book.id);
+      html += `
+        <div class="list-item" data-book="${book.id}">
+          <div class="icon-circle" style="background: ${done ? '#34c759' : '#af52de'}">
+            ${done ? ICONS.check : ICONS.book}
+          </div>
+          <div class="list-item-content">
+            <div class="list-item-title">${escapeHtml(book.title)}</div>
+            <div class="list-item-subtitle">${escapeHtml(section.title)}</div>
+          </div>
+          <button class="favorite-btn active" data-unfav-book="${book.id}">
+            ${ICONS.heartFill}
+          </button>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  if (favLessons.length === 0 && favBooks.length === 0) {
+    html += `
+      <div class="empty-state">
+        <div class="empty-state-icon">${ICONS.heart}</div>
+        <div class="empty-state-title">Пока пусто</div>
+        <div class="empty-state-text">Нажмите на сердечко у урока или книги, чтобы добавить в избранное</div>
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+  app.innerHTML = html;
+
+  app.querySelectorAll('[data-tab]').forEach(b => {
+    b.onclick = () => { state.favoritesTab = b.dataset.tab; render(); };
+  });
+
+  app.querySelectorAll('[data-lesson]').forEach(el => {
+    const lesson = findLessonById(el.dataset.lesson);
+    if (lesson) el.onclick = (e) => {
+      if (e.target.closest('[data-unfav-lesson]')) return;
+      playLesson(lesson);
+    };
+  });
+  app.querySelectorAll('[data-unfav-lesson]').forEach(el => {
+    el.onclick = (e) => { e.stopPropagation(); toggleFavorite('lesson', el.dataset.unfavLesson); render(); };
+  });
+  app.querySelectorAll('[data-book]').forEach(el => {
+    const book = findBookById(el.dataset.book);
+    if (book) el.onclick = (e) => {
+      if (e.target.closest('[data-unfav-book]')) return;
+      openBook(book);
+    };
+  });
+  app.querySelectorAll('[data-unfav-book]').forEach(el => {
+    el.onclick = (e) => { e.stopPropagation(); toggleFavorite('book', el.dataset.unfavBook); render(); };
+  });
+}
+
+// ============ SEARCH ============
+function renderSearch(app) {
+  const allLessons = collectAllLessons();
+  const allBooks = collectAllBooks();
+  const q = state.searchQuery.toLowerCase();
+
+  const lessons = q ? allLessons.filter(x => x.lesson.title.toLowerCase().includes(q)) : [];
+  const books = q ? allBooks.filter(x => x.book.title.toLowerCase().includes(q)) : [];
+
+  let html = `
+    <div class="page">
+      <div class="page-header">
+        <button class="icon-btn" id="backBtn">${ICONS.back}</button>
+        <div class="page-title">Поиск</div>
+      </div>
+      <div class="search-input-wrap">
+        <div class="search-icon">${ICONS.search}</div>
+        <input type="text" class="search-input" id="searchInput" placeholder="Уроки, книги..." value="${escapeHtml(state.searchQuery)}" autofocus>
+      </div>
+  `;
+
+  if (!q) {
+    html += `
+      <div class="empty-state">
+        <div class="empty-state-icon">${ICONS.search}</div>
+        <div class="empty-state-title">Начните вводить</div>
+        <div class="empty-state-text">Поиск по урокам и книгам</div>
+      </div>
+    `;
+  } else if (lessons.length === 0 && books.length === 0) {
+    html += `
+      <div class="empty-state">
+        <div class="empty-state-icon">${ICONS.search}</div>
+        <div class="empty-state-title">Ничего не найдено</div>
+        <div class="empty-state-text">Попробуйте изменить запрос</div>
+      </div>
+    `;
+  } else {
+    if (lessons.length > 0) {
+      html += `<div class="section-title">Аудио уроки (${lessons.length})</div><div class="section-group">`;
+      lessons.forEach(({ lesson, section, subsection }) => {
+        const done = state.progress.completedLessons.includes(lesson.id);
+        html += `
+          <div class="list-item" data-lesson="${lesson.id}">
+            <div class="icon-circle" style="background: ${done ? '#34c759' : '#ff9500'}">
+              ${done ? ICONS.check : ICONS.play}
+            </div>
+            <div class="list-item-content">
+              <div class="list-item-title">${escapeHtml(lesson.title)}</div>
+              <div class="list-item-subtitle">${escapeHtml(section.title)} · ${escapeHtml(subsection.title)}</div>
+            </div>
+            <div class="chevron">${ICONS.chevron}</div>
+          </div>
+        `;
+      });
+      html += `</div>`;
+    }
+    if (books.length > 0) {
+      html += `<div class="section-title">Книги (${books.length})</div><div class="section-group">`;
+      books.forEach(({ book, section, subsection }) => {
+        const done = state.progress.readBooks.includes(book.id);
+        html += `
+          <div class="list-item" data-book="${book.id}">
+            <div class="icon-circle" style="background: ${done ? '#34c759' : '#af52de'}">
+              ${done ? ICONS.check : ICONS.book}
+            </div>
+            <div class="list-item-content">
+              <div class="list-item-title">${escapeHtml(book.title)}</div>
+              <div class="list-item-subtitle">${escapeHtml(section.title)} · ${escapeHtml(subsection.title)}</div>
+            </div>
+            <div class="chevron">${ICONS.chevron}</div>
+          </div>
+        `;
+      });
+      html += `</div>`;
+    }
+  }
+  html += `</div>`;
+  app.innerHTML = html;
+
+  document.getElementById('backBtn').onclick = () => { state.view = 'home'; state.searchQuery = ''; render(); };
+  const input = document.getElementById('searchInput');
+  input.oninput = (e) => { state.searchQuery = e.target.value; renderSearch(app); };
+  input.focus();
+
+  app.querySelectorAll('[data-lesson]').forEach(el => {
+    const lesson = findLessonById(el.dataset.lesson);
+    if (lesson) el.onclick = () => playLesson(lesson);
+  });
+  app.querySelectorAll('[data-book]').forEach(el => {
+    const book = findBookById(el.dataset.book);
+    if (book) el.onclick = () => openBook(book);
+  });
+}
+
+// ============ PROGRESS ============
+function renderProgress(app) {
+  const stats = getTotalStats();
+  const completedCount = stats.completedL + stats.completedB;
+  const totalCount = stats.lessons + stats.books;
+  const overallPct = totalCount === 0 ? 0 : Math.round((completedCount/totalCount)*100);
+  const circumference = 2 * Math.PI * 54;
+  const offset = circumference * (1 - overallPct/100);
+
+  let html = `
+    <div class="page">
+      <div class="page-header">
+        <div class="page-title">Мой прогресс</div>
+      </div>
+      <div style="padding: 20px 16px; text-align:center; background: var(--tg-section); border-bottom: 0.5px solid var(--tg-separator)">
+        <div style="position:relative; display:inline-block; width:140px; height:140px">
+          <svg width="140" height="140" class="progress-ring">
+            <circle cx="70" cy="70" r="54" stroke="var(--tg-separator)" stroke-width="10" fill="none"/>
+            <circle cx="70" cy="70" r="54" stroke="var(--tg-btn)" stroke-width="10" fill="none"
+              stroke-linecap="round" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
+              style="transition: stroke-dashoffset 0.5s"/>
+          </svg>
+          <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center">
+            <div style="font-size:32px; font-weight:700">${overallPct}%</div>
+            <div style="font-size:12px; color:var(--tg-hint)">завершено</div>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:20px">
+          <div class="stat-card">
+            <div class="stat-value" style="color:#ff9500">${stats.completedL}</div>
+            <div class="stat-label">уроков</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:#af52de">${stats.completedB}</div>
+            <div class="stat-label">книг</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:#5856d6">${fmtTime(stats.totalTime)}</div>
+            <div class="stat-label">время</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">По разделам</div>
+      <div class="section-group">
+  `;
+
+  state.sections.forEach(s => {
+    const ss = getSubsectionStats(s);
+    const pct = ss.total === 0 ? 0 : Math.round((ss.done/ss.total)*100);
+    html += `
+      <div style="padding:12px 16px; border-bottom:0.5px solid var(--tg-separator)">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px">
+          <div class="icon-circle" style="background: var(--tg-btn); width:36px; height:36px">
+            ${ICONS[s.icon] || ICONS.folder}
+          </div>
+          <div style="flex:1">
+            <div style="font-weight:500">${escapeHtml(s.title)}</div>
+            <div style="font-size:12px; color:var(--tg-hint)">${ss.done} из ${ss.total}</div>
+          </div>
+          <div style="font-weight:600">${pct}%</div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-bar-fill" style="width:${pct}%"></div>
+        </div>
+      </div>
+    `;
+  });
+
+  if (state.sections.length === 0) {
+    html += `<div style="padding:20px; text-align:center; color:var(--tg-hint)">Нет данных</div>`;
+  }
+
+  html += `
+      </div>
+      <div style="padding:20px 16px; text-align:center; color:var(--tg-hint); font-size:14px; font-style:italic">
+        "И скажи: Господи! Приумножь мои знания"<br>
+        <span style="font-size:12px">— Та Ха, 20:114</span>
+      </div>
+    </div>
+  `;
+  app.innerHTML = html;
 }
 
 // ============ AUDIO PLAYER ============
 function playLesson(lesson) {
   state.currentLesson = lesson;
   audio.src = lesson.audioUrl;
-  const player = document.getElementById('audioPlayer');
-  player.classList.remove('hidden');
+  audio.playbackRate = state.audioSpeed;
+  document.getElementById('audioPlayer').classList.add('visible');
   document.getElementById('audioTitle').textContent = lesson.title;
-  audio.play().catch(()=>{});
-  updatePlayIcon(true);
+  document.getElementById('audioStatus').textContent = 'Загрузка...';
+  audio.play().then(() => {
+    updatePlayIcon(true);
+    document.getElementById('audioStatus').textContent = 'Воспроизведение';
+  }).catch(e => {
+    document.getElementById('audioStatus').textContent = 'Ошибка';
+  });
+  if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
 }
 
 function updatePlayIcon(playing) {
-  document.getElementById('playIcon').classList.toggle('hidden', playing);
-  document.getElementById('pauseIcon').classList.toggle('hidden', !playing);
+  document.getElementById('playIcon').style.display = playing ? 'none' : 'block';
+  document.getElementById('pauseIcon').style.display = playing ? 'block' : 'none';
 }
 
-audio.addEventListener('play', () => updatePlayIcon(true));
-audio.addEventListener('pause', () => updatePlayIcon(false));
+audio.addEventListener('play', () => { updatePlayIcon(true); document.getElementById('audioStatus').textContent = 'Воспроизведение'; });
+audio.addEventListener('pause', () => { updatePlayIcon(false); document.getElementById('audioStatus').textContent = 'Пауза'; });
+audio.addEventListener('waiting', () => { document.getElementById('audioStatus').textContent = 'Буферизация...'; });
 audio.addEventListener('timeupdate', () => {
   const pct = (audio.currentTime / audio.duration) * 100 || 0;
   document.getElementById('audioProgressFill').style.width = pct + '%';
@@ -499,32 +1698,46 @@ audio.addEventListener('timeupdate', () => {
     if (audio.duration && audio.currentTime / audio.duration > 0.9) {
       if (!state.progress.completedLessons.includes(state.currentLesson.id)) {
         state.progress.completedLessons.push(state.currentLesson.id);
+        showToast('Урок завершён ✓');
       }
     }
-    saveData();
+    saveProgress();
   }
 });
 audio.addEventListener('ended', () => {
   if (state.currentLesson && !state.progress.completedLessons.includes(state.currentLesson.id)) {
     state.progress.completedLessons.push(state.currentLesson.id);
-    saveData();
-    if (tg) tg.HapticFeedback?.notificationOccurred('success');
+    saveProgress();
+    showToast('Урок завершён ✓');
+    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
   }
+  updatePlayIcon(false);
+  document.getElementById('audioStatus').textContent = 'Завершено';
 });
 
 document.getElementById('playPauseBtn').onclick = () => {
   if (audio.paused) audio.play(); else audio.pause();
 };
+document.getElementById('rewindBtn').onclick = () => { audio.currentTime = Math.max(0, audio.currentTime - 15); };
+document.getElementById('forwardBtn').onclick = () => { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 15); };
 document.getElementById('closeAudioBtn').onclick = () => {
   audio.pause();
-  document.getElementById('audioPlayer').classList.add('hidden');
+  document.getElementById('audioPlayer').classList.remove('visible');
   state.currentLesson = null;
-  if (state.view === 'subsection') render();
+  render();
 };
 document.getElementById('audioProgress').onclick = (e) => {
   const rect = e.currentTarget.getBoundingClientRect();
   const pct = (e.clientX - rect.left) / rect.width;
   if (audio.duration) audio.currentTime = pct * audio.duration;
+};
+document.getElementById('speedBtn').onclick = () => {
+  const speeds = [0.75, 1, 1.25, 1.5, 2];
+  const idx = speeds.indexOf(state.audioSpeed);
+  state.audioSpeed = speeds[(idx + 1) % speeds.length];
+  audio.playbackRate = state.audioSpeed;
+  document.getElementById('speedBtn').textContent = state.audioSpeed + 'x';
+  showToast('Скорость: ' + state.audioSpeed + 'x');
 };
 
 // ============ PDF VIEWER ============
@@ -532,415 +1745,671 @@ async function openBook(book) {
   state.currentBook = book;
   const viewer = document.getElementById('pdfViewer');
   const content = document.getElementById('pdfContent');
-  viewer.classList.remove('hidden');
-  content.innerHTML = '<div class="text-center p-8">Загрузка...</div>';
+  viewer.classList.add('visible');
+  document.getElementById('pdfTitle').textContent = book.title;
+  content.innerHTML = '<div style="padding:40px; text-align:center; color:var(--tg-hint)">Загрузка...</div>';
   try {
-    pdfDoc = await pdfjsLib.getDocument(book.pdfUrl).promise;
-    document.getElementById('pdfPageCount').textContent = pdfDoc.numPages;
-    pdfPage = (state.progress.bookPages[book.id] || 0) + 1;
-    if (pdfPage > pdfDoc.numPages) pdfPage = 1;
+    state.pdfDoc = await pdfjsLib.getDocument(book.pdfUrl).promise;
+    document.getElementById('pdfPageCount').textContent = state.pdfDoc.numPages;
+    state.pdfPage = (state.progress.bookPages[book.id] || 0) + 1;
+    if (state.pdfPage > state.pdfDoc.numPages) state.pdfPage = 1;
     await renderPdfPage();
+    updateBookmarkIcon();
   } catch(e) {
-    content.innerHTML = `<div class="text-center p-8 text-red-400">Ошибка загрузки PDF: ${e.message}</div>`;
+    content.innerHTML = `<div style="padding:40px; text-align:center; color:var(--tg-destructive)">Ошибка загрузки: ${escapeHtml(e.message)}</div>`;
   }
 }
 
 async function renderPdfPage() {
-  if (!pdfDoc) return;
+  if (!state.pdfDoc) return;
   const content = document.getElementById('pdfContent');
   content.innerHTML = '';
-  const page = await pdfDoc.getPage(pdfPage);
-  const viewport = page.getViewport({ scale: window.innerWidth / page.getViewport({scale:1}).width });
+  const page = await state.pdfDoc.getPage(state.pdfPage);
+  const scale = window.innerWidth / page.getViewport({scale:1}).width;
+  const viewport = page.getViewport({ scale });
   const canvas = document.createElement('canvas');
   canvas.className = 'pdf-canvas';
   canvas.width = viewport.width;
   canvas.height = viewport.height;
   content.appendChild(canvas);
   await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-  document.getElementById('pdfPageNum').textContent = pdfPage;
-  // Save progress
+  document.getElementById('pdfPageNum').textContent = state.pdfPage;
   if (state.currentBook) {
     state.progress.bookPages[state.currentBook.id] = Math.max(
       state.progress.bookPages[state.currentBook.id] || 0,
-      pdfPage
+      state.pdfPage
     );
-    if (pdfPage >= pdfDoc.numPages && !state.progress.readBooks.includes(state.currentBook.id)) {
+    if (state.pdfPage >= state.pdfDoc.numPages && !state.progress.readBooks.includes(state.currentBook.id)) {
       state.progress.readBooks.push(state.currentBook.id);
-      if (tg) tg.HapticFeedback?.notificationOccurred('success');
+      showToast('Книга прочитана ✓');
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
     }
-    saveData();
+    saveProgress();
   }
+}
+
+function updateBookmarkIcon() {
+  if (!state.currentBook) return;
+  const bookmarks = state.progress.bookBookmarks[state.currentBook.id] || [];
+  const isCurrentBookmarked = bookmarks.some(b => b.page === state.pdfPage);
+  const icon = document.getElementById('bookmarkIcon');
+  if (isCurrentBookmarked) {
+    icon.setAttribute('fill', 'currentColor');
+  } else {
+    icon.setAttribute('fill', 'none');
+  }
+}
+
+function renderBookmarksList() {
+  const list = document.getElementById('bookmarksList');
+  if (!state.currentBook) return;
+  const bookmarks = state.progress.bookBookmarks[state.currentBook.id] || [];
+  if (bookmarks.length === 0) {
+    list.innerHTML = '<div style="padding:40px; text-align:center; color:var(--tg-hint); font-size:14px">Нет закладок</div>';
+    return;
+  }
+  list.innerHTML = bookmarks.map((b, i) => `
+    <div class="bookmark-item" data-bookmark-idx="${i}">
+      <div style="color:var(--tg-btn)">${ICONS.bookmark}</div>
+      <div style="flex:1">
+        <div style="font-weight:500">Страница ${b.page}</div>
+        ${b.label ? `<div style="font-size:12px; color:var(--tg-hint); margin-top:2px">${escapeHtml(b.label)}</div>` : ''}
+      </div>
+      <button class="admin-mini-btn danger" data-del-bookmark="${i}">
+        ${ICONS.trash}
+      </button>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('[data-bookmark-idx]').forEach(el => {
+    el.onclick = async (e) => {
+      if (e.target.closest('[data-del-bookmark]')) return;
+      const idx = +el.dataset.bookmarkIdx;
+      state.pdfPage = bookmarks[idx].page;
+      await renderPdfPage();
+      updateBookmarkIcon();
+      document.getElementById('pdfBookmarks').classList.remove('open');
+      state.bookmarksOpen = false;
+    };
+  });
+  list.querySelectorAll('[data-del-bookmark]').forEach(el => {
+    el.onclick = (e) => {
+      e.stopPropagation();
+      const idx = +el.dataset.delBookmark;
+      bookmarks.splice(idx, 1);
+      saveProgress();
+      renderBookmarksList();
+      updateBookmarkIcon();
+    };
+  });
 }
 
 document.getElementById('closePdfBtn').onclick = () => {
-  document.getElementById('pdfViewer').classList.add('hidden');
-  pdfDoc = null;
+  document.getElementById('pdfViewer').classList.remove('visible');
+  state.pdfDoc = null;
   state.currentBook = null;
-  if (state.view === 'subsection') render();
+  state.bookmarksOpen = false;
+  document.getElementById('pdfBookmarks').classList.remove('open');
+  render();
 };
 document.getElementById('prevPageBtn').onclick = async () => {
-  if (pdfPage > 1) { pdfPage--; await renderPdfPage(); }
+  if (state.pdfPage > 1) { state.pdfPage--; await renderPdfPage(); updateBookmarkIcon(); }
 };
 document.getElementById('nextPageBtn').onclick = async () => {
-  if (pdfDoc && pdfPage < pdfDoc.numPages) { pdfPage++; await renderPdfPage(); }
+  if (state.pdfDoc && state.pdfPage < state.pdfDoc.numPages) { state.pdfPage++; await renderPdfPage(); updateBookmarkIcon(); }
 };
-
-// ============ PROGRESS ============
-function renderProgress(app) {
-  const stats = getTotalStats();
-  const completedCount = stats.completedL + stats.completedB;
-  const totalCount = stats.lessons + stats.books;
-  const overallPct = totalCount === 0 ? 0 : Math.round((completedCount/totalCount)*100);
-
-  let html = `
-    <div class="p-4 fade-in">
-      <h1 class="text-2xl font-bold mb-4">Мой прогресс</h1>
-      <div class="card p-6 mb-4 text-center">
-        <div class="relative inline-block">
-          <svg width="140" height="140" class="progress-ring">
-            <circle cx="70" cy="70" r="60" stroke="currentColor" stroke-width="10" fill="none" class="tg-hint opacity-30"/>
-            <circle cx="70" cy="70" r="60" stroke="url(#grad)" stroke-width="10" fill="none"
-              stroke-linecap="round" stroke-dasharray="${2*Math.PI*60}"
-              stroke-dashoffset="${2*Math.PI*60*(1-overallPct/100)}"/>
-            <defs><linearGradient id="grad"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#eab308"/></linearGradient></defs>
-          </svg>
-          <div class="absolute inset-0 flex flex-col items-center justify-center">
-            <div class="text-3xl font-bold">${overallPct}%</div>
-            <div class="text-xs tg-hint">завершено</div>
-          </div>
-        </div>
-        <div class="grid grid-cols-3 gap-3 mt-5">
-          <div class="tg-secondary rounded-xl p-3">
-            <div class="text-xl font-bold text-green-400">${stats.completedL}</div>
-            <div class="text-xs tg-hint">уроков</div>
-          </div>
-          <div class="tg-secondary rounded-xl p-3">
-            <div class="text-xl font-bold text-yellow-400">${stats.completedB}</div>
-            <div class="text-xs tg-hint">книг</div>
-          </div>
-          <div class="tg-secondary rounded-xl p-3">
-            <div class="text-xl font-bold text-blue-400">${fmtTime(stats.totalTime)}</div>
-            <div class="text-xs tg-hint">время</div>
-          </div>
-        </div>
-      </div>
-      <h2 class="text-lg font-bold mb-3">По разделам</h2>
-  `;
-  state.sections.forEach(s => {
-    const pct = getSectionProgress(s);
-    html += `
-      <div class="card p-4 mb-2">
-        <div class="flex items-center gap-3 mb-2">
-          <div class="text-2xl">${s.icon || '📚'}</div>
-          <div class="flex-1">
-            <div class="font-medium">${s.title}</div>
-            <div class="text-xs tg-hint">${pct}% завершено</div>
-          </div>
-        </div>
-        <div class="h-2 bg-black/30 rounded-full overflow-hidden">
-          <div class="h-full bg-gradient-to-r from-green-500 to-yellow-500" style="width:${pct}%"></div>
-        </div>
-      </div>
-    `;
-  });
-  if (state.sections.length === 0) {
-    html += `<div class="card p-6 text-center tg-hint">Нет данных</div>`;
+document.getElementById('addBookmarkBtn').onclick = () => {
+  if (!state.currentBook) return;
+  const id = state.currentBook.id;
+  if (!state.progress.bookBookmarks[id]) state.progress.bookBookmarks[id] = [];
+  const existing = state.progress.bookBookmarks[id].findIndex(b => b.page === state.pdfPage);
+  if (existing >= 0) {
+    state.progress.bookBookmarks[id].splice(existing, 1);
+    showToast('Закладка удалена');
+  } else {
+    state.progress.bookBookmarks[id].push({
+      page: state.pdfPage,
+      label: '',
+      createdAt: Date.now()
+    });
+    showToast('Закладка добавлена');
+    if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
   }
-  html += `
-    <div class="mt-6 p-4 tg-secondary rounded-2xl text-center">
-      <div class="text-3xl mb-2">🤲</div>
-      <div class="text-sm tg-hint italic">"И скажи: "Господи! Приумножь мои знания"</div>
-      <div class="text-xs tg-hint mt-1">Та Ха, 20:114</div>
-    </div>
-  </div>`;
-  app.innerHTML = html;
-}
+  saveProgress();
+  updateBookmarkIcon();
+  if (state.bookmarksOpen) renderBookmarksList();
+};
+document.getElementById('toggleBookmarksBtn').onclick = () => {
+  state.bookmarksOpen = !state.bookmarksOpen;
+  document.getElementById('pdfBookmarks').classList.toggle('open', state.bookmarksOpen);
+  if (state.bookmarksOpen) renderBookmarksList();
+};
+document.getElementById('closeBookmarksBtn').onclick = () => {
+  state.bookmarksOpen = false;
+  document.getElementById('pdfBookmarks').classList.remove('open');
+};
 
 // ============ ADMIN ============
 function renderAdmin(app) {
-  if (!state.isAdmin) {
+  if (!isAdmin()) {
     app.innerHTML = `
-      <div class="p-4 fade-in">
-        <h1 class="text-2xl font-bold mb-4">Админ-панель</h1>
-        <div class="card p-6">
-          <div class="text-sm tg-hint mb-2">Введите пароль для входа</div>
-          <input type="password" id="adminPass" placeholder="Пароль" class="mb-3">
-          <button id="adminLoginBtn" class="tg-btn w-full py-3 rounded-xl font-medium">Войти</button>
-          <div class="text-xs tg-hint mt-3 text-center">Пароль по умолчанию: admin123</div>
+      <div class="page">
+        <div class="page-header">
+          <div class="page-title">Админ-панель</div>
+        </div>
+        <div class="empty-state">
+          <div class="empty-state-icon">${ICONS.lock}</div>
+          <div class="empty-state-title">Доступ запрещён</div>
+          <div class="empty-state-text">Только для администраторов</div>
         </div>
       </div>
     `;
-    document.getElementById('adminLoginBtn').onclick = () => {
-      const v = document.getElementById('adminPass').value;
-      if (v === ADMIN_PASSWORD) { state.isAdmin = true; render(); }
-      else alert('Неверный пароль');
-    };
     return;
   }
 
   let html = `
-    <div class="p-4 fade-in">
-      <div class="flex items-center justify-between mb-4">
-        <h1 class="text-2xl font-bold">Админ-панель</h1>
-        <button id="logoutBtn" class="text-sm tg-hint">Выйти</button>
+    <div class="page">
+      <div class="page-header">
+        <div class="page-title">Админ-панель</div>
       </div>
-      <button id="addSectionBtn" class="tg-btn w-full py-3 rounded-xl font-medium mb-4 flex items-center justify-center gap-2">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-        Добавить раздел
-      </button>
+      <div style="padding:16px">
+        <button class="tg-btn" style="width:100%; padding:14px; border-radius:12px; font-size:16px; display:flex; align-items:center; justify-content:center; gap:8px" id="addSectionBtn">
+          ${ICONS.plus} <span>Добавить раздел</span>
+        </button>
+      </div>
   `;
-  state.sections.forEach((s, si) => {
+
+  if (state.sections.length === 0) {
     html += `
-      <div class="card p-4 mb-3">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="text-2xl">${s.icon || '📚'}</div>
-          <div class="flex-1">
-            <div class="font-semibold">${s.title}</div>
-            <div class="text-xs tg-hint">${s.subsections.length} подразделов</div>
-          </div>
-          <button data-edit-section="${si}" class="p-2 tg-hint">✏️</button>
-          <button data-del-section="${si}" class="p-2 text-red-400">🗑️</button>
-        </div>
-        <button data-add-subsection="${si}" class="w-full py-2 rounded-lg tg-secondary text-sm tg-link font-medium mb-2">+ Добавить подраздел</button>
+      <div class="empty-state">
+        <div class="empty-state-icon">${ICONS.folder}</div>
+        <div class="empty-state-title">Нет разделов</div>
+        <div class="empty-state-text">Создайте первый раздел</div>
+      </div>
     `;
-    s.subsections.forEach((ss, ssi) => {
-      html += `
-        <div class="tg-secondary rounded-xl p-3 mb-2">
-          <div class="flex items-center gap-2 mb-2">
-            <div class="flex-1 font-medium text-sm">${ss.title}</div>
-            <button data-edit-sub="${si}-${ssi}" class="text-xs tg-hint">✏️</button>
-            <button data-del-sub="${si}-${ssi}" class="text-xs text-red-400">🗑️</button>
-          </div>
-          <div class="text-xs tg-hint mb-2">${ss.lessons.length} уроков · ${ss.books.length} книг</div>
-          <div class="flex gap-2">
-            <button data-add-lesson="${si}-${ssi}" class="flex-1 py-1.5 rounded-lg bg-green-600/20 text-green-400 text-xs font-medium">+ Урок</button>
-            <button data-add-book="${si}-${ssi}" class="flex-1 py-1.5 rounded-lg bg-yellow-600/20 text-yellow-400 text-xs font-medium">+ Книга</button>
-          </div>
-          ${ss.lessons.map((l, li) => `
-            <div class="flex items-center gap-2 mt-2 p-2 bg-black/20 rounded-lg">
-              <span class="text-xs">🎧</span>
-              <span class="flex-1 text-xs truncate">${l.title}</span>
-              <button data-edit-lesson="${si}-${ssi}-${li}" class="text-xs tg-hint">✏️</button>
-              <button data-del-lesson="${si}-${ssi}-${li}" class="text-xs text-red-400">✕</button>
-            </div>
-          `).join('')}
-          ${ss.books.map((b, bi) => `
-            <div class="flex items-center gap-2 mt-2 p-2 bg-black/20 rounded-lg">
-              <span class="text-xs">📕</span>
-              <span class="flex-1 text-xs truncate">${b.title}</span>
-              <button data-edit-book="${si}-${ssi}-${bi}" class="text-xs tg-hint">✏️</button>
-              <button data-del-book="${si}-${ssi}-${bi}" class="text-xs text-red-400">✕</button>
-            </div>
-          `).join('')}
-        </div>
-      `;
+  } else {
+    state.sections.forEach((s, si) => {
+      html += renderAdminSection(s, si, []);
     });
-    html += `</div>`;
-  });
+  }
+
   html += `
-    <div class="mt-6 p-4 tg-secondary rounded-2xl">
-      <div class="text-sm font-semibold mb-2">⚙️ Управление данными</div>
-      <div class="flex gap-2">
-        <button id="exportBtn" class="flex-1 py-2 rounded-lg tg-btn text-sm">Экспорт</button>
-        <button id="importBtn" class="flex-1 py-2 rounded-lg tg-secondary text-sm">Импорт</button>
-        <button id="resetBtn" class="flex-1 py-2 rounded-lg bg-red-600 text-white text-sm">Сброс</button>
+    <div style="padding:16px">
+      <div class="section-title">Данные</div>
+      <div class="section-group">
+        <div class="list-item" id="exportBtn">
+          <div class="icon-circle" style="background:#5856d6">${ICONS.download}</div>
+          <div class="list-item-content"><div class="list-item-title">Экспорт данных</div></div>
+        </div>
+        <div class="list-item" id="importBtn">
+          <div class="icon-circle" style="background:#34c759">${ICONS.upload}</div>
+          <div class="list-item-content"><div class="list-item-title">Импорт данных</div></div>
+        </div>
+        <div class="list-item" id="resetBtn">
+          <div class="icon-circle" style="background:#ff3b30">${ICONS.trash}</div>
+          <div class="list-item-content"><div class="list-item-title tg-destructive">Сбросить всё</div></div>
+        </div>
       </div>
     </div>
     </div>
   `;
   app.innerHTML = html;
 
-  document.getElementById('logoutBtn').onclick = () => { state.isAdmin = false; render(); };
   document.getElementById('addSectionBtn').onclick = () => showSectionModal();
-  document.getElementById('exportBtn').onclick = () => {
-    const data = JSON.stringify({ sections: state.sections, progress: state.progress }, null, 2);
-    const blob = new Blob([data], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'islamic_app_backup.json'; a.click();
-  };
-  document.getElementById('importBtn').onclick = () => {
-    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json';
-    inp.onchange = (e) => {
-      const f = e.target.files[0]; if (!f) return;
-      const r = new FileReader();
-      r.onload = (ev) => {
-        try {
-          const d = JSON.parse(ev.target.result);
-          if (d.sections) state.sections = d.sections;
-          if (d.progress) state.progress = d.progress;
-          saveData(); render(); alert('Импортировано!');
-        } catch { alert('Ошибка файла'); }
-      };
-      r.readAsText(f);
-    };
-    inp.click();
-  };
+  document.getElementById('exportBtn').onclick = exportData;
+  document.getElementById('importBtn').onclick = importData;
   document.getElementById('resetBtn').onclick = () => {
-    if (confirm('Удалить все данные?')) {
+    if (confirm('Удалить все данные? Это действие необратимо.')) {
       localStorage.removeItem(STORAGE_KEY);
-      state.sections = []; state.progress = { completedLessons: [], readBooks: [], lessonTimes: {}, bookPages: {} };
+      state.sections = [];
+      saveContent();
       render();
     }
   };
 
-  app.querySelectorAll('[data-edit-section]').forEach(b => b.onclick = () => showSectionModal(+b.dataset.editSection));
-  app.querySelectorAll('[data-del-section]').forEach(b => b.onclick = () => {
-    if (confirm('Удалить раздел?')) { state.sections.splice(+b.dataset.delSection, 1); saveData(); render(); }
+  bindAdminEvents(app);
+}
+
+function renderAdminSection(node, nodeIdx, parentPath) {
+  const isRoot = parentPath.length === 0;
+  const pathStr = parentPath.join('-') + (parentPath.length > 0 ? '-' : '') + nodeIdx;
+  const stats = getSubsectionStats(node);
+
+  let html = `
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div style="color:var(--tg-btn)">${ICONS[isRoot ? (node.icon || 'folder') : 'folder']}</div>
+        <div class="admin-section-title">${escapeHtml(node.title)}</div>
+        <button class="admin-mini-btn" data-edit-node="${pathStr}" data-node-type="${isRoot ? 'section' : 'subsection'}">
+          ${ICONS.edit}
+        </button>
+        ${isRoot ? `<button class="admin-mini-btn danger" data-del-section="${nodeIdx}">${ICONS.trash}</button>` : ''}
+      </div>
+      <div style="padding:10px 14px; font-size:12px; color:var(--tg-hint); border-bottom:0.5px solid var(--tg-separator)">
+        ${stats.lessons} уроков · ${stats.books} книг · ${stats.done}/${stats.total} пройдено
+      </div>
+      <div style="padding:8px">
+  `;
+
+  // Подразделы
+  (node.subsections || []).forEach((ss, ssi) => {
+    const childPath = [...parentPath, nodeIdx, ssi];
+    html += renderAdminSection(ss, ssi, [...parentPath, nodeIdx]);
   });
-  app.querySelectorAll('[data-add-subsection]').forEach(b => b.onclick = () => showSubsectionModal(+b.dataset.addSubsection));
-  app.querySelectorAll('[data-edit-sub]').forEach(b => {
-    const [si, ssi] = b.dataset.editSub.split('-').map(Number);
-    b.onclick = () => showSubsectionModal(si, ssi);
+
+  // Уроки
+  (node.lessons || []).forEach((l, li) => {
+    const lessonPath = [...parentPath, nodeIdx, 'l', li].join('-');
+    html += `
+      <div class="admin-item">
+        <div style="color:#ff9500; width:16px; height:16px">${ICONS.play}</div>
+        <div class="admin-item-title">${escapeHtml(l.title)}</div>
+        <button class="admin-mini-btn" data-edit-lesson="${lessonPath}">${ICONS.edit}</button>
+        <button class="admin-mini-btn danger" data-del-lesson="${lessonPath}">${ICONS.trash}</button>
+      </div>
+    `;
   });
-  app.querySelectorAll('[data-del-sub]').forEach(b => {
-    const [si, ssi] = b.dataset.delSub.split('-').map(Number);
-    b.onclick = () => {
-      if (confirm('Удалить подраздел?')) { state.sections[si].subsections.splice(ssi, 1); saveData(); render(); }
+
+  // Книги
+  (node.books || []).forEach((b, bi) => {
+    const bookPath = [...parentPath, nodeIdx, 'b', bi].join('-');
+    html += `
+      <div class="admin-item">
+        <div style="color:#af52de; width:16px; height:16px">${ICONS.book}</div>
+        <div class="admin-item-title">${escapeHtml(b.title)}</div>
+        <button class="admin-mini-btn" data-edit-book="${bookPath}">${ICONS.edit}</button>
+        <button class="admin-mini-btn danger" data-del-book="${bookPath}">${ICONS.trash}</button>
+      </div>
+    `;
+  });
+
+  html += `
+        <div style="display:flex; gap:6px; margin-top:8px">
+          <button class="tg-btn" style="flex:1; padding:8px; border-radius:8px; font-size:13px; display:flex; align-items:center; justify-content:center; gap:4px" data-add-subsection="${pathStr}">
+            ${ICONS.folder} <span>Подраздел</span>
+          </button>
+          <button class="tg-btn" style="flex:1; padding:8px; border-radius:8px; font-size:13px; display:flex; align-items:center; justify-content:center; gap:4px; background:#ff9500" data-add-lesson="${pathStr}">
+            ${ICONS.play} <span>Урок</span>
+          </button>
+          <button class="tg-btn" style="flex:1; padding:8px; border-radius:8px; font-size:13px; display:flex; align-items:center; justify-content:center; gap:4px; background:#af52de" data-add-book="${pathStr}">
+            ${ICONS.book} <span>Книга</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  return html;
+}
+
+function bindAdminEvents(app) {
+  // Edit/Delete sections
+  app.querySelectorAll('[data-edit-node]').forEach(el => {
+    el.onclick = () => {
+      const path = el.dataset.editNode.split('-').map(x => isNaN(x) ? x : +x);
+      const type = el.dataset.nodeType;
+      if (type === 'section') {
+        showSectionModal(+path[0]);
+      } else {
+        const node = getNodeByPath(path);
+        if (node) showSubsectionModal(node, path);
+      }
     };
   });
-  app.querySelectorAll('[data-add-lesson]').forEach(b => {
-    const [si, ssi] = b.dataset.addLesson.split('-').map(Number);
-    b.onclick = () => showLessonModal(si, ssi);
+  app.querySelectorAll('[data-del-section]').forEach(el => {
+    el.onclick = () => {
+      if (confirm('Удалить раздел со всем содержимым?')) {
+        state.sections.splice(+el.dataset.delSection, 1);
+        saveContent(); render();
+      }
+    };
   });
-  app.querySelectorAll('[data-edit-lesson]').forEach(b => {
-    const [si, ssi, li] = b.dataset.editLesson.split('-').map(Number);
-    b.onclick = () => showLessonModal(si, ssi, li);
+
+  // Add subsection
+  app.querySelectorAll('[data-add-subsection]').forEach(el => {
+    el.onclick = () => {
+      const path = el.dataset.addSubsection.split('-').map(x => isNaN(x) ? x : +x);
+      const node = getNodeByPath(path);
+      if (node) {
+        if (!node.subsections) node.subsections = [];
+        showSubsectionModal(null, path, true);
+      }
+    };
   });
-  app.querySelectorAll('[data-del-lesson]').forEach(b => {
-    const [si, ssi, li] = b.dataset.delLesson.split('-').map(Number);
-    b.onclick = () => { state.sections[si].subsections[ssi].lessons.splice(li, 1); saveData(); render(); };
+
+  // Add lesson
+  app.querySelectorAll('[data-add-lesson]').forEach(el => {
+    el.onclick = () => {
+      const path = el.dataset.addLesson.split('-').map(x => isNaN(x) ? x : +x);
+      const node = getNodeByPath(path);
+      if (node) {
+        if (!node.lessons) node.lessons = [];
+        showLessonModal(null, path, true);
+      }
+    };
   });
-  app.querySelectorAll('[data-add-book]').forEach(b => {
-    const [si, ssi] = b.dataset.addBook.split('-').map(Number);
-    b.onclick = () => showBookModal(si, ssi);
+
+  // Add book
+  app.querySelectorAll('[data-add-book]').forEach(el => {
+    el.onclick = () => {
+      const path = el.dataset.addBook.split('-').map(x => isNaN(x) ? x : +x);
+      const node = getNodeByPath(path);
+      if (node) {
+        if (!node.books) node.books = [];
+        showBookModal(null, path, true);
+      }
+    };
   });
-  app.querySelectorAll('[data-edit-book]').forEach(b => {
-    const [si, ssi, bi] = b.dataset.editBook.split('-').map(Number);
-    b.onclick = () => showBookModal(si, ssi, bi);
+
+  // Edit lesson
+  app.querySelectorAll('[data-edit-lesson]').forEach(el => {
+    el.onclick = () => {
+      const parts = el.dataset.editLesson.split('-').map(x => isNaN(x) ? x : +x);
+      const li = parts.pop();
+      const node = getNodeByPath(parts);
+      if (node && node.lessons) showLessonModal(node.lessons[li], parts, false, li);
+    };
   });
-  app.querySelectorAll('[data-del-book]').forEach(b => {
-    const [si, ssi, bi] = b.dataset.delBook.split('-').map(Number);
-    b.onclick = () => { state.sections[si].subsections[ssi].books.splice(bi, 1); saveData(); render(); };
+  app.querySelectorAll('[data-del-lesson]').forEach(el => {
+    el.onclick = () => {
+      const parts = el.dataset.delLesson.split('-').map(x => isNaN(x) ? x : +x);
+      const li = parts.pop();
+      const node = getNodeByPath(parts);
+      if (node && node.lessons) {
+        node.lessons.splice(li, 1);
+        saveContent(); render();
+      }
+    };
+  });
+
+  // Edit book
+  app.querySelectorAll('[data-edit-book]').forEach(el => {
+    el.onclick = () => {
+      const parts = el.dataset.editBook.split('-').map(x => isNaN(x) ? x : +x);
+      const bi = parts.pop();
+      const node = getNodeByPath(parts);
+      if (node && node.books) showBookModal(node.books[bi], parts, false, bi);
+    };
+  });
+  app.querySelectorAll('[data-del-book]').forEach(el => {
+    el.onclick = () => {
+      const parts = el.dataset.delBook.split('-').map(x => isNaN(x) ? x : +x);
+      const bi = parts.pop();
+      const node = getNodeByPath(parts);
+      if (node && node.books) {
+        node.books.splice(bi, 1);
+        saveContent(); render();
+      }
+    };
   });
 }
 
+// Получить узел по пути в админ-структуре
+// Путь: для раздела [idx], для подраздела [idx, ssi, ssi2, ...]
+function getNodeByPath(path) {
+  if (path.length === 0) return null;
+  let node = state.sections[path[0]];
+  for (let i = 1; i < path.length; i++) {
+    if (!node || !node.subsections) return null;
+    node = node.subsections[path[i]];
+  }
+  return node;
+}
+
+function exportData() {
+  const data = JSON.stringify({ sections: state.sections, progress: state.progress }, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'islamic_app_backup.json'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('Данные экспортированы');
+}
+
+function importData() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json';
+  inp.onchange = (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = (ev) => {
+      try {
+        const d = JSON.parse(ev.target.result);
+        if (d.sections) state.sections = d.sections;
+        if (d.progress) state.progress = { ...state.progress, ...d.progress };
+        saveContent(); saveProgress();
+        render();
+        showToast('Данные импортированы');
+      } catch { showToast('Ошибка файла'); }
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+}
+
 // ============ MODALS ============
-function showModal(content) {
-  const m = document.createElement('div');
-  m.className = 'modal';
-  m.innerHTML = `<div class="modal-content">${content}</div>`;
-  document.body.appendChild(m);
-  m.onclick = (e) => { if (e.target === m) m.remove(); };
-  return m;
+function showModal(title, bodyHtml, onSave) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title">${escapeHtml(title)}</div>
+        <button class="icon-btn" id="modalClose">${ICONS.back}</button>
+      </div>
+      <div class="modal-body">${bodyHtml}</div>
+      <div class="modal-footer">
+        <button class="cancel-btn" id="modalCancel">Отмена</button>
+        <button class="save-btn" id="modalSave">Сохранить</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  const close = () => overlay.remove();
+  overlay.querySelector('#modalClose').onclick = close;
+  overlay.querySelector('#modalCancel').onclick = close;
+  overlay.querySelector('#modalSave').onclick = () => {
+    const result = onSave(overlay);
+    if (result !== false) close();
+  };
+  overlay.onclick = (e) => { if (e.target === overlay) close(); };
+  return overlay;
 }
 
 function showSectionModal(idx) {
   const editing = idx !== undefined;
-  const s = editing ? state.sections[idx] : { title: '', icon: '📚' };
-  const m = showModal(`
-    <h2 class="text-xl font-bold mb-4">${editing ? 'Редактировать' : 'Новый'} раздел</h2>
-    <label class="text-sm tg-hint">Название</label>
-    <input id="mTitle" value="${s.title}" class="mb-3">
-    <label class="text-sm tg-hint">Иконка (эмодзи)</label>
-    <input id="mIcon" value="${s.icon || '📚'}" class="mb-4" maxlength="4">
-    <div class="flex gap-2">
-      <button id="mCancel" class="flex-1 py-3 rounded-xl tg-secondary">Отмена</button>
-      <button id="mSave" class="flex-1 py-3 rounded-xl tg-btn">Сохранить</button>
+  const s = editing ? state.sections[idx] : { title: '', icon: 'folder' };
+  const iconOptions = ['folder', 'mosque', 'book', 'moon', 'tasbih'];
+  const body = `
+    <div class="form-group">
+      <label class="form-label">Название</label>
+      <input type="text" class="form-input" id="mTitle" value="${escapeHtml(s.title)}" placeholder="Например: Основы ислама">
     </div>
-  `);
-  m.querySelector('#mCancel').onclick = () => m.remove();
-  m.querySelector('#mSave').onclick = () => {
-    const title = m.querySelector('#mTitle').value.trim();
-    const icon = m.querySelector('#mIcon').value.trim() || '📚';
-    if (!title) return alert('Введите название');
-    if (editing) { state.sections[idx].title = title; state.sections[idx].icon = icon; }
-    else state.sections.push({ id: uid(), title, icon, subsections: [] });
-    saveData(); m.remove(); render();
-  };
+    <div class="form-group">
+      <label class="form-label">Иконка</label>
+      <div style="display:flex; gap:8px; flex-wrap:wrap">
+        ${iconOptions.map(ic => `
+          <button type="button" class="icon-pick" data-icon="${ic}" style="width:44px; height:44px; border-radius:12px; background:${s.icon === ic ? 'var(--tg-btn)' : 'var(--tg-secondary)'}; color:${s.icon === ic ? 'var(--tg-btn-text)' : 'var(--tg-text)'}; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center">
+            <div style="width:22px; height:22px">${ICONS[ic]}</div>
+          </button>
+        `).join('')}
+      </div>
+      <input type="hidden" id="mIcon" value="${s.icon || 'folder'}">
+    </div>
+  `;
+  const m = showModal(editing ? 'Редактировать раздел' : 'Новый раздел', body, (overlay) => {
+    const title = overlay.querySelector('#mTitle').value.trim();
+    const icon = overlay.querySelector('#mIcon').value;
+    if (!title) { showToast('Введите название'); return false; }
+    if (editing) {
+      state.sections[idx].title = title;
+      state.sections[idx].icon = icon;
+    } else {
+      state.sections.push({ id: uid(), title, icon, subsections: [] });
+    }
+    saveContent(); render();
+  });
+  m.querySelectorAll('.icon-pick').forEach(b => {
+    b.onclick = () => {
+      m.querySelector('#mIcon').value = b.dataset.icon;
+      m.querySelectorAll('.icon-pick').forEach(x => {
+        x.style.background = 'var(--tg-secondary)';
+        x.style.color = 'var(--tg-text)';
+      });
+      b.style.background = 'var(--tg-btn)';
+      b.style.color = 'var(--tg-btn-text)';
+    };
+  });
 }
 
-function showSubsectionModal(si, ssi) {
-  const editing = ssi !== undefined;
-  const ss = editing ? state.sections[si].subsections[ssi] : { title: '' };
-  const m = showModal(`
-    <h2 class="text-xl font-bold mb-4">${editing ? 'Редактировать' : 'Новый'} подраздел</h2>
-    <label class="text-sm tg-hint">Название</label>
-    <input id="mTitle" value="${ss.title}" class="mb-4">
-    <div class="flex gap-2">
-      <button id="mCancel" class="flex-1 py-3 rounded-xl tg-secondary">Отмена</button>
-      <button id="mSave" class="flex-1 py-3 rounded-xl tg-btn">Сохранить</button>
+function showSubsectionModal(existingNode, parentPath, isNew) {
+  const title = existingNode ? existingNode.title : '';
+  const body = `
+    <div class="form-group">
+      <label class="form-label">Название подраздела</label>
+      <input type="text" class="form-input" id="mTitle" value="${escapeHtml(title)}" placeholder="Например: Акыда">
     </div>
-  `);
-  m.querySelector('#mCancel').onclick = () => m.remove();
-  m.querySelector('#mSave').onclick = () => {
-    const title = m.querySelector('#mTitle').value.trim();
-    if (!title) return alert('Введите название');
-    if (editing) state.sections[si].subsections[ssi].title = title;
-    else state.sections[si].subsections.push({ id: uid(), title, lessons: [], books: [] });
-    saveData(); m.remove(); render();
-  };
+  `;
+  showModal(isNew ? 'Новый подраздел' : 'Редактировать подраздел', body, (overlay) => {
+    const t = overlay.querySelector('#mTitle').value.trim();
+    if (!t) { showToast('Введите название'); return false; }
+    const parent = getNodeByPath(parentPath);
+    if (!parent) return;
+    if (!parent.subsections) parent.subsections = [];
+    if (isNew) {
+      parent.subsections.push({ id: uid(), title: t, subsections: [], lessons: [], books: [] });
+    } else {
+      existingNode.title = t;
+    }
+    saveContent(); render();
+  });
 }
 
-function showLessonModal(si, ssi, li) {
-  const editing = li !== undefined;
-  const l = editing ? state.sections[si].subsections[ssi].lessons[li] : { title: '', audioUrl: '', duration: '' };
-  const m = showModal(`
-    <h2 class="text-xl font-bold mb-4">${editing ? 'Редактировать' : 'Новый'} урок</h2>
-    <label class="text-sm tg-hint">Название</label>
-    <input id="mTitle" value="${l.title}" class="mb-3">
-    <label class="text-sm tg-hint">Ссылка на аудио (MP3 URL)</label>
-    <input id="mUrl" value="${l.audioUrl}" placeholder="https://..." class="mb-3">
-    <label class="text-sm tg-hint">Длительность (текст)</label>
-    <input id="mDur" value="${l.duration || ''}" placeholder="15 мин" class="mb-4">
-    <div class="flex gap-2">
-      <button id="mCancel" class="flex-1 py-3 rounded-xl tg-secondary">Отмена</button>
-      <button id="mSave" class="flex-1 py-3 rounded-xl tg-btn">Сохранить</button>
+function showLessonModal(existingLesson, parentPath, isNew, lessonIdx) {
+  const l = existingLesson || { title: '', audioUrl: '', duration: '' };
+  const body = `
+    <div class="form-group">
+      <label class="form-label">Название урока</label>
+      <input type="text" class="form-input" id="mTitle" value="${escapeHtml(l.title)}" placeholder="Например: Вера в Аллаха">
     </div>
-  `);
-  m.querySelector('#mCancel').onclick = () => m.remove();
-  m.querySelector('#mSave').onclick = () => {
-    const title = m.querySelector('#mTitle').value.trim();
-    const audioUrl = m.querySelector('#mUrl').value.trim();
-    const duration = m.querySelector('#mDur').value.trim();
-    if (!title || !audioUrl) return alert('Заполните название и ссылку');
-    const data = { title, audioUrl, duration };
-    if (editing) Object.assign(state.sections[si].subsections[ssi].lessons[li], data);
-    else state.sections[si].subsections[ssi].lessons.push({ id: uid(), ...data });
-    saveData(); m.remove(); render();
-  };
+    <div class="form-group">
+      <label class="form-label">Ссылка на аудио (MP3)</label>
+      <input type="url" class="form-input" id="mUrl" value="${escapeHtml(l.audioUrl)}" placeholder="https://...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Длительность (текст)</label>
+      <input type="text" class="form-input" id="mDur" value="${escapeHtml(l.duration || '')}" placeholder="15 мин">
+    </div>
+  `;
+  showModal(isNew ? 'Новый урок' : 'Редактировать урок', body, (overlay) => {
+    const title = overlay.querySelector('#mTitle').value.trim();
+    const audioUrl = overlay.querySelector('#mUrl').value.trim();
+    const duration = overlay.querySelector('#mDur').value.trim();
+    if (!title || !audioUrl) { showToast('Заполните название и ссылку'); return false; }
+    const parent = getNodeByPath(parentPath);
+    if (!parent) return;
+    if (!parent.lessons) parent.lessons = [];
+    if (isNew) {
+      parent.lessons.push({ id: uid(), title, audioUrl, duration });
+    } else {
+      parent.lessons[lessonIdx] = { ...parent.lessons[lessonIdx], title, audioUrl, duration };
+    }
+    saveContent(); render();
+  });
 }
 
-function showBookModal(si, ssi, bi) {
-  const editing = bi !== undefined;
-  const b = editing ? state.sections[si].subsections[ssi].books[bi] : { title: '', pdfUrl: '' };
-  const m = showModal(`
-    <h2 class="text-xl font-bold mb-4">${editing ? 'Редактировать' : 'Новая'} книга</h2>
-    <label class="text-sm tg-hint">Название</label>
-    <input id="mTitle" value="${b.title}" class="mb-3">
-    <label class="text-sm tg-hint">Ссылка на PDF</label>
-    <input id="mUrl" value="${b.pdfUrl}" placeholder="https://..." class="mb-4">
-    <div class="p-3 tg-secondary rounded-xl text-xs tg-hint mb-4">
-      💡 Для GitHub Pages загрузите PDF в репозиторий и укажите относительный путь, например: <code class="text-green-400">books/mybook.pdf</code>
+function showBookModal(existingBook, parentPath, isNew, bookIdx) {
+  const b = existingBook || { title: '', pdfUrl: '' };
+  const body = `
+    <div class="form-group">
+      <label class="form-label">Название книги</label>
+      <input type="text" class="form-input" id="mTitle" value="${escapeHtml(b.title)}" placeholder="Например: Три основы">
     </div>
-    <div class="flex gap-2">
-      <button id="mCancel" class="flex-1 py-3 rounded-xl tg-secondary">Отмена</button>
-      <button id="mSave" class="flex-1 py-3 rounded-xl tg-btn">Сохранить</button>
+    <div class="form-group">
+      <label class="form-label">Ссылка на PDF</label>
+      <input type="url" class="form-input" id="mUrl" value="${escapeHtml(b.pdfUrl)}" placeholder="https://... или books/file.pdf">
     </div>
-  `);
-  m.querySelector('#mCancel').onclick = () => m.remove();
-  m.querySelector('#mSave').onclick = () => {
-    const title = m.querySelector('#mTitle').value.trim();
-    const pdfUrl = m.querySelector('#mUrl').value.trim();
-    if (!title || !pdfUrl) return alert('Заполните все поля');
-    if (editing) { state.sections[si].subsections[ssi].books[bi].title = title; state.sections[si].subsections[ssi].books[bi].pdfUrl = pdfUrl; }
-    else state.sections[si].subsections[ssi].books.push({ id: uid(), title, pdfUrl });
-    saveData(); m.remove(); render();
+    <div style="padding:10px; background:var(--tg-secondary); border-radius:8px; font-size:12px; color:var(--tg-hint)">
+      💡 Для GitHub Pages загрузите PDF в репозиторий и укажите путь: <code style="color:var(--tg-link)">books/mybook.pdf</code>
+    </div>
+  `;
+  showModal(isNew ? 'Новая книга' : 'Редактировать книгу', body, (overlay) => {
+    const title = overlay.querySelector('#mTitle').value.trim();
+    const pdfUrl = overlay.querySelector('#mUrl').value.trim();
+    if (!title || !pdfUrl) { showToast('Заполните все поля'); return false; }
+    const parent = getNodeByPath(parentPath);
+    if (!parent) return;
+    if (!parent.books) parent.books = [];
+    if (isNew) {
+      parent.books.push({ id: uid(), title, pdfUrl });
+    } else {
+      parent.books[bookIdx] = { ...parent.books[bookIdx], title, pdfUrl };
+    }
+    saveContent(); render();
+  });
+}
+
+function showEditSubsectionModal(node, path) {
+  showSubsectionModal(node, path.slice(0, -1), false);
+}
+
+// ============ TASBIH ============
+function showTasbihModal() {
+  let count = state.progress.tasbih || 0;
+  const targets = [33, 99, 100, 1000];
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-sheet" style="max-height:95vh">
+      <div class="modal-header">
+        <div class="modal-title">Тасбих</div>
+        <button class="icon-btn" id="tasbihClose">${ICONS.back}</button>
+      </div>
+      <div class="modal-body" style="text-align:center; padding:30px 20px">
+        <div id="tasbihCount" style="font-size:72px; font-weight:700; margin:20px 0">${count}</div>
+        <div id="tasbihTarget" style="color:var(--tg-hint); font-size:14px; margin-bottom:20px">
+          ${targets.find(t => t > count) ? 'До цели: ' + (targets.find(t => t > count) - count) : 'Все цели достигнуты!'}
+        </div>
+        <button id="tasbihBtn" style="width:180px; height:180px; border-radius:50%; background:var(--tg-btn); color:var(--tg-btn-text); border:none; font-size:20px; font-weight:600; cursor:pointer; box-shadow:0 4px 20px rgba(0,0,0,0.2)">
+          Нажать
+        </button>
+        <div style="display:flex; gap:8px; margin-top:24px; justify-content:center">
+          <button id="tasbihMinus" style="padding:10px 20px; background:var(--tg-secondary); border:none; border-radius:10px; color:var(--tg-text); cursor:pointer">-1</button>
+          <button id="tasbihReset" style="padding:10px 20px; background:var(--tg-secondary); border:none; border-radius:10px; color:var(--tg-destructive); cursor:pointer">Сброс</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  const close = () => overlay.remove();
+  overlay.querySelector('#tasbihClose').onclick = close;
+  overlay.onclick = (e) => { if (e.target === overlay) close(); };
+
+  const update = () => {
+    overlay.querySelector('#tasbihCount').textContent = count;
+    const next = targets.find(t => t > count);
+    overlay.querySelector('#tasbihTarget').textContent = next ? 'До цели: ' + (next - count) : 'Все цели достигнуты!';
+  };
+
+  overlay.querySelector('#tasbihBtn').onclick = () => {
+    count++;
+    state.progress.tasbih = count;
+    saveProgress();
+    update();
+    if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+    if (targets.includes(count) && tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+  };
+  overlay.querySelector('#tasbihMinus').onclick = () => {
+    if (count > 0) { count--; state.progress.tasbih = count; saveProgress(); update(); }
+  };
+  overlay.querySelector('#tasbihReset').onclick = () => {
+    if (confirm('Сбросить счётчик?')) {
+      count = 0; state.progress.tasbih = 0; saveProgress(); update();
+    }
   };
 }
 
 // ============ INIT ============
 loadData();
-render();
 </script>
 </body>
 </html>
