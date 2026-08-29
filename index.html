@@ -1,530 +1,715 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>Требуй знания!</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --tg-theme-bg-color: #ffffff;
-            --tg-theme-secondary-bg-color: #f4f4f5;
-            --tg-theme-text-color: #000000;
-            --tg-theme-hint-color: #8e8e93;
-            --tg-theme-button-color: #007aff;
-            --tg-theme-accent-text-color: #007aff;
-            --tg-theme-destructive-text-color: #ff3b30;
-            --nav-height: 64px;
-            --mini-player-height: 64px;
-            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-            --safe-area-top: env(safe-area-inset-top, 0px);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color);
-            overflow: hidden; height: 100%; width: 100%;
-            -webkit-font-smoothing: antialiased;
-        }
-        button, input, textarea { font-family: inherit; }
-        #app { display: flex; flex-direction: column; height: 100%; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>Требуй знания!</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+:root {
+    --tg-theme-bg-color: #ffffff;
+    --tg-theme-secondary-bg-color: #f4f4f5;
+    --tg-theme-text-color: #000000;
+    --tg-theme-hint-color: #8e8e93;
+    --tg-theme-button-color: #007aff;
+    --tg-theme-accent-text-color: #007aff;
+    --tg-theme-destructive-text-color: #ff3b30;
+    --nav-height: 64px;
+    --mini-player-height: 64px;
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-top: env(safe-area-inset-top, 0px);
+}
+body[data-theme="light"] {
+    --tg-theme-bg-color: #ffffff;
+    --tg-theme-secondary-bg-color: #f4f4f5;
+    --tg-theme-text-color: #000000;
+    --tg-theme-hint-color: #8e8e93;
+    --tg-theme-button-color: #007aff;
+    --tg-theme-accent-text-color: #007aff;
+}
+body[data-theme="dark"] {
+    --tg-theme-bg-color: #1c1c1e;
+    --tg-theme-secondary-bg-color: #2c2c2e;
+    --tg-theme-text-color: #ffffff;
+    --tg-theme-hint-color: #8e8e93;
+    --tg-theme-button-color: #0a84ff;
+    --tg-theme-accent-text-color: #0a84ff;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color);
+    overflow: hidden; height: 100%; width: 100%;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.3s, color 0.3s;
+}
+button, input, textarea, select { font-family: inherit; color: inherit; }
+#app { display: flex; flex-direction: column; height: 100%; }
 
-        .content-area {
-            flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-            padding-bottom: calc(var(--nav-height) + var(--safe-area-bottom) + 16px);
-            transition: padding-bottom 0.25s ease;
-        }
-        .content-area.player-active {
-            padding-bottom: calc(var(--nav-height) + var(--mini-player-height) + var(--safe-area-bottom) + 16px);
-        }
+.content-area {
+    flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(var(--nav-height) + var(--safe-area-bottom) + 16px);
+    transition: padding-bottom 0.25s ease;
+}
+.content-area.player-active {
+    padding-bottom: calc(var(--nav-height) + var(--mini-player-height) + var(--safe-area-bottom) + 16px);
+}
 
-        .page { display: none; padding: 16px; animation: fadeIn 0.3s ease-out; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.page { display: none; padding: 16px; animation: fadeIn 0.3s ease-out; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.5px; }
-        h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
-        .subtitle { color: var(--tg-theme-hint-color); font-size: 15px; margin-bottom: 20px; }
-        .block { background: var(--tg-theme-secondary-bg-color); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
+h1 .h-icon { width: 28px; height: 28px; color: var(--tg-theme-accent-text-color); }
+h2 { font-size: 18px; font-weight: 600; margin: 20px 0 12px; }
+.subtitle { color: var(--tg-theme-hint-color); font-size: 15px; margin-bottom: 20px; }
+.block { background: var(--tg-theme-secondary-bg-color); border-radius: 16px; padding: 16px; margin-bottom: 12px; transition: background 0.3s; }
 
-        /* NAV */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            height: calc(var(--nav-height) + var(--safe-area-bottom));
-            padding-bottom: var(--safe-area-bottom);
-            background: var(--tg-theme-secondary-bg-color);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            display: flex; justify-content: space-around; align-items: center;
-            border-top: 0.5px solid rgba(128,128,128,0.2); z-index: 90;
-        }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            flex: 1; height: 100%; background: none; border: none;
-            color: var(--tg-theme-hint-color); font-size: 10px; font-weight: 500;
-            cursor: pointer; gap: 4px; transition: color 0.2s, transform 0.15s;
-        }
-        .nav-item:active { transform: scale(0.9); }
-        .nav-item.active { color: var(--tg-theme-accent-text-color); }
-        .nav-item svg { width: 24px; height: 24px; }
+/* NAV */
+.bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: calc(var(--nav-height) + var(--safe-area-bottom));
+    padding-bottom: var(--safe-area-bottom);
+    background: var(--tg-theme-secondary-bg-color);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    display: flex; justify-content: space-around; align-items: center;
+    border-top: 0.5px solid rgba(128,128,128,0.2); z-index: 90;
+    transition: background 0.3s;
+}
+.nav-item {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    flex: 1; height: 100%; background: none; border: none;
+    color: var(--tg-theme-hint-color); font-size: 10px; font-weight: 500;
+    cursor: pointer; gap: 4px; transition: color 0.2s, transform 0.15s;
+}
+.nav-item:active { transform: scale(0.9); }
+.nav-item.active { color: var(--tg-theme-accent-text-color); }
+.nav-item svg { width: 24px; height: 24px; }
 
-        /* CARDS */
-        .tma-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-        .tma-card {
-            display: flex; flex-direction: column;
-            background: var(--tg-theme-secondary-bg-color);
-            border-radius: 16px; overflow: hidden;
-            transition: transform 0.15s ease; cursor: pointer;
-        }
-        .tma-card:active { transform: scale(0.96); }
-        .tma-card__cover {
-            width: 100%; aspect-ratio: 1 / 1;
-            background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 48px; color: #fff; position: relative;
-        }
-        .tma-card__cover .play-badge {
-            position: absolute; bottom: 8px; right: 8px;
-            width: 32px; height: 32px; border-radius: 50%;
-            background: rgba(0,0,0,0.6); color: #fff;
-            display: flex; align-items: center; justify-content: center; font-size: 14px;
-        }
-        .tma-card__body { display: flex; flex-direction: column; flex-grow: 1; padding: 10px 12px 12px; gap: 4px; }
-        .tma-card__title {
-            font-size: 14px; font-weight: 600; line-height: 1.3;
-            display: -webkit-box; -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical; overflow: hidden;
-        }
-        .tma-card__meta { font-size: 12px; color: var(--tg-theme-hint-color); margin-top: auto; }
-        .tma-card__actions { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
-        .chip {
-            font-size: 11px; padding: 3px 8px;
-            background: var(--tg-theme-bg-color);
-            color: var(--tg-theme-accent-text-color);
-            border-radius: 8px; font-weight: 600;
-            border: none; cursor: pointer;
-        }
-        .heart {
-            background: none; border: none;
-            color: var(--tg-theme-hint-color); font-size: 20px; cursor: pointer;
-            padding: 4px; line-height: 1; transition: transform 0.2s;
-        }
-        .heart:active { transform: scale(0.8); }
-        .heart.active { color: var(--tg-theme-destructive-text-color); }
-        .premium-badge {
-            position: absolute; top: 8px; left: 8px;
-            background: rgba(0,0,0,0.6); color: #ffd700;
-            padding: 3px 8px; border-radius: 8px;
-            font-size: 11px; font-weight: 600;
-        }
+/* CARDS */
+.tma-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.tma-card {
+    display: flex; flex-direction: column;
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 16px; overflow: hidden;
+    transition: transform 0.15s ease, background 0.3s; cursor: pointer;
+    position: relative;
+}
+.tma-card:active { transform: scale(0.96); }
+.tma-card__cover {
+    width: 100%; aspect-ratio: 1 / 1;
+    background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; position: relative;
+}
+.tma-card__cover svg { width: 56px; height: 56px; }
+.tma-card__cover .play-badge {
+    position: absolute; bottom: 8px; right: 8px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(0,0,0,0.6); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+}
+.tma-card__cover .play-badge svg { width: 14px; height: 14px; }
+.tma-card__cover .pdf-badge {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(255,59,48,0.9); color: #fff;
+    padding: 3px 8px; border-radius: 8px;
+    font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; gap: 3px;
+}
+.tma-card__cover .pdf-badge svg { width: 10px; height: 10px; }
+.tma-card__edit-btn {
+    position: absolute; top: 6px; right: 6px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(0,0,0,0.5); color: #fff;
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2;
+}
+.tma-card__edit-btn svg { width: 14px; height: 14px; }
+.tma-card__body { display: flex; flex-direction: column; flex-grow: 1; padding: 10px 12px 12px; gap: 4px; }
+.tma-card__title {
+    font-size: 14px; font-weight: 600; line-height: 1.3;
+    display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; overflow: hidden;
+}
+.tma-card__meta { font-size: 12px; color: var(--tg-theme-hint-color); margin-top: auto; }
+.tma-card__actions { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.chip {
+    font-size: 11px; padding: 3px 8px;
+    background: var(--tg-theme-bg-color);
+    color: var(--tg-theme-accent-text-color);
+    border-radius: 8px; font-weight: 600;
+    border: none; cursor: pointer;
+    transition: background 0.3s;
+}
+.heart {
+    background: none; border: none;
+    color: var(--tg-theme-hint-color); cursor: pointer;
+    padding: 4px; line-height: 1; transition: transform 0.2s, color 0.2s;
+    display: flex; align-items: center;
+}
+.heart svg { width: 20px; height: 20px; }
+.heart:active { transform: scale(0.8); }
+.heart.active { color: var(--tg-theme-destructive-text-color); }
 
-        /* CATEGORIES TREE */
-        .cat-tabs {
-            display: flex; gap: 8px; overflow-x: auto;
-            padding-bottom: 4px; margin-bottom: 16px;
-            scrollbar-width: none;
-        }
-        .cat-tabs::-webkit-scrollbar { display: none; }
-        .cat-tab {
-            padding: 8px 14px; border-radius: 20px;
-            background: var(--tg-theme-secondary-bg-color);
-            color: var(--tg-theme-text-color);
-            font-size: 14px; font-weight: 500;
-            white-space: nowrap; cursor: pointer;
-            border: none; transition: all 0.2s;
-            display: flex; align-items: center; gap: 6px;
-        }
-        .cat-tab.active { background: var(--tg-theme-button-color); color: #fff; }
-        .cat-tab .emoji { font-size: 16px; }
+/* CATEGORIES */
+.cat-tabs {
+    display: flex; gap: 8px; overflow-x: auto;
+    padding-bottom: 4px; margin-bottom: 12px;
+    scrollbar-width: none;
+}
+.cat-tabs::-webkit-scrollbar { display: none; }
+.cat-tab {
+    padding: 8px 14px; border-radius: 20px;
+    background: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+    font-size: 14px; font-weight: 500;
+    white-space: nowrap; cursor: pointer;
+    border: none; transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+}
+.cat-tab.active { background: var(--tg-theme-button-color); color: #fff; }
+.cat-tab svg { width: 16px; height: 16px; }
 
-        .subcat-row {
-            display: flex; gap: 8px; overflow-x: auto;
-            padding-bottom: 8px; margin-bottom: 16px;
-            scrollbar-width: none;
-        }
-        .subcat-row::-webkit-scrollbar { display: none; }
-        .subcat-chip {
-            padding: 6px 12px; border-radius: 12px;
-            background: var(--tg-theme-bg-color);
-            border: 1.5px solid var(--tg-theme-secondary-bg-color);
-            color: var(--tg-theme-text-color);
-            font-size: 13px; cursor: pointer;
-            white-space: nowrap;
-        }
-        .subcat-chip.active { border-color: var(--tg-theme-button-color); color: var(--tg-theme-accent-text-color); font-weight: 600; }
+.subcat-row {
+    display: flex; gap: 8px; overflow-x: auto;
+    padding-bottom: 8px; margin-bottom: 16px;
+    scrollbar-width: none;
+}
+.subcat-row::-webkit-scrollbar { display: none; }
+.subcat-chip {
+    padding: 6px 12px; border-radius: 12px;
+    background: var(--tg-theme-bg-color);
+    border: 1.5px solid var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+    font-size: 13px; cursor: pointer;
+    white-space: nowrap;
+    display: flex; align-items: center; gap: 5px;
+}
+.subcat-chip svg { width: 14px; height: 14px; }
+.subcat-chip.active { border-color: var(--tg-theme-button-color); color: var(--tg-theme-accent-text-color); font-weight: 600; }
 
-        /* SEARCH */
-        .search-bar {
-            width: 100%; padding: 12px 16px;
-            border-radius: 12px; border: none;
-            background: var(--tg-theme-secondary-bg-color);
-            color: var(--tg-theme-text-color);
-            font-size: 16px; margin-bottom: 12px; outline: none;
-        }
-        .search-bar::placeholder { color: var(--tg-theme-hint-color); }
+/* SEARCH */
+.search-bar {
+    width: 100%; padding: 12px 16px 12px 44px;
+    border-radius: 12px; border: none;
+    background: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+    font-size: 16px; margin-bottom: 12px; outline: none;
+    transition: background 0.3s;
+}
+.search-bar::placeholder { color: var(--tg-theme-hint-color); }
+.search-wrap { position: relative; margin-bottom: 12px; }
+.search-wrap svg {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    width: 18px; height: 18px; color: var(--tg-theme-hint-color);
+}
 
-        /* CALENDAR */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 12px; }
-        .day-cell {
-            aspect-ratio: 1; border-radius: 6px;
-            background: var(--tg-theme-bg-color);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px; color: var(--tg-theme-hint-color);
-        }
-        .day-cell.active { background: var(--tg-theme-button-color); color: #fff; font-weight: 600; }
-        .day-cell.today { border: 2px solid var(--tg-theme-accent-text-color); }
+/* CALENDAR */
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 12px; }
+.day-cell {
+    aspect-ratio: 1; border-radius: 6px;
+    background: var(--tg-theme-bg-color);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: var(--tg-theme-hint-color);
+    transition: background 0.3s;
+}
+.day-cell.active { background: var(--tg-theme-button-color); color: #fff; font-weight: 600; }
+.day-cell.today { border: 2px solid var(--tg-theme-accent-text-color); }
 
-        /* PROFILE */
-        .profile-avatar {
-            width: 80px; height: 80px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
-            color: #fff; display: flex; align-items: center; justify-content: center;
-            font-size: 32px; font-weight: 700; margin: 0 auto 16px;
-        }
-        .profile-name { text-align: center; font-size: 22px; font-weight: 600; margin-bottom: 24px;}
-        .settings-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 14px 0;
-            border-bottom: 0.5px solid rgba(128,128,128,0.2);
-            font-size: 16px; cursor: pointer;
-        }
-        .settings-item:last-child { border-bottom: none; }
-        .settings-item span:last-child { color: var(--tg-theme-hint-color); }
+/* PROFILE */
+.profile-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 32px; font-weight: 700; margin: 0 auto 16px;
+    user-select: none;
+}
+.profile-name { text-align: center; font-size: 22px; font-weight: 600; margin-bottom: 24px;}
+.settings-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 0;
+    border-bottom: 0.5px solid rgba(128,128,128,0.2);
+    font-size: 16px; cursor: pointer;
+}
+.settings-item:last-child { border-bottom: none; }
+.settings-item span:last-child { color: var(--tg-theme-hint-color); display: flex; align-items: center; gap: 6px; }
+.settings-item .s-icon { display: inline-flex; margin-right: 8px; }
+.settings-item .s-icon svg { width: 18px; height: 18px; }
 
-        /* MINI PLAYER */
-        .mini-player {
-            position: fixed;
-            bottom: calc(var(--nav-height) + var(--safe-area-bottom));
-            left: 8px; right: 8px;
-            height: var(--mini-player-height);
-            background: var(--tg-theme-secondary-bg-color);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 14px;
-            display: flex; align-items: center;
-            padding: 8px; gap: 10px;
-            z-index: 80;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            transform: translateY(120%);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            cursor: pointer;
-        }
-        .mini-player.visible { transform: translateY(0); }
-        .mini-player__cover {
-            width: 48px; height: 48px; border-radius: 10px;
-            background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; flex-shrink: 0;
-        }
-        .mini-player__info { flex: 1; min-width: 0; }
-        .mini-player__title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .mini-player__author { font-size: 12px; color: var(--tg-theme-hint-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .mini-player__btn {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: none; border: none;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--tg-theme-text-color); font-size: 20px; cursor: pointer; flex-shrink: 0;
-        }
-        .mini-player__btn:active { transform: scale(0.85); }
-        .mini-player__progress {
-            position: absolute; bottom: 0; left: 8px; right: 8px;
-            height: 3px; background: rgba(128,128,128,0.2);
-            border-radius: 2px; overflow: hidden;
-        }
-        .mini-player__progress-bar { height: 100%; background: var(--tg-theme-button-color); width: 0%; transition: width 0.3s linear; }
+/* MINI PLAYER */
+.mini-player {
+    position: fixed;
+    bottom: calc(var(--nav-height) + var(--safe-area-bottom));
+    left: 8px; right: 8px;
+    height: var(--mini-player-height);
+    background: var(--tg-theme-secondary-bg-color);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-radius: 14px;
+    display: flex; align-items: center;
+    padding: 8px; gap: 10px;
+    z-index: 80;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    transform: translateY(120%);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s;
+    cursor: pointer;
+}
+.mini-player.visible { transform: translateY(0); }
+.mini-player__cover {
+    width: 48px; height: 48px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; flex-shrink: 0;
+}
+.mini-player__cover svg { width: 24px; height: 24px; }
+.mini-player__info { flex: 1; min-width: 0; }
+.mini-player__title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-player__author { font-size: 12px; color: var(--tg-theme-hint-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-player__btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: none; border: none;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--tg-theme-text-color); cursor: pointer; flex-shrink: 0;
+}
+.mini-player__btn svg { width: 22px; height: 22px; }
+.mini-player__btn:active { transform: scale(0.85); }
+.mini-player__progress {
+    position: absolute; bottom: 0; left: 8px; right: 8px;
+    height: 3px; background: rgba(128,128,128,0.2);
+    border-radius: 2px; overflow: hidden;
+}
+.mini-player__progress-bar { height: 100%; background: var(--tg-theme-button-color); width: 0%; transition: width 0.3s linear; }
 
-        /* FULL PLAYER */
-        .full-player {
-            position: fixed; inset: 0; background: var(--tg-theme-bg-color);
-            z-index: 200; display: flex; flex-direction: column;
-            padding: calc(var(--safe-area-top) + 16px) 20px calc(var(--safe-area-bottom) + 20px);
-            transform: translateY(100%);
-            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-        }
-        .full-player.visible { transform: translateY(0); }
-        .full-player__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .full-player__close, .full-player__more {
-            width: 32px; height: 32px; background: none; border: none;
-            color: var(--tg-theme-text-color); font-size: 24px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .full-player__header-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--tg-theme-hint-color); }
-        .full-player__cover {
-            width: 100%; max-width: 320px; aspect-ratio: 1;
-            margin: 0 auto 32px; border-radius: 20px;
-            background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
-            display: flex; align-items: center; justify-content: center; font-size: 100px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        .full-player__title { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 4px; letter-spacing: -0.3px; }
-        .full-player__author { font-size: 15px; color: var(--tg-theme-hint-color); text-align: center; margin-bottom: 24px; }
-        .full-player__seek { width: 100%; height: 4px; background: rgba(128,128,128,0.2); border-radius: 2px; cursor: pointer; position: relative; margin-bottom: 8px; }
-        .full-player__seek-fill { height: 100%; background: var(--tg-theme-button-color); border-radius: 2px; width: 0%; position: relative; }
-        .full-player__seek-fill::after { content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--tg-theme-button-color); }
-        .full-player__time { display: flex; justify-content: space-between; font-size: 12px; color: var(--tg-theme-hint-color); margin-bottom: 24px; }
-        .full-player__controls { display: flex; justify-content: space-around; align-items: center; margin-bottom: 24px; }
-        .fp-btn { background: none; border: none; color: var(--tg-theme-text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .fp-btn:active { transform: scale(0.85); }
-        .fp-btn.small { font-size: 24px; width: 44px; height: 44px; }
-        .fp-btn.play { width: 72px; height: 72px; border-radius: 50%; background: var(--tg-theme-button-color); color: #fff; font-size: 32px; }
-        .full-player__speed { text-align: center; font-size: 14px; font-weight: 600; color: var(--tg-theme-accent-text-color); cursor: pointer; padding: 8px 16px; background: var(--tg-theme-secondary-bg-color); border-radius: 20px; border: none; margin: 0 auto; }
+/* FULL PLAYER */
+.full-player {
+    position: fixed; inset: 0; background: var(--tg-theme-bg-color);
+    z-index: 200; display: flex; flex-direction: column;
+    padding: calc(var(--safe-area-top) + 16px) 20px calc(var(--safe-area-bottom) + 20px);
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1), background 0.3s;
+}
+.full-player.visible { transform: translateY(0); }
+.full-player__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.full-player__close, .full-player__more {
+    width: 32px; height: 32px; background: none; border: none;
+    color: var(--tg-theme-text-color); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+}
+.full-player__close svg, .full-player__more svg { width: 22px; height: 22px; }
+.full-player__header-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--tg-theme-hint-color); }
+.full-player__cover {
+    width: 100%; max-width: 320px; aspect-ratio: 1;
+    margin: 0 auto 32px; border-radius: 20px;
+    background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
+    display: flex; align-items: center; justify-content: center; color: #fff;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.full-player__cover svg { width: 100px; height: 100px; }
+.full-player__title { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 4px; letter-spacing: -0.3px; }
+.full-player__author { font-size: 15px; color: var(--tg-theme-hint-color); text-align: center; margin-bottom: 24px; }
+.full-player__seek { width: 100%; height: 4px; background: rgba(128,128,128,0.2); border-radius: 2px; cursor: pointer; position: relative; margin-bottom: 8px; }
+.full-player__seek-fill { height: 100%; background: var(--tg-theme-button-color); border-radius: 2px; width: 0%; position: relative; }
+.full-player__seek-fill::after { content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--tg-theme-button-color); }
+.full-player__time { display: flex; justify-content: space-between; font-size: 12px; color: var(--tg-theme-hint-color); margin-bottom: 24px; }
+.full-player__controls { display: flex; justify-content: space-around; align-items: center; margin-bottom: 24px; }
+.fp-btn { background: none; border: none; color: var(--tg-theme-text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.fp-btn svg { width: 28px; height: 28px; }
+.fp-btn:active { transform: scale(0.85); }
+.fp-btn.small svg { width: 24px; height: 24px; }
+.fp-btn.small { width: 44px; height: 44px; }
+.fp-btn.play {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--tg-theme-button-color); color: #fff;
+}
+.fp-btn.play svg { width: 32px; height: 32px; }
+.full-player__speed { text-align: center; font-size: 14px; font-weight: 600; color: var(--tg-theme-accent-text-color); cursor: pointer; padding: 8px 16px; background: var(--tg-theme-secondary-bg-color); border-radius: 20px; border: none; margin: 0 auto; }
 
-        /* READER */
-        .reader { position: fixed; inset: 0; background: var(--tg-theme-bg-color); z-index: 200; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1); }
-        .reader.visible { transform: translateY(0); }
-        .reader.theme-sepia { --tg-theme-bg-color: #f4ecd8; --tg-theme-text-color: #5b4636; --tg-theme-secondary-bg-color: #e8dcc4; --tg-theme-hint-color: #8b7355; }
-        .reader.theme-dark { --tg-theme-bg-color: #1c1c1e; --tg-theme-text-color: #ffffff; --tg-theme-secondary-bg-color: #2c2c2e; --tg-theme-hint-color: #8e8e93; }
-        .reader__header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: calc(var(--safe-area-top) + 12px) 12px 12px;
-            border-bottom: 0.5px solid rgba(128,128,128,0.2);
-            background: var(--tg-theme-bg-color); z-index: 2;
-        }
-        .reader__btn {
-            width: 40px; height: 40px; background: none; border: none;
-            color: var(--tg-theme-accent-text-color); font-size: 20px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .reader__title { flex: 1; text-align: center; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px; }
-        .reader__content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 24px 20px; font-size: 17px; line-height: 1.6; }
-        .reader__content p { margin-bottom: 16px; }
-        .reader__content .chapter-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.3px; }
-        .reader__footer { padding: 12px 16px calc(var(--safe-area-bottom) + 12px); border-top: 0.5px solid rgba(128,128,128,0.2); background: var(--tg-theme-bg-color); display: flex; align-items: center; gap: 12px; }
-        .reader__progress-bar { flex: 1; height: 4px; background: rgba(128,128,128,0.2); border-radius: 2px; overflow: hidden; }
-        .reader__progress-fill { height: 100%; background: var(--tg-theme-button-color); width: 0%; transition: width 0.3s; }
-        .reader__progress-text { font-size: 12px; color: var(--tg-theme-hint-color); font-weight: 600; min-width: 40px; text-align: right; }
+/* READER */
+.reader { position: fixed; inset: 0; background: var(--tg-theme-bg-color); z-index: 200; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1), background 0.3s; }
+.reader.visible { transform: translateY(0); }
+.reader.theme-sepia { --tg-theme-bg-color: #f4ecd8; --tg-theme-text-color: #5b4636; --tg-theme-secondary-bg-color: #e8dcc4; --tg-theme-hint-color: #8b7355; }
+.reader.theme-dark { --tg-theme-bg-color: #1c1c1e; --tg-theme-text-color: #ffffff; --tg-theme-secondary-bg-color: #2c2c2e; --tg-theme-hint-color: #8e8e93; }
+.reader__header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: calc(var(--safe-area-top) + 12px) 12px 12px;
+    border-bottom: 0.5px solid rgba(128,128,128,0.2);
+    background: var(--tg-theme-bg-color); z-index: 2;
+}
+.reader__btn {
+    width: 40px; height: 40px; background: none; border: none;
+    color: var(--tg-theme-accent-text-color); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+}
+.reader__btn svg { width: 22px; height: 22px; }
+.reader__title { flex: 1; text-align: center; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px; }
+.reader__content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 24px 20px; font-size: 17px; line-height: 1.6; }
+.reader__content p { margin-bottom: 16px; }
+.reader__content .chapter-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.3px; }
+.reader__footer { padding: 12px 16px calc(var(--safe-area-bottom) + 12px); border-top: 0.5px solid rgba(128,128,128,0.2); background: var(--tg-theme-bg-color); display: flex; align-items: center; gap: 12px; }
+.reader__progress-bar { flex: 1; height: 4px; background: rgba(128,128,128,0.2); border-radius: 2px; overflow: hidden; }
+.reader__progress-fill { height: 100%; background: var(--tg-theme-button-color); width: 0%; transition: width 0.3s; }
+.reader__progress-text { font-size: 12px; color: var(--tg-theme-hint-color); font-weight: 600; min-width: 40px; text-align: right; }
 
-        .reader__settings-panel {
-            position: absolute; bottom: 0; left: 0; right: 0;
-            background: var(--tg-theme-secondary-bg-color);
-            padding: 20px 16px calc(var(--safe-area-bottom) + 20px);
-            border-radius: 20px 20px 0 0;
-            transform: translateY(100%); transition: transform 0.3s ease; z-index: 3;
-        }
-        .reader__settings-panel.visible { transform: translateY(0); }
-        .settings-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .settings-row:last-child { margin-bottom: 0; }
-        .settings-label { font-size: 14px; font-weight: 600; }
-        .font-controls, .theme-controls { display: flex; gap: 8px; }
-        .font-btn, .theme-btn {
-            width: 40px; height: 40px; border-radius: 10px;
-            background: var(--tg-theme-bg-color); border: 2px solid transparent;
-            color: var(--tg-theme-text-color); font-size: 16px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; font-weight: 600;
-        }
-        .font-btn.active, .theme-btn.active { border-color: var(--tg-theme-button-color); }
+.reader__settings-panel {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: var(--tg-theme-secondary-bg-color);
+    padding: 20px 16px calc(var(--safe-area-bottom) + 20px);
+    border-radius: 20px 20px 0 0;
+    transform: translateY(100%); transition: transform 0.3s ease; z-index: 3;
+}
+.reader__settings-panel.visible { transform: translateY(0); }
+.settings-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.settings-row:last-child { margin-bottom: 0; }
+.settings-label { font-size: 14px; font-weight: 600; }
+.font-controls, .theme-controls { display: flex; gap: 8px; }
+.font-btn, .theme-btn {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--tg-theme-bg-color); border: 2px solid transparent;
+    color: var(--tg-theme-text-color); font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; font-weight: 600;
+}
+.font-btn.active, .theme-btn.active { border-color: var(--tg-theme-button-color); }
 
-        /* NOTES PANEL (боковая панель заметок) */
-        .notes-panel {
-            position: fixed; top: 0; right: 0; bottom: 0;
-            width: 85%; max-width: 360px;
-            background: var(--tg-theme-bg-color);
-            z-index: 210;
-            transform: translateX(100%);
-            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-            display: flex; flex-direction: column;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.2);
-        }
-        .notes-panel.visible { transform: translateX(0); }
-        .notes-overlay {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.4);
-            z-index: 205; opacity: 0; pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .notes-overlay.visible { opacity: 1; pointer-events: auto; }
-        .notes-panel__header {
-            padding: calc(var(--safe-area-top) + 16px) 16px 16px;
-            border-bottom: 0.5px solid rgba(128,128,128,0.2);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .notes-panel__title { font-size: 18px; font-weight: 700; }
-        .notes-panel__close { background: none; border: none; color: var(--tg-theme-accent-text-color); font-size: 24px; cursor: pointer; }
-        .notes-panel__content { flex: 1; overflow-y: auto; padding: 16px; }
-        .notes-panel__empty { text-align: center; color: var(--tg-theme-hint-color); padding: 40px 20px; font-size: 14px; }
-        .note-item {
-            background: var(--tg-theme-secondary-bg-color);
-            border-radius: 12px; padding: 12px;
-            margin-bottom: 10px; position: relative;
-        }
-        .note-item__chapter { font-size: 11px; color: var(--tg-theme-accent-text-color); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
-        .note-item__text { font-size: 14px; line-height: 1.5; margin-bottom: 8px; white-space: pre-wrap; word-break: break-word; }
-        .note-item__date { font-size: 11px; color: var(--tg-theme-hint-color); }
-        .note-item__delete {
-            position: absolute; top: 8px; right: 8px;
-            background: none; border: none;
-            color: var(--tg-theme-destructive-text-color);
-            font-size: 16px; cursor: pointer;
-            width: 28px; height: 28px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .notes-panel__add {
-            padding: 16px;
-            border-top: 0.5px solid rgba(128,128,128,0.2);
-            background: var(--tg-theme-bg-color);
-        }
-        .notes-panel__textarea {
-            width: 100%; min-height: 80px; max-height: 150px;
-            padding: 12px; border-radius: 12px;
-            background: var(--tg-theme-secondary-bg-color);
-            color: var(--tg-theme-text-color);
-            border: none; outline: none;
-            font-size: 14px; resize: vertical;
-            margin-bottom: 10px;
-        }
-        .notes-panel__textarea::placeholder { color: var(--tg-theme-hint-color); }
-        .notes-panel__submit {
-            width: 100%; padding: 12px;
-            background: var(--tg-theme-button-color);
-            color: #fff; border: none; border-radius: 12px;
-            font-size: 15px; font-weight: 600; cursor: pointer;
-        }
-        .notes-panel__submit:active { transform: scale(0.98); }
-        .notes-badge {
-            position: absolute; top: -4px; right: -4px;
-            background: var(--tg-theme-destructive-text-color);
-            color: #fff; font-size: 10px; font-weight: 700;
-            min-width: 16px; height: 16px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            padding: 0 4px;
-        }
+/* PDF VIEWER */
+.pdf-viewer { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 12px; background: #525659; }
+.pdf-viewer canvas { max-width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 12px; background: #fff; }
+.pdf-controls { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 8px; }
+.pdf-controls button { width: 40px; height: 40px; border-radius: 50%; background: var(--tg-theme-secondary-bg-color); border: none; color: var(--tg-theme-text-color); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.pdf-controls button svg { width: 18px; height: 18px; }
+.pdf-controls .pdf-page-info { font-size: 13px; color: var(--tg-theme-hint-color); min-width: 80px; text-align: center; }
 
-        /* ADMIN PANEL */
-        .admin-panel {
-            position: fixed; inset: 0;
-            background: var(--tg-theme-bg-color);
-            z-index: 300;
-            transform: translateX(100%);
-            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-            display: flex; flex-direction: column;
-        }
-        .admin-panel.visible { transform: translateX(0); }
-        .admin-header {
-            padding: calc(var(--safe-area-top) + 16px) 16px 16px;
-            background: var(--tg-theme-secondary-bg-color);
-            border-bottom: 0.5px solid rgba(128,128,128,0.2);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .admin-title { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-        .admin-close { background: none; border: none; color: var(--tg-theme-accent-text-color); font-size: 24px; cursor: pointer; }
-        .admin-tabs {
-            display: flex; background: var(--tg-theme-secondary-bg-color);
-            border-bottom: 0.5px solid rgba(128,128,128,0.2);
-        }
-        .admin-tab {
-            flex: 1; padding: 12px; background: none; border: none;
-            color: var(--tg-theme-hint-color); font-size: 13px; font-weight: 600;
-            cursor: pointer; border-bottom: 2px solid transparent;
-            transition: all 0.2s;
-        }
-        .admin-tab.active { color: var(--tg-theme-accent-text-color); border-bottom-color: var(--tg-theme-button-color); }
-        .admin-content { flex: 1; overflow-y: auto; padding: 16px; }
-        .admin-section { display: none; }
-        .admin-section.active { display: block; }
+/* NOTES PANEL */
+.notes-panel {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: 85%; max-width: 360px;
+    background: var(--tg-theme-bg-color);
+    z-index: 210;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    display: flex; flex-direction: column;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+}
+.notes-panel.visible { transform: translateX(0); }
+.notes-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 205; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+}
+.notes-overlay.visible { opacity: 1; pointer-events: auto; }
+.notes-panel__header {
+    padding: calc(var(--safe-area-top) + 16px) 16px 16px;
+    border-bottom: 0.5px solid rgba(128,128,128,0.2);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.notes-panel__title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.notes-panel__title svg { width: 20px; height: 20px; color: var(--tg-theme-accent-text-color); }
+.notes-panel__close { background: none; border: none; color: var(--tg-theme-accent-text-color); cursor: pointer; display: flex; }
+.notes-panel__close svg { width: 22px; height: 22px; }
+.notes-panel__content { flex: 1; overflow-y: auto; padding: 16px; }
+.notes-panel__empty { text-align: center; color: var(--tg-theme-hint-color); padding: 40px 20px; font-size: 14px; }
+.notes-panel__empty svg { width: 48px; height: 48px; margin: 0 auto 12px; opacity: 0.5; display: block; }
+.note-item {
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 12px; padding: 12px;
+    margin-bottom: 10px; position: relative;
+}
+.note-item__chapter { font-size: 11px; color: var(--tg-theme-accent-text-color); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+.note-item__text { font-size: 14px; line-height: 1.5; margin-bottom: 8px; white-space: pre-wrap; word-break: break-word; }
+.note-item__date { font-size: 11px; color: var(--tg-theme-hint-color); }
+.note-item__delete {
+    position: absolute; top: 8px; right: 8px;
+    background: none; border: none;
+    color: var(--tg-theme-destructive-text-color);
+    cursor: pointer;
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+}
+.note-item__delete svg { width: 14px; height: 14px; }
+.notes-panel__add {
+    padding: 16px;
+    border-top: 0.5px solid rgba(128,128,128,0.2);
+    background: var(--tg-theme-bg-color);
+}
+.notes-panel__textarea {
+    width: 100%; min-height: 80px; max-height: 150px;
+    padding: 12px; border-radius: 12px;
+    background: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+    border: none; outline: none;
+    font-size: 14px; resize: vertical;
+    margin-bottom: 10px;
+}
+.notes-panel__textarea::placeholder { color: var(--tg-theme-hint-color); }
+.notes-panel__submit {
+    width: 100%; padding: 12px;
+    background: var(--tg-theme-button-color);
+    color: #fff; border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.notes-panel__submit svg { width: 16px; height: 16px; }
+.notes-panel__submit:active { transform: scale(0.98); }
+.notes-badge {
+    position: absolute; top: -2px; right: -2px;
+    background: var(--tg-theme-destructive-text-color);
+    color: #fff; font-size: 10px; font-weight: 700;
+    min-width: 16px; height: 16px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 4px;
+}
 
-        .admin-item {
-            background: var(--tg-theme-secondary-bg-color);
-            border-radius: 12px; padding: 12px;
-            margin-bottom: 10px;
-            display: flex; align-items: center; gap: 12px;
-        }
-        .admin-item__icon { font-size: 28px; flex-shrink: 0; }
-        .admin-item__info { flex: 1; min-width: 0; }
-        .admin-item__title { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .admin-item__meta { font-size: 12px; color: var(--tg-theme-hint-color); margin-top: 2px; }
-        .admin-item__actions { display: flex; gap: 6px; }
-        .admin-btn {
-            padding: 6px 12px; border-radius: 8px;
-            border: none; font-size: 13px; font-weight: 600;
-            cursor: pointer;
-        }
-        .admin-btn.primary { background: var(--tg-theme-button-color); color: #fff; }
-        .admin-btn.danger { background: var(--tg-theme-destructive-text-color); color: #fff; }
-        .admin-btn.secondary { background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
+/* ADMIN PANEL */
+.admin-panel {
+    position: fixed; inset: 0;
+    background: var(--tg-theme-bg-color);
+    z-index: 300;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    display: flex; flex-direction: column;
+}
+.admin-panel.visible { transform: translateX(0); }
+.admin-header {
+    padding: calc(var(--safe-area-top) + 16px) 16px 16px;
+    background: var(--tg-theme-secondary-bg-color);
+    border-bottom: 0.5px solid rgba(128,128,128,0.2);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.admin-title { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.admin-title svg { width: 22px; height: 22px; color: var(--tg-theme-accent-text-color); }
+.admin-close { background: none; border: none; color: var(--tg-theme-accent-text-color); cursor: pointer; display: flex; }
+.admin-close svg { width: 22px; height: 22px; }
+.admin-tabs {
+    display: flex; background: var(--tg-theme-secondary-bg-color);
+    border-bottom: 0.5px solid rgba(128,128,128,0.2);
+}
+.admin-tab {
+    flex: 1; padding: 12px; background: none; border: none;
+    color: var(--tg-theme-hint-color); font-size: 13px; font-weight: 600;
+    cursor: pointer; border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.admin-tab svg { width: 14px; height: 14px; }
+.admin-tab.active { color: var(--tg-theme-accent-text-color); border-bottom-color: var(--tg-theme-button-color); }
+.admin-content { flex: 1; overflow-y: auto; padding: 16px; }
+.admin-section { display: none; }
+.admin-section.active { display: block; }
 
-        .admin-fab {
-            position: sticky; bottom: 16px;
-            width: 56px; height: 56px; border-radius: 50%;
-            background: var(--tg-theme-button-color); color: #fff;
-            border: none; font-size: 28px; cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            margin: 16px auto 0;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .admin-fab:active { transform: scale(0.9); }
+.admin-item {
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 12px; padding: 12px;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 12px;
+}
+.admin-item__icon { width: 36px; height: 36px; border-radius: 10px; background: var(--tg-theme-bg-color); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--tg-theme-accent-text-color); }
+.admin-item__icon svg { width: 20px; height: 20px; }
+.admin-item__info { flex: 1; min-width: 0; }
+.admin-item__title { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.admin-item__meta { font-size: 12px; color: var(--tg-theme-hint-color); margin-top: 2px; }
+.admin-item__actions { display: flex; gap: 6px; }
+.admin-btn {
+    padding: 6px 12px; border-radius: 8px;
+    border: none; font-size: 13px; font-weight: 600;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+}
+.admin-btn svg { width: 14px; height: 14px; }
+.admin-btn.primary { background: var(--tg-theme-button-color); color: #fff; }
+.admin-btn.danger { background: var(--tg-theme-destructive-text-color); color: #fff; }
+.admin-btn.secondary { background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
 
-        /* MODAL */
-        .modal-overlay {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 400;
-            display: none;
-            align-items: flex-end;
-            justify-content: center;
-        }
-        .modal-overlay.visible { display: flex; }
-        .modal {
-            background: var(--tg-theme-bg-color);
-            width: 100%; max-width: 500px;
-            border-radius: 20px 20px 0 0;
-            padding: 20px 16px calc(var(--safe-area-bottom) + 20px);
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: slideUp 0.3s ease;
-        }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; text-align: center; }
-        .form-group { margin-bottom: 14px; }
-        .form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--tg-theme-hint-color); }
-        .form-input, .form-select, .form-textarea {
-            width: 100%; padding: 12px;
-            background: var(--tg-theme-secondary-bg-color);
-            color: var(--tg-theme-text-color);
-            border: none; border-radius: 10px;
-            font-size: 15px; outline: none;
-        }
-        .form-textarea { min-height: 100px; resize: vertical; font-family: inherit; }
-        .form-input:focus, .form-select:focus, .form-textarea:focus { box-shadow: 0 0 0 2px var(--tg-theme-button-color); }
-        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-        .modal-actions button { flex: 1; padding: 14px; border-radius: 12px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
+.admin-fab {
+    position: sticky; bottom: 16px;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--tg-theme-button-color); color: #fff;
+    border: none; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    margin: 16px auto 0;
+    display: flex; align-items: center; justify-content: center;
+}
+.admin-fab svg { width: 24px; height: 24px; }
+.admin-fab:active { transform: scale(0.9); }
 
-        .chapter-editor {
-            background: var(--tg-theme-secondary-bg-color);
-            border-radius: 12px; padding: 12px;
-            margin-bottom: 10px;
-        }
-        .chapter-editor__header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 8px;
-        }
-        .chapter-editor__title { font-size: 14px; font-weight: 600; }
-        .chapter-editor__delete { background: none; border: none; color: var(--tg-theme-destructive-text-color); font-size: 18px; cursor: pointer; }
+/* MODAL */
+.modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 400;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+}
+.modal-overlay.visible { display: flex; }
+.modal {
+    background: var(--tg-theme-bg-color);
+    width: 100%; max-width: 500px;
+    border-radius: 20px 20px 0 0;
+    padding: 20px 16px calc(var(--safe-area-bottom) + 20px);
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; text-align: center; }
+.form-group { margin-bottom: 14px; }
+.form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--tg-theme-hint-color); }
+.form-input, .form-select, .form-textarea {
+    width: 100%; padding: 12px;
+    background: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+    border: none; border-radius: 10px;
+    font-size: 15px; outline: none;
+}
+.form-textarea { min-height: 100px; resize: vertical; font-family: inherit; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { box-shadow: 0 0 0 2px var(--tg-theme-button-color); }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.modal-actions button { flex: 1; padding: 14px; border-radius: 12px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.modal-actions button svg { width: 16px; height: 16px; }
 
-        /* TOAST */
-        .toast {
-            position: fixed; top: calc(var(--safe-area-top) + 20px);
-            left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: var(--tg-theme-text-color); color: var(--tg-theme-bg-color);
-            padding: 12px 20px; border-radius: 12px;
-            font-size: 14px; font-weight: 500;
-            z-index: 500;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            max-width: 90%;
-        }
-        .toast.visible { transform: translateX(-50%) translateY(0); }
+.chapter-editor {
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 12px; padding: 12px;
+    margin-bottom: 10px;
+}
+.chapter-editor__header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+}
+.chapter-editor__title { font-size: 14px; font-weight: 600; }
+.chapter-editor__delete { background: none; border: none; color: var(--tg-theme-destructive-text-color); cursor: pointer; display: flex; }
+.chapter-editor__delete svg { width: 16px; height: 16px; }
 
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--tg-theme-hint-color); }
-        .empty-state__icon { font-size: 48px; margin-bottom: 12px; }
-        .empty-state__text { font-size: 15px; }
+/* ICON PICKER */
+.icon-picker {
+    display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px;
+    max-height: 200px; overflow-y: auto;
+    padding: 8px; background: var(--tg-theme-secondary-bg-color);
+    border-radius: 10px;
+}
+.icon-picker-item {
+    aspect-ratio: 1; border-radius: 8px;
+    background: var(--tg-theme-bg-color);
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--tg-theme-text-color);
+    transition: all 0.15s;
+}
+.icon-picker-item svg { width: 20px; height: 20px; }
+.icon-picker-item.active { border-color: var(--tg-theme-button-color); background: var(--tg-theme-button-color); color: #fff; }
+.icon-picker-item:active { transform: scale(0.9); }
 
-        .admin-hint {
-            background: var(--tg-theme-secondary-bg-color);
-            border-radius: 12px; padding: 12px;
-            margin-bottom: 16px; font-size: 13px;
-            color: var(--tg-theme-hint-color);
-            display: flex; gap: 10px; align-items: flex-start;
-        }
-        .admin-hint__icon { font-size: 20px; flex-shrink: 0; }
-    </style>
+/* BOTTOM SHEET (inline edit menu) */
+.bottom-sheet-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 350;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+}
+.bottom-sheet-overlay.visible { display: flex; }
+.bottom-sheet {
+    background: var(--tg-theme-bg-color);
+    width: 100%; max-width: 500px;
+    border-radius: 20px 20px 0 0;
+    padding: 8px 0 calc(var(--safe-area-bottom) + 8px);
+    animation: slideUp 0.25s ease;
+}
+.bottom-sheet__handle {
+    width: 40px; height: 4px; border-radius: 2px;
+    background: rgba(128,128,128,0.3);
+    margin: 8px auto 12px;
+}
+.bottom-sheet__item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 20px; cursor: pointer;
+    font-size: 16px; font-weight: 500;
+    border: none; background: none; width: 100%;
+    color: var(--tg-theme-text-color); text-align: left;
+}
+.bottom-sheet__item svg { width: 22px; height: 22px; color: var(--tg-theme-accent-text-color); }
+.bottom-sheet__item.danger { color: var(--tg-theme-destructive-text-color); }
+.bottom-sheet__item.danger svg { color: var(--tg-theme-destructive-text-color); }
+.bottom-sheet__item:active { background: var(--tg-theme-secondary-bg-color); }
+
+/* TOAST */
+.toast {
+    position: fixed; top: calc(var(--safe-area-top) + 20px);
+    left: 50%; transform: translateX(-50%) translateY(-100px);
+    background: var(--tg-theme-text-color); color: var(--tg-theme-bg-color);
+    padding: 12px 20px; border-radius: 12px;
+    font-size: 14px; font-weight: 500;
+    z-index: 500;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    max-width: 90%;
+    display: flex; align-items: center; gap: 8px;
+}
+.toast svg { width: 18px; height: 18px; flex-shrink: 0; }
+.toast.visible { transform: translateX(-50%) translateY(0); }
+
+.empty-state { text-align: center; padding: 40px 20px; color: var(--tg-theme-hint-color); }
+.empty-state svg { width: 56px; height: 56px; margin: 0 auto 12px; opacity: 0.5; display: block; }
+.empty-state__text { font-size: 15px; }
+
+.admin-hint {
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 12px; padding: 12px;
+    margin-bottom: 16px; font-size: 13px;
+    color: var(--tg-theme-hint-color);
+    display: flex; gap: 10px; align-items: flex-start;
+}
+.admin-hint svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--tg-theme-accent-text-color); }
+
+.pdf-upload-area {
+    border: 2px dashed rgba(128,128,128,0.3);
+    border-radius: 12px; padding: 20px;
+    text-align: center; cursor: pointer;
+    background: var(--tg-theme-secondary-bg-color);
+    transition: all 0.2s;
+}
+.pdf-upload-area:active { transform: scale(0.98); }
+.pdf-upload-area svg { width: 32px; height: 32px; color: var(--tg-theme-accent-text-color); margin-bottom: 8px; }
+.pdf-upload-area.has-file { border-color: var(--tg-theme-button-color); border-style: solid; }
+.pdf-upload-area .file-info { font-size: 13px; color: var(--tg-theme-text-color); margin-top: 8px; word-break: break-all; }
+.pdf-upload-area .file-size { font-size: 11px; color: var(--tg-theme-hint-color); margin-top: 4px; }
+
+.achievement-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
+.achievement-row.locked { opacity: 0.4; }
+.achievement-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--tg-theme-bg-color); display: flex; align-items: center; justify-content: center; color: var(--tg-theme-accent-text-color); flex-shrink: 0; }
+.achievement-icon svg { width: 24px; height: 24px; }
+.achievement-info { flex: 1; }
+.achievement-title { font-weight: 600; font-size: 15px; }
+.achievement-desc { font-size: 13px; color: var(--tg-theme-hint-color); }
+.achievement-check { color: #34c759; display: flex; }
+.achievement-check svg { width: 22px; height: 22px; }
+.achievement-lock { color: var(--tg-theme-hint-color); display: flex; }
+.achievement-lock svg { width: 18px; height: 18px; }
+
+.streak-icon { color: #ff9500; display: flex; }
+.streak-icon svg { width: 40px; height: 40px; }
+
+.continue-card {
+    display: flex; gap: 12px; align-items: center; cursor: pointer;
+}
+.continue-card__cover {
+    width: 60px; height: 60px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; flex-shrink: 0;
+}
+.continue-card__cover svg { width: 28px; height: 28px; }
+.continue-card__cover.book { background: linear-gradient(135deg, #5856d6, #af52de); }
+.continue-card__cover.pdf { background: linear-gradient(135deg, #ff3b30, #ff6b6b); }
+.continue-card__info { flex: 1; min-width: 0; }
+.continue-card__title { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.continue-card__meta { font-size: 13px; color: var(--tg-theme-hint-color); margin-top: 4px; }
+.continue-card__action { display: flex; color: var(--tg-theme-accent-text-color); }
+.continue-card__action svg { width: 24px; height: 24px; }
+</style>
 </head>
 <body>
 
@@ -533,11 +718,16 @@
 
         <!-- ============ ГЛАВНАЯ ============ -->
         <div id="page-home" class="page active">
-            <h1 id="greeting">Привет! 👋</h1>
+            <h1 id="greeting">
+                <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Привет! 👋</span>
+            </h1>
             <p class="subtitle" id="greeting-sub">Готов продолжить обучение?</p>
 
             <div class="block" style="display: flex; align-items: center; gap: 16px;">
-                <div style="font-size: 40px;">🔥</div>
+                <div class="streak-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg>
+                </div>
                 <div>
                     <div style="font-size: 18px; font-weight: 600;" id="streak-text">0 дней подряд</div>
                     <div style="font-size: 14px; color: var(--tg-theme-hint-color);">Не прерывай серию!</div>
@@ -553,8 +743,14 @@
 
         <!-- ============ УРОКИ ============ -->
         <div id="page-lessons" class="page">
-            <h1>🎧 Уроки</h1>
-            <input type="text" class="search-bar" id="lessonsSearch" placeholder="🔍 Поиск уроков...">
+            <h1>
+                <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                <span>Уроки</span>
+            </h1>
+            <div class="search-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="text" class="search-bar" id="lessonsSearch" placeholder="Поиск уроков..." style="margin-bottom: 0;">
+            </div>
             <div id="lessonsCategories" class="cat-tabs"></div>
             <div id="lessonsSubcategories" class="subcat-row"></div>
             <div id="lessonsGrid" class="tma-grid"></div>
@@ -562,8 +758,14 @@
 
         <!-- ============ КНИГИ ============ -->
         <div id="page-books" class="page">
-            <h1>📚 Книги</h1>
-            <input type="text" class="search-bar" id="booksSearch" placeholder="🔍 Поиск книг...">
+            <h1>
+                <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                <span>Книги</span>
+            </h1>
+            <div class="search-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="text" class="search-bar" id="booksSearch" placeholder="Поиск книг..." style="margin-bottom: 0;">
+            </div>
             <div id="booksCategories" class="cat-tabs"></div>
             <div id="booksSubcategories" class="subcat-row"></div>
             <div id="booksGrid" class="tma-grid"></div>
@@ -571,7 +773,10 @@
 
         <!-- ============ ПРОГРЕСС ============ -->
         <div id="page-progress" class="page">
-            <h1>Прогресс</h1>
+            <h1>
+                <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                <span>Прогресс</span>
+            </h1>
             <div class="block" style="display: flex; justify-content: space-around; text-align: center;">
                 <div>
                     <div style="font-size: 24px; font-weight: 700; color: var(--tg-theme-accent-text-color);" id="stat-hours">0</div>
@@ -608,37 +813,41 @@
             </div>
 
             <div class="block">
-                <div class="settings-item" onclick="showToast('Тема следует за настройками Telegram')">
-                    <span>🌙 Тема оформления</span><span>Системная</span>
+                <div class="settings-item" onclick="showToast('Тема следует за настройками')">
+                    <span><span class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></span>Тема оформления</span>
+                    <span id="themeLabel">Системная</span>
+                </div>
+                <div class="settings-item" onclick="cycleTheme()">
+                    <span><span class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span>Сменить тему</span>
+                    <span>→</span>
                 </div>
                 <div class="settings-item" onclick="showToast('Язык: Русский')">
-                    <span>🌍 Язык</span><span>Русский</span>
-                </div>
-                <div class="settings-item" onclick="showToast('💎 Премиум скоро!')">
-                    <span>💎 Подписка</span>
-                    <span style="color: var(--tg-theme-accent-text-color); font-weight: 600;">Оформить</span>
+                    <span><span class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span>Язык</span>
+                    <span>Русский</span>
                 </div>
             </div>
 
             <div class="block">
                 <div class="settings-item" onclick="exportData()">
-                    <span>📤 Экспорт данных</span><span>JSON</span>
+                    <span><span class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></span>Экспорт данных</span>
+                    <span>JSON</span>
                 </div>
                 <div class="settings-item" onclick="document.getElementById('importFile').click()">
-                    <span>📥 Импорт данных</span><span>JSON</span>
+                    <span><span class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg></span>Импорт данных</span>
+                    <span>JSON</span>
                 </div>
                 <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
             </div>
 
             <div class="block">
                 <div class="settings-item" onclick="resetProgress()">
-                    <span>🗑 Сбросить прогресс</span>
+                    <span><span class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></span>Сбросить прогресс</span>
                     <span style="color: var(--tg-theme-destructive-text-color);">Сброс</span>
                 </div>
             </div>
 
             <div class="block" style="text-align: center; color: var(--tg-theme-hint-color); font-size: 13px;">
-                <div id="versionLabel" style="cursor: pointer; user-select: none;">Требуй знания! v4.0</div>
+                <div id="versionLabel" style="cursor: pointer; user-select: none;">Требуй знания! v5.0</div>
                 <div style="margin-top: 4px; font-size: 11px;">Сделано с ❤️ для Telegram</div>
                 <div id="adminHint" style="margin-top: 8px; font-size: 10px; opacity: 0.5;"></div>
             </div>
@@ -648,24 +857,34 @@
 
     <!-- ============ МИНИ-ПЛЕЕР ============ -->
     <div class="mini-player" id="miniPlayer" onclick="openFullPlayer()">
-        <div class="mini-player__cover" id="mpCover">🎧</div>
+        <div class="mini-player__cover" id="mpCover">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </div>
         <div class="mini-player__info">
             <div class="mini-player__title" id="mpTitle">—</div>
             <div class="mini-player__author" id="mpAuthor">—</div>
         </div>
-        <button class="mini-player__btn" id="mpPlayBtn" onclick="togglePlay(event)">▶️</button>
+        <button class="mini-player__btn" id="mpPlayBtn" onclick="togglePlay(event)">
+            <svg id="mpPlayIcon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+        </button>
         <div class="mini-player__progress"><div class="mini-player__progress-bar" id="mpProgressBar"></div></div>
     </div>
 
     <!-- ============ ПОЛНОЭКРАННЫЙ ПЛЕЕР ============ -->
     <div class="full-player" id="fullPlayer">
         <div class="full-player__header">
-            <button class="full-player__close" onclick="closeFullPlayer()">✕</button>
+            <button class="full-player__close" onclick="closeFullPlayer()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
             <div class="full-player__header-title">СЕЙЧАС ИГРАЕТ</div>
-            <button class="full-player__more" onclick="showToast('Меню в разработке')">⋯</button>
+            <button class="full-player__more" onclick="showToast('Меню в разработке')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            </button>
         </div>
         <div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column;">
-            <div class="full-player__cover" id="fpCover">🎧</div>
+            <div class="full-player__cover" id="fpCover">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            </div>
             <div class="full-player__title" id="fpTitle">—</div>
             <div class="full-player__author" id="fpAuthor">—</div>
             <div class="full-player__seek" id="fpSeek" onclick="seekAudio(event)">
@@ -676,9 +895,15 @@
                 <span id="fpDuration">0:00</span>
             </div>
             <div class="full-player__controls">
-                <button class="fp-btn small" onclick="skipTime(-15)">⏪</button>
-                <button class="fp-btn play" id="fpPlayBtn" onclick="togglePlay()">▶️</button>
-                <button class="fp-btn small" onclick="skipTime(15)">⏩</button>
+                <button class="fp-btn small" onclick="skipTime(-15)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 17a5 5 0 0 0-1 0"/><path d="M15.84 17a5 5 0 0 0-5.81-7.97"/><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                </button>
+                <button class="fp-btn play" id="fpPlayBtn" onclick="togglePlay()">
+                    <svg id="fpPlayIcon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                </button>
+                <button class="fp-btn small" onclick="skipTime(15)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 17a5 5 0 0 0 1 0"/><path d="M8.16 17a5 5 0 0 1 5.81-7.97"/><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                </button>
             </div>
             <button class="full-player__speed" id="fpSpeed" onclick="changeSpeed()">1x</button>
         </div>
@@ -687,22 +912,30 @@
     <!-- ============ ЧИТАЛКА ============ -->
     <div class="reader" id="reader">
         <div class="reader__header">
-            <button class="reader__btn" onclick="closeReader()">←</button>
+            <button class="reader__btn" onclick="closeReader()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
             <div class="reader__title" id="readerTitle">—</div>
             <div style="display: flex; gap: 4px; position: relative;">
                 <button class="reader__btn" onclick="toggleNotesPanel()" id="notesBtn" style="position: relative;">
-                    📝
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                     <span class="notes-badge" id="notesBadge" style="display: none;">0</span>
                 </button>
-                <button class="reader__btn" onclick="toggleReaderSettings()">⚙️</button>
+                <button class="reader__btn" onclick="toggleReaderSettings()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </button>
             </div>
         </div>
         <div class="reader__content" id="readerContent"></div>
-        <div class="reader__footer">
-            <button class="reader__btn" onclick="prevChapter()" id="prevChBtn" style="font-size: 16px;">◀</button>
+        <div class="reader__footer" id="readerFooter">
+            <button class="reader__btn" onclick="prevChapter()" id="prevChBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
             <div class="reader__progress-bar"><div class="reader__progress-fill" id="readerProgressFill"></div></div>
             <div class="reader__progress-text" id="readerProgressText">0%</div>
-            <button class="reader__btn" onclick="nextChapter()" id="nextChBtn" style="font-size: 16px;">▶</button>
+            <button class="reader__btn" onclick="nextChapter()" id="nextChBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
         </div>
         <div class="reader__settings-panel" id="readerSettings">
             <div class="settings-row">
@@ -728,64 +961,102 @@
     <div class="notes-overlay" id="notesOverlay" onclick="toggleNotesPanel()"></div>
     <div class="notes-panel" id="notesPanel">
         <div class="notes-panel__header">
-            <div class="notes-panel__title">📝 Мои заметки</div>
-            <button class="notes-panel__close" onclick="toggleNotesPanel()">✕</button>
+            <div class="notes-panel__title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                <span>Мои заметки</span>
+            </div>
+            <button class="notes-panel__close" onclick="toggleNotesPanel()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
         </div>
         <div class="notes-panel__content" id="notesContent"></div>
         <div class="notes-panel__add">
             <textarea class="notes-panel__textarea" id="noteInput" placeholder="Ваши мысли по текущей главе..."></textarea>
-            <button class="notes-panel__submit" onclick="addNote()">Добавить заметку</button>
+            <button class="notes-panel__submit" onclick="addNote()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Добавить заметку</span>
+            </button>
         </div>
     </div>
 
     <!-- ============ АДМИН-ПАНЕЛЬ ============ -->
     <div class="admin-panel" id="adminPanel">
         <div class="admin-header">
-            <div class="admin-title">⚙️ Админ-панель</div>
-            <button class="admin-close" onclick="closeAdmin()">✕</button>
+            <div class="admin-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>Админ-панель</span>
+            </div>
+            <button class="admin-close" onclick="closeAdmin()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
         </div>
         <div class="admin-tabs">
-            <button class="admin-tab active" data-section="categories" onclick="switchAdminTab('categories')">📁 Разделы</button>
-            <button class="admin-tab" data-section="content" onclick="switchAdminTab('content')">📚 Контент</button>
-            <button class="admin-tab" data-section="data" onclick="switchAdminTab('data')">💾 Данные</button>
+            <button class="admin-tab active" data-section="categories" onclick="switchAdminTab('categories')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span>Разделы</span>
+            </button>
+            <button class="admin-tab" data-section="content" onclick="switchAdminTab('content')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Контент</span>
+            </button>
+            <button class="admin-tab" data-section="data" onclick="switchAdminTab('data')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                <span>Данные</span>
+            </button>
         </div>
         <div class="admin-content">
-            <!-- Разделы -->
             <div class="admin-section active" id="admin-categories">
                 <div class="admin-hint">
-                    <div class="admin-hint__icon">💡</div>
-                    <div>Создавайте разделы и подразделы для организации уроков и книг. Подразделы привязываются к родительскому разделу.</div>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <div>Создавайте разделы и подразделы для организации уроков и книг.</div>
                 </div>
                 <div id="adminCategoriesList"></div>
-                <button class="admin-fab" onclick="openCategoryModal()">+</button>
+                <button class="admin-fab" onclick="openCategoryModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
             </div>
 
-            <!-- Контент -->
             <div class="admin-section" id="admin-content">
                 <div class="admin-hint">
-                    <div class="admin-hint__icon">💡</div>
-                    <div>Добавляйте аудиоуроки и книги. Для книг можно создавать главы с текстом.</div>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <div>Добавляйте аудиоуроки, текстовые книги и PDF.</div>
                 </div>
                 <div class="cat-tabs" style="margin-bottom: 12px;">
                     <button class="cat-tab active" data-type="all" onclick="filterAdminContent('all')">Все</button>
-                    <button class="cat-tab" data-type="audio" onclick="filterAdminContent('audio')">🎧 Уроки</button>
-                    <button class="cat-tab" data-type="book" onclick="filterAdminContent('book')">📚 Книги</button>
+                    <button class="cat-tab" data-type="audio" onclick="filterAdminContent('audio')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                        Уроки
+                    </button>
+                    <button class="cat-tab" data-type="book" onclick="filterAdminContent('book')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                        Книги
+                    </button>
                 </div>
                 <div id="adminContentList"></div>
-                <button class="admin-fab" onclick="openContentModal()">+</button>
+                <button class="admin-fab" onclick="openContentModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
             </div>
 
-            <!-- Данные -->
             <div class="admin-section" id="admin-data">
                 <div class="admin-hint">
-                    <div class="admin-hint__icon">💡</div>
-                    <div>Экспортируйте все данные (контент, разделы, прогресс) в JSON для резервной копии. Импортируйте для восстановления.</div>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <div>Экспортируйте данные в JSON для резервной копии.</div>
                 </div>
                 <div class="block">
-                    <button class="admin-btn primary" style="width: 100%; padding: 14px; font-size: 15px; margin-bottom: 10px;" onclick="exportData()">📤 Экспортировать всё</button>
-                    <button class="admin-btn secondary" style="width: 100%; padding: 14px; font-size: 15px; margin-bottom: 10px;" onclick="document.getElementById('importFileAdmin').click()">📥 Импортировать данные</button>
+                    <button class="admin-btn primary" style="width: 100%; padding: 14px; font-size: 15px; margin-bottom: 10px;" onclick="exportData()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        Экспортировать всё
+                    </button>
+                    <button class="admin-btn secondary" style="width: 100%; padding: 14px; font-size: 15px; margin-bottom: 10px;" onclick="document.getElementById('importFileAdmin').click()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                        Импортировать данные
+                    </button>
                     <input type="file" id="importFileAdmin" accept=".json" style="display:none" onchange="importData(event)">
-                    <button class="admin-btn danger" style="width: 100%; padding: 14px; font-size: 15px;" onclick="resetAllData()">🗑 Сбросить всё</button>
+                    <button class="admin-btn danger" style="width: 100%; padding: 14px; font-size: 15px;" onclick="resetAllData()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        Сбросить всё
+                    </button>
                 </div>
                 <div class="block" style="font-size: 13px; color: var(--tg-theme-hint-color);">
                     <div>📊 Статистика:</div>
@@ -804,12 +1075,12 @@
                 <input type="text" class="form-input" id="catName" placeholder="Например: Наука">
             </div>
             <div class="form-group">
-                <label class="form-label">Иконка (эмодзи)</label>
-                <input type="text" class="form-input" id="catIcon" placeholder="🧪" maxlength="2">
+                <label class="form-label">Иконка</label>
+                <div class="icon-picker" id="catIconPicker"></div>
             </div>
             <div class="form-group">
                 <label class="form-label">Тип</label>
-                <select class="form-select" id="catType">
+                <select class="form-select" id="catType" onchange="updateParentVisibility()">
                     <option value="category">Раздел (корневой)</option>
                     <option value="subcategory">Подраздел</option>
                 </select>
@@ -827,8 +1098,14 @@
                 </select>
             </div>
             <div class="modal-actions">
-                <button class="admin-btn secondary" onclick="closeCategoryModal()">Отмена</button>
-                <button class="admin-btn primary" onclick="saveCategory()">Сохранить</button>
+                <button class="admin-btn secondary" onclick="closeCategoryModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    Отмена
+                </button>
+                <button class="admin-btn primary" onclick="saveCategory()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Сохранить
+                </button>
             </div>
         </div>
     </div>
@@ -841,7 +1118,8 @@
                 <label class="form-label">Тип</label>
                 <select class="form-select" id="cntType" onchange="toggleContentFields()">
                     <option value="audio">🎧 Аудиоурок</option>
-                    <option value="book">📚 Книга</option>
+                    <option value="book">📚 Книга (текст)</option>
+                    <option value="pdf">📄 Книга (PDF)</option>
                 </select>
             </div>
             <div class="form-group">
@@ -853,12 +1131,12 @@
                 <input type="text" class="form-input" id="cntAuthor" placeholder="Автор">
             </div>
             <div class="form-group">
-                <label class="form-label">Иконка (эмодзи)</label>
-                <input type="text" class="form-input" id="cntEmoji" placeholder="🎧" maxlength="2">
+                <label class="form-label">Иконка</label>
+                <div class="icon-picker" id="cntIconPicker"></div>
             </div>
             <div class="form-group">
                 <label class="form-label">Раздел</label>
-                <select class="form-select" id="cntCategory"></select>
+                <select class="form-select" id="cntCategory" onchange="updateSubcategoryOptions()"></select>
             </div>
             <div class="form-group" id="cntSubcategoryGroup">
                 <label class="form-label">Подраздел (опционально)</label>
@@ -877,17 +1155,51 @@
             <div id="bookFields" style="display:none;">
                 <label class="form-label">Главы книги</label>
                 <div id="chaptersList"></div>
-                <button class="admin-btn secondary" style="width: 100%; padding: 10px; margin-top: 8px;" onclick="addChapterField()">+ Добавить главу</button>
+                <button class="admin-btn secondary" style="width: 100%; padding: 10px; margin-top: 8px;" onclick="addChapterField()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Добавить главу
+                </button>
             </div>
-            <div class="form-group" style="margin-top: 14px;">
-                <label style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
-                    <input type="checkbox" id="cntPremium"> 💎 Премиум-контент
-                </label>
+            <div id="pdfFields" style="display:none;">
+                <label class="form-label">PDF файл</label>
+                <div class="pdf-upload-area" id="pdfUploadArea" onclick="document.getElementById('pdfFileInput').click()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <div style="font-size: 14px; font-weight: 600;">Нажмите для загрузки PDF</div>
+                    <div style="font-size: 12px; color: var(--tg-theme-hint-color); margin-top: 4px;">Максимум ~4 МБ (ограничение localStorage)</div>
+                    <div class="file-info" id="pdfFileInfo"></div>
+                    <div class="file-size" id="pdfFileSize"></div>
+                </div>
+                <input type="file" id="pdfFileInput" accept="application/pdf" style="display:none" onchange="handlePdfUpload(event)">
             </div>
             <div class="modal-actions">
-                <button class="admin-btn secondary" onclick="closeContentModal()">Отмена</button>
-                <button class="admin-btn primary" onclick="saveContent()">Сохранить</button>
+                <button class="admin-btn secondary" onclick="closeContentModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    Отмена
+                </button>
+                <button class="admin-btn primary" onclick="saveContent()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Сохранить
+                </button>
             </div>
+        </div>
+    </div>
+
+    <!-- ============ BOTTOM SHEET (INLINE EDIT) ============ -->
+    <div class="bottom-sheet-overlay" id="editSheet">
+        <div class="bottom-sheet">
+            <div class="bottom-sheet__handle"></div>
+            <button class="bottom-sheet__item" onclick="editFromSheet()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <span>Редактировать</span>
+            </button>
+            <button class="bottom-sheet__item danger" onclick="deleteFromSheet()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                <span>Удалить</span>
+            </button>
+            <button class="bottom-sheet__item" onclick="closeEditSheet()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <span>Отмена</span>
+            </button>
         </div>
     </div>
 
@@ -925,26 +1237,82 @@ const tg = window.Telegram?.WebApp;
 if (tg) { try { tg.ready(); tg.expand(); tg.setHeaderColor(tg.themeParams?.bg_color || '#ffffff'); } catch(e) {} }
 function haptic(type = 'light') { try { tg?.HapticFeedback?.[type === 'selection' ? 'selectionChanged' : 'impactOccurred'](type === 'selection' ? undefined : type); } catch(e) {} }
 
-// ============ ДЕФОЛТНЫЕ ДАННЫЕ ============
+// ============ PDF.JS INIT ============
+if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+// ============ НАБОР SVG ИКОНОК ============
+const ICONS = {
+    science: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31"/><path d="M14 9.3V1.99"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/></svg>',
+    physics: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z"/><path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z"/></svg>',
+    biology: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c.37-.8 1.36-2 3-2 2.71 0 5 2.29 5 5 0 1.64-.8 2.63-1.6 3-.84.4-1.3.8-1.4 1.42"/><path d="M12 5c-.37-.8-1.36-2-3-2-2.71 0-5 2.29-5 5 0 1.64.8 2.63 1.6 3 .84.4 1.3.8 1.4 1.42"/><path d="M12 5v14"/><path d="M5 14h14"/></svg>',
+    history: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h.01"/><path d="M9 12h.01"/><path d="M9 15h.01"/><path d="M9 18h.01"/></svg>',
+    it: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+    psychology: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>',
+    growth: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>',
+    art: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>',
+    music: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+    book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>',
+    globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>',
+    star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+    heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
+    zap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+    target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+    rocket: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>',
+    briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
+    coffee: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>'
+};
+
+// Иконки для UI
+const UI_ICONS = {
+    play: '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>',
+    pause: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>',
+    heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
+    heartFilled: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
+    menu: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>',
+    pdf: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15v-2h1.5a1.5 1.5 0 0 1 0 3H9z"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+    trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
+    fire: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg>',
+    inbox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>',
+    plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+    chevronLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
+    chevronRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+    zoomIn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>',
+    zoomOut: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>'
+};
+
+// ============ АДМИН ID — ЗАМЕНИТЕ НА СВОЙ ============
+// Чтобы узнать свой Telegram ID: напишите боту @userinfobot в Telegram
+const ADMIN_IDS = [8690178977]; // <-- ВПИШИТЕ СЮДА СВОЙ TELEGRAM ID (число)
+
+function isAdmin() {
+    const userId = tg?.initDataUnsafe?.user?.id;
+    return ADMIN_IDS.includes(userId);
+}
+
+// ============ ДАННЫЕ ============
 const DEFAULT_DATA = {
     categories: [
-        { id: 'cat1', name: 'Наука', icon: '🧪', type: 'category', parentId: null, applies: 'both' },
-        { id: 'cat2', name: 'Физика', icon: '⚛️', type: 'subcategory', parentId: 'cat1', applies: 'audio' },
-        { id: 'cat3', name: 'Биология', icon: '🧬', type: 'subcategory', parentId: 'cat1', applies: 'both' },
-        { id: 'cat4', name: 'История', icon: '🏛', type: 'category', parentId: null, applies: 'both' },
-        { id: 'cat5', name: 'IT', icon: '💻', type: 'category', parentId: null, applies: 'both' },
-        { id: 'cat6', name: 'Психология', icon: '🧠', type: 'category', parentId: null, applies: 'both' },
-        { id: 'cat7', name: 'Саморазвитие', icon: '🚀', type: 'category', parentId: null, applies: 'both' }
+        { id: 'cat1', name: 'Наука', icon: 'science', type: 'category', parentId: null, applies: 'both' },
+        { id: 'cat2', name: 'Физика', icon: 'physics', type: 'subcategory', parentId: 'cat1', applies: 'audio' },
+        { id: 'cat3', name: 'Биология', icon: 'biology', type: 'subcategory', parentId: 'cat1', applies: 'both' },
+        { id: 'cat4', name: 'История', icon: 'history', type: 'category', parentId: null, applies: 'both' },
+        { id: 'cat5', name: 'IT', icon: 'it', type: 'category', parentId: null, applies: 'both' },
+        { id: 'cat6', name: 'Психология', icon: 'psychology', type: 'category', parentId: null, applies: 'both' },
+        { id: 'cat7', name: 'Саморазвитие', icon: 'growth', type: 'category', parentId: null, applies: 'both' }
     ],
     content: [
         {
             id: 1, type: 'audio', categoryId: 'cat2', subcategoryId: null,
-            emoji: '🌌', title: 'Тайны черных дыр', author: 'Алексей Иванов',
-            duration: 2700, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-1.mp3', premium: false
+            icon: 'physics', title: 'Тайны черных дыр', author: 'Алексей Иванов',
+            duration: 2700, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-1.mp3'
         },
         {
             id: 2, type: 'book', categoryId: 'cat4', subcategoryId: null,
-            emoji: '🏛', title: 'История Древнего Рима', author: 'Марк Туллий', premium: false,
+            icon: 'history', title: 'История Древнего Рима', author: 'Марк Туллий',
             chapters: [
                 { id: 'ch1', title: 'Глава 1. Основание Рима', text: 'Согласно легенде, Рим был основан братьями Ромулом и Ремом в 753 году до нашей эры. Братья были вскормлены волчицей и выросли, чтобы основать величайшую цивилизацию древности.\n\nРомул стал первым царем Рима и дал городу свое имя. Он создал сенат из ста самых знатных людей, которые стали называться "патрициями".\n\nМаленькое поселение на Палатинском холме быстро росло. Беглые рабы, изгнанники и искатели приключений находили здесь убежище.' },
                 { id: 'ch2', title: 'Глава 2. Царский период', text: 'Римом правили семь царей: четверо латинов и сабинян и трое этрусков. Последний царь, Тарквиний Гордый, был жестоким тираном и был изгнан в 509 году до н.э.\n\nПосле изгнания царей была установлена Республика. Власть перешла к сенату и народным собраниям.\n\nЭтот период ознаменовался борьбой плебеев и патрициев. Плебеи постепенно добились равноправия.' },
@@ -953,17 +1321,17 @@ const DEFAULT_DATA = {
         },
         {
             id: 3, type: 'audio', categoryId: 'cat5', subcategoryId: null,
-            emoji: '💻', title: 'Python с нуля', author: 'IT Academy',
-            duration: 1800, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-2.mp3', premium: false
+            icon: 'it', title: 'Python с нуля', author: 'IT Academy',
+            duration: 1800, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-2.mp3'
         },
         {
             id: 4, type: 'audio', categoryId: 'cat6', subcategoryId: null,
-            emoji: '🧠', title: 'Как работает память', author: 'Доктор Нейро',
-            duration: 900, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-3.mp3', premium: false
+            icon: 'psychology', title: 'Как работает память', author: 'Доктор Нейро',
+            duration: 900, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-3.mp3'
         },
         {
             id: 5, type: 'book', categoryId: 'cat1', subcategoryId: null,
-            emoji: '📖', title: 'Краткая история времени', author: 'Стивен Хокинг', premium: false,
+            icon: 'science', title: 'Краткая история времени', author: 'Стивен Хокинг',
             chapters: [
                 { id: 'ch1', title: 'Глава 1. Наши представления о Вселенной', text: 'Древние греки считали, что Вселенная конечна и имеет сферическую форму. Земля находится в центре, а вокруг нее вращаются Солнце, Луна и планеты.\n\nЭта модель господствовала более тысячи лет. Но в 1543 году Коперник предложил гелиоцентрическую модель.' },
                 { id: 'ch2', title: 'Глава 2. Пространство и время', text: 'До Эйнштейна пространство и время считались абсолютными. Специальная теория относительности (1905) перевернула эти представления.\n\nДвижущиеся часы идут медленнее, а движущиеся линейки сокращаются.' }
@@ -971,15 +1339,14 @@ const DEFAULT_DATA = {
         },
         {
             id: 6, type: 'audio', categoryId: 'cat6', subcategoryId: null,
-            emoji: '🎨', title: 'Психология цвета', author: 'Анна Дизайнер',
-            duration: 1200, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-5.mp3', premium: true
+            icon: 'art', title: 'Психология цвета', author: 'Анна Дизайнер',
+            duration: 1200, audioUrl: 'https://cdn.jsdelivr.net/gh/AnnetXue/Music@master/SoundHelix-Song-5.mp3'
         }
     ]
 };
 
-// ============ STATE ============
-const DATA_KEY = 'tknowledge_data_v4';
-const STATE_KEY = 'tknowledge_state_v4';
+const DATA_KEY = 'tknowledge_data_v5';
+const STATE_KEY = 'tknowledge_state_v5';
 
 let data = { categories: [], content: [] };
 let state = {
@@ -988,7 +1355,8 @@ let state = {
     activeDays: [], lastActiveDay: null, streak: 0,
     readerSettings: { fontSize: 17, theme: 'light' },
     playerSettings: { speed: 1 },
-    notes: {} // { bookId: [{ id, chapterId, text, timestamp }] }
+    notes: {},
+    appTheme: 'system' // 'system' | 'light' | 'dark'
 };
 
 function loadData() {
@@ -998,7 +1366,7 @@ function loadData() {
         else { data = JSON.parse(JSON.stringify(DEFAULT_DATA)); saveData(); }
     } catch(e) { data = JSON.parse(JSON.stringify(DEFAULT_DATA)); saveData(); }
 }
-function saveData() { try { localStorage.setItem(DATA_KEY, JSON.stringify(data)); } catch(e) {} }
+function saveData() { try { localStorage.setItem(DATA_KEY, JSON.stringify(data)); } catch(e) { showToast('Ошибка сохранения. Возможно, файл PDF слишком большой.'); } }
 
 function loadState() {
     try {
@@ -1034,6 +1402,17 @@ function declOfNum(n, titles) {
     return titles[(n % 100 > 4 && n % 100 < 20) ? 2 : cases[Math.min(n % 10, 5)]];
 }
 function genId() { return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5); }
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' Б';
+    if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' КБ';
+    return (bytes/(1024*1024)).toFixed(2) + ' МБ';
+}
 
 function getCategoryName(id) {
     const c = data.categories.find(c => c.id === id);
@@ -1041,14 +1420,50 @@ function getCategoryName(id) {
 }
 function getCategoryIcon(id) {
     const c = data.categories.find(c => c.id === id);
-    return c ? c.icon : '📁';
+    return c ? (ICONS[c.icon] || ICONS.science) : ICONS.science;
+}
+
+function getContentIcon(item) {
+    if (!item) return ICONS.book;
+    if (item.type === 'pdf') return UI_ICONS.pdf;
+    if (item.type === 'audio') return ICONS.music;
+    return ICONS[item.icon] || ICONS.book;
+}
+
+// ============ ТЕМА ПРИЛОЖЕНИЯ ============
+function applyAppTheme() {
+    const body = document.body;
+    body.removeAttribute('data-theme');
+    if (state.appTheme === 'light') body.setAttribute('data-theme', 'light');
+    else if (state.appTheme === 'dark') body.setAttribute('data-theme', 'dark');
+    // 'system' — ничего не делаем, используем тему Telegram
+    updateThemeLabel();
+}
+
+function cycleTheme() {
+    const themes = ['system', 'light', 'dark'];
+    const idx = themes.indexOf(state.appTheme);
+    state.appTheme = themes[(idx + 1) % themes.length];
+    applyAppTheme();
+    saveState();
+    haptic('selection');
+    showToast('🎨 Тема: ' + getThemeName(state.appTheme));
+}
+
+function getThemeName(theme) {
+    return { system: 'Системная', light: 'Светлая', dark: 'Тёмная' }[theme] || 'Системная';
+}
+
+function updateThemeLabel() {
+    const label = document.getElementById('themeLabel');
+    if (label) label.textContent = getThemeName(state.appTheme);
 }
 
 // ============ TOAST ============
 let toastTimeout;
 function showToast(msg) {
     const toast = document.getElementById('toast');
-    toast.textContent = msg;
+    toast.innerHTML = msg;
     toast.classList.add('visible');
     clearTimeout(toastTimeout);
     toastTimeout = setTimeout(() => toast.classList.remove('visible'), 2500);
@@ -1063,7 +1478,6 @@ let saveInterval = null;
 function playTrack(id) {
     const item = data.content.find(c => c.id == id && c.type === 'audio');
     if (!item) return;
-    if (item.premium) { showToast('💎 Трек доступен в Премиум'); haptic('medium'); return; }
 
     const wasSameTrack = currentTrack?.id === item.id;
     currentTrack = item;
@@ -1103,7 +1517,7 @@ function changeSpeed() {
     state.playerSettings.speed = speeds[(idx + 1) % speeds.length];
     audio.playbackRate = state.playerSettings.speed;
     document.getElementById('fpSpeed').textContent = state.playerSettings.speed + 'x';
-    showToast('Скорость: ' + state.playerSettings.speed + 'x');
+    showToast('⏩ Скорость: ' + state.playerSettings.speed + 'x');
     haptic('selection'); saveState();
 }
 function seekAudio(e) {
@@ -1114,13 +1528,13 @@ function seekAudio(e) {
     haptic('light');
 }
 function updatePlayButtons() {
-    const icon = isPlaying ? '⏸️' : '▶️';
-    document.getElementById('mpPlayBtn').textContent = icon;
-    document.getElementById('fpPlayBtn').textContent = icon;
+    const icon = isPlaying ? UI_ICONS.pause : UI_ICONS.play;
+    document.getElementById('mpPlayIcon').outerHTML = `<svg id="mpPlayIcon" viewBox="0 0 24 24">${icon.replace(/<\/?svg[^>]*>/g, '')}</svg>`;
+    document.getElementById('fpPlayIcon').outerHTML = `<svg id="fpPlayIcon" viewBox="0 0 24 24">${icon.replace(/<\/?svg[^>]*>/g, '')}</svg>`;
 }
 function showMiniPlayer() {
     if (!currentTrack) return;
-    document.getElementById('mpCover').textContent = currentTrack.emoji;
+    document.getElementById('mpCover').innerHTML = ICONS.music;
     document.getElementById('mpTitle').textContent = currentTrack.title;
     document.getElementById('mpAuthor').textContent = currentTrack.author;
     document.getElementById('miniPlayer').classList.add('visible');
@@ -1128,7 +1542,7 @@ function showMiniPlayer() {
 }
 function openFullPlayer() {
     if (!currentTrack) return;
-    document.getElementById('fpCover').textContent = currentTrack.emoji;
+    document.getElementById('fpCover').innerHTML = ICONS.music;
     document.getElementById('fpTitle').textContent = currentTrack.title;
     document.getElementById('fpAuthor').textContent = currentTrack.author;
     document.getElementById('fpSpeed').textContent = state.playerSettings.speed + 'x';
@@ -1154,7 +1568,7 @@ audio.addEventListener('ended', () => {
     if (currentTrack && !state.lessonsCompleted.includes(currentTrack.id)) {
         state.lessonsCompleted.push(currentTrack.id);
         markActiveToday(); saveState();
-        showToast('🎉 Урок завершен!');
+        showToast('✅ Урок завершен!');
         renderProgress(); renderHome();
     }
 });
@@ -1162,34 +1576,65 @@ audio.addEventListener('ended', () => {
 // ============ ЧИТАЛКА ============
 let currentBook = null;
 let currentChapter = 0;
+let currentPdfDoc = null;
+let currentPdfPage = 1;
+let pdfScale = 1.2;
 
 function openBook(id) {
-    const item = data.content.find(c => c.id == id && c.type === 'book');
+    const item = data.content.find(c => c.id == id && (c.type === 'book' || c.type === 'pdf'));
     if (!item) return;
-    if (item.premium) { showToast('💎 Книга доступна в Премиум'); haptic('medium'); return; }
-    if (!item.chapters || item.chapters.length === 0) { showToast('В книге нет глав'); return; }
+    if (item.type === 'pdf' && !item.pdfData) { showToast('PDF файл не найден'); return; }
+    if (item.type === 'book' && (!item.chapters || item.chapters.length === 0)) { showToast('В книге нет глав'); return; }
 
     currentBook = item;
     const saved = state.bookProgress[item.id];
-    currentChapter = saved?.chapter || 0;
-    if (currentChapter >= item.chapters.length) currentChapter = 0;
 
     document.getElementById('readerTitle').textContent = item.title;
     document.getElementById('reader').classList.add('visible');
     applyReaderSettings();
-    renderChapter();
+
+    if (item.type === 'pdf') {
+        document.getElementById('readerContent').innerHTML = '<div class="pdf-viewer" id="pdfViewer"><canvas id="pdfCanvas"></canvas></div>';
+        document.getElementById('readerFooter').innerHTML = `
+            <div class="pdf-controls" style="flex: 1;">
+                <button onclick="pdfPrevPage()">${UI_ICONS.chevronLeft}</button>
+                <div class="pdf-page-info" id="pdfPageInfo">— / —</div>
+                <button onclick="pdfNextPage()">${UI_ICONS.chevronRight}</button>
+                <button onclick="pdfZoomIn()">${UI_ICONS.zoomIn}</button>
+                <button onclick="pdfZoomOut()">${UI_ICONS.zoomOut}</button>
+            </div>
+        `;
+        currentPdfPage = saved?.page || 1;
+        loadPdf(item.pdfData);
+    } else {
+        currentChapter = saved?.chapter || 0;
+        if (currentChapter >= item.chapters.length) currentChapter = 0;
+        document.getElementById('readerContent').innerHTML = '';
+        document.getElementById('readerFooter').innerHTML = `
+            <button class="reader__btn" onclick="prevChapter()" id="prevChBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div class="reader__progress-bar"><div class="reader__progress-fill" id="readerProgressFill"></div></div>
+            <div class="reader__progress-text" id="readerProgressText">0%</div>
+            <button class="reader__btn" onclick="nextChapter()" id="nextChBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+        `;
+        renderChapter();
+    }
+
     updateNotesBadge();
     markActiveToday();
     haptic('medium');
 }
 
 function renderChapter() {
-    if (!currentBook) return;
+    if (!currentBook || currentBook.type !== 'book') return;
     const chapter = currentBook.chapters[currentChapter];
     const content = document.getElementById('readerContent');
     content.innerHTML = `
-        <div class="chapter-title">${chapter.title}</div>
-        ${chapter.text.split('\n\n').map(p => `<p>${p}</p>`).join('')}
+        <div class="chapter-title">${escapeHtml(chapter.title)}</div>
+        ${chapter.text.split('\n\n').map(p => `<p>${escapeHtml(p)}</p>`).join('')}
     `;
     content.scrollTop = 0;
     const saved = state.bookProgress[currentBook.id];
@@ -1201,18 +1646,74 @@ function renderChapter() {
     document.getElementById('nextChBtn').style.visibility = currentChapter < currentBook.chapters.length - 1 ? 'visible' : 'hidden';
 }
 
+async function loadPdf(base64) {
+    if (!window.pdfjsLib) { showToast('PDF.js не загружен'); return; }
+    try {
+        const binary = atob(base64.split(',')[1] || base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        currentPdfDoc = await pdfjsLib.getDocument({ data: bytes }).promise;
+        document.getElementById('pdfPageInfo').textContent = `${currentPdfPage} / ${currentPdfDoc.numPages}`;
+        renderPdfPage();
+    } catch(err) {
+        console.error(err);
+        showToast('Ошибка загрузки PDF');
+    }
+}
+
+async function renderPdfPage() {
+    if (!currentPdfDoc) return;
+    const page = await currentPdfDoc.getPage(currentPdfPage);
+    const viewport = page.getViewport({ scale: pdfScale });
+    const canvas = document.getElementById('pdfCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    document.getElementById('pdfPageInfo').textContent = `${currentPdfPage} / ${currentPdfDoc.numPages}`;
+    updateReaderProgress();
+    if (currentBook) {
+        state.bookProgress[currentBook.id] = { page: currentPdfPage, totalPages: currentPdfDoc.numPages };
+        saveState();
+    }
+}
+
+function pdfPrevPage() {
+    if (currentPdfPage > 1) { currentPdfPage--; renderPdfPage(); haptic('light'); }
+}
+function pdfNextPage() {
+    if (currentPdfDoc && currentPdfPage < currentPdfDoc.numPages) { currentPdfPage++; renderPdfPage(); haptic('light'); }
+}
+function pdfZoomIn() {
+    pdfScale = Math.min(3, pdfScale + 0.2);
+    renderPdfPage();
+    haptic('selection');
+}
+function pdfZoomOut() {
+    pdfScale = Math.max(0.5, pdfScale - 0.2);
+    renderPdfPage();
+    haptic('selection');
+}
+
 function prevChapter() {
-    if (currentChapter > 0) { saveBookProgress(); currentChapter--; renderChapter(); haptic('light'); }
+    if (currentBook && currentBook.type === 'book' && currentChapter > 0) { saveBookProgress(); currentChapter--; renderChapter(); haptic('light'); }
 }
 function nextChapter() {
-    if (currentBook && currentChapter < currentBook.chapters.length - 1) { saveBookProgress(); currentChapter++; renderChapter(); haptic('light'); }
+    if (currentBook && currentBook.type === 'book' && currentChapter < currentBook.chapters.length - 1) { saveBookProgress(); currentChapter++; renderChapter(); haptic('light'); }
 }
 
 function updateReaderProgress() {
     if (!currentBook) return;
-    const percent = Math.round(((currentChapter + 1) / currentBook.chapters.length) * 100);
-    document.getElementById('readerProgressFill').style.width = percent + '%';
-    document.getElementById('readerProgressText').textContent = percent + '%';
+    let percent = 0;
+    if (currentBook.type === 'book') {
+        percent = Math.round(((currentChapter + 1) / currentBook.chapters.length) * 100);
+    } else if (currentBook.type === 'pdf' && currentPdfDoc) {
+        percent = Math.round((currentPdfPage / currentPdfDoc.numPages) * 100);
+    }
+    const fill = document.getElementById('readerProgressFill');
+    const text = document.getElementById('readerProgressText');
+    if (fill) fill.style.width = percent + '%';
+    if (text) text.textContent = percent + '%';
 }
 
 function closeReader() {
@@ -1222,16 +1723,25 @@ function closeReader() {
     document.getElementById('notesPanel').classList.remove('visible');
     document.getElementById('notesOverlay').classList.remove('visible');
     currentBook = null;
+    currentPdfDoc = null;
     haptic('light');
 }
 
 function saveBookProgress() {
     if (!currentBook) return;
-    const content = document.getElementById('readerContent');
-    state.bookProgress[currentBook.id] = { chapter: currentChapter, scroll: content.scrollTop };
-    if (currentChapter === currentBook.chapters.length - 1 && !state.booksCompleted.includes(currentBook.id)) {
-        state.booksCompleted.push(currentBook.id);
-        showToast('📖 Книга прочитана!');
+    if (currentBook.type === 'book') {
+        const content = document.getElementById('readerContent');
+        state.bookProgress[currentBook.id] = { chapter: currentChapter, scroll: content.scrollTop };
+        if (currentChapter === currentBook.chapters.length - 1 && !state.booksCompleted.includes(currentBook.id)) {
+            state.booksCompleted.push(currentBook.id);
+            showToast('📖 Книга прочитана!');
+        }
+    } else if (currentBook.type === 'pdf' && currentPdfDoc) {
+        state.bookProgress[currentBook.id] = { page: currentPdfPage, totalPages: currentPdfDoc.numPages };
+        if (currentPdfPage === currentPdfDoc.numPages && !state.booksCompleted.includes(currentBook.id)) {
+            state.booksCompleted.push(currentBook.id);
+            showToast('📖 PDF прочитан!');
+        }
     }
     saveState();
 }
@@ -1257,15 +1767,9 @@ function applyReaderSettings() {
     reader.classList.remove('theme-sepia', 'theme-dark');
     if (state.readerSettings.theme === 'sepia') reader.classList.add('theme-sepia');
     else if (state.readerSettings.theme === 'dark') reader.classList.add('theme-dark');
-    document.getElementById('readerContent').style.fontSize = state.readerSettings.fontSize + 'px';
+    const content = document.getElementById('readerContent');
+    if (content) content.style.fontSize = state.readerSettings.fontSize + 'px';
 }
-
-document.getElementById('readerContent').addEventListener('scroll', () => {
-    if (currentBook) {
-        clearTimeout(window.readerSaveTimeout);
-        window.readerSaveTimeout = setTimeout(saveBookProgress, 500);
-    }
-});
 
 // ============ ЗАМЕТКИ ============
 function toggleNotesPanel() {
@@ -1288,28 +1792,32 @@ function renderNotes() {
     const bookNotes = state.notes[currentBook.id] || [];
     const content = document.getElementById('notesContent');
     if (bookNotes.length === 0) {
-        content.innerHTML = '<div class="notes-panel__empty">📝<br><br>У вас пока нет заметок к этой книге.<br>Добавьте первую заметку ниже!</div>';
+        content.innerHTML = `<div class="notes-panel__empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            У вас пока нет заметок.<br>Добавьте первую ниже!
+        </div>`;
         return;
     }
     content.innerHTML = bookNotes.map(note => {
-        const chapter = currentBook.chapters.find(c => c.id === note.chapterId);
-        const chapterTitle = chapter ? chapter.title : 'Удалённая глава';
+        let chapterTitle = 'Удалённая глава';
+        if (currentBook.type === 'book') {
+            const chapter = currentBook.chapters.find(c => c.id === note.chapterId);
+            if (chapter) chapterTitle = chapter.title;
+        } else if (currentBook.type === 'pdf') {
+            chapterTitle = `Страница ${note.page || '?'}`;
+        }
         const date = new Date(note.timestamp).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
         return `
-            <div class="note-item" onclick="goToNote('${note.chapterId}')">
-                <div class="note-item__chapter">${chapterTitle}</div>
+            <div class="note-item" onclick="goToNote('${note.id}')">
+                <div class="note-item__chapter">${escapeHtml(chapterTitle)}</div>
                 <div class="note-item__text">${escapeHtml(note.text)}</div>
                 <div class="note-item__date">${date}</div>
-                <button class="note-item__delete" onclick="deleteNote(event, '${note.id}')">✕</button>
+                <button class="note-item__delete" onclick="deleteNote(event, '${note.id}')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
         `;
     }).join('');
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
 }
 
 function addNote() {
@@ -1319,13 +1827,18 @@ function addNote() {
     if (!text) { showToast('Введите текст заметки'); return; }
 
     if (!state.notes[currentBook.id]) state.notes[currentBook.id] = [];
-    const chapter = currentBook.chapters[currentChapter];
-    state.notes[currentBook.id].push({
+    const note = {
         id: genId(),
-        chapterId: chapter.id,
         text: text,
         timestamp: Date.now()
-    });
+    };
+    if (currentBook.type === 'book') {
+        const chapter = currentBook.chapters[currentChapter];
+        note.chapterId = chapter.id;
+    } else if (currentBook.type === 'pdf') {
+        note.page = currentPdfPage;
+    }
+    state.notes[currentBook.id].push(note);
     input.value = '';
     saveState();
     renderNotes();
@@ -1346,15 +1859,31 @@ function deleteNote(e, noteId) {
     haptic('light');
 }
 
-function goToNote(chapterId) {
+function goToNote(noteId) {
     if (!currentBook) return;
-    const idx = currentBook.chapters.findIndex(c => c.id === chapterId);
-    if (idx >= 0 && idx !== currentChapter) {
-        saveBookProgress();
-        currentChapter = idx;
-        renderChapter();
-        toggleNotesPanel();
-        showToast('📖 Переход к главе');
+    const note = (state.notes[currentBook.id] || []).find(n => n.id === noteId);
+    if (!note) return;
+    if (currentBook.type === 'book' && note.chapterId) {
+        const idx = currentBook.chapters.findIndex(c => c.id === note.chapterId);
+        if (idx >= 0 && idx !== currentChapter) {
+            saveBookProgress();
+            currentChapter = idx;
+            renderChapter();
+            toggleNotesPanel();
+            showToast('📖 Переход к главе');
+        } else {
+            toggleNotesPanel();
+        }
+    } else if (currentBook.type === 'pdf' && note.page) {
+        if (note.page !== currentPdfPage) {
+            saveBookProgress();
+            currentPdfPage = note.page;
+            renderPdfPage();
+            toggleNotesPanel();
+            showToast('📄 Переход к странице');
+        } else {
+            toggleNotesPanel();
+        }
     } else {
         toggleNotesPanel();
     }
@@ -1394,9 +1923,12 @@ function renderCategoryTabs(prefix, type) {
     const cats = data.categories.filter(c => c.type === 'category' && (c.applies === 'both' || c.applies === type));
     const filter = prefix === 'lessons' ? lessonsFilter : booksFilter;
 
-    let html = `<button class="cat-tab ${filter.category === 'all' ? 'active' : ''}" onclick="setCategory('${prefix}', 'all')"><span class="emoji">📋</span> Все</button>`;
+    let html = `<button class="cat-tab ${filter.category === 'all' ? 'active' : ''}" onclick="setCategory('${prefix}', 'all')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Все
+    </button>`;
     cats.forEach(c => {
-        html += `<button class="cat-tab ${filter.category === c.id ? 'active' : ''}" onclick="setCategory('${prefix}', '${c.id}')"><span class="emoji">${c.icon}</span> ${c.name}</button>`;
+        html += `<button class="cat-tab ${filter.category === c.id ? 'active' : ''}" onclick="setCategory('${prefix}', '${c.id}')">${ICONS[c.icon] || ICONS.science}<span>${escapeHtml(c.name)}</span></button>`;
     });
     container.innerHTML = html;
 }
@@ -1405,20 +1937,14 @@ function renderSubcategoryTabs(prefix, type) {
     const container = document.getElementById(prefix + 'Subcategories');
     const filter = prefix === 'lessons' ? lessonsFilter : booksFilter;
 
-    if (filter.category === 'all') {
-        container.innerHTML = '';
-        return;
-    }
+    if (filter.category === 'all') { container.innerHTML = ''; return; }
 
     const subcats = data.categories.filter(c => c.type === 'subcategory' && c.parentId === filter.category && (c.applies === 'both' || c.applies === type));
-    if (subcats.length === 0) {
-        container.innerHTML = '';
-        return;
-    }
+    if (subcats.length === 0) { container.innerHTML = ''; return; }
 
     let html = `<button class="subcat-chip ${filter.subcategory === 'all' ? 'active' : ''}" onclick="setSubcategory('${prefix}', 'all')">Все</button>`;
     subcats.forEach(c => {
-        html += `<button class="subcat-chip ${filter.subcategory === c.id ? 'active' : ''}" onclick="setSubcategory('${prefix}', '${c.id}')">${c.icon} ${c.name}</button>`;
+        html += `<button class="subcat-chip ${filter.subcategory === c.id ? 'active' : ''}" onclick="setSubcategory('${prefix}', '${c.id}')">${ICONS[c.icon] || ICONS.science}<span>${escapeHtml(c.name)}</span></button>`;
     });
     container.innerHTML = html;
 }
@@ -1437,40 +1963,50 @@ function setSubcategory(prefix, subId) {
 
 function renderContentGrid(gridId, type, filter) {
     const grid = document.getElementById(gridId);
-    let items = data.content.filter(c => c.type === type);
+    let items = data.content.filter(c => c.type === type || (type === 'book' && (c.type === 'book' || c.type === 'pdf')));
 
-    if (filter.category !== 'all') {
-        items = items.filter(i => i.categoryId === filter.category);
-    }
-    if (filter.subcategory !== 'all') {
-        items = items.filter(i => i.subcategoryId === filter.subcategory);
-    }
+    if (filter.category !== 'all') items = items.filter(i => i.categoryId === filter.category);
+    if (filter.subcategory !== 'all') items = items.filter(i => i.subcategoryId === filter.subcategory);
     if (filter.search) {
         const s = filter.search.toLowerCase();
         items = items.filter(i => i.title.toLowerCase().includes(s) || i.author.toLowerCase().includes(s));
     }
 
     if (items.length === 0) {
-        grid.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><div class="empty-state__icon">📭</div><div class="empty-state__text">Ничего не найдено</div></div>';
+        grid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+            <div class="empty-state__text">Ничего не найдено</div>
+        </div>`;
         return;
     }
 
+    const adminMode = isAdmin();
+
     grid.innerHTML = items.map(item => {
         const isFav = state.favorites.includes(item.id);
-        const meta = item.type === 'audio' ? `Аудио • ${formatTime(item.duration)}` : `Книга • ${(item.chapters || []).length} глав`;
-        const playBadge = item.type === 'audio' ? '<div class="play-badge">▶</div>' : '';
-        const premium = item.premium ? '<div class="premium-badge">💎</div>' : '';
+        let meta = '';
+        if (item.type === 'audio') meta = `Аудио • ${formatTime(item.duration)}`;
+        else if (item.type === 'pdf') meta = `PDF • ${item.pageCount || '?'} стр.`;
+        else meta = `Книга • ${(item.chapters || []).length} глав`;
+        const playBadge = item.type === 'audio' ? `<div class="play-badge">${UI_ICONS.play}</div>` : '';
+        const pdfBadge = item.type === 'pdf' ? `<div class="pdf-badge">${UI_ICONS.pdf}<span>PDF</span></div>` : '';
+        const editBtn = adminMode ? `<button class="tma-card__edit-btn" onclick="openEditSheet(event, ${item.id})">${UI_ICONS.menu}</button>` : '';
         const catName = getCategoryName(item.categoryId);
         return `
             <div class="tma-card" onclick="openContent(${item.id})">
-                <div class="tma-card__cover">${premium}${item.emoji}${playBadge}</div>
+                ${editBtn}
+                <div class="tma-card__cover">
+                    ${getContentIcon(item)}
+                    ${playBadge}
+                    ${pdfBadge}
+                </div>
                 <div class="tma-card__body">
                     <div class="tma-card__title">${escapeHtml(item.title)}</div>
                     <div class="tma-card__meta">${escapeHtml(item.author)}</div>
                     <div class="tma-card__meta">${meta}</div>
                     <div class="tma-card__actions">
                         <span class="chip">${catName}</span>
-                        <button class="heart ${isFav ? 'active' : ''}" onclick="toggleFav(event, ${item.id})">${isFav ? '♥' : '♡'}</button>
+                        <button class="heart ${isFav ? 'active' : ''}" onclick="toggleFav(event, ${item.id})">${isFav ? UI_ICONS.heartFilled : UI_ICONS.heart}</button>
                     </div>
                 </div>
             </div>
@@ -1495,17 +2031,57 @@ function toggleFav(e, id) {
     haptic('light');
 }
 
+// ============ INLINE EDIT (BOTTOM SHEET) ============
+let editSheetItemId = null;
+
+function openEditSheet(e, id) {
+    e.stopPropagation();
+    editSheetItemId = id;
+    document.getElementById('editSheet').classList.add('visible');
+    haptic('selection');
+}
+
+function closeEditSheet() {
+    document.getElementById('editSheet').classList.remove('visible');
+    editSheetItemId = null;
+}
+
+function editFromSheet() {
+    if (editSheetItemId) openContentModal(editSheetItemId);
+    closeEditSheet();
+}
+
+function deleteFromSheet() {
+    if (!editSheetItemId) return;
+    const item = data.content.find(c => c.id === editSheetItemId);
+    if (!item) return;
+    if (!confirm(`Удалить "${item.title}"?`)) { closeEditSheet(); return; }
+    data.content = data.content.filter(c => c.id !== editSheetItemId);
+    saveData();
+    closeEditSheet();
+    renderLessons();
+    renderBooks();
+    renderHome();
+    if (document.getElementById('adminPanel').classList.contains('visible')) renderAdminContent();
+    showToast('🗑 Удалено');
+    haptic('light');
+}
+
+document.getElementById('editSheet').addEventListener('click', (e) => {
+    if (e.target.id === 'editSheet') closeEditSheet();
+});
+
 // ============ ГЛАВНАЯ ============
 function renderHome() {
     const user = tg?.initDataUnsafe?.user;
     const name = user?.first_name || 'Друг';
-    document.getElementById('greeting').textContent = `Привет, ${name}! 👋`;
+    document.getElementById('greeting').querySelector('span').textContent = `Привет, ${name}! 👋`;
     document.getElementById('streak-text').textContent = `${state.streak} ${declOfNum(state.streak, ['день', 'дня', 'дней'])} подряд`;
 
     const continueBlock = document.getElementById('continue-block');
     let continueHtml = '';
     const lastAudioId = Object.keys(state.audioProgress).find(id => state.audioProgress[id].position > 10);
-    const lastBookId = Object.keys(state.bookProgress).find(id => state.bookProgress[id].chapter >= 0);
+    const lastBookId = Object.keys(state.bookProgress).find(id => state.bookProgress[id].chapter >= 0 || state.bookProgress[id].page >= 0);
 
     if (lastAudioId) {
         const item = data.content.find(c => c.id == lastAudioId);
@@ -1513,13 +2089,13 @@ function renderHome() {
             const prog = state.audioProgress[lastAudioId];
             const remaining = Math.max(0, Math.round((prog.duration - prog.position) / 60));
             continueHtml += `
-                <div class="block" style="display: flex; gap: 12px; align-items: center; cursor: pointer;" onclick="playTrack(${item.id})">
-                    <div style="width: 60px; height: 60px; border-radius: 12px; background: linear-gradient(135deg, var(--tg-theme-button-color), #5856d6); display:flex; align-items:center; justify-content:center; font-size: 28px; flex-shrink:0;">${item.emoji}</div>
-                    <div style="flex: 1; min-width: 0;">
-                        <div style="font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(item.title)}</div>
-                        <div style="font-size: 13px; color: var(--tg-theme-hint-color); margin-top: 4px;">Осталось ~${remaining} мин</div>
+                <div class="block continue-card" onclick="playTrack(${item.id})">
+                    <div class="continue-card__cover">${ICONS.music}</div>
+                    <div class="continue-card__info">
+                        <div class="continue-card__title">${escapeHtml(item.title)}</div>
+                        <div class="continue-card__meta">Осталось ~${remaining} мин</div>
                     </div>
-                    <div style="font-size: 24px;">▶️</div>
+                    <div class="continue-card__action">${UI_ICONS.play}</div>
                 </div>
             `;
         }
@@ -1528,20 +2104,32 @@ function renderHome() {
         const item = data.content.find(c => c.id == lastBookId);
         if (item) {
             const prog = state.bookProgress[lastBookId];
+            let meta = '';
+            let coverClass = 'continue-card__cover';
+            if (item.type === 'pdf') {
+                meta = `Страница ${prog.page || 1} из ${prog.totalPages || '?'}`;
+                coverClass += ' pdf';
+            } else {
+                meta = `Глава ${(prog.chapter || 0) + 1} из ${(item.chapters || []).length}`;
+                coverClass += ' book';
+            }
             continueHtml += `
-                <div class="block" style="display: flex; gap: 12px; align-items: center; cursor: pointer;" onclick="openBook(${item.id})">
-                    <div style="width: 60px; height: 60px; border-radius: 12px; background: linear-gradient(135deg, #5856d6, #af52de); display:flex; align-items:center; justify-content:center; font-size: 28px; flex-shrink:0;">${item.emoji}</div>
-                    <div style="flex: 1; min-width: 0;">
-                        <div style="font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(item.title)}</div>
-                        <div style="font-size: 13px; color: var(--tg-theme-hint-color); margin-top: 4px;">Глава ${prog.chapter + 1} из ${(item.chapters || []).length}</div>
+                <div class="block continue-card" onclick="openBook(${item.id})">
+                    <div class="${coverClass}">${getContentIcon(item)}</div>
+                    <div class="continue-card__info">
+                        <div class="continue-card__title">${escapeHtml(item.title)}</div>
+                        <div class="continue-card__meta">${meta}</div>
                     </div>
-                    <div style="font-size: 24px;">📖</div>
+                    <div class="continue-card__action">${UI_ICONS.chevronRight}</div>
                 </div>
             `;
         }
     }
     if (!continueHtml) {
-        continueHtml = '<div class="block" style="text-align: center; color: var(--tg-theme-hint-color); padding: 24px;">Пока ничего не начато. Выберите контент в Уроках или Книгах!</div>';
+        continueHtml = `<div class="block" style="text-align: center; color: var(--tg-theme-hint-color); padding: 24px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 40px; height: 40px; margin: 0 auto 10px; display: block; opacity: 0.5;"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+            Пока ничего не начато.<br>Выберите контент в Уроках или Книгах!
+        </div>`;
     }
     continueBlock.innerHTML = continueHtml;
 
@@ -1552,10 +2140,10 @@ function renderHome() {
     } else {
         recs.innerHTML = recommended.map(item => `
             <div class="tma-card" style="min-width: 140px; max-width: 140px;" onclick="openContent(${item.id})">
-                <div class="tma-card__cover">${item.emoji}</div>
+                <div class="tma-card__cover">${getContentIcon(item)}</div>
                 <div class="tma-card__body">
                     <div class="tma-card__title">${escapeHtml(item.title)}</div>
-                    <div class="tma-card__meta">${item.type === 'audio' ? formatTime(item.duration) : (item.chapters || []).length + ' глав'}</div>
+                    <div class="tma-card__meta">${item.type === 'audio' ? formatTime(item.duration) : item.type === 'pdf' ? 'PDF' : (item.chapters || []).length + ' глав'}</div>
                 </div>
             </div>
         `).join('');
@@ -1596,47 +2184,70 @@ function renderProgress() {
     document.getElementById('calendar-count').textContent = `${activeCount} ${declOfNum(activeCount, ['день', 'дня', 'дней'])}`;
 
     const achievements = [
-        { icon: '🎯', title: 'Первые шаги', desc: 'Начать первый урок', done: state.lessonsCompleted.length > 0 || state.booksCompleted.length > 0 },
-        { icon: '🔥', title: 'Неделя знаний', desc: '7 дней подряд', done: state.streak >= 7 },
-        { icon: '📚', title: 'Книголюб', desc: 'Прочитать книгу', done: state.booksCompleted.length > 0 },
-        { icon: '🎧', title: 'Меломан', desc: '5 аудиоуроков', done: state.lessonsCompleted.length >= 5 },
-        { icon: '💎', title: 'Коллекционер', desc: '10 в избранном', done: state.favorites.length >= 10 },
-        { icon: '📝', title: 'Писатель', desc: '5 заметок', done: Object.values(state.notes).reduce((s, n) => s + n.length, 0) >= 5 },
-        { icon: '🏆', title: 'Марафонец', desc: '30 дней подряд', done: state.streak >= 30 }
+        { icon: UI_ICONS.trophy, title: 'Первые шаги', desc: 'Начать первый урок', done: state.lessonsCompleted.length > 0 || state.booksCompleted.length > 0 },
+        { icon: UI_ICONS.fire, title: 'Неделя знаний', desc: '7 дней подряд', done: state.streak >= 7 },
+        { icon: ICONS.book, title: 'Книголюб', desc: 'Прочитать книгу', done: state.booksCompleted.length > 0 },
+        { icon: ICONS.music, title: 'Меломан', desc: '5 аудиоуроков', done: state.lessonsCompleted.length >= 5 },
+        { icon: UI_ICONS.heartFilled, title: 'Коллекционер', desc: '10 в избранном', done: state.favorites.length >= 10 },
+        { icon: ICONS.psychology, title: 'Писатель', desc: '5 заметок', done: Object.values(state.notes).reduce((s, n) => s + n.length, 0) >= 5 },
+        { icon: ICONS.rocket, title: 'Марафонец', desc: '30 дней подряд', done: state.streak >= 30 }
     ];
     document.getElementById('achievements').innerHTML = achievements.map(a => `
-        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; ${a.done ? '' : 'opacity: 0.4;'}">
-            <div style="font-size: 32px;">${a.icon}</div>
-            <div style="flex: 1;">
-                <div style="font-weight: 600; font-size: 15px;">${a.title}</div>
-                <div style="font-size: 13px; color: var(--tg-theme-hint-color);">${a.desc}</div>
+        <div class="achievement-row ${a.done ? '' : 'locked'}">
+            <div class="achievement-icon">${a.icon}</div>
+            <div class="achievement-info">
+                <div class="achievement-title">${a.title}</div>
+                <div class="achievement-desc">${a.desc}</div>
             </div>
-            ${a.done ? '<div style="color: #34c759; font-size: 20px;">✓</div>' : '<div style="color: var(--tg-theme-hint-color); font-size: 14px;">🔒</div>'}
+            ${a.done ? `<div class="achievement-check">${UI_ICONS.check}</div>` : `<div class="achievement-lock">${UI_ICONS.lock}</div>`}
         </div>
     `).join('');
 }
 
-// ============ АДМИН-ПАНЕЛЬ ============
-let adminTapCount = 0;
-let adminTapTimer = null;
+// ============ АДМИН-ПАНЕЛЬ (LONG PRESS НА АВАТАР) ============
+let pressTimer = null;
+let pressTriggered = false;
 
-document.getElementById('versionLabel').addEventListener('click', () => {
-    adminTapCount++;
-    clearTimeout(adminTapTimer);
-    adminTapTimer = setTimeout(() => { adminTapCount = 0; }, 2000);
-    if (adminTapCount >= 5) {
-        adminTapCount = 0;
-        openAdmin();
-        haptic('medium');
-    }
-});
+function setupAdminAccess() {
+    const avatar = document.getElementById('user-avatar');
+    if (!avatar) return;
+
+    const startPress = (e) => {
+        if (!isAdmin()) return;
+        pressTriggered = false;
+        pressTimer = setTimeout(() => {
+            pressTriggered = true;
+            haptic('medium');
+            openAdmin();
+        }, 600);
+    };
+    const cancelPress = () => {
+        clearTimeout(pressTimer);
+    };
+    const handleClick = (e) => {
+        if (pressTriggered) {
+            e.preventDefault();
+            e.stopPropagation();
+            pressTriggered = false;
+        }
+    };
+
+    avatar.addEventListener('touchstart', startPress, { passive: true });
+    avatar.addEventListener('touchend', cancelPress);
+    avatar.addEventListener('touchmove', cancelPress);
+    avatar.addEventListener('touchcancel', cancelPress);
+    avatar.addEventListener('mousedown', startPress);
+    avatar.addEventListener('mouseup', cancelPress);
+    avatar.addEventListener('mouseleave', cancelPress);
+    avatar.addEventListener('click', handleClick);
+}
 
 function openAdmin() {
     document.getElementById('adminPanel').classList.add('visible');
     renderAdminCategories();
     renderAdminContent();
     renderAdminStats();
-    showToast('⚙️ Админ-панель открыта');
+    showToast('⚙️ Админ-панель');
 }
 function closeAdmin() {
     document.getElementById('adminPanel').classList.remove('visible');
@@ -1653,7 +2264,10 @@ function switchAdminTab(section) {
 function renderAdminCategories() {
     const list = document.getElementById('adminCategoriesList');
     if (data.categories.length === 0) {
-        list.innerHTML = '<div class="empty-state"><div class="empty-state__icon">📁</div><div class="empty-state__text">Нет разделов. Создайте первый!</div></div>';
+        list.innerHTML = `<div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <div class="empty-state__text">Нет разделов. Создайте первый!</div>
+        </div>`;
         return;
     }
 
@@ -1664,14 +2278,18 @@ function renderAdminCategories() {
         const contentCount = data.content.filter(c => c.categoryId === root.id || subs.some(s => s.id === c.subcategoryId)).length;
         html += `
             <div class="admin-item" style="border-left: 4px solid var(--tg-theme-button-color);">
-                <div class="admin-item__icon">${root.icon}</div>
+                <div class="admin-item__icon">${ICONS[root.icon] || ICONS.science}</div>
                 <div class="admin-item__info">
                     <div class="admin-item__title">${escapeHtml(root.name)}</div>
-                    <div class="admin-item__meta">Раздел • ${root.applies === 'both' ? 'Уроки и книги' : root.applies === 'audio' ? 'Только уроки' : 'Только книги'} • ${contentCount} ед.</div>
+                    <div class="admin-item__meta">Раздел • ${root.applies === 'both' ? 'Все' : root.applies === 'audio' ? 'Уроки' : 'Книги'} • ${contentCount} ед.</div>
                 </div>
                 <div class="admin-item__actions">
-                    <button class="admin-btn secondary" onclick="editCategory('${root.id}')">✏️</button>
-                    <button class="admin-btn danger" onclick="deleteCategory('${root.id}')">🗑</button>
+                    <button class="admin-btn secondary" onclick="editCategory('${root.id}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="admin-btn danger" onclick="deleteCategory('${root.id}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+                    </button>
                 </div>
             </div>
         `;
@@ -1679,14 +2297,18 @@ function renderAdminCategories() {
             const subCount = data.content.filter(c => c.subcategoryId === sub.id).length;
             html += `
                 <div class="admin-item" style="margin-left: 24px; border-left: 4px solid var(--tg-theme-hint-color);">
-                    <div class="admin-item__icon">${sub.icon}</div>
+                    <div class="admin-item__icon">${ICONS[sub.icon] || ICONS.science}</div>
                     <div class="admin-item__info">
                         <div class="admin-item__title">${escapeHtml(sub.name)}</div>
                         <div class="admin-item__meta">Подраздел • ${subCount} ед.</div>
                     </div>
                     <div class="admin-item__actions">
-                        <button class="admin-btn secondary" onclick="editCategory('${sub.id}')">✏️</button>
-                        <button class="admin-btn danger" onclick="deleteCategory('${sub.id}')">🗑</button>
+                        <button class="admin-btn secondary" onclick="editCategory('${sub.id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        <button class="admin-btn danger" onclick="deleteCategory('${sub.id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+                        </button>
                     </div>
                 </div>
             `;
@@ -1696,6 +2318,8 @@ function renderAdminCategories() {
 }
 
 let editingCategoryId = null;
+let selectedCatIcon = 'science';
+
 function openCategoryModal(id = null) {
     editingCategoryId = id;
     document.getElementById('categoryModalTitle').textContent = id ? 'Редактировать раздел' : 'Новый раздел';
@@ -1706,19 +2330,20 @@ function openCategoryModal(id = null) {
     if (id) {
         const cat = data.categories.find(c => c.id === id);
         document.getElementById('catName').value = cat.name;
-        document.getElementById('catIcon').value = cat.icon;
+        selectedCatIcon = cat.icon;
         catType.value = cat.type;
         document.getElementById('catApplies').value = cat.applies;
     } else {
         document.getElementById('catName').value = '';
-        document.getElementById('catIcon').value = '';
+        selectedCatIcon = 'science';
         catType.value = 'category';
         document.getElementById('catApplies').value = 'both';
     }
 
     const roots = data.categories.filter(c => c.type === 'category');
-    parentSelect.innerHTML = roots.map(r => `<option value="${r.id}">${r.icon} ${escapeHtml(r.name)}</option>`).join('');
+    parentSelect.innerHTML = roots.map(r => `<option value="${r.id}">${escapeHtml(r.name)}</option>`).join('');
 
+    renderIconPicker('catIconPicker', selectedCatIcon, (icon) => { selectedCatIcon = icon; });
     updateParentVisibility();
     document.getElementById('categoryModal').classList.add('visible');
 }
@@ -1728,7 +2353,6 @@ function closeCategoryModal() {
     editingCategoryId = null;
 }
 
-document.getElementById('catType').addEventListener('change', updateParentVisibility);
 function updateParentVisibility() {
     const isSub = document.getElementById('catType').value === 'subcategory';
     document.getElementById('catParentGroup').style.display = isSub ? 'block' : 'none';
@@ -1736,7 +2360,7 @@ function updateParentVisibility() {
 
 function saveCategory() {
     const name = document.getElementById('catName').value.trim();
-    const icon = document.getElementById('catIcon').value.trim() || '📁';
+    const icon = selectedCatIcon;
     const type = document.getElementById('catType').value;
     const applies = document.getElementById('catApplies').value;
     const parentId = type === 'subcategory' ? document.getElementById('catParent').value : null;
@@ -1775,6 +2399,26 @@ function deleteCategory(id) {
     haptic('light');
 }
 
+// ============ ICON PICKER ============
+function renderIconPicker(containerId, selectedIcon, onSelect) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = Object.keys(ICONS).map(key => `
+        <div class="icon-picker-item ${key === selectedIcon ? 'active' : ''}" data-icon="${key}" onclick="selectIcon('${containerId}', '${key}')">
+            ${ICONS[key]}
+        </div>
+    `).join('');
+    container._onSelect = onSelect;
+}
+
+function selectIcon(containerId, icon) {
+    const container = document.getElementById(containerId);
+    container.querySelectorAll('.icon-picker-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.icon === icon);
+    });
+    if (container._onSelect) container._onSelect(icon);
+    haptic('selection');
+}
+
 // ============ АДМИН: КОНТЕНТ ============
 let adminContentFilter = 'all';
 function filterAdminContent(type) {
@@ -1787,61 +2431,81 @@ function filterAdminContent(type) {
 function renderAdminContent() {
     const list = document.getElementById('adminContentList');
     let items = data.content;
-    if (adminContentFilter !== 'all') items = items.filter(c => c.type === adminContentFilter);
+    if (adminContentFilter === 'audio') items = items.filter(c => c.type === 'audio');
+    else if (adminContentFilter === 'book') items = items.filter(c => c.type === 'book' || c.type === 'pdf');
 
     if (items.length === 0) {
-        list.innerHTML = '<div class="empty-state"><div class="empty-state__icon">📭</div><div class="empty-state__text">Нет контента. Добавьте первый!</div></div>';
+        list.innerHTML = `<div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+            <div class="empty-state__text">Нет контента. Добавьте первый!</div>
+        </div>`;
         return;
     }
 
-    list.innerHTML = items.map(item => `
-        <div class="admin-item">
-            <div class="admin-item__icon">${item.emoji}</div>
-            <div class="admin-item__info">
-                <div class="admin-item__title">${escapeHtml(item.title)}${item.premium ? ' 💎' : ''}</div>
-                <div class="admin-item__meta">${item.type === 'audio' ? '🎧 Аудио' : '📚 Книга'} • ${getCategoryName(item.categoryId)} • ${escapeHtml(item.author)}</div>
+    list.innerHTML = items.map(item => {
+        const typeLabel = item.type === 'audio' ? '🎧 Аудио' : item.type === 'pdf' ? '📄 PDF' : '📚 Книга';
+        return `
+            <div class="admin-item">
+                <div class="admin-item__icon">${getContentIcon(item)}</div>
+                <div class="admin-item__info">
+                    <div class="admin-item__title">${escapeHtml(item.title)}</div>
+                    <div class="admin-item__meta">${typeLabel} • ${getCategoryName(item.categoryId)} • ${escapeHtml(item.author)}</div>
+                </div>
+                <div class="admin-item__actions">
+                    <button class="admin-btn secondary" onclick="editContent(${item.id})">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="admin-btn danger" onclick="deleteContent(${item.id})">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+                    </button>
+                </div>
             </div>
-            <div class="admin-item__actions">
-                <button class="admin-btn secondary" onclick="editContent(${item.id})">✏️</button>
-                <button class="admin-btn danger" onclick="deleteContent(${item.id})">🗑</button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 let editingContentId = null;
 let tempChapters = [];
+let tempPdfData = null;
+let selectedCntIcon = 'book';
 
 function openContentModal(id = null) {
     editingContentId = id;
     document.getElementById('contentModalTitle').textContent = id ? 'Редактировать контент' : 'Новый контент';
 
     const catSelect = document.getElementById('cntCategory');
-    const subSelect = document.getElementById('cntSubcategory');
     const cats = data.categories.filter(c => c.type === 'category');
-    catSelect.innerHTML = '<option value="">— Выберите раздел —</option>' + cats.map(c => `<option value="${c.id}">${c.icon} ${escapeHtml(c.name)}</option>`).join('');
+    catSelect.innerHTML = '<option value="">— Выберите раздел —</option>' + cats.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+
+    tempPdfData = null;
+    document.getElementById('pdfFileInfo').textContent = '';
+    document.getElementById('pdfFileSize').textContent = '';
+    document.getElementById('pdfUploadArea').classList.remove('has-file');
 
     if (id) {
         const item = data.content.find(c => c.id === id);
         document.getElementById('cntType').value = item.type;
         document.getElementById('cntTitle').value = item.title;
         document.getElementById('cntAuthor').value = item.author;
-        document.getElementById('cntEmoji').value = item.emoji;
+        selectedCntIcon = item.icon || 'book';
         document.getElementById('cntCategory').value = item.categoryId || '';
-        document.getElementById('cntPremium').checked = !!item.premium;
         if (item.type === 'audio') {
             document.getElementById('cntAudioUrl').value = item.audioUrl || '';
             document.getElementById('cntDuration').value = item.duration || '';
-        } else {
+        } else if (item.type === 'book') {
             tempChapters = JSON.parse(JSON.stringify(item.chapters || []));
+        } else if (item.type === 'pdf') {
+            tempPdfData = item.pdfData;
+            document.getElementById('pdfFileInfo').textContent = item.pdfName || 'PDF файл';
+            document.getElementById('pdfFileSize').textContent = item.pdfSize ? formatBytes(item.pdfSize) : '';
+            document.getElementById('pdfUploadArea').classList.add('has-file');
         }
     } else {
         document.getElementById('cntType').value = 'audio';
         document.getElementById('cntTitle').value = '';
         document.getElementById('cntAuthor').value = '';
-        document.getElementById('cntEmoji').value = '';
+        selectedCntIcon = 'book';
         document.getElementById('cntCategory').value = '';
-        document.getElementById('cntPremium').checked = false;
         document.getElementById('cntAudioUrl').value = '';
         document.getElementById('cntDuration').value = '';
         tempChapters = [];
@@ -1849,6 +2513,7 @@ function openContentModal(id = null) {
 
     toggleContentFields();
     updateSubcategoryOptions();
+    renderIconPicker('cntIconPicker', selectedCntIcon, (icon) => { selectedCntIcon = icon; });
     document.getElementById('contentModal').classList.add('visible');
 }
 
@@ -1856,21 +2521,23 @@ function closeContentModal() {
     document.getElementById('contentModal').classList.remove('visible');
     editingContentId = null;
     tempChapters = [];
+    tempPdfData = null;
 }
 
-document.getElementById('cntCategory').addEventListener('change', updateSubcategoryOptions);
 function updateSubcategoryOptions() {
     const catId = document.getElementById('cntCategory').value;
     const subSelect = document.getElementById('cntSubcategory');
     const type = document.getElementById('cntType').value;
-    const subs = data.categories.filter(c => c.type === 'subcategory' && c.parentId === catId && (c.applies === 'both' || c.applies === type));
-    subSelect.innerHTML = '<option value="">—</option>' + subs.map(s => `<option value="${s.id}">${s.icon} ${escapeHtml(s.name)}</option>`).join('');
+    const appliesType = type === 'audio' ? 'audio' : 'book';
+    const subs = data.categories.filter(c => c.type === 'subcategory' && c.parentId === catId && (c.applies === 'both' || c.applies === appliesType));
+    subSelect.innerHTML = '<option value="">—</option>' + subs.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
 }
 
 function toggleContentFields() {
     const type = document.getElementById('cntType').value;
     document.getElementById('audioFields').style.display = type === 'audio' ? 'block' : 'none';
     document.getElementById('bookFields').style.display = type === 'book' ? 'block' : 'none';
+    document.getElementById('pdfFields').style.display = type === 'pdf' ? 'block' : 'none';
     if (type === 'book') renderChaptersEditor();
     updateSubcategoryOptions();
 }
@@ -1885,7 +2552,9 @@ function renderChaptersEditor() {
         <div class="chapter-editor">
             <div class="chapter-editor__header">
                 <div class="chapter-editor__title">Глава ${idx + 1}</div>
-                <button class="chapter-editor__delete" onclick="removeChapterField(${idx})">✕</button>
+                <button class="chapter-editor__delete" onclick="removeChapterField(${idx})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
             <input type="text" class="form-input" style="margin-bottom: 8px;" placeholder="Название главы" value="${escapeHtml(ch.title)}" onchange="tempChapters[${idx}].title = this.value">
             <textarea class="form-textarea" placeholder="Текст главы..." onchange="tempChapters[${idx}].text = this.value">${escapeHtml(ch.text)}</textarea>
@@ -1905,31 +2574,76 @@ function removeChapterField(idx) {
     haptic('light');
 }
 
+function handlePdfUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (file.size > 4.5 * 1024 * 1024) {
+        showToast('⚠️ Файл слишком большой (макс. ~4 МБ)');
+        event.target.value = '';
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        tempPdfData = e.target.result;
+        document.getElementById('pdfFileInfo').textContent = file.name;
+        document.getElementById('pdfFileSize').textContent = formatBytes(file.size);
+        document.getElementById('pdfUploadArea').classList.add('has-file');
+        document.getElementById('pdfUploadArea').querySelector('div:nth-child(2)').textContent = '✅ Файл загружен';
+        haptic('medium');
+    };
+    reader.readAsDataURL(file);
+}
+
 function saveContent() {
     const type = document.getElementById('cntType').value;
     const title = document.getElementById('cntTitle').value.trim();
     const author = document.getElementById('cntAuthor').value.trim();
-    const emoji = document.getElementById('cntEmoji').value.trim() || (type === 'audio' ? '🎧' : '📚');
+    const icon = selectedCntIcon;
     const categoryId = document.getElementById('cntCategory').value;
     const subcategoryId = document.getElementById('cntSubcategory').value || null;
-    const premium = document.getElementById('cntPremium').checked;
 
     if (!title) { showToast('Введите название'); return; }
     if (!categoryId) { showToast('Выберите раздел'); return; }
 
     const item = {
         id: editingContentId || (Math.max(0, ...data.content.map(c => typeof c.id === 'number' ? c.id : 0)) + 1),
-        type, title, author, emoji, categoryId, subcategoryId, premium
+        type, title, author, icon, categoryId, subcategoryId
     };
 
     if (type === 'audio') {
         item.audioUrl = document.getElementById('cntAudioUrl').value.trim();
         item.duration = parseInt(document.getElementById('cntDuration').value) || 0;
-    } else {
+        if (!item.audioUrl) { showToast('Укажите URL аудио'); return; }
+    } else if (type === 'book') {
         if (tempChapters.length === 0) { showToast('Добавьте хотя бы одну главу'); return; }
         const invalid = tempChapters.some(ch => !ch.title.trim() || !ch.text.trim());
         if (invalid) { showToast('Заполните все главы'); return; }
         item.chapters = tempChapters.map(ch => ({ id: ch.id || genId(), title: ch.title.trim(), text: ch.text.trim() }));
+    } else if (type === 'pdf') {
+        if (!tempPdfData && !editingContentId) { showToast('Загрузите PDF файл'); return; }
+        if (tempPdfData) {
+            item.pdfData = tempPdfData;
+            item.pdfName = document.getElementById('pdfFileInfo').textContent;
+            item.pdfSize = document.getElementById('pdfFileSize').textContent;
+        } else {
+            const existing = data.content.find(c => c.id === editingContentId);
+            item.pdfData = existing?.pdfData;
+            item.pdfName = existing?.pdfName;
+            item.pdfSize = existing?.pdfSize;
+        }
+        // Получаем количество страниц
+        if (window.pdfjsLib && item.pdfData) {
+            try {
+                const binary = atob(item.pdfData.split(',')[1] || item.pdfData);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                pdfjsLib.getDocument({ data: bytes }).promise.then(doc => {
+                    item.pageCount = doc.numPages;
+                    saveData();
+                    renderAdminContent();
+                }).catch(() => {});
+            } catch(e) {}
+        }
     }
 
     if (editingContentId) {
@@ -1958,7 +2672,7 @@ function deleteContent(id) {
     haptic('light');
 }
 
-// ============ ДАННЫЕ: ЭКСПОРТ/ИМПОРТ ============
+// ============ ДАННЫЕ ============
 function renderAdminStats() {
     const stats = document.getElementById('adminStats');
     const cats = data.categories.length;
@@ -1966,13 +2680,15 @@ function renderAdminStats() {
     const subs = data.categories.filter(c => c.type === 'subcategory').length;
     const audio = data.content.filter(c => c.type === 'audio').length;
     const books = data.content.filter(c => c.type === 'book').length;
+    const pdfs = data.content.filter(c => c.type === 'pdf').length;
     const notesCount = Object.values(state.notes).reduce((s, n) => s + n.length, 0);
 
     stats.innerHTML = `
         <div>📁 Разделов: ${cats} (корневых: ${roots}, подразделов: ${subs})</div>
         <div>🎧 Аудиоуроков: ${audio}</div>
-        <div>📚 Книг: ${books}</div>
-        <div>📝 Заметок у пользователя: ${notesCount}</div>
+        <div>📚 Книг (текст): ${books}</div>
+        <div>📄 Книг (PDF): ${pdfs}</div>
+        <div>📝 Заметок: ${notesCount}</div>
         <div>❤️ В избранном: ${state.favorites.length}</div>
         <div>✅ Пройдено уроков: ${state.lessonsCompleted.length}</div>
         <div>📖 Прочитано книг: ${state.booksCompleted.length}</div>
@@ -1980,7 +2696,7 @@ function renderAdminStats() {
 }
 
 function exportData() {
-    const exportObj = { version: 4, data, state, exportedAt: new Date().toISOString() };
+    const exportObj = { version: 5, data, state, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -2004,6 +2720,7 @@ function importData(event) {
             data = obj.data;
             state = { ...state, ...obj.state };
             saveData(); saveState();
+            applyAppTheme();
             renderAll();
             if (document.getElementById('adminPanel').classList.contains('visible')) {
                 renderAdminCategories();
@@ -2013,7 +2730,7 @@ function importData(event) {
             showToast('📥 Данные импортированы');
             haptic('medium');
         } catch(err) {
-            showToast('❌ Ошибка импорта: ' + err.message);
+            showToast('❌ Ошибка: ' + err.message);
         }
     };
     reader.readAsText(file);
@@ -2021,13 +2738,14 @@ function importData(event) {
 }
 
 function resetAllData() {
-    if (!confirm('⚠️ Удалить ВСЕ данные (контент, разделы, прогресс, заметки)?\nЭто действие нельзя отменить!')) return;
+    if (!confirm('⚠️ Удалить ВСЕ данные? Это действие нельзя отменить!')) return;
     if (!confirm('Точно уверены?')) return;
     localStorage.removeItem(DATA_KEY);
     localStorage.removeItem(STATE_KEY);
     data = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    state = { favorites: [], audioProgress: {}, bookProgress: {}, listeningTime: 0, lessonsCompleted: [], booksCompleted: [], activeDays: [], lastActiveDay: null, streak: 0, readerSettings: { fontSize: 17, theme: 'light' }, playerSettings: { speed: 1 }, notes: {} };
+    state = { favorites: [], audioProgress: {}, bookProgress: {}, listeningTime: 0, lessonsCompleted: [], booksCompleted: [], activeDays: [], lastActiveDay: null, streak: 0, readerSettings: { fontSize: 17, theme: 'light' }, playerSettings: { speed: 1 }, notes: {}, appTheme: 'system' };
     saveData(); saveState();
+    applyAppTheme();
     renderAll();
     renderAdminCategories();
     renderAdminContent();
@@ -2038,7 +2756,10 @@ function resetAllData() {
 
 function resetProgress() {
     if (!confirm('Сбросить прогресс пользователя (заметки, избранное, статистику)?\nКонтент и разделы останутся.')) return;
-    state = { favorites: [], audioProgress: {}, bookProgress: {}, listeningTime: 0, lessonsCompleted: [], booksCompleted: [], activeDays: [], lastActiveDay: null, streak: 0, readerSettings: state.readerSettings, playerSettings: state.playerSettings, notes: {} };
+    const appTheme = state.appTheme;
+    const readerSettings = state.readerSettings;
+    const playerSettings = state.playerSettings;
+    state = { favorites: [], audioProgress: {}, bookProgress: {}, listeningTime: 0, lessonsCompleted: [], booksCompleted: [], activeDays: [], lastActiveDay: null, streak: 0, readerSettings, playerSettings, notes: {}, appTheme };
     saveState();
     showToast('✅ Прогресс сброшен');
     renderAll();
@@ -2091,16 +2812,23 @@ function renderAll() {
     renderBooks();
     renderProgress();
     if (currentTrack) showMiniPlayer();
+    updateThemeLabel();
 
-    // Восстановление настроек читалки
     document.querySelectorAll('.font-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.size) === state.readerSettings.fontSize));
     document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.theme === state.readerSettings.theme));
 }
 
+applyAppTheme();
 renderAll();
+setupAdminAccess();
 
-// Подсказка про админку
-document.getElementById('adminHint').textContent = '💡 Подсказка: 5 тапов на версию';
+// Подсказка про админку (только для админа)
+const adminHint = document.getElementById('adminHint');
+if (isAdmin()) {
+    adminHint.textContent = '🔐 Долгое нажатие на аватарку → админ-панель';
+} else {
+    adminHint.textContent = '';
+}
 </script>
 
 </body>
