@@ -20,7 +20,6 @@
     --danger: #ef4444;
     --warning: #f59e0b;
     --purple: #8b5cf6;
-    --pink: #ec4899;
     --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
@@ -33,7 +32,6 @@
     --glass-bg: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(255, 255, 255, 0.3);
 }
-
 [data-theme="dark"] {
     --bg-primary: #0f172a;
     --bg-secondary: #1e293b;
@@ -49,9 +47,7 @@
     --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5);
     --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.6);
 }
-
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: var(--bg-primary);
@@ -60,101 +56,51 @@ body {
     transition: background 0.3s ease, color 0.3s ease;
     min-height: 100vh;
 }
-
-.app {
-    max-width: 500px;
-    margin: 0 auto;
-    background: var(--bg-primary);
-    min-height: 100vh;
-    position: relative;
-    padding-bottom: 80px;
-}
-
+.app { max-width: 500px; margin: 0 auto; background: var(--bg-primary); min-height: 100vh; position: relative; padding-bottom: 80px; }
 .header {
     background: var(--glass-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
     padding: 16px 20px;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    position: sticky; top: 0; z-index: 10;
+    display: flex; justify-content: space-between; align-items: center;
 }
 .header-info h1 { font-size: 18px; font-weight: 700; }
 .header-info p { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 .header-actions { display: flex; gap: 8px; }
 .icon-btn {
-    width: 36px; height: 36px;
-    border-radius: 10px;
-    background: var(--bg-tertiary);
-    border: none;
-    cursor: pointer;
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--bg-tertiary); border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    color: var(--text-primary);
-    transition: all 0.2s;
+    color: var(--text-primary); transition: all 0.2s;
 }
 .icon-btn:hover { background: var(--border); transform: scale(1.05); }
 .icon-btn svg { width: 18px; height: 18px; }
-
 .content { padding: 16px; }
-
 .tab { display: none; animation: slideIn 0.3s ease; }
 .tab.active { display: block; }
-
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes wave {
-    0% { transform: scaleY(0.3); }
-    50% { transform: scaleY(1); }
-    100% { transform: scaleY(0.3); }
-}
+@keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+@keyframes wave { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
 .nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    position: fixed; bottom: 0; left: 0; right: 0;
     background: var(--glass-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid var(--border);
-    max-width: 500px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-around;
-    padding: 8px 4px;
-    z-index: 10;
+    max-width: 500px; margin: 0 auto;
+    display: flex; justify-content: space-around;
+    padding: 8px 4px; z-index: 10;
 }
 .nav-btn {
-    background: none;
-    border: none;
-    padding: 8px 10px;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: var(--text-tertiary);
-    font-size: 10px;
-    font-weight: 500;
-    transition: all 0.2s;
-    border-radius: 10px;
-    min-width: 50px;
+    background: none; border: none; padding: 8px 10px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center;
+    color: var(--text-tertiary); font-size: 10px; font-weight: 500;
+    transition: all 0.2s; border-radius: 10px; min-width: 50px;
 }
 .nav-btn svg { width: 22px; height: 22px; margin-bottom: 2px; transition: all 0.2s; }
 .nav-btn.active { color: var(--accent); }
@@ -163,89 +109,45 @@ body {
 .card {
     background: var(--bg-secondary);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 14px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: var(--shadow-sm);
-    animation: scaleIn 0.3s ease;
-    position: relative;
+    border-radius: 16px; padding: 14px;
+    margin-bottom: 10px; cursor: pointer;
+    transition: all 0.2s; box-shadow: var(--shadow-sm);
+    animation: scaleIn 0.3s ease; position: relative;
 }
 .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.card-title {
-    font-weight: 600;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+.card-title { font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 8px; }
 .card-sub { font-size: 13px; color: var(--text-secondary); margin-top: 4px; display: flex; align-items: center; gap: 6px; }
 
 .card-menu-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    background: var(--bg-tertiary);
-    border: none;
-    cursor: pointer;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-secondary);
-    transition: all 0.2s;
+    position: absolute; top: 10px; right: 10px;
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--bg-tertiary); border: none; cursor: pointer;
+    display: none; align-items: center; justify-content: center;
+    color: var(--text-secondary); transition: all 0.2s; z-index: 2;
 }
 .card-menu-btn:hover { background: var(--border); }
 .card-menu-btn svg { width: 16px; height: 16px; }
-
 .editor-mode .card-menu-btn { display: flex; }
 
-.glass {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    box-shadow: var(--shadow-lg);
-}
-
 .gradient-card {
-    border-radius: 20px;
-    padding: 20px;
-    color: white;
-    position: relative;
-    overflow: hidden;
-    box-shadow: var(--shadow-lg);
+    border-radius: 20px; padding: 20px; color: white;
+    position: relative; overflow: hidden; box-shadow: var(--shadow-lg);
 }
 .gradient-card::before {
-    content: '';
-    position: absolute;
-    top: -50%; right: -50%;
+    content: ''; position: absolute; top: -50%; right: -50%;
     width: 200%; height: 200%;
     background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
     pointer-events: none;
 }
 
 .btn {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 14px;
-    width: 100%;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    padding: 12px 20px; border: none; border-radius: 12px;
+    font-weight: 600; cursor: pointer; font-size: 14px;
+    width: 100%; margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
     transition: all 0.2s;
 }
 .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
-.btn:active { transform: translateY(0); }
 .btn svg { width: 18px; height: 18px; }
 .btn-primary { background: var(--accent); color: white; }
 .btn-success { background: var(--success); color: white; }
@@ -254,145 +156,79 @@ body {
 .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); }
 .btn-ghost { background: transparent; color: var(--text-primary); border: 1px solid var(--border); }
 
-.btn-sm { padding: 8px 12px; font-size: 12px; width: auto; margin: 0; }
-
 input, textarea, select {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    font-size: 14px;
-    font-family: inherit;
-    margin-bottom: 12px;
-    background: var(--bg-secondary);
-    color: var(--text-primary);
+    width: 100%; padding: 12px 14px;
+    border: 1px solid var(--border); border-radius: 12px;
+    font-size: 14px; font-family: inherit; margin-bottom: 12px;
+    background: var(--bg-secondary); color: var(--text-primary);
     transition: all 0.2s;
 }
 input:focus, textarea:focus, select:focus {
-    outline: none;
-    border-color: var(--accent);
+    outline: none; border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
-label {
-    display: block;
-    font-size: 13px;
-    font-weight: 500;
-    margin-bottom: 6px;
-    color: var(--text-secondary);
-}
+label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--text-secondary); }
 
-.search-box {
-    position: relative;
-    margin-bottom: 16px;
-}
+.search-box { position: relative; margin-bottom: 16px; }
 .search-box svg {
-    position: absolute;
-    left: 14px;
-    top: 50%;
+    position: absolute; left: 14px; top: 50%;
     transform: translateY(-50%);
-    width: 18px; height: 18px;
-    color: var(--text-tertiary);
+    width: 18px; height: 18px; color: var(--text-tertiary);
     pointer-events: none;
 }
-.search-box input {
-    padding-left: 42px;
-    margin: 0;
-}
+.search-box input { padding-left: 42px; margin: 0; }
 
-.progress-bar {
-    background: var(--bg-tertiary);
-    height: 6px;
-    border-radius: 3px;
-    margin-top: 8px;
-    overflow: hidden;
-}
-.progress-fill {
-    background: var(--gradient-3);
-    height: 100%;
-    border-radius: 3px;
-    transition: width 0.5s ease;
-}
+.progress-bar { background: var(--bg-tertiary); height: 6px; border-radius: 3px; margin-top: 8px; overflow: hidden; }
+.progress-fill { background: var(--gradient-3); height: 100%; border-radius: 3px; transition: width 0.5s ease; }
 
 .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: rgba(59, 130, 246, 0.15);
-    color: var(--accent);
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 600;
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(59, 130, 246, 0.15); color: var(--accent);
+    padding: 3px 10px; border-radius: 12px;
+    font-size: 11px; font-weight: 600;
 }
 .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
-.badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
-.badge-purple { background: rgba(139, 92, 246, 0.15); color: var(--purple); }
 .badge svg { width: 12px; height: 12px; }
 
 .modal {
-    display: none;
-    position: fixed;
+    display: none; position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.6);
     backdrop-filter: blur(4px);
-    z-index: 100;
-    align-items: flex-end;
-    justify-content: center;
+    z-index: 100; align-items: flex-end; justify-content: center;
     animation: fadeIn 0.2s;
 }
 .modal.active { display: flex; }
 .modal-content {
     background: var(--bg-secondary);
     border-radius: 24px 24px 0 0;
-    padding: 20px;
-    width: 100%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
+    padding: 20px; width: 100%; max-width: 500px;
+    max-height: 90vh; overflow-y: auto;
     animation: slideUp 0.3s ease;
 }
-@keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-}
 .modal-title {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    font-size: 18px; font-weight: 700; margin-bottom: 16px;
+    display: flex; justify-content: space-between; align-items: center;
 }
 .close-btn {
-    background: var(--bg-tertiary);
-    border: none;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
+    background: var(--bg-tertiary); border: none;
+    width: 32px; height: 32px; border-radius: 50%;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
     color: var(--text-primary);
 }
 .close-btn svg { width: 16px; height: 16px; }
 
 .context-menu {
-    position: fixed;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: var(--shadow-xl);
-    z-index: 200;
-    min-width: 200px;
-    animation: scaleIn 0.2s ease;
+    position: fixed; background: var(--bg-secondary);
+    border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: var(--shadow-xl); z-index: 200;
+    min-width: 200px; animation: scaleIn 0.2s ease;
     overflow: hidden;
 }
 .context-menu-item {
-    padding: 12px 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    transition: background 0.2s;
+    padding: 12px 16px; cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 14px; transition: background 0.2s;
     border-bottom: 1px solid var(--border);
 }
 .context-menu-item:last-child { border-bottom: none; }
@@ -403,61 +239,34 @@ label {
 
 .audio-player {
     background: var(--gradient-1);
-    border-radius: 20px;
-    padding: 24px;
-    color: white;
-    position: relative;
-    overflow: hidden;
+    border-radius: 20px; padding: 24px; color: white;
+    position: relative; overflow: hidden;
 }
 .audio-player::before {
-    content: '';
-    position: absolute;
-    top: -50%; right: -30%;
+    content: ''; position: absolute; top: -50%; right: -30%;
     width: 200%; height: 200%;
     background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
 }
 .audio-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 24px;
-    margin: 20px 0;
-    position: relative;
+    display: flex; justify-content: center; align-items: center;
+    gap: 24px; margin: 20px 0; position: relative;
 }
 .audio-controls button {
-    background: rgba(255,255,255,0.2);
-    border: none;
-    color: white;
-    width: 48px; height: 48px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.2); border: none; color: white;
+    width: 48px; height: 48px; border-radius: 50%;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
     transition: all 0.2s;
 }
 .audio-controls button:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
 .audio-controls button svg { width: 22px; height: 22px; }
 .play-btn {
     width: 64px !important; height: 64px !important;
-    background: white !important;
-    color: var(--accent) !important;
+    background: white !important; color: var(--accent) !important;
 }
 .play-btn svg { width: 28px !important; height: 28px !important; }
 
-.wave-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    height: 30px;
-    margin: 10px 0;
-}
-.wave-bar {
-    width: 3px;
-    background: white;
-    border-radius: 2px;
-    height: 100%;
-    transform-origin: center;
-}
+.wave-container { display: flex; align-items: center; justify-content: center; gap: 3px; height: 30px; margin: 10px 0; }
+.wave-bar { width: 3px; background: white; border-radius: 2px; height: 100%; transform-origin: center; }
 .wave-bar.playing { animation: wave 1s ease-in-out infinite; }
 .wave-bar:nth-child(1) { animation-delay: 0s; }
 .wave-bar:nth-child(2) { animation-delay: 0.1s; }
@@ -467,215 +276,114 @@ label {
 .wave-bar:nth-child(6) { animation-delay: 0.3s; }
 .wave-bar:nth-child(7) { animation-delay: 0.2s; }
 
-.speed-selector {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-    margin: 12px 0;
-}
+.speed-selector { display: flex; gap: 6px; justify-content: center; margin: 12px 0; flex-wrap: wrap; }
 .speed-btn {
-    padding: 6px 12px;
-    background: rgba(255,255,255,0.2);
-    border: none;
-    border-radius: 8px;
-    color: white;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
+    padding: 6px 12px; background: rgba(255,255,255,0.2);
+    border: none; border-radius: 8px; color: white;
+    cursor: pointer; font-size: 12px; font-weight: 600;
     transition: all 0.2s;
 }
-.speed-btn.active {
-    background: white;
-    color: var(--accent);
-}
+.speed-btn.active { background: white; color: var(--accent); }
 
-.pdf-viewer {
-    background: var(--bg-tertiary);
-    min-height: 400px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    overflow: auto;
+.playlist-section {
+    margin-top: 16px; padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    position: relative; z-index: 1;
 }
+.playlist-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px; border-radius: 8px;
+    cursor: pointer; transition: background 0.2s;
+    margin-bottom: 4px;
+}
+.playlist-item:hover { background: rgba(255,255,255,0.1); }
+.playlist-item.current { background: rgba(255,255,255,0.2); }
+.playlist-item-num { font-size: 12px; opacity: 0.7; width: 20px; }
+.playlist-item-title { flex: 1; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.playlist-item-dur { font-size: 11px; opacity: 0.7; }
+
+.pdf-viewer { background: var(--bg-tertiary); min-height: 400px; display: flex; align-items: center; justify-content: center; padding: 16px; overflow: auto; }
 .pdf-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    background: var(--bg-secondary);
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px; background: var(--bg-secondary);
     border-top: 1px solid var(--border);
 }
 .pdf-controls button {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    border: 1px solid var(--border);
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex; align-items: center; gap: 6px;
-    font-size: 13px;
+    background: var(--bg-tertiary); color: var(--text-primary);
+    border: 1px solid var(--border); padding: 8px 16px;
+    border-radius: 8px; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; font-size: 13px;
 }
 .pdf-controls button svg { width: 14px; height: 14px; }
 
 .achievement {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px;
-    background: var(--bg-tertiary);
-    border-radius: 12px;
-    margin-bottom: 8px;
-    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px; background: var(--bg-tertiary);
+    border-radius: 12px; margin-bottom: 8px;
 }
-.achievement.earned {
-    background: var(--gradient-5);
-    color: white;
-}
+.achievement.earned { background: var(--gradient-5); color: white; }
 .achievement.earned .ach-desc { color: rgba(255,255,255,0.8); }
 
-.heat-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
-}
-.heat-cell {
-    aspect-ratio: 1;
-    border-radius: 3px;
-    background: var(--bg-tertiary);
-    transition: all 0.2s;
-}
+.heat-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.heat-cell { aspect-ratio: 1; border-radius: 3px; background: var(--bg-tertiary); }
 .heat-1 { background: #9be9a8; }
 .heat-2 { background: #40c463; }
 .heat-3 { background: #30a14e; }
 .heat-4 { background: #216e39; }
 
-.streak-row {
-    display: flex;
-    gap: 6px;
-    justify-content: space-between;
-    margin: 12px 0;
-}
+.streak-row { display: flex; gap: 6px; justify-content: space-between; margin: 12px 0; }
 .streak-day {
-    flex: 1;
-    aspect-ratio: 1;
-    border-radius: 10px;
+    flex: 1; aspect-ratio: 1; border-radius: 10px;
     background: var(--bg-tertiary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     font-size: 18px;
-    transition: all 0.2s;
 }
-.streak-day.active {
-    background: var(--gradient-5);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-}
-.streak-day.today {
-    border: 2px solid var(--warning);
-}
+.streak-day.active { background: var(--gradient-5); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
+.streak-day.today { border: 2px solid var(--warning); }
 
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    text-align: center;
-}
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; text-align: center; }
 .stat-value { font-size: 24px; font-weight: 700; }
 .stat-label { font-size: 11px; opacity: 0.8; margin-top: 2px; }
 
 .ring-container { display: flex; justify-content: center; margin: 10px 0; }
 
-.week-chart {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    height: 120px;
-    gap: 8px;
-    padding: 10px 0;
-}
-.week-bar {
-    flex: 1;
-    background: var(--bg-tertiary);
-    border-radius: 8px 8px 0 0;
-    position: relative;
-    min-height: 4px;
-    transition: all 0.3s;
-    overflow: hidden;
-}
-.week-bar-fill {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    background: var(--gradient-3);
-    border-radius: 8px 8px 0 0;
-    transition: height 0.5s ease;
-}
-.week-label {
-    text-align: center;
-    font-size: 10px;
-    color: var(--text-tertiary);
-    margin-top: 6px;
-}
+.week-chart { display: flex; align-items: flex-end; justify-content: space-between; height: 120px; gap: 8px; padding: 10px 0; }
+.week-bar { flex: 1; background: var(--bg-tertiary); border-radius: 8px 8px 0 0; position: relative; min-height: 4px; overflow: hidden; }
+.week-bar-fill { position: absolute; bottom: 0; left: 0; right: 0; background: var(--gradient-3); border-radius: 8px 8px 0 0; transition: height 0.5s ease; }
+.week-label { text-align: center; font-size: 10px; color: var(--text-tertiary); margin-top: 6px; }
 
-.empty {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--text-tertiary);
-}
-.empty-icon {
-    width: 64px; height: 64px;
-    margin: 0 auto 12px;
-    color: var(--text-tertiary);
-    opacity: 0.5;
-}
+.empty { text-align: center; padding: 40px 20px; color: var(--text-tertiary); }
+.empty-icon { width: 64px; height: 64px; margin: 0 auto 12px; opacity: 0.5; }
 
 .bookmark-item {
-    background: var(--bg-tertiary);
-    border-radius: 10px;
-    padding: 10px 12px;
-    margin-bottom: 6px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    background: var(--bg-tertiary); border-radius: 10px;
+    padding: 10px 12px; margin-bottom: 6px;
+    display: flex; justify-content: space-between; align-items: center;
     cursor: pointer;
 }
 .bookmark-item:hover { background: var(--border); }
 
-.section {
-    margin-bottom: 20px;
-}
+.section { margin-bottom: 20px; }
 .section-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    font-size: 13px; font-weight: 600;
+    color: var(--text-secondary); text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
 }
 .section-title svg { width: 14px; height: 14px; }
 
 .quick-action {
     background: var(--bg-secondary);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 14px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-bottom: 8px;
+    border-radius: 16px; padding: 14px;
+    display: flex; align-items: center; gap: 12px;
+    cursor: pointer; transition: all 0.2s; margin-bottom: 8px;
 }
 .quick-action:hover { transform: translateX(4px); box-shadow: var(--shadow-md); }
 .quick-action-icon {
-    width: 44px; height: 44px;
-    border-radius: 12px;
+    width: 44px; height: 44px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
-    color: white;
-    flex-shrink: 0;
+    color: white; flex-shrink: 0;
 }
 .quick-action-icon svg { width: 22px; height: 22px; }
 .quick-action-content { flex: 1; min-width: 0; }
@@ -683,87 +391,57 @@ label {
 .quick-action-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 
 .subtabs {
-    display: flex;
-    gap: 4px;
-    background: var(--bg-tertiary);
-    padding: 4px;
-    border-radius: 12px;
-    margin-bottom: 16px;
+    display: flex; gap: 4px; background: var(--bg-tertiary);
+    padding: 4px; border-radius: 12px; margin-bottom: 16px;
+    overflow-x: auto;
 }
 .subtab {
-    flex: 1;
-    padding: 8px;
-    background: none;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-secondary);
+    flex: 1; padding: 8px; background: none; border: none;
+    border-radius: 8px; cursor: pointer;
+    font-size: 13px; font-weight: 500; color: var(--text-secondary);
     transition: all 0.2s;
     display: flex; align-items: center; justify-content: center; gap: 6px;
+    white-space: nowrap;
 }
 .subtab svg { width: 14px; height: 14px; }
-.subtab.active {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    box-shadow: var(--shadow-sm);
-}
+.subtab.active { background: var(--bg-secondary); color: var(--text-primary); box-shadow: var(--shadow-sm); }
 
 .toggle {
-    position: relative;
-    width: 44px;
-    height: 24px;
-    background: var(--bg-tertiary);
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid var(--border);
+    position: relative; width: 44px; height: 24px;
+    background: var(--bg-tertiary); border-radius: 12px;
+    cursor: pointer; transition: all 0.2s;
+    border: 1px solid var(--border); flex-shrink: 0;
 }
 .toggle.active { background: var(--accent); border-color: var(--accent); }
 .toggle::after {
-    content: '';
-    position: absolute;
-    top: 2px; left: 2px;
-    width: 18px; height: 18px;
-    background: white;
-    border-radius: 50%;
-    transition: all 0.2s;
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 18px; height: 18px; background: white;
+    border-radius: 50%; transition: all 0.2s;
     box-shadow: var(--shadow-sm);
 }
 .toggle.active::after { left: 22px; }
 
 .setting-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
 }
 .setting-row:last-child { border-bottom: none; }
 .setting-label { display: flex; align-items: center; gap: 10px; font-size: 14px; }
 .setting-label svg { width: 18px; height: 18px; color: var(--text-secondary); }
 
 .add-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px;
-    margin-top: 16px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px; margin-top: 16px;
 }
-.add-buttons .btn { margin: 0; font-size: 12px; padding: 10px; }
+.add-buttons .btn { margin: 0; font-size: 11px; padding: 10px 6px; }
 
 .confirm-modal {
-    background: var(--bg-secondary);
-    border-radius: 20px;
-    padding: 24px;
-    text-align: center;
-    max-width: 320px;
+    background: var(--bg-secondary); border-radius: 20px;
+    padding: 24px; text-align: center; max-width: 320px;
 }
 .confirm-icon {
-    width: 64px; height: 64px;
-    margin: 0 auto 16px;
-    background: rgba(239, 68, 68, 0.1);
-    border-radius: 50%;
+    width: 64px; height: 64px; margin: 0 auto 16px;
+    background: rgba(239, 68, 68, 0.1); border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     color: var(--danger);
 }
@@ -776,33 +454,20 @@ label {
 .cat-stat {
     background: var(--bg-secondary);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 8px;
+    border-radius: 12px; padding: 12px; margin-bottom: 8px;
 }
-.cat-stat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-}
-.cat-stat-title { font-weight: 600; font-size: 14px; }
+.cat-stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.cat-stat-title { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px; }
 .cat-stat-percent { font-size: 13px; color: var(--accent); font-weight: 600; }
 
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.gap-2 { gap: 8px; }
-.gap-3 { gap: 12px; }
-.mt-2 { margin-top: 8px; }
-.mt-3 { margin-top: 12px; }
-.mb-2 { margin-bottom: 8px; }
-.mb-3 { margin-bottom: 12px; }
-.text-sm { font-size: 13px; }
-.text-xs { font-size: 11px; }
-.text-center { text-align: center; }
-.w-full { width: 100%; }
+.editor-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--gradient-5); color: white;
+    padding: 2px 8px; border-radius: 10px;
+    font-size: 10px; font-weight: 600;
+    margin-left: 8px;
+}
+
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
 </head>
@@ -854,8 +519,9 @@ label {
 
 <script>
 // ============ КОНФИГУРАЦИЯ АДМИНОВ ============
+// Добавь сюда Telegram ID тех, кто может редактировать контент
+// Узнать ID можно через @userinfobot в Telegram
 const ADMIN_TELEGRAM_IDS = [8690178977
-    // Добавь сюда Telegram ID администраторов
     // Пример: 123456789, 987654321
 ];
 
@@ -866,12 +532,11 @@ const ICONS = {
     book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
     chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
     user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
-    settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
     search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
     play: '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
     pause: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>',
-    back15: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><text x="12" y="16" font-size="8" text-anchor="middle" fill="currentColor" stroke="none" font-weight="bold">15</text></svg>',
-    fwd15: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><text x="12" y="16" font-size="8" text-anchor="middle" fill="currentColor" stroke="none" font-weight="bold">15</text></svg>',
+    back15: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>',
+    fwd15: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>',
     heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
     heartFill: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
     bookmark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
@@ -889,15 +554,13 @@ const ICONS = {
     moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
     clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
     zap: '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
-    award: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
     shuffle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>',
     arrowLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>',
     bell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
-    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
     pages: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
     moreVertical: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>',
-    copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
-    skipForward: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>'
+    skipForward: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>',
+    shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'
 };
 
 const icon = (name, size = 20) => `<span style="display:inline-flex;width:${size}px;height:${size}px;">${ICONS[name] || ''}</span>`;
@@ -947,20 +610,28 @@ function init() {
         DB.set('user', user);
     }
     state.user = user;
-    document.getElementById('header-sub').textContent = `Привет, ${user.name}!`;
+    updateHeaderSub();
     
     renderNav();
     renderTab();
 }
 
+function updateHeaderSub() {
+    const sub = document.getElementById('header-sub');
+    sub.innerHTML = `Привет, ${escapeHtml(state.user.name)}!${state.editorMode ? '<span class="editor-badge">' + icon('shield', 10) + ' Редактор</span>' : ''}`;
+}
+
 function checkAdminAccess() {
     const tg = window.Telegram?.WebApp;
     if (tg) {
+        tg.ready();
+        tg.expand();
         const tgUser = tg.initDataUnsafe?.user;
         if (tgUser && ADMIN_TELEGRAM_IDS.includes(tgUser.id)) {
             state.editorMode = true;
         }
     } else {
+        // Для локального тестирования
         state.editorMode = DB.get('editorMode', false);
     }
     updateEditorMode();
@@ -968,11 +639,8 @@ function checkAdminAccess() {
 
 function updateEditorMode() {
     const app = document.getElementById('app');
-    if (state.editorMode) {
-        app.classList.add('editor-mode');
-    } else {
-        app.classList.remove('editor-mode');
-    }
+    if (state.editorMode) app.classList.add('editor-mode');
+    else app.classList.remove('editor-mode');
 }
 
 // ============ THEME ============
@@ -1033,6 +701,7 @@ function escapeHtml(str) {
 }
 
 function formatDuration(sec) {
+    if (!sec || isNaN(sec)) return '0:00';
     const m = Math.floor(sec / 60);
     const s = Math.floor(sec % 60);
     return `${m}:${s.toString().padStart(2, '0')}`;
@@ -1133,18 +802,27 @@ function getAllBooks() {
 // ============ CONTEXT MENU ============
 function showContextMenu(event, items) {
     event.stopPropagation();
+    event.preventDefault();
     const menu = document.getElementById('context-menu');
     menu.innerHTML = items.map(item => `
-        <div class="context-menu-item ${item.danger ? 'danger' : ''}" onclick="${item.action}">
+        <div class="context-menu-item ${item.danger ? 'danger' : ''}" onclick="hideContextMenu(); ${item.action}">
             ${icon(item.icon, 18)}
             <span>${item.label}</span>
         </div>
     `).join('');
     
-    const rect = event.target.getBoundingClientRect();
+    const rect = event.currentTarget.getBoundingClientRect();
     menu.style.display = 'block';
-    menu.style.left = Math.min(rect.left, window.innerWidth - 220) + 'px';
-    menu.style.top = (rect.bottom + 4) + 'px';
+    
+    let left = rect.right - 200;
+    let top = rect.bottom + 4;
+    
+    if (left < 10) left = 10;
+    if (left + 200 > window.innerWidth) left = window.innerWidth - 210;
+    if (top + menu.offsetHeight > window.innerHeight) top = rect.top - menu.offsetHeight - 4;
+    
+    menu.style.left = left + 'px';
+    menu.style.top = top + 'px';
     
     setTimeout(() => {
         document.addEventListener('click', hideContextMenu, { once: true });
@@ -1177,6 +855,10 @@ function showConfirm(title, text, onConfirm) {
         closeModal();
         onConfirm();
     };
+}
+
+function closeModal() {
+    document.getElementById('modal').classList.remove('active');
 }
 
 // ============ ГЛАВНАЯ ============
@@ -1214,7 +896,6 @@ function renderHome() {
                         <div style="font-size: 11px; opacity: 0.9; display: flex; align-items: center; gap: 4px;">${icon('fire', 12)} дней</div>
                     </div>
                 </div>
-                
                 <div class="stats-grid">
                     <div>
                         <div class="stat-value">${progress.filter(p => p.type === 'lesson' && p.completed).length}</div>
@@ -1234,9 +915,7 @@ function renderHome() {
         
         <div class="section">
             <div class="section-title">${icon('fire', 14)} Серия дней</div>
-            <div class="streak-row">
-                ${renderStreakDays(streak)}
-            </div>
+            <div class="streak-row">${renderStreakDays(streak)}</div>
         </div>
     `;
     
@@ -1267,22 +946,14 @@ function renderHome() {
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                 ${lessons.length > 0 ? `
                     <div class="quick-action" onclick="openRandomLesson()" style="margin: 0;">
-                        <div class="quick-action-icon" style="background: var(--gradient-3); width: 36px; height: 36px;">
-                            ${icon('shuffle', 18)}
-                        </div>
-                        <div class="quick-action-content">
-                            <div class="quick-action-title" style="font-size: 13px;">Случайный урок</div>
-                        </div>
+                        <div class="quick-action-icon" style="background: var(--gradient-3); width: 36px; height: 36px;">${icon('shuffle', 18)}</div>
+                        <div class="quick-action-content"><div class="quick-action-title" style="font-size: 13px;">Случайный урок</div></div>
                     </div>
                 ` : ''}
                 ${books.length > 0 ? `
                     <div class="quick-action" onclick="openRandomBook()" style="margin: 0;">
-                        <div class="quick-action-icon" style="background: var(--gradient-4); width: 36px; height: 36px;">
-                            ${icon('shuffle', 18)}
-                        </div>
-                        <div class="quick-action-content">
-                            <div class="quick-action-title" style="font-size: 13px;">Случайная книга</div>
-                        </div>
+                        <div class="quick-action-icon" style="background: var(--gradient-4); width: 36px; height: 36px;">${icon('shuffle', 18)}</div>
+                        <div class="quick-action-content"><div class="quick-action-title" style="font-size: 13px;">Случайная книга</div></div>
                     </div>
                 ` : ''}
             </div>
@@ -1306,21 +977,10 @@ function renderHome() {
     }
     
     if (recentLessons.length > 0) {
-        html += `
-            <div class="section">
-                <div class="section-title">${icon('headphones', 14)} Новые уроки</div>
-                ${recentLessons.map(l => renderLessonCard(l)).join('')}
-            </div>
-        `;
+        html += `<div class="section"><div class="section-title">${icon('headphones', 14)} Новые уроки</div>${recentLessons.map(l => renderLessonCard(l)).join('')}</div>`;
     }
-    
     if (recentBooks.length > 0) {
-        html += `
-            <div class="section">
-                <div class="section-title">${icon('book', 14)} Новые книги</div>
-                ${recentBooks.map(b => renderBookCard(b)).join('')}
-            </div>
-        `;
+        html += `<div class="section"><div class="section-title">${icon('book', 14)} Новые книги</div>${recentBooks.map(b => renderBookCard(b)).join('')}</div>`;
     }
     
     if (lessons.length === 0 && books.length === 0) {
@@ -1328,7 +988,7 @@ function renderHome() {
             <div class="empty">
                 <div class="empty-icon">${icon('folder', 64)}</div>
                 <div style="font-weight: 600; margin-bottom: 6px; color: var(--text-primary);">Пока пусто</div>
-                <div style="font-size: 13px;">${state.editorMode ? 'Добавь первый раздел в Уроках или Книгах' : 'Контент скоро появится!'}</div>
+                <div style="font-size: 13px;">${state.editorMode ? 'Перейди в Уроки или Книги — там можно создать первый раздел' : 'Контент скоро появится!'}</div>
             </div>
         `;
     }
@@ -1340,15 +1000,10 @@ function renderStreakDays(streak) {
     const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
     const today = new Date();
     const todayIdx = (today.getDay() + 6) % 7;
-    
     return days.map((d, i) => {
         const isActive = i <= todayIdx && i >= todayIdx - streak.count + 1;
         const isToday = i === todayIdx;
-        return `
-            <div class="streak-day ${isActive ? 'active' : ''} ${isToday ? 'today' : ''}" title="${d}">
-                ${isActive ? '🔥' : ''}
-            </div>
-        `;
+        return `<div class="streak-day ${isActive ? 'active' : ''} ${isToday ? 'today' : ''}" title="${d}">${isActive ? '🔥' : ''}</div>`;
     }).join('');
 }
 
@@ -1356,14 +1011,10 @@ function calculateStreak() {
     const progress = DB.get('progress');
     const dates = [...new Set(progress.map(p => p.date))].sort().reverse();
     if (dates.length === 0) return { count: 0 };
-    
     let count = 0;
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    
+    const today = new Date(); today.setHours(0,0,0,0);
     for (let i = 0; i < 365; i++) {
-        const d = new Date(today);
-        d.setDate(d.getDate() - i);
+        const d = new Date(today); d.setDate(d.getDate() - i);
         const key = d.toISOString().split('T')[0];
         if (dates.includes(key)) count++;
         else if (i === 0) continue;
@@ -1378,12 +1029,10 @@ function renderLessonCard(l) {
     const fav = isFavorite('lesson', l.id);
     return `
         <div class="card" onclick="openLesson(${l.id})">
-            <button class="card-menu-btn" onclick="showLessonMenu(event, ${l.id})">${icon('moreVertical', 16)}</button>
+            <button class="card-menu-btn" onclick="event.stopPropagation(); showLessonMenu(event, ${l.id})">${icon('moreVertical', 16)}</button>
             <div class="card-title">
-                <span style="width: 32px; height: 32px; border-radius: 8px; background: var(--gradient-1); display: inline-flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;">
-                    ${icon('headphones', 16)}
-                </span>
-                <span style="flex: 1; min-width: 0;" class="truncate">${escapeHtml(l.title)}</span>
+                <span style="width: 32px; height: 32px; border-radius: 8px; background: var(--gradient-1); display: inline-flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;">${icon('headphones', 16)}</span>
+                <span style="flex: 1; min-width: 0; padding-right: 30px;" class="truncate">${escapeHtml(l.title)}</span>
                 ${p?.completed ? `<span class="badge badge-success">${icon('check', 12)}</span>` : ''}
                 ${fav ? `<span style="color: #ef4444;">${icon('heartFill', 16)}</span>` : ''}
             </div>
@@ -1402,12 +1051,10 @@ function renderBookCard(b) {
     const fav = isFavorite('book', b.id);
     return `
         <div class="card" onclick="openBook(${b.id})">
-            <button class="card-menu-btn" onclick="showBookMenu(event, ${b.id})">${icon('moreVertical', 16)}</button>
+            <button class="card-menu-btn" onclick="event.stopPropagation(); showBookMenu(event, ${b.id})">${icon('moreVertical', 16)}</button>
             <div class="card-title">
-                <span style="width: 32px; height: 32px; border-radius: 8px; background: var(--gradient-2); display: inline-flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;">
-                    ${icon('book', 16)}
-                </span>
-                <span style="flex: 1; min-width: 0;" class="truncate">${escapeHtml(b.title)}</span>
+                <span style="width: 32px; height: 32px; border-radius: 8px; background: var(--gradient-2); display: inline-flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;">${icon('book', 16)}</span>
+                <span style="flex: 1; min-width: 0; padding-right: 30px;" class="truncate">${escapeHtml(b.title)}</span>
                 ${p?.completed ? `<span class="badge badge-success">${icon('check', 12)}</span>` : ''}
                 ${fav ? `<span style="color: #ef4444;">${icon('heartFill', 16)}</span>` : ''}
             </div>
@@ -1423,17 +1070,1212 @@ function renderBookCard(b) {
 function openRandomLesson() {
     const lessons = getAllLessons();
     if (lessons.length === 0) return;
-    const l = lessons[Math.floor(Math.random() * lessons.length)];
-    state.currentCategory = l.categoryId;
-    openLesson(l.id);
+    openLesson(lessons[Math.floor(Math.random() * lessons.length)].id);
 }
 
 function openRandomBook() {
     const books = getAllBooks();
     if (books.length === 0) return;
-    const b = books[Math.floor(Math.random() * books.length)];
-    state.currentCategory = b.categoryId;
-    openBook(b.id);
+    openBook(books[Math.floor(Math.random() * books.length)].id);
 }
 
-//
+// ============ МЕНЮ КОНТЕКСТНЫЕ ============
+function showLessonMenu(event, id) {
+    const items = [
+        { icon: 'heart', label: isFavorite('lesson', id) ? 'Убрать из избранного' : 'В избранное', action: `toggleFavorite('lesson', ${id}); renderTab();` },
+    ];
+    if (state.editorMode) {
+        items.push({ icon: 'edit', label: 'Редактировать', action: `showLessonForm(null, ${id})` });
+        items.push({ icon: 'trash', label: 'Удалить', action: `confirmDeleteLesson(${id})`, danger: true });
+    }
+    showContextMenu(event, items);
+}
+
+function showBookMenu(event, id) {
+    const items = [
+        { icon: 'heart', label: isFavorite('book', id) ? 'Убрать из избранного' : 'В избранное', action: `toggleFavorite('book', ${id}); renderTab();` },
+    ];
+    if (state.editorMode) {
+        items.push({ icon: 'edit', label: 'Редактировать', action: `showBookForm(null, ${id})` });
+        items.push({ icon: 'trash', label: 'Удалить', action: `confirmDeleteBook(${id})`, danger: true });
+    }
+    showContextMenu(event, items);
+}
+
+function showCategoryMenu(event, id) {
+    if (!state.editorMode) return;
+    const items = [
+        { icon: 'edit', label: 'Редактировать раздел', action: `showCatForm(${id})` },
+        { icon: 'plus', label: 'Добавить подраздел', action: `showCatForm(null, ${id})` },
+        { icon: 'headphones', label: 'Добавить урок', action: `showLessonForm(${id})` },
+        { icon: 'book', label: 'Добавить книгу', action: `showBookForm(${id})` },
+        { icon: 'trash', label: 'Удалить раздел', action: `confirmDeleteCat(${id})`, danger: true }
+    ];
+    showContextMenu(event, items);
+}
+
+function confirmDeleteLesson(id) {
+    const lesson = getLessons().find(l => l.id === id);
+    showConfirm(
+        'Удалить урок?',
+        `Урок "${lesson?.title}" будет удалён. Прогресс сохранится, но сам урок исчезнет.`,
+        () => {
+            DB.set('lessons', getLessons().filter(l => l.id !== id));
+            renderTab();
+            showToast('🗑 Урок удалён');
+        }
+    );
+}
+
+function confirmDeleteBook(id) {
+    const book = getBooks().find(b => b.id === id);
+    showConfirm(
+        'Удалить книгу?',
+        `Книга "${book?.title}" будет удалена. Прогресс сохранится, но сама книга исчезнет.`,
+        () => {
+            DB.set('books', getBooks().filter(b => b.id !== id));
+            renderTab();
+            showToast('🗑 Книга удалена');
+        }
+    );
+}
+
+function confirmDeleteCat(id) {
+    const cat = findCategory(id);
+    const ids = getAllDescendantIds(id);
+    const lessonsCount = getLessons().filter(l => ids.includes(l.categoryId)).length;
+    const booksCount = getBooks().filter(b => ids.includes(b.categoryId)).length;
+    showConfirm(
+        'Удалить раздел?',
+        `Раздел "${cat?.title}" и всё его содержимое (${ids.length - 1} подразделов, ${lessonsCount} уроков, ${booksCount} книг) будет удалено.`,
+        () => {
+            DB.set('categories', getCategories().filter(c => !ids.includes(c.id)));
+            DB.set('lessons', getLessons().filter(l => !ids.includes(l.categoryId)));
+            DB.set('books', getBooks().filter(b => !ids.includes(b.categoryId)));
+            state.currentCategory = null;
+            renderTab();
+            showToast('🗑 Раздел удалён');
+        }
+    );
+}
+
+// ============ УРОКИ / КНИГИ ============
+function renderLessons() {
+    const container = document.getElementById('tab-lessons');
+    if (state.currentCategory) renderCategoryView(container, 'lesson');
+    else renderContentList(container, 'lesson');
+}
+
+function renderBooks() {
+    const container = document.getElementById('tab-books');
+    if (state.currentCategory) renderCategoryView(container, 'book');
+    else renderContentList(container, 'book');
+}
+
+function renderContentList(container, type) {
+    const allItems = type === 'lesson' ? getAllLessons() : getAllBooks();
+    const tree = buildTree(null);
+    const title = type === 'lesson' ? 'Уроки' : 'Книги';
+    const iconType = type === 'lesson' ? 'headphones' : 'book';
+    
+    let html = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h2 style="font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                ${icon(iconType, 24)} ${title}
+            </h2>
+            ${state.editorMode ? `<button class="icon-btn" onclick="showCatForm()" title="Новый раздел">${icon('plus', 18)}</button>` : ''}
+        </div>
+        
+        <div class="search-box">
+            ${icon('search', 18)}
+            <input type="text" placeholder="Поиск..." value="${escapeHtml(state.searchQuery)}" oninput="handleSearch(this.value)">
+        </div>
+        
+        <div class="subtabs">
+            <button class="subtab ${state[type === 'lesson' ? 'lessonsSubTab' : 'booksSubTab'] === 'all' ? 'active' : ''}" onclick="setSubTab('${type}', 'all')">Все</button>
+            <button class="subtab ${state[type === 'lesson' ? 'lessonsSubTab' : 'booksSubTab'] === 'progress' ? 'active' : ''}" onclick="setSubTab('${type}', 'progress')">В процессе</button>
+            <button class="subtab ${state[type === 'lesson' ? 'lessonsSubTab' : 'booksSubTab'] === 'done' ? 'active' : ''}" onclick="setSubTab('${type}', 'done')">Готово</button>
+            <button class="subtab ${state[type === 'lesson' ? 'lessonsSubTab' : 'booksSubTab'] === 'fav' ? 'active' : ''}" onclick="setSubTab('${type}', 'fav')">❤️</button>
+        </div>
+    `;
+    
+    const subTab = state[type === 'lesson' ? 'lessonsSubTab' : 'booksSubTab'];
+    let filteredItems = allItems;
+    
+    if (state.searchQuery) {
+        const q = state.searchQuery.toLowerCase();
+        filteredItems = filteredItems.filter(i => 
+            i.title.toLowerCase().includes(q) || 
+            (i.description || '').toLowerCase().includes(q) ||
+            (i.author || '').toLowerCase().includes(q)
+        );
+    }
+    
+    if (subTab === 'fav') {
+        const favIds = DB.get('favorites').filter(f => f.type === type).map(f => f.contentId);
+        filteredItems = filteredItems.filter(i => favIds.includes(i.id));
+    } else if (subTab === 'progress') {
+        filteredItems = filteredItems.filter(i => { const p = getProgress(type, i.id); return p && !p.completed && p.percent > 0; });
+    } else if (subTab === 'done') {
+        filteredItems = filteredItems.filter(i => getProgress(type, i.id)?.completed);
+    }
+    
+    if (filteredItems.length === 0 && tree.length === 0 && !state.searchQuery) {
+        html += `
+            <div class="empty">
+                <div class="empty-icon">${icon('folder', 64)}</div>
+                <div style="font-weight: 600; margin-bottom: 6px; color: var(--text-primary);">Пока ничего нет</div>
+                <div style="font-size: 13px; margin-bottom: 16px;">${state.editorMode ? 'Создай первый раздел, чтобы начать' : 'Контент скоро появится!'}</div>
+                ${state.editorMode ? `<button class="btn btn-primary" style="width: auto; margin: 0 auto;" onclick="showCatForm()">${icon('plus', 16)} Создать раздел</button>` : ''}
+            </div>
+        `;
+    } else {
+        // Разделы
+        if (tree.length > 0) {
+            html += `<div class="section"><div class="section-title">${icon('folder', 14)} Разделы</div>`;
+            tree.forEach(cat => {
+                const total = countItemsInTree(cat, type);
+                html += `
+                    <div class="card" onclick="openCategory(${cat.id})">
+                        <button class="card-menu-btn" onclick="event.stopPropagation(); showCategoryMenu(event, ${cat.id})">${icon('moreVertical', 16)}</button>
+                        <div class="card-title">
+                            <span style="font-size: 20px;">${cat.emoji || '📂'}</span>
+                            <span style="flex: 1; padding-right: 30px;" class="truncate">${escapeHtml(cat.title)}</span>
+                            <span class="badge">${total}</span>
+                        </div>
+                        ${cat.description ? `<div class="card-sub">${escapeHtml(cat.description.substring(0, 60))}${cat.description.length > 60 ? '...' : ''}</div>` : ''}
+                    </div>
+                `;
+            });
+            html += `</div>`;
+        }
+        
+        // Контент
+        if (filteredItems.length > 0) {
+            html += `<div class="section"><div class="section-title">${icon(iconType, 14)} ${type === 'lesson' ? 'Уроки' : 'Книги'} <span class="badge">${filteredItems.length}</span></div>`;
+            html += filteredItems.map(i => type === 'lesson' ? renderLessonCard(i) : renderBookCard(i)).join('');
+            html += `</div>`;
+        }
+        
+        if (filteredItems.length === 0 && state.searchQuery) {
+            html += `<div class="empty"><div class="empty-icon">${icon('search', 48)}</div>Ничего не найдено</div>`;
+        }
+    }
+    
+    container.innerHTML = html;
+}
+
+function handleSearch(q) {
+    state.searchQuery = q;
+    renderTab();
+}
+
+function setSubTab(type, tab) {
+    if (type === 'lesson') state.lessonsSubTab = tab;
+    else state.booksSubTab = tab;
+    renderTab();
+}
+
+function renderCategoryView(container, type) {
+    const cat = findCategory(state.currentCategory);
+    if (!cat) { state.currentCategory = null; renderTab(); return; }
+    
+    const path = getCategoryPath(cat.id);
+    const lessons = getLessons().filter(l => l.categoryId === cat.id);
+    const books = getBooks().filter(b => b.categoryId === cat.id);
+    const subcats = getCategories().filter(c => c.parentId === cat.id);
+    
+    let html = `
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <button onclick="goBack()" style="background: var(--bg-tertiary); border: none; width: 32px; height: 32px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-primary);">${icon('arrowLeft', 16)}</button>
+            <div style="font-size: 12px; color: var(--text-secondary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                ${path.map(p => escapeHtml(p.title)).join(' / ')}
+            </div>
+            ${state.editorMode ? `<button class="icon-btn" onclick="showCategoryMenu(event, ${cat.id})">${icon('moreVertical', 16)}</button>` : ''}
+        </div>
+        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 24px;">${cat.emoji || '📂'}</span>
+            ${escapeHtml(cat.title)}
+        </h2>
+        ${cat.description ? `<p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 16px;">${escapeHtml(cat.description)}</p>` : '<div style="height: 12px;"></div>'}
+    `;
+    
+    if (subcats.length > 0) {
+        html += `<div class="section"><div class="section-title">${icon('folder', 14)} Подразделы</div>`;
+        subcats.forEach(c => {
+            const tree = buildTree(c.id);
+            const fullCat = { ...c, children: tree, lessons: getLessons().filter(l => l.categoryId === c.id), books: getBooks().filter(b => b.categoryId === c.id) };
+            const totalL = countItemsInTree(fullCat, 'lesson');
+            const totalB = countItemsInTree(fullCat, 'book');
+            html += `
+                <div class="card" onclick="openCategory(${c.id})">
+                    <button class="card-menu-btn" onclick="event.stopPropagation(); showCategoryMenu(event, ${c.id})">${icon('moreVertical', 16)}</button>
+                    <div class="card-title">
+                        <span style="font-size: 20px;">${c.emoji || '📂'}</span>
+                        <span style="flex: 1; padding-right: 30px;" class="truncate">${escapeHtml(c.title)}</span>
+                        ${icon('chevronRight', 16)}
+                    </div>
+                    <div class="card-sub">
+                        ${totalL > 0 ? `${icon('headphones', 12)} ${totalL}` : ''}
+                        ${totalL > 0 && totalB > 0 ? ' • ' : ''}
+                        ${totalB > 0 ? `${icon('book', 12)} ${totalB}` : ''}
+                    </div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+    }
+    
+    if (lessons.length > 0) {
+        html += `<div class="section"><div class="section-title">${icon('headphones', 14)} Уроки <span class="badge">${lessons.length}</span></div>`;
+        lessons.forEach(l => html += renderLessonCard(l));
+        html += `</div>`;
+    }
+    
+    if (books.length > 0) {
+        html += `<div class="section"><div class="section-title">${icon('book', 14)} Книги <span class="badge">${books.length}</span></div>`;
+        books.forEach(b => html += renderBookCard(b));
+        html += `</div>`;
+    }
+    
+    // Кнопки добавления для редактора
+    if (state.editorMode) {
+        html += `
+            <div class="add-buttons">
+                <button class="btn btn-primary" onclick="showCatForm(null, ${cat.id})">${icon('plus', 14)} Подраздел</button>
+                <button class="btn btn-success" onclick="showLessonForm(${cat.id})">${icon('headphones', 14)} Урок</button>
+                <button class="btn btn-purple" onclick="showBookForm(${cat.id})">${icon('book', 14)} Книга</button>
+            </div>
+        `;
+    }
+    
+    if (lessons.length === 0 && books.length === 0 && subcats.length === 0) {
+        html += `<div class="empty"><div class="empty-icon">${icon('folder', 48)}</div>Раздел пуст</div>`;
+    }
+    
+    container.innerHTML = html;
+}
+
+function openCategory(id) {
+    state.currentCategory = id;
+    renderTab();
+}
+
+function goBack() {
+    const cat = findCategory(state.currentCategory);
+    state.currentCategory = cat?.parentId || null;
+    renderTab();
+}
+
+// ============ АУДИОПЛЕЕР ============
+function openLesson(id) {
+    const lesson = getAllLessons().find(l => l.id === id);
+    if (!lesson) return;
+    state.currentLesson = lesson;
+    state.currentCategory = lesson.categoryId;
+    
+    // Формируем плейлист из уроков этого раздела
+    const categoryLessons = getLessons().filter(l => l.categoryId === lesson.categoryId);
+    state.playlist = categoryLessons;
+    state.playlistIndex = categoryLessons.findIndex(l => l.id === id);
+    
+    const p = getProgress('lesson', id);
+    state.audio.src = lesson.audioUrl;
+    state.audio.playbackRate = state.audioSpeed;
+    if (p) state.audio.currentTime = p.position || 0;
+    
+    const fav = isFavorite('lesson', id);
+    
+    document.getElementById('audio-body').innerHTML = `
+        <div class="audio-player">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; position: relative; z-index: 1;">
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 18px; font-weight: 700;" class="truncate">${escapeHtml(lesson.title)}</div>
+                    ${lesson.description ? `<div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">${escapeHtml(lesson.description).substring(0, 80)}${lesson.description.length > 80 ? '...' : ''}</div>` : ''}
+                </div>
+                <button onclick="closeAudio()" style="background: rgba(255,255,255,0.2); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">${icon('x', 16)}</button>
+            </div>
+            
+            <div class="wave-container" id="wave">
+                ${Array(7).fill(0).map(() => '<div class="wave-bar"></div>').join('')}
+            </div>
+            
+            <div style="margin-bottom: 16px; position: relative; z-index: 1;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; opacity: 0.9;">
+                    <span id="cur-time">0:00</span>
+                    <span id="total-time">${formatDuration(lesson.duration)}</span>
+                </div>
+                <input type="range" id="seek" min="0" max="100" value="0" step="0.1"
+                       style="width: 100%; margin: 0; accent-color: white;" oninput="seekAudio(this.value)">
+            </div>
+            
+            <div class="speed-selector">
+                ${[0.5, 0.75, 1, 1.25, 1.5, 2].map(s => `
+                    <button class="speed-btn ${state.audioSpeed === s ? 'active' : ''}" onclick="setSpeed(${s})">${s}x</button>
+                `).join('')}
+            </div>
+            
+            <div class="audio-controls">
+                <button onclick="skipAudio(-15)" title="Назад 15с">${icon('back15', 22)}</button>
+                ${state.playlist.length > 1 ? `<button onclick="prevInPlaylist()" title="Предыдущий">${icon('skipForward', 22)}</button>` : ''}
+                <button class="play-btn" id="play-btn" onclick="togglePlay()">${icon('play', 28)}</button>
+                ${state.playlist.length > 1 ? `<button onclick="nextInPlaylist()" title="Следующий">${icon('skipForward', 22)}</button>` : ''}
+                <button onclick="skipAudio(15)" title="Вперёд 15с">${icon('fwd15', 22)}</button>
+            </div>
+            
+            <div style="display: flex; gap: 8px; position: relative; z-index: 1;">
+                <button onclick="handleFav('lesson', ${id})" class="btn" style="background: rgba(255,255,255,0.2); color: white; margin: 0; flex: 1;">
+                    ${fav ? icon('heartFill', 16) : icon('heart', 16)}
+                    ${fav ? 'В избранном' : 'В избранное'}
+                </button>
+                <button onclick="completeLesson()" class="btn" style="background: rgba(255,255,255,0.2); color: white; margin: 0; flex: 1;">
+                    ${icon('check', 16)} Завершить
+                </button>
+            </div>
+            
+            ${state.playlist.length > 1 ? `
+                <div class="playlist-section">
+                    <div style="font-size: 12px; opacity: 0.8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        ${icon('headphones', 12)} Плейлист (${state.playlistIndex + 1}/${state.playlist.length})
+                    </div>
+                    ${state.playlist.map((pl, i) => `
+                        <div class="playlist-item ${i === state.playlistIndex ? 'current' : ''}" onclick="playFromPlaylist(${i})">
+                            <div class="playlist-item-num">${i + 1}</div>
+                            <div class="playlist-item-title">${escapeHtml(pl.title)}</div>
+                            <div class="playlist-item-dur">${formatDuration(pl.duration)}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : ''}
+        </div>
+    `;
+    
+    document.getElementById('audio-modal').classList.add('active');
+    updateAudioTime();
+    updateMediaSession();
+}
+
+function setSpeed(speed) {
+    state.audioSpeed = speed;
+    state.audio.playbackRate = speed;
+    // Перерисовываем кнопки
+    document.querySelectorAll('.speed-btn').forEach(btn => {
+        btn.classList.toggle('active', parseFloat(btn.textContent) === speed);
+    });
+}
+
+function playFromPlaylist(index) {
+    if (index < 0 || index >= state.playlist.length) return;
+    state.playlistIndex = index;
+    const lesson = state.playlist[index];
+    state.currentLesson = lesson;
+    
+    const p = getProgress('lesson', lesson.id);
+    state.audio.src = lesson.audioUrl;
+    state.audio.playbackRate = state.audioSpeed;
+    state.audio.currentTime = p ? (p.position || 0) : 0;
+    state.audio.play().catch(() => {});
+    
+    // Обновляем UI
+    openLesson(lesson.id);
+    state.audio.play().catch(() => {});
+}
+
+function nextInPlaylist() {
+    if (state.playlistIndex < state.playlist.length - 1) {
+        playFromPlaylist(state.playlistIndex + 1);
+    }
+}
+
+function prevInPlaylist() {
+    if (state.playlistIndex > 0) {
+        playFromPlaylist(state.playlistIndex - 1);
+    }
+}
+
+function updateMediaSession() {
+    if ('mediaSession' in navigator && state.currentLesson) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: state.currentLesson.title,
+            artist: state.currentLesson.categoryName || 'Уроки и Книги',
+            album: 'Уроки и Книги'
+        });
+        navigator.mediaSession.setActionHandler('play', () => togglePlay());
+        navigator.mediaSession.setActionHandler('pause', () => togglePlay());
+        navigator.mediaSession.setActionHandler('seekbackward', () => skipAudio(-15));
+        navigator.mediaSession.setActionHandler('seekforward', () => skipAudio(15));
+        navigator.mediaSession.setActionHandler('previoustrack', () => prevInPlaylist());
+        navigator.mediaSession.setActionHandler('nexttrack', () => nextInPlaylist());
+    }
+}
+
+function togglePlay() {
+    if (state.audio.paused) {
+        state.audio.play().catch(e => {
+            alert('Не удалось воспроизвести. Проверь ссылку.');
+        });
+        document.getElementById('play-btn').innerHTML = icon('pause', 28);
+        document.querySelectorAll('.wave-bar').forEach(b => b.classList.add('playing'));
+    } else {
+        state.audio.pause();
+        document.getElementById('play-btn').innerHTML = icon('play', 28);
+        document.querySelectorAll('.wave-bar').forEach(b => b.classList.remove('playing'));
+    }
+}
+
+function seekAudio(v) {
+    if (state.audio.duration) {
+        state.audio.currentTime = (parseFloat(v) / 100) * state.audio.duration;
+    }
+}
+
+function skipAudio(sec) {
+    state.audio.currentTime = Math.max(0, Math.min(state.audio.duration || 0, state.audio.currentTime + sec));
+}
+
+function updateAudioTime() {
+    const ct = document.getElementById('cur-time');
+    const seek = document.getElementById('seek');
+    if (ct) ct.textContent = formatDuration(state.audio.currentTime);
+    if (seek && state.audio.duration && !seek.matches(':active')) {
+        seek.value = (state.audio.currentTime / state.audio.duration) * 100;
+    }
+    if (state.currentLesson && state.audio.duration) {
+        const pct = (state.audio.currentTime / state.audio.duration) * 100;
+        saveProgress('lesson', state.currentLesson.id, pct, state.audio.currentTime, false);
+    }
+}
+
+state.audio.addEventListener('timeupdate', updateAudioTime);
+state.audio.addEventListener('loadedmetadata', () => {
+    const tt = document.getElementById('total-time');
+    if (tt && state.audio.duration && isFinite(state.audio.duration)) {
+        tt.textContent = formatDuration(state.audio.duration);
+        if (state.currentLesson && state.currentLesson.duration !== Math.floor(state.audio.duration)) {
+            const lessons = getLessons();
+            const idx = lessons.findIndex(l => l.id === state.currentLesson.id);
+            if (idx >= 0) {
+                lessons[idx].duration = Math.floor(state.audio.duration);
+                DB.set('lessons', lessons);
+                state.currentLesson.duration = Math.floor(state.audio.duration);
+            }
+        }
+    }
+});
+state.audio.addEventListener('ended', () => {
+    document.getElementById('play-btn').innerHTML = icon('play', 28);
+    document.querySelectorAll('.wave-bar').forEach(b => b.classList.remove('playing'));
+    if (state.currentLesson) {
+        saveProgress('lesson', state.currentLesson.id, 100, state.currentLesson.duration, true);
+    }
+    // Автовоспроизведение следующего
+    if (state.playlistIndex < state.playlist.length - 1) {
+        setTimeout(() => nextInPlaylist(), 1000);
+    }
+});
+
+function completeLesson() {
+    if (!state.currentLesson) return;
+    saveProgress('lesson', state.currentLesson.id, 100, state.currentLesson.duration, true);
+    closeAudio();
+    showToast('🎉 Урок завершён!');
+}
+
+function closeAudio() {
+    state.audio.pause();
+    document.getElementById('audio-modal').classList.remove('active');
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
+    renderTab();
+}
+
+// ============ PDF РИДЕР ============
+async function openBook(id) {
+    const book = getAllBooks().find(b => b.id === id);
+    if (!book) return;
+    state.currentBook = book;
+    state.currentCategory = book.categoryId;
+    
+    const p = getProgress('book', id);
+    state.pdfPage = p ? (p.position || 1) : 1;
+    
+    const fav = isFavorite('book', id);
+    const bookmarks = DB.get('bookmarks_' + id);
+    
+    document.getElementById('pdf-body').innerHTML = `
+        <div style="display: flex; flex-direction: column; height: 100vh; background: var(--bg-secondary);">
+            <div style="padding: 12px 16px; background: var(--bg-secondary); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-weight: 700; font-size: 15px;" class="truncate">${escapeHtml(book.title)}</div>
+                    ${book.author ? `<div style="font-size: 12px; color: var(--text-secondary);">${escapeHtml(book.author)}</div>` : ''}
+                </div>
+                <div style="display: flex; gap: 6px;">
+                    <button onclick="showBookmarks(${id})" style="background: var(--bg-tertiary); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; color: var(--text-primary); display: flex; align-items: center; justify-content: center; position: relative;">
+                        ${icon('bookmark', 16)}
+                        ${bookmarks.length > 0 ? `<span style="position: absolute; top: -4px; right: -4px; background: var(--accent); color: white; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">${bookmarks.length}</span>` : ''}
+                    </button>
+                    <button onclick="closePdf()" style="background: var(--bg-tertiary); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; color: var(--text-primary); display: flex; align-items: center; justify-content: center;">
+                        ${icon('x', 16)}
+                    </button>
+                </div>
+            </div>
+            <div class="pdf-viewer" id="pdf-viewer" style="flex: 1; overflow: auto;">
+                <canvas id="pdf-canvas"></canvas>
+            </div>
+            <div class="pdf-controls">
+                <button onclick="pdfPrev()">${icon('chevronLeft', 14)} Назад</button>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span id="p-cur">${state.pdfPage}</span> / <span id="p-total">${book.pages}</span>
+                    <button onclick="addBookmark()" title="Добавить закладку" style="background: var(--accent); color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 12px;">
+                        ${icon('bookmark', 12)} Закладка
+                    </button>
+                </div>
+                <button onclick="pdfNext()">Вперёд ${icon('chevronRight', 14)}</button>
+            </div>
+            <div style="padding: 12px 16px; background: var(--bg-secondary); border-top: 1px solid var(--border); display: flex; gap: 8px;">
+                <button onclick="handleFav('book', ${id})" style="flex: 1; padding: 10px; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px;">
+                    ${fav ? icon('heartFill', 16) : icon('heart', 16)}
+                    ${fav ? 'В избранном' : 'В избранное'}
+                </button>
+                <button onclick="completeBook()" style="flex: 1; padding: 10px; background: var(--success); color: white; border: none; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 600;">
+                    ${icon('check', 16)} Прочитано
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('pdf-modal').classList.add('active');
+    
+    try {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        state.pdfDoc = await pdfjsLib.getDocument(book.pdfUrl).promise;
+        document.getElementById('p-total').textContent = state.pdfDoc.numPages;
+        renderPdfPage();
+    } catch (e) {
+        document.getElementById('pdf-viewer').innerHTML = `<div style="color: var(--text-primary); text-align: center; padding: 20px;">Не удалось загрузить PDF<br><small style="color: var(--text-secondary);">${e.message}</small></div>`;
+    }
+}
+
+async function renderPdfPage() {
+    if (!state.pdfDoc) return;
+    const page = await state.pdfDoc.getPage(state.pdfPage);
+    const scale = 1.5;
+    const viewport = page.getViewport({ scale });
+    const canvas = document.getElementById('pdf-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    document.getElementById('p-cur').textContent = state.pdfPage;
+    if (state.currentBook) {
+        const pct = (state.pdfPage / state.currentBook.pages) * 100;
+        saveProgress('book', state.currentBook.id, pct, state.pdfPage, false);
+    }
+}
+
+function pdfNext() {
+    if (state.pdfDoc && state.pdfPage < state.pdfDoc.numPages) {
+        state.pdfPage++;
+        renderPdfPage();
+    }
+}
+
+function pdfPrev() {
+    if (state.pdfPage > 1) {
+        state.pdfPage--;
+        renderPdfPage();
+    }
+}
+
+function addBookmark() {
+    if (!state.currentBook) return;
+    const key = 'bookmarks_' + state.currentBook.id;
+    const bookmarks = DB.get(key);
+    const existing = bookmarks.findIndex(b => b.page === state.pdfPage);
+    if (existing >= 0) {
+        bookmarks.splice(existing, 1);
+        DB.set(key, bookmarks);
+        showToast('🔖 Закладка удалена');
+    } else {
+        bookmarks.push({ page: state.pdfPage, date: new Date().toISOString() });
+        bookmarks.sort((a, b) => a.page - b.page);
+        DB.set(key, bookmarks);
+        showToast('🔖 Закладка добавлена');
+    }
+    openBook(state.currentBook.id);
+}
+
+function showBookmarks(bookId) {
+    const bookmarks = DB.get('bookmarks_' + bookId);
+    const body = document.getElementById('modal-body');
+    body.innerHTML = `
+        <div class="modal-title">
+            🔖 Закладки
+            <button class="close-btn" onclick="closeModal()">${icon('x', 16)}</button>
+        </div>
+        ${bookmarks.length === 0 ? `<div class="empty"><div class="empty-icon">${icon('bookmark', 48)}</div>Нет закладок</div>` : 
+        bookmarks.map(b => `
+            <div class="bookmark-item" onclick="goToBookmark(${b.page})">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="color: var(--accent);">${icon('bookmark', 18)}</span>
+                    <div>
+                        <div style="font-weight: 600;">Страница ${b.page}</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">${new Date(b.date).toLocaleString('ru')}</div>
+                    </div>
+                </div>
+            </div>
+        `).join('')}
+    `;
+    document.getElementById('modal').classList.add('active');
+}
+
+function goToBookmark(page) {
+    state.pdfPage = page;
+    closeModal();
+    renderPdfPage();
+}
+
+function completeBook() {
+    if (!state.currentBook) return;
+    saveProgress('book', state.currentBook.id, 100, state.currentBook.pages, true);
+    closePdf();
+    showToast('🎉 Книга прочитана!');
+}
+
+function closePdf() {
+    document.getElementById('pdf-modal').classList.remove('active');
+    state.pdfDoc = null;
+    renderTab();
+}
+
+function handleFav(type, id) {
+    toggleFavorite(type, id);
+    if (type === 'lesson' && state.currentLesson) openLesson(id);
+    if (type === 'book' && state.currentBook) openBook(id);
+}
+
+// ============ ПРОГРЕСС ============
+function renderProgress() {
+    const container = document.getElementById('tab-progress');
+    const progress = DB.get('progress');
+    const lessons = getAllLessons();
+    const books = getAllBooks();
+    
+    const totalL = lessons.length;
+    const totalB = books.length;
+    const doneL = progress.filter(p => p.type === 'lesson' && p.completed).length;
+    const doneB = progress.filter(p => p.type === 'book' && p.completed).length;
+    
+    const avgPct = progress.length ? progress.reduce((s, p) => s + (p.percent || 0), 0) / progress.length : 0;
+    const totalTime = progress.reduce((s, p) => s + (p.position || 0), 0);
+    const hours = Math.floor(totalTime / 3600);
+    const mins = Math.floor((totalTime % 3600) / 60);
+    
+    const weekData = getWeekData();
+    const maxVal = Math.max(...weekData.map(d => d.value), 1);
+    
+    const heatData = {};
+    progress.forEach(p => { if (p.date) heatData[p.date] = (heatData[p.date] || 0) + 1; });
+    let heatCells = '';
+    for (let i = 27; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        const key = d.toISOString().split('T')[0];
+        const count = heatData[key] || 0;
+        const level = count === 0 ? 0 : count === 1 ? 1 : count === 2 ? 2 : count <= 4 ? 3 : 4;
+        heatCells += `<div class="heat-cell heat-${level}" title="${key}: ${count}"></div>`;
+    }
+    
+    const achievements = getAchievementsList();
+    const earned = DB.get('achievements').map(a => a.type);
+    
+    // Статистика по категориям
+    const catStats = getCategoryStats();
+    
+    container.innerHTML = `
+        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+            ${icon('chart', 24)} Прогресс
+        </h2>
+        
+        <div class="gradient-card" style="background: var(--gradient-1); margin-bottom: 16px;">
+            <div style="position: relative; z-index: 1;">
+                <div class="ring-container">
+                    <svg width="140" height="140" style="transform: rotate(-90deg);">
+                        <circle cx="70" cy="70" r="58" stroke="rgba(255,255,255,0.2)" stroke-width="10" fill="none"/>
+                        <circle cx="70" cy="70" r="58" stroke="white" stroke-width="10" fill="none"
+                                stroke-dasharray="${2 * Math.PI * 58}"
+                                stroke-dashoffset="${2 * Math.PI * 58 * (1 - avgPct / 100)}"
+                                stroke-linecap="round" style="transition: stroke-dashoffset 1s ease;"/>
+                        <text x="70" y="70" text-anchor="middle" dy=".3em" font-size="28" font-weight="bold" fill="white" transform="rotate(90 70 70)">${Math.round(avgPct)}%</text>
+                    </svg>
+                </div>
+                <div class="stats-grid" style="margin-top: 12px;">
+                    <div><div class="stat-value">${doneL}/${totalL}</div><div class="stat-label">Уроков</div></div>
+                    <div><div class="stat-value">${doneB}/${totalB}</div><div class="stat-label">Книг</div></div>
+                    <div><div class="stat-value">${hours}ч ${mins}м</div><div class="stat-label">Время</div></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card" style="cursor: default;">
+            <div class="section-title" style="margin-bottom: 12px;">${icon('chart', 14)} Активность за неделю</div>
+            <div class="week-chart">
+                ${weekData.map(d => `
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        <div class="week-bar" style="height: 100%;">
+                            <div class="week-bar-fill" style="height: ${(d.value / maxVal) * 100}%;"></div>
+                        </div>
+                        <div class="week-label">${d.label}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+        
+        ${catStats.length > 0 ? `
+            <div class="card" style="cursor: default; margin-top: 12px;">
+                <div class="section-title" style="margin-bottom: 12px;">${icon('folder', 14)} По разделам</div>
+                ${catStats.map(cs => `
+                    <div class="cat-stat">
+                        <div class="cat-stat-header">
+                            <div class="cat-stat-title">${cs.emoji || '📂'} ${escapeHtml(cs.title)}</div>
+                            <div class="cat-stat-percent">${cs.percent}%</div>
+                        </div>
+                        <div class="progress-bar" style="margin: 0;">
+                            <div class="progress-fill" style="width: ${cs.percent}%;"></div>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-tertiary); margin-top: 6px;">
+                            ${cs.doneL} из ${cs.totalL} уроков • ${cs.doneB} из ${cs.totalB} книг
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        ` : ''}
+        
+        <div class="card" style="cursor: default; margin-top: 12px;">
+            <div class="section-title" style="margin-bottom: 12px;">${icon('fire', 14)} Активность (28 дней)</div>
+            <div class="heat-grid">${heatCells}</div>
+            <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-tertiary); margin-top: 6px;">
+                <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+            </div>
+        </div>
+        
+        <div class="card" style="cursor: default; margin-top: 12px;">
+            <div class="section-title" style="margin-bottom: 12px;">
+                ${icon('trophy', 14)} Достижения 
+                <span class="badge badge-purple">${earned.length}/${achievements.length}</span>
+            </div>
+            ${achievements.map(a => `
+                <div class="achievement ${earned.includes(a.type) ? 'earned' : ''}">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="font-size: 24px;">${a.icon}</div>
+                        <div>
+                            <div style="font-weight: 600;">${a.title}</div>
+                            <div class="ach-desc" style="font-size: 12px; color: var(--text-secondary);">${a.desc}</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 20px;">${earned.includes(a.type) ? icon('check', 20) : '🔒'}</div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function getCategoryStats() {
+    const rootCats = buildTree(null);
+    const progress = DB.get('progress');
+    
+    return rootCats.map(cat => {
+        const allLessons = [];
+        const allBooks = [];
+        
+        const collect = (c) => {
+            c.lessons.forEach(l => allLessons.push(l));
+            c.books.forEach(b => allBooks.push(b));
+            c.children.forEach(collect);
+        };
+        collect(cat);
+        
+        const doneL = allLessons.filter(l => progress.find(p => p.type === 'lesson' && p.contentId === l.id && p.completed)).length;
+        const doneB = allBooks.filter(b => progress.find(p => p.type === 'book' && p.contentId === b.id && p.completed)).length;
+        const total = allLessons.length + allBooks.length;
+        const done = doneL + doneB;
+        const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+        
+        return {
+            title: cat.title,
+            emoji: cat.emoji,
+            totalL: allLessons.length,
+            totalB: allBooks.length,
+            doneL, doneB, percent
+        };
+    }).filter(cs => cs.totalL + cs.totalB > 0);
+}
+
+function getWeekData() {
+    const progress = DB.get('progress');
+    const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+    const result = [];
+    const today = new Date();
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date(today); d.setDate(d.getDate() - i);
+        const key = d.toISOString().split('T')[0];
+        const count = progress.filter(p => p.date === key).length;
+        result.push({ label: days[(d.getDay() + 6) % 7], value: count, date: key });
+    }
+    return result;
+}
+
+// ============ ДОСТИЖЕНИЯ ============
+function getAchievementsList() {
+    const progress = DB.get('progress');
+    const doneL = progress.filter(p => p.type === 'lesson' && p.completed).length;
+    const doneB = progress.filter(p => p.type === 'book' && p.completed).length;
+    const totalSec = progress.reduce((s, p) => s + (p.position || 0), 0);
+    const streak = calculateStreak().count;
+    
+    return [
+        { type: 'first_lesson', icon: '🌱', title: 'Первые шаги', desc: 'Пройти 1 урок', cond: doneL >= 1 },
+        { type: 'first_book', icon: '📖', title: 'Первая книга', desc: 'Завершить 1 книгу', cond: doneB >= 1 },
+        { type: 'five_lessons', icon: '🎯', title: 'Пятёрка', desc: '5 уроков', cond: doneL >= 5 },
+        { type: 'ten_lessons', icon: '🎖', title: 'Десятка', desc: '10 уроков', cond: doneL >= 10 },
+        { type: 'five_books', icon: '📚', title: 'Книжный червь', desc: '5 книг', cond: doneB >= 5 },
+        { type: 'ten_books', icon: '🏆', title: 'Марафонец', desc: '10 книг', cond: doneB >= 10 },
+        { type: 'hour', icon: '⏱', title: 'Час знаний', desc: '1 час прослушано', cond: totalSec >= 3600 },
+        { type: 'ten_hours', icon: '🎧', title: 'Аудиофил', desc: '10 часов', cond: totalSec >= 36000 },
+        { type: 'streak_3', icon: '🔥', title: 'Разогрев', desc: '3 дня подряд', cond: streak >= 3 },
+        { type: 'streak_7', icon: '⚡', title: 'Неделя огня', desc: '7 дней подряд', cond: streak >= 7 },
+        { type: 'streak_30', icon: '💎', title: 'Месяц силы', desc: '30 дней подряд', cond: streak >= 30 }
+    ];
+}
+
+function checkAchievements() {
+    const list = getAchievementsList();
+    const earned = DB.get('achievements').map(a => a.type);
+    let newOnes = [];
+    list.forEach(a => {
+        if (a.cond && !earned.includes(a.type)) {
+            DB.set('achievements', [...DB.get('achievements'), { type: a.type, date: new Date().toISOString() }]);
+            newOnes.push(a);
+        }
+    });
+    if (newOnes.length > 0) {
+        setTimeout(() => showToast('🎉 Новая награда: ' + newOnes.map(a => a.title).join(', ')), 300);
+    }
+}
+
+// ============ ПРОФИЛЬ ============
+function renderProfile() {
+    const container = document.getElementById('tab-profile');
+    const progress = DB.get('progress');
+    const doneL = progress.filter(p => p.type === 'lesson' && p.completed).length;
+    const doneB = progress.filter(p => p.type === 'book' && p.completed).length;
+    const totalSec = progress.reduce((s, p) => s + (p.position || 0), 0);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const streak = calculateStreak().count;
+    const earned = DB.get('achievements').length;
+    
+    container.innerHTML = `
+        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+            ${icon('user', 24)} Профиль
+        </h2>
+        
+        <div class="gradient-card" style="background: var(--gradient-2); margin-bottom: 16px;">
+            <div style="position: relative; z-index: 1; display: flex; align-items: center; gap: 16px;">
+                <div style="width: 70px; height: 70px; border-radius: 50%; background: rgba(255,255,255,0.25); color: white; font-size: 28px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    ${state.user.name[0].toUpperCase()}
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 20px; font-weight: 700; display: flex; align-items: center;" class="truncate">
+                        ${escapeHtml(state.user.name)}
+                        ${state.editorMode ? '<span class="editor-badge">' + icon('shield', 10) + ' Редактор</span>' : ''}
+                    </div>
+                    <div style="font-size: 12px; opacity: 0.9; margin-top: 2px;">С нами с ${new Date(state.user.created).toLocaleDateString('ru')}</div>
+                    <div style="display: flex; gap: 12px; margin-top: 8px; font-size: 12px;">
+                        <span style="display: flex; align-items: center; gap: 4px;">${icon('fire', 12)} ${streak} дней</span>
+                        <span style="display: flex; align-items: center; gap: 4px;">${icon('trophy', 12)} ${earned} наград</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card" style="cursor: default;">
+            <div class="section-title">${icon('chart', 14)} Моя статистика</div>
+            <div class="stats-grid">
+                <div><div class="stat-value" style="color: var(--accent);">${doneL}</div><div class="stat-label">Уроков</div></div>
+                <div><div class="stat-value" style="color: var(--purple);">${doneB}</div><div class="stat-label">Книг</div></div>
+                <div><div class="stat-value" style="color: var(--success);">${h}ч ${m}м</div><div class="stat-label">Время</div></div>
+            </div>
+        </div>
+        
+        <div class="card" style="cursor: default; margin-top: 12px;">
+            <div class="section-title">${icon('settings', 14)} Настройки</div>
+            <div class="setting-row">
+                <div class="setting-label">${icon('moon', 18)}<span>Тёмная тема</span></div>
+                <div class="toggle ${state.theme === 'dark' ? 'active' : ''}" onclick="toggleTheme()"></div>
+            </div>
+            <div class="setting-row">
+                <div class="setting-label">${icon('bell', 18)}<span>Уведомления</span></div>
+                <div class="toggle active" onclick="this.classList.toggle('active'); showToast('Настройка сохранена')"></div>
+            </div>
+        </div>
+        
+        <div class="card" style="cursor: default; margin-top: 12px;">
+            <div class="section-title">${icon('user', 14)} Аккаунт</div>
+            <button class="btn btn-ghost" onclick="changeName()">${icon('edit', 16)} Изменить имя</button>
+            <button class="btn btn-danger" onclick="resetData()">${icon('trash', 16)} Сбросить все данные</button>
+        </div>
+        
+        <div style="text-align: center; color: var(--text-tertiary); font-size: 12px; margin-top: 20px; padding: 16px;">
+            <div>📱 Уроки и Книги v3.0</div>
+            <div style="margin-top: 4px;">Сделано с ❤️</div>
+        </div>
+    `;
+}
+
+function changeName() {
+    const name = prompt('Новое имя:', state.user.name);
+    if (name && name.trim()) {
+        state.user.name = name.trim();
+        DB.set('user', state.user);
+        updateHeaderSub();
+        renderProfile();
+    }
+}
+
+function resetData() {
+    if (confirm('Удалить ВСЕ данные? Это нельзя отменить!')) {
+        if (confirm('Точно-точно? Все уроки, книги, прогресс — всё пропадёт!')) {
+            Object.keys(localStorage).filter(k => k.startsWith('la_')).forEach(k => localStorage.removeItem(k));
+            alert('Данные сброшены');
+            location.reload();
+        }
+    }
+}
+
+// ============ ФОРМЫ РЕДАКТОРА ============
+function showCatForm(editId = null, parentId = null) {
+    const cat = editId ? findCategory(editId) : null;
+    const title = cat ? 'Редактировать раздел' : 'Новый раздел';
+    
+    const allCats = getCategories();
+    const parentOptions = '<option value="">— Корневой —</option>' + 
+        allCats.filter(c => c.id !== editId).map(c => 
+            `<option value="${c.id}" ${(cat?.parentId || parentId) === c.id ? 'selected' : ''}>${c.emoji || '📂'} ${escapeHtml(c.title)}</option>`
+        ).join('');
+    
+    document.getElementById('modal-body').innerHTML = `
+        <div class="modal-title">
+            ${title}
+            <button class="close-btn" onclick="closeModal()">${icon('x', 16)}</button>
+        </div>
+        <form onsubmit="saveCat(event, ${editId || 'null'})">
+            <label>Название *</label>
+            <input type="text" id="f-title" value="${cat ? escapeHtml(cat.title) : ''}" required>
+            
+            <label>Эмодзи</label>
+            <input type="text" id="f-emoji" value="${cat?.emoji || ''}" maxlength="4" placeholder="📂">
+            
+            <label>Родитель</label>
+            <select id="f-parent">${parentOptions}</select>
+            
+            <label>Описание</label>
+            <textarea id="f-desc" rows="3" placeholder="О чём этот раздел...">${cat?.description || ''}</textarea>
+            
+            <button type="submit" class="btn btn-primary">${icon('check', 16)} Сохранить</button>
+            <button type="button" onclick="closeModal()" class="btn btn-secondary">Отмена</button>
+        </form>
+    `;
+    document.getElementById('modal').classList.add('active');
+}
+
+function saveCat(e, editId) {
+    e.preventDefault();
+    const cats = getCategories();
+    const data = {
+        title: document.getElementById('f-title').value.trim(),
+        emoji: document.getElementById('f-emoji').value.trim(),
+        parentId: document.getElementById('f-parent').value ? parseInt(document.getElementById('f-parent').value) : null,
+        description: document.getElementById('f-desc').value.trim()
+    };
+    
+    if (editId) {
+        const idx = cats.findIndex(c => c.id === editId);
+        cats[idx] = { ...cats[idx], ...data };
+    } else {
+        cats.push({ id: DB.nextId('categories'), ...data, order: cats.length });
+    }
+    
+    DB.set('categories', cats);
+    closeModal();
+    renderTab();
+    showToast(editId ? '✅ Раздел обновлён' : '✅ Раздел создан');
+}
+
+function showLessonForm(catId = null, editId = null) {
+    const lesson = editId ? getLessons().find(l => l.id === editId) : null;
+    const title = lesson ? 'Редактировать урок' : 'Новый урок';
+    
+    const allCats = getCategories();
+    if (allCats.length === 0) {
+        alert('Сначала создай хотя бы один раздел!');
+        return;
+    }
+    
+    const catOptions = allCats.map(c => 
+        `<option value="${c.id}" ${(lesson?.categoryId || catId) === c.id ? 'selected' : ''}>${c.emoji || '📂'} ${escapeHtml(c.title)}</option>`
+    ).join('');
+    
+    document.getElementById('modal-body').innerHTML = `
+        <div class="modal-title">
+            ${title}
+            <button class="close-btn" onclick="closeModal()">${icon('x', 16)}</button>
+        </div>
+        <form onsubmit="saveLesson(event, ${editId || 'null'})">
+            <label>Раздел *</label>
+            <select id="f-cat" required>${catOptions}</select>
+            
+            <label>Название *</label>
+            <input type="text" id="f-title" value="${lesson ? escapeHtml(lesson.title) : ''}" required>
+            
+            <label>Описание</label>
+            <textarea id="f-desc" rows="3" placeholder="О чём этот урок...">${lesson?.description || ''}</textarea>
+            
+            <label>Ссылка на аудио (mp3) *</label>
+            <input type="url" id="f-url" value="${lesson?.audioUrl || ''}" required placeholder="https://...">
+            <div style="font-size: 11px; color: var(--text-secondary); margin: -8px 0 12px;">
+                Длительность определится автоматически при первом прослушивании
+            </div>
+            
+            <button type="submit" class="btn btn-success">${icon('check', 16)} Сохранить</button>
+            <button type="button" onclick="closeModal()" class="btn btn-secondary">Отмена</button>
+        </form>
+    `;
+    document.getElementById('modal').classList.add('active');
+}
+
+function saveLesson(e, editId) {
+    e.preventDefault();
+    const lessons = getLessons();
+    const data = {
+        categoryId: parseInt(document.getElementById('f-cat').value),
+        title: document.getElementById('f-title').value.trim(),
+        description: document.getElementById('f-desc').value.trim(),
+        audioUrl: document.getElementById('f-url').value.trim(),
+        duration: 60
+    };
+    
+    if (editId) {
+        const idx = lessons.findIndex(l => l.id === editId);
+        const oldDur = lessons[idx].duration;
+        lessons[idx] = { ...lessons[idx], ...data, duration: oldDur || 60 };
+    } else {
+        lessons.push({ id: DB.nextId('lessons'), ...data, created: new Date().toISOString() });
+    }
+    
+    DB.set('lessons', lessons);
+    closeModal();
+    renderTab();
+    showToast(editId ? '✅ Урок обновлён' : '✅ Урок создан');
+}
+
+function showBookForm(catId = null, editId = null) {
+    const book = editId ? getBooks().find(b => b.id === editId) : null;
+    const title = book ? 'Редактировать книгу' : 'Новая книга';
+    
+    const allCats = getCategories();
+    if (allCats.length === 0) {
+        alert('Сначала создай хотя бы один раздел!');
+        return;
+    }
+    
+    const catOptions = allCats.map(c => 
+        `<option value="${c.id}" ${(book?.categoryId || catId) === c.id ? 'selected' : ''}>${c.emoji || '📂'} ${escapeHtml(c.title)}</option>`
+    ).join('');
+    
+    document.getElementById('modal-body').innerHTML = `
+        <div class="modal-title">
+            ${title}
+            <button class="close-btn" onclick="closeModal()">${icon('x', 16)}</button>
+        </div>
+        <form onsubmit="saveBook(event, ${editId || 'null'})">
+            <label>Раздел *</label>
+            <select id="f-cat" required>${catOptions}</select>
+            
+            <label>Название *</label>
+            <input type="text" id="f-title" value="${book ? escapeHtml(book.title) : ''}" required>
+            
+            <label>Автор</label>
+            <input type="text" id="f-author" value="${book?.author || ''}">
+            
+            <label>Описание</label>
+            <textarea id="f-desc" rows="3" placeholder="О чём эта книга...">${book?.description || ''}</textarea>
+            
+            <label>Ссылка на PDF *</label>
+            <input type="url" id="f-url" value="${book?.pdfUrl || ''}" required placeholder="https://...">
+            
+            <label>Количество страниц *</label>
+            <input type="number" id="f-pages" value="${book?.pages || ''}" required min="1">
+            
+            <button type="submit" class="btn btn-purple">${icon('check', 16)} Сохранить</button>
+            <button type="button" onclick="closeModal()" class="btn btn-secondary">Отмена</button>
+        </form>
+    `;
+    document.getElementById('modal').classList.add('active');
+}
+
+function saveBook(e, editId) {
+    e.preventDefault();
+    const books = getBooks();
+    const data = {
+        categoryId: parseInt(document.getElementById('f-cat').value),
+        title: document.getElementById('f-title').value.trim(),
+        author: document.getElementById('f-author').value.trim(),
+        description: document.getElementById('f-desc').value.trim(),
+        pdfUrl: document.getElementById('f-url').value.trim(),
+        pages: parseInt(document.getElementById('f-pages').value)
+    };
+    
+    if (editId) {
+        const idx = books.findIndex(b => b.id === editId);
+        books[idx] = { ...books[idx], ...data };
+    } else {
+        books.push({ id: DB.nextId('books'), ...data, created: new Date().toISOString() });
+    }
+    
+    DB.set('books', books);
+    closeModal();
+    renderTab();
+    showToast(editId ? '✅ Книга обновлена' : '✅ Книга создана');
+}
+
+// ============ TOAST ============
+function showToast(message) {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.style.cssText = `
+        position: fixed; bottom: 100px; left: 50%;
+        transform: translateX(-50%);
+        background: var(--text-primary); color: var(--bg-primary);
+        padding: 12px 20px; border-radius: 12px;
+        font-size: 14px; font-weight: 500;
+        box-shadow: var(--shadow-xl); z-index: 1000;
+        animation: slideUp 0.3s ease;
+        max-width: 90%; text-align: center;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
+}
+
+// ============ СТАРТ ============
+init();
+</script>
+</body>
+</html>
