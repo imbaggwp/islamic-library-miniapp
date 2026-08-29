@@ -3,1322 +3,2153 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>IlmHub — Исламские лекции и книги</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>Исламские уроки</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-600-normal.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/amiri@latest/arabic-400-normal.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
-  :root {
-    --bg: #faf7f2;
-    --bg-card: #ffffff;
-    --bg-elevated: #f5f0e8;
-    --text: #1f2937;
-    --text-muted: #6b7280;
-    --border: #e5e7eb;
-    --accent: #0f766e;
-    --accent-light: #14b8a6;
-    --accent-bg: #f0fdfa;
-    --gold: #b08d57;
-  }
-  [data-theme="dark"] {
-    --bg: #111827;
-    --bg-card: #1f2937;
-    --bg-elevated: #111827;
-    --text: #f3f4f6;
-    --text-muted: #9ca3af;
-    --border: #374151;
-    --accent: #14b8a6;
-    --accent-light: #5eead4;
-    --accent-bg: #042f2e;
-    --gold: #d4a574;
-  }
-  [data-theme="sepia"] {
-    --bg: #f5ecd7;
-    --bg-card: #fbf5e4;
-    --bg-elevated: #ede0c4;
-    --text: #44351f;
-    --text-muted: #7a6547;
-    --border: #d9c9a3;
-    --accent: #8b6f3e;
-    --accent-light: #b08d57;
-    --accent-bg: #f5ecd7;
-    --gold: #8b6f3e;
-  }
-  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-  html, body {
-    margin: 0; padding: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    overscroll-behavior: none;
-    transition: background 0.3s, color 0.3s;
-  }
-  .font-arabic { font-family: 'Amiri', serif; direction: rtl; }
-  #app {
-    min-height: 100vh;
-    padding-bottom: 180px;
-    max-width: 640px;
-    margin: 0 auto;
-    position: relative;
-  }
-  .card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .card:active { transform: scale(0.98); }
-  .btn-primary {
-    background: var(--accent);
-    color: white;
-    border-radius: 12px;
-    padding: 12px 20px;
-    font-weight: 600;
-    transition: opacity 0.2s;
-  }
-  .btn-primary:active { opacity: 0.8; }
-  .nav-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 10px 4px;
-    color: var(--text-muted);
-    font-size: 11px;
-    font-weight: 500;
-    transition: color 0.2s;
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-  .nav-item.active { color: var(--accent); }
-  .nav-item svg { width: 24px; height: 24px; }
-  .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--bg-card);
-    border-top: 1px solid var(--border);
-    display: flex;
-    max-width: 640px;
-    margin: 0 auto;
-    z-index: 40;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  .mini-player {
-    position: fixed;
-    bottom: 64px;
-    left: 0;
-    right: 0;
-    background: var(--bg-card);
-    border-top: 1px solid var(--border);
-    padding: 10px 16px;
-    display: none;
-    align-items: center;
-    gap: 12px;
-    z-index: 39;
-    max-width: 640px;
-    margin: 0 auto;
-    cursor: pointer;
-  }
-  .mini-player.active { display: flex; }
-  .progress-bar {
-    height: 4px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-    cursor: pointer;
-  }
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    transition: width 0.1s linear;
-  }
-  .section-card {
-    position: relative;
-    overflow: hidden;
-    border-radius: 16px;
-    aspect-ratio: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 14px;
-    color: white;
-    cursor: pointer;
-    transition: transform 0.2s;
-  }
-  .section-card:active { transform: scale(0.97); }
-  .section-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.7) 100%);
-    z-index: 1;
-  }
-  .section-card > * { position: relative; z-index: 2; }
-  .pattern-bg {
-    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%230f766e' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M20 0l20 20-20 20L0 20z'/%3E%3C/g%3E%3C/svg%3E");
-  }
-  .reader-page {
-    background: var(--bg-card);
-    padding: 28px 24px;
-    min-height: 60vh;
-    font-size: 17px;
-    line-height: 1.8;
-    color: var(--text);
-  }
-  [data-theme="sepia"] .reader-page { background: #fbf5e4; }
-  .fade-in { animation: fadeIn 0.3s ease; }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .slide-up { animation: slideUp 0.3s ease; }
-  @keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-  }
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: var(--bg-elevated);
-    color: var(--text);
-    font-size: 13px;
-    font-weight: 500;
-    border: 1px solid var(--border);
-  }
-  .chip.active {
-    background: var(--accent);
-    color: white;
-    border-color: var(--accent);
-  }
-  input, textarea, select {
-    background: var(--bg-elevated);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 14px;
-    font-size: 15px;
-    width: 100%;
-    font-family: inherit;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  input:focus, textarea:focus, select:focus { border-color: var(--accent); }
-  ::-webkit-scrollbar { width: 0; height: 0; }
-  .divider { height: 1px; background: var(--border); margin: 12px 0; }
-  .stat-circle {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background: conic-gradient(var(--accent) var(--pct), var(--border) 0);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
-  .stat-circle::before {
-    content: '';
-    position: absolute;
-    inset: 8px;
-    background: var(--bg-card);
-    border-radius: 50%;
-  }
-  .stat-circle > span { position: relative; font-weight: 700; font-size: 18px; }
-  .toast {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--text);
-    color: var(--bg);
-    padding: 10px 20px;
-    border-radius: 999px;
-    font-size: 14px;
-    font-weight: 500;
-    z-index: 100;
-    opacity: 0;
-    transition: opacity 0.3s, transform 0.3s;
-    pointer-events: none;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .admin-badge {
-    background: linear-gradient(135deg, var(--gold), #d4a574);
-    color: white;
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-  }
-  .skeleton {
-    background: linear-gradient(90deg, var(--bg-elevated) 0%, var(--border) 50%, var(--bg-elevated) 100%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: 8px;
-  }
-  @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
+:root {
+  --bg-color: var(--tg-theme-bg-color, #ffffff);
+  --text-color: var(--tg-theme-text-color, #000000);
+  --hint-color: var(--tg-theme-hint-color, #707579);
+  --link-color: var(--tg-theme-link-color, #2481cc);
+  --button-color: var(--tg-theme-button-color, #2481cc);
+  --button-text-color: var(--tg-theme-button-text-color, #ffffff);
+  --secondary-bg-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
+  --radius-card: 12px;
+  --radius-btn: 8px;
+  --spacing: 16px;
+  --spacing-sm: 12px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-size: 16px;
+  line-height: 1.5;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+body { padding-bottom: 80px; }
+
+/* Header */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-color);
+  padding: var(--spacing);
+  border-bottom: 1px solid var(--secondary-bg-color);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+}
+.app-header h1 {
+  font-size: 18px;
+  font-weight: 600;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.icon-btn:active { background: var(--secondary-bg-color); }
+.icon-btn svg { width: 24px; height: 24px; }
+
+/* Breadcrumbs */
+.breadcrumbs {
+  padding: 8px var(--spacing);
+  font-size: 13px;
+  color: var(--hint-color);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+.breadcrumbs a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+.breadcrumbs span { color: var(--hint-color); }
+
+/* Main content */
+main { padding: var(--spacing); }
+
+/* Cards */
+.card {
+  background: var(--bg-color);
+  border-radius: var(--radius-card);
+  padding: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  border: 1px solid var(--secondary-bg-color);
+  cursor: pointer;
+  transition: transform 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+.card:active { transform: scale(0.98); }
+.card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--secondary-bg-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--link-color);
+}
+.card-icon svg { width: 24px; height: 24px; }
+.card-content { flex: 1; min-width: 0; }
+.card-title {
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.card-subtitle {
+  font-size: 13px;
+  color: var(--hint-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.card-arrow {
+  color: var(--hint-color);
+  flex-shrink: 0;
+}
+
+/* Favorite button */
+.fav-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--hint-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.fav-btn.active { color: #e53935; }
+.fav-btn svg { width: 20px; height: 20px; }
+
+/* Section header */
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--hint-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: var(--spacing) 0 8px 4px;
+}
+
+/* Audio player */
+.player-container {
+  padding: var(--spacing);
+  text-align: center;
+}
+.player-cover {
+  width: 200px;
+  height: 200px;
+  border-radius: 20px;
+  background: var(--secondary-bg-color);
+  margin: 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--link-color);
+}
+.player-cover svg { width: 64px; height: 64px; }
+.player-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.player-subtitle {
+  font-size: 14px;
+  color: var(--hint-color);
+  margin-bottom: 24px;
+}
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--secondary-bg-color);
+  border-radius: 2px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  position: relative;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--button-color);
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.1s linear;
+}
+.progress-times {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--hint-color);
+  margin-bottom: 24px;
+}
+.player-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.ctrl-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ctrl-btn svg { width: 28px; height: 28px; }
+.play-btn {
+  width: 64px;
+  height: 64px;
+  background: var(--button-color);
+  color: var(--button-text-color);
+}
+.play-btn svg { width: 32px; height: 32px; }
+.speed-btn {
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--secondary-bg-color);
+  background: transparent;
+  color: var(--text-color);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Resume dialog */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing);
+}
+.dialog {
+  background: var(--bg-color);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+}
+.dialog h3 { margin-bottom: 8px; font-size: 17px; }
+.dialog p { font-size: 14px; color: var(--hint-color); margin-bottom: 16px; }
+.dialog-actions { display: flex; gap: 8px; }
+.dialog-actions button {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius-btn);
+  border: none;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn-primary { background: var(--button-color); color: var(--button-text-color); }
+.btn-secondary { background: var(--secondary-bg-color); color: var(--text-color); }
+
+/* PDF Reader */
+.reader-container {
+  background: var(--secondary-bg-color);
+  min-height: calc(100vh - 56px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+}
+.reader-canvas-wrap {
+  width: 100%;
+  max-width: 800px;
+  overflow: auto;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.reader-canvas-wrap canvas { display: block; width: 100%; height: auto; }
+.reader-toolbar {
+  position: sticky;
+  bottom: 0;
+  background: var(--bg-color);
+  border-top: 1px solid var(--secondary-bg-color);
+  padding: 8px var(--spacing);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  max-width: 800px;
+}
+.page-input {
+  width: 60px;
+  padding: 6px;
+  border: 1px solid var(--secondary-bg-color);
+  border-radius: var(--radius-btn);
+  background: var(--bg-color);
+  color: var(--text-color);
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Search */
+.search-input-wrap {
+  padding: var(--spacing);
+  position: sticky;
+  top: 56px;
+  background: var(--bg-color);
+  z-index: 50;
+}
+.search-input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border-radius: var(--radius-btn);
+  border: none;
+  background: var(--secondary-bg-color);
+  color: var(--text-color);
+  font-size: 15px;
+  outline: none;
+}
+.search-input-wrap svg {
+  position: absolute;
+  left: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: var(--hint-color);
+}
+
+/* Profile */
+.profile-header {
+  text-align: center;
+  padding: 24px var(--spacing);
+}
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--secondary-bg-color);
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--link-color);
+  overflow: hidden;
+}
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile-avatar svg { width: 40px; height: 40px; }
+.profile-name { font-size: 20px; font-weight: 600; }
+.profile-username { font-size: 14px; color: var(--hint-color); }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 0 var(--spacing);
+  margin-bottom: var(--spacing);
+}
+.stat-card {
+  background: var(--secondary-bg-color);
+  border-radius: var(--radius-card);
+  padding: 12px 8px;
+  text-align: center;
+}
+.stat-value { font-size: 20px; font-weight: 600; color: var(--link-color); }
+.stat-label { font-size: 11px; color: var(--hint-color); margin-top: 2px; }
+
+.settings-list { padding: 0 var(--spacing); }
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--secondary-bg-color);
+}
+.setting-label { font-size: 15px; }
+.setting-control select, .setting-control input {
+  padding: 6px 10px;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--secondary-bg-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-size: 14px;
+}
+
+/* Bottom nav */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-color);
+  border-top: 1px solid var(--secondary-bg-color);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  z-index: 90;
+}
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: none;
+  border: none;
+  color: var(--hint-color);
+  cursor: pointer;
+  font-size: 11px;
+}
+.nav-item.active { color: var(--link-color); }
+.nav-item svg { width: 24px; height: 24px; }
+
+/* Mini player */
+.mini-player {
+  position: fixed;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+  background: var(--bg-color);
+  border-top: 1px solid var(--secondary-bg-color);
+  padding: 8px var(--spacing);
+  display: none;
+  align-items: center;
+  gap: 12px;
+  z-index: 80;
+  cursor: pointer;
+}
+.mini-player.visible { display: flex; }
+.mini-player-info { flex: 1; min-width: 0; }
+.mini-player-title {
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mini-player-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--button-color);
+  color: var(--button-text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mini-player-btn svg { width: 18px; height: 18px; }
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px var(--spacing);
+  color: var(--hint-color);
+}
+.empty-state svg { width: 64px; height: 64px; margin-bottom: 16px; opacity: 0.5; }
+.empty-state p { font-size: 15px; }
+
+/* Admin */
+.admin-login {
+  padding: 40px var(--spacing);
+  text-align: center;
+}
+.admin-login input {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--secondary-bg-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+.admin-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--secondary-bg-color);
+  overflow-x: auto;
+}
+.admin-tab {
+  flex: 1;
+  padding: 12px;
+  background: none;
+  border: none;
+  color: var(--hint-color);
+  font-size: 14px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+.admin-tab.active { color: var(--link-color); border-bottom-color: var(--link-color); }
+.admin-form {
+  padding: var(--spacing);
+}
+.form-group { margin-bottom: 12px; }
+.form-group label {
+  display: block;
+  font-size: 13px;
+  color: var(--hint-color);
+  margin-bottom: 4px;
+}
+.form-group input, .form-group textarea, .form-group select {
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--secondary-bg-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-size: 14px;
+  font-family: inherit;
+}
+.form-group textarea { min-height: 80px; resize: vertical; }
+.admin-actions {
+  display: flex;
+  gap: 8px;
+  padding: var(--spacing);
+}
+.admin-actions button {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius-btn);
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.json-output {
+  margin: var(--spacing);
+  padding: 12px;
+  background: var(--secondary-bg-color);
+  border-radius: var(--radius-card);
+  font-family: monospace;
+  font-size: 12px;
+  max-height: 300px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Dark mode for reader */
+.reader-dark .reader-canvas-wrap {
+  filter: invert(1) hue-rotate(180deg);
+  background: #1a1a1a;
+}
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.view { animation: fadeIn 0.2s ease; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--hint-color); border-radius: 2px; }
 </style>
 </head>
-<body data-theme="light">
+<body>
 
 <div id="app"></div>
 
-<div id="mini-player" class="mini-player" onclick="openFullPlayer()">
-  <div id="mp-cover" style="width:44px;height:44px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:white;flex-shrink:0">
-    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M9 19V6l12-3v13M9 19c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2z"/></svg>
+<!-- Мини-плеер -->
+<div class="mini-player" id="miniPlayer" onclick="App.goToCurrentLesson()">
+  <div class="mini-player-info">
+    <div class="mini-player-title" id="miniPlayerTitle"></div>
   </div>
-  <div style="flex:1;min-width:0">
-    <div id="mp-title" style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
-    <div id="mp-speaker" style="font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
-    <div class="progress-bar" style="margin-top:6px" onclick="event.stopPropagation()">
-      <div id="mp-progress" class="progress-fill" style="width:0%"></div>
-    </div>
-  </div>
-  <button id="mp-play-btn" onclick="event.stopPropagation();togglePlay()" style="width:40px;height:40px;border-radius:50%;background:var(--accent);color:white;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer">
-    <svg id="mp-play-icon" width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-  </button>
+  <button class="mini-player-btn" id="miniPlayerBtn" onclick="event.stopPropagation(); App.toggleMiniPlayer()"></button>
 </div>
 
-<nav class="bottom-nav">
-  <button class="nav-item active" data-route="home" onclick="navigate('home')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+<!-- Нижняя навигация -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="nav-item active" data-route="home" onclick="App.navigate('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span>Главная</span>
   </button>
-  <button class="nav-item" data-route="search" onclick="navigate('search')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+  <button class="nav-item" data-route="search" onclick="App.navigate('search')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <span>Поиск</span>
   </button>
-  <button class="nav-item" data-route="progress" onclick="navigate('progress')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-    <span>Прогресс</span>
+  <button class="nav-item" data-route="favorites" onclick="App.navigate('favorites')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span>Избранное</span>
   </button>
-  <button class="nav-item" data-route="settings" onclick="navigate('settings')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-    <span>Ещё</span>
+  <button class="nav-item" data-route="profile" onclick="App.navigate('profile')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Профиль</span>
   </button>
 </nav>
 
-<div id="toast" class="toast"></div>
-
 <script>
-// ============ TELEGRAM WEBAPP INIT ============
+/* ═══════════════════════════════════════════════════════════
+   ИНИЦИАЛИЗАЦИЯ TELEGRAM WEB APP
+═══════════════════════════════════════════════════════════ */
 const tg = window.Telegram?.WebApp;
 if (tg) {
-  try {
-    tg.ready();
-    tg.expand();
-    tg.enableClosingConfirmation();
-  } catch(e) { console.log('TMA init:', e); }
+  tg.ready();
+  tg.expand();
 }
 
-// ============ STATE ============
-const state = {
-  route: 'home',
-  params: {},
-  theme: localStorage.getItem('theme') || 'light',
-  user: JSON.parse(localStorage.getItem('user') || 'null') || {
-    id: 1,
-    name: 'Абдуллах',
-    telegramId: tg?.initDataUnsafe?.user?.id || 123456789,
-    isAdmin: true,
-    avatar: null
-  },
-  currentLesson: JSON.parse(localStorage.getItem('currentLesson') || 'null'),
-  playbackSpeed: parseFloat(localStorage.getItem('playbackSpeed') || '1'),
-  progress: JSON.parse(localStorage.getItem('progress') || '{}'),
-  bookmarks: JSON.parse(localStorage.getItem('bookmarks') || '{}'),
-  history: JSON.parse(localStorage.getItem('history') || '[]'),
-  searchQuery: ''
+/* ═══════════════════════════════════════════════════════════
+   SVG ИКОНКИ
+═══════════════════════════════════════════════════════════ */
+const Icons = {
+  folder: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
+  headphones: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
+  book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+  play: '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
+  pause: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>',
+  arrowLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>',
+  arrowRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+  heartFill: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+  settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+  moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+  sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+  rewind: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 19 2 12 11 5 11 19"/><polygon points="22 19 13 12 22 5 22 19"/></svg>',
+  forward: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 19 22 12 13 5 13 19"/><polygon points="2 19 11 12 2 5 2 19"/></svg>',
+  zoomIn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>',
+  zoomOut: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>',
+  fullscreen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+  close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>',
+  user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>'
 };
 
-// ============ MOCK DATA ============
-const SECTIONS = [
-  { id: 'aqida', title: 'Акида', subtitle: 'Вероубеждение', color: 'linear-gradient(135deg, #0f766e, #14b8a6)', icon: '🕌' },
-  { id: 'fiqh', title: 'Фикх', subtitle: 'Правоведение', color: 'linear-gradient(135deg, #b08d57, #d4a574)', icon: '⚖️' },
-  { id: 'tafsir', title: 'Тафсир', subtitle: 'Толкование Корана', color: 'linear-gradient(135deg, #7c3aed, #a78bfa)', icon: '📖' },
-  { id: 'hadith', title: 'Хадис', subtitle: 'Предания Пророка ﷺ', color: 'linear-gradient(135deg, #dc2626, #f87171)', icon: '📜' },
-  { id: 'sira', title: 'Сира', subtitle: 'Биография Пророка ﷺ', color: 'linear-gradient(135deg, #0891b2, #22d3ee)', icon: '🌙' },
-  { id: 'tazkiya', title: 'Тазкия', subtitle: 'Очищение души', color: 'linear-gradient(135deg, #059669, #34d399)', icon: '💚' }
-];
-
-const SUBSECTIONS = {
-  aqida: [
-    { id: 'three-fundamentals', title: 'Три основы', count: 8 },
-    { id: 'four-rules', title: 'Четыре правила', count: 5 },
-    { id: 'tawhid', title: 'Таухид', count: 12 }
+/* ═══════════════════════════════════════════════════════════
+   ДЕМО-ДАННЫЕ
+═══════════════════════════════════════════════════════════ */
+const DemoData = {
+  sections: [
+    { id: "quran", title: "Коран", icon: "book", description: "Изучение Священного Корана", parentId: null, order: 1 },
+    { id: "tafsir", title: "Тафсир", icon: "book", description: "Толкование Корана", parentId: "quran", order: 1 },
+    { id: "tajweed", title: "Таджвид", icon: "headphones", description: "Правила чтения Корана", parentId: "quran", order: 2 },
+    { id: "tafsir_juz", title: "Тафсир джуза Амма", icon: "book", description: "Разбор последнего джуза", parentId: "tafsir", order: 1 },
+    { id: "tafsir_surah", title: "Тафсир отдельных сур", icon: "book", description: "Детальный разбор сур", parentId: "tafsir", order: 2 },
+    { id: "fiqh", title: "Фикх", icon: "book", description: "Исламское право", parentId: null, order: 2 },
+    { id: "fiqh_ibadaat", title: "Ибадат", icon: "book", description: "Поклонение", parentId: "fiqh", order: 1 },
+    { id: "fiqh_salah", title: "Молитва", icon: "book", description: "Правила намаза", parentId: "fiqh_ibadaat", order: 1 },
+    { id: "hadith", title: "Хадисы", icon: "book", description: "Изучение хадисов", parentId: null, order: 3 },
+    { id: "hadith_arbain", title: "40 хадисов ан-Навави", icon: "book", description: "Сборник хадисов", parentId: "hadith", order: 1 },
+    { id: "aqida", title: "Акыда", icon: "book", description: "Исламское вероубеждение", parentId: null, order: 4 },
+    { id: "dua", title: "Дуа и зикры", icon: "book", description: "Ежедневные молитвы", parentId: null, order: 5 }
   ],
-  fiqh: [
-    { id: 'tahara', title: 'Тахара (Очищение)', count: 10 },
-    { id: 'salah', title: 'Саля (Молитва)', count: 15 },
-    { id: 'siyam', title: 'Сиям (Пост)', count: 7 }
+  lessons: [
+    { id: "lesson_001", title: "Введение в тафсир", description: "Основные понятия и методы тафсира", sectionId: "tafsir_juz", audioUrl: "", duration: 1820 },
+    { id: "lesson_002", title: "Сура Аль-Фатиха", description: "Тафсир открывающей суры", sectionId: "tafsir_surah", audioUrl: "", duration: 2400 },
+    { id: "lesson_003", title: "Правила нуна сакина", description: "Основы таджвида", sectionId: "tajweed", audioUrl: "", duration: 1500 },
+    { id: "lesson_004", title: "Обязательные части намаза", description: "Арканы salat", sectionId: "fiqh_salah", audioUrl: "", duration: 2100 },
+    { id: "lesson_005", title: "Хадис о намерениях", description: "Разбор первого хадиса ан-Навави", sectionId: "hadith_arbain", audioUrl: "", duration: 1950 },
+    { id: "lesson_006", title: "Основы Акыды", description: "Шесть столпов веры", sectionId: "aqida", audioUrl: "", duration: 2700 },
+    { id: "lesson_007", title: "Утренние и вечерние зикры", description: "Азкар из Крепости мусульманина", sectionId: "dua", audioUrl: "", duration: 1200 }
   ],
-  tafsir: [
-    { id: 'juz-amma', title: 'Джуз Амма', count: 20 },
-    { id: 'surah-fatihah', title: 'Сура Аль-Фатиха', count: 6 }
-  ],
-  hadith: [
-    { id: 'forty-nawawi', title: '40 хадисов ан-Навави', count: 40 },
-    { id: 'riyadh-salihin', title: 'Рияд ас-Салихин', count: 25 }
-  ],
-  sira: [
-    { id: 'makkah-period', title: 'Мекканский период', count: 12 },
-    { id: 'madinah-period', title: 'Мединский период', count: 18 }
-  ],
-  tazkiya: [
-    { id: 'heart-diseases', title: 'Болезни сердца', count: 9 },
-    { id: 'virtues', title: 'Добродетели', count: 14 }
+  books: [
+    { id: "book_001", title: "Крепость мусульманина", author: "Саид ибн Али аль-Кахтани", description: "Сборник ежедневных дуа и зикров", sectionId: "dua", pdfUrl: "", pages: 84 },
+    { id: "book_002", title: "40 хадисов ан-Навави", author: "Имам ан-Навави", description: "Знаменитый сборник хадисов", sectionId: "hadith_arbain", pdfUrl: "", pages: 120 },
+    { id: "book_003", title: "Краткий тафсир Ибн Касир", author: "Исмаил ибн Касир", description: "Классический тафсир Корана", sectionId: "tafsir_surah", pdfUrl: "", pages: 450 }
   ]
 };
 
-const LESSONS = [
-  { id: 'l1', sectionId: 'aqida', subId: 'three-fundamentals', title: 'Первый основа: Познание Господа', speaker: 'Шейх Мухаммад ибн Абдуль-Ваххаб', duration: 1845, audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
-  { id: 'l2', sectionId: 'aqida', subId: 'three-fundamentals', title: 'Второй основа: Познание религии Ислам', speaker: 'Шейх Мухаммад ибн Абдуль-Ваххаб', duration: 2130, audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
-  { id: 'l3', sectionId: 'aqida', subId: 'three-fundamentals', title: 'Третий основа: Познание Пророка', speaker: 'Шейх Мухаммад ибн Абдуль-Ваххаб', duration: 1680, audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
-  { id: 'l4', sectionId: 'aqida', subId: 'tawhid', title: 'Таухид ар-Рубубийя', speaker: 'Шейх Салих аль-Фаузан', duration: 2400, audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
-  { id: 'l5', sectionId: 'fiqh', subId: 'tahara', title: 'Виды воды и её свойства', speaker: 'Шейх Ибн Баз', duration: 1560, audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' },
-  { id: 'l6', sectionId: 'fiqh', subId: 'salah', title: 'Обязательные части намаза', speaker: 'Шейх Ибн Усеймин', duration: 2280, audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' },
-  { id: 'l7', sectionId: 'tafsir', subId: 'surah-fatihah', title: 'Толкование Аль-Фатихи', speaker: 'Шейх ас-Саади', duration: 3120, audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3' },
-  { id: 'l8', sectionId: 'hadith', subId: 'forty-nawawi', title: 'Хадис о намерениях', speaker: 'Шейх аль-Бухари', duration: 1420, audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' },
-  { id: 'l9', sectionId: 'sira', subId: 'makkah-period', title: 'Рождение Пророка ﷺ', speaker: 'Шейх Рагиб ас-Сарджани', duration: 2700, audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3' },
-  { id: 'l10', sectionId: 'tazkiya', subId: 'virtues', title: 'Искренность (Ихляс)', speaker: 'Имам аль-Газали', duration: 1980, audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3' },
-  { id: 'l11', sectionId: 'aqida', subId: 'four-rules', title: 'Первое правило: Знание', speaker: 'Шейх Мухаммад ибн Абдуль-Ваххаб', duration: 1740, audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3' },
-  { id: 'l12', sectionId: 'fiqh', subId: 'siyam', title: 'Пост в месяц Рамадан', speaker: 'Шейх Ибн Баз', duration: 2040, audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3' }
-];
-
-const BOOKS = [
-  { id: 'b1', sectionId: 'aqida', subId: 'three-fundamentals', title: 'Три основы', author: 'Шейх Мухаммад ибн Абдуль-Ваххаб', pages: 45, cover: 'linear-gradient(135deg, #0f766e, #14b8a6)' },
-  { id: 'b2', sectionId: 'tafsir', subId: 'juz-amma', title: 'Тафсир Джуз Амма', author: 'Шейх Ибн Усеймин', pages: 320, cover: 'linear-gradient(135deg, #7c3aed, #a78bfa)' },
-  { id: 'b3', sectionId: 'tazkiya', subId: 'heart-diseases', title: 'Болезни сердец и их лечение', author: 'Ибн аль-Джаузи', pages: 180, cover: 'linear-gradient(135deg, #059669, #34d399)' },
-  { id: 'b4', sectionId: 'hadith', subId: 'forty-nawawi', title: '40 хадисов ан-Навави', author: 'Имам ан-Навави', pages: 240, cover: 'linear-gradient(135deg, #dc2626, #f87171)' },
-  { id: 'b5', sectionId: 'sira', subId: 'makkah-period', title: 'Ракык аль-Магарид', author: 'Шейх Рагиб ас-Сарджани', pages: 450, cover: 'linear-gradient(135deg, #0891b2, #22d3ee)' },
-  { id: 'b6', sectionId: 'fiqh', subId: 'salah', title: 'Молитва Пророка ﷺ', author: 'Шейх аль-Албани', pages: 210, cover: 'linear-gradient(135deg, #b08d57, #d4a574)' }
-];
-
-// Mock book content
-const BOOK_CONTENT = {
-  b1: [
-    'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\n\nТри основы\n\nЗнай, да помилует тебя Аллах, что нам необходимо изучить три вопроса:\n\nПервый: познание рабом своего Господа.\nВторой: познание рабом своей религии.\nТретий: познание рабом своего Пророка.',
-    'Глава 1. Познание Господа\n\nЕсли тебя спросят: «Кто твой Господь?» — то ответь: «Мой Господь — Аллах, который воспитал меня и воспитал все миры Своими милостями».\n\nВсевышний Аллах сказал:\n«Хвала Аллаху, Господу миров».\n\nВсякое благо, которое ты имеешь — это от Него.',
-    'Глава 2. Виды поклонения\n\nЗнай, что поклонение Аллаху предписано в Коране и Сунне.\n\nК видам поклонения относятся:\n• Мольба (дуа)\n• Страх (хауф)\n• Упование (таваккуль)\n• Желание (рагъба)\n• Смирение (хушу)\n• Намерение (нийя)',
-    'Глава 3. Столпы Ислама\n\nИслам основан на пяти столпах:\n\n1. Свидетельство, что нет божества, достойного поклонения, кроме Аллаха, и что Мухаммад — Посланник Аллаха.\n\n2. Совершение молитвы.\n\n3. Выплата закята.\n\n4. Пост в месяц Рамадан.\n\n5. Совершение хаджа к Дому.',
-    'Глава 4. Столпы Имана\n\nИман — это вера в:\n\n1. Аллаха\n2. Его ангелов\n3. Его Писания\n4. Его посланников\n5. Последний день\n6. Предопределение — и хорошее, и плохое.\n\nВсевышний Аллах сказал:\n«Праведник тот, кто уверовал в Аллаха, Последний день, ангелов, Писание и пророков».'
-  ],
-  b2: Array.from({length: 10}, (_, i) => `Страница ${i+1}\n\nСура Ан-Нас\n\nСкажи: «Прибегаю к защите Господа людей,\nЦаря людей,\nБога людей,\nот зла искусителя, исчезающего,\nкоторый наущает в груди людей».\n\nТолкование:\nЭта сура учит нас обращаться за защитой к Аллаху от зла шайтана.`),
-  b3: Array.from({length: 8}, (_, i) => `Глава ${i+1}\n\nО болезнях сердца\n\nСердце — это орган, от которого зависит здоровье всего тела. Когда оно здорово — здорово всё тело, а когда оно испорчено — испорчено всё тело.\n\nК болезням сердца относятся:\n• Зависть\n• Гордыня\n• Лицемерие\n• Скупость\n• Гнев`),
-  b4: Array.from({length: 12}, (_, i) => `Хадис ${i+1}\n\nПередают со слов праведного халифа Абу Хафса Умара ибн аль-Хаттаба, да будет доволен им Аллах, что он слышал, как Посланник Аллаха ﷺ сказал:\n\n«Поистине, дела оцениваются по намерениям, и каждому человеку — то, что он намеревался сделать».`),
-  b5: Array.from({length: 15}, (_, i) => `Страница ${i+1}\n\nРождение Пророка ﷺ\n\nПророк Мухаммад ﷺ родился в Мекке в году Слона, в понедельник, в месяц Раби аль-Авваль.\n\nЕго отец — Абдуллах ибн Абдуль-Мутталиб умер ещё до его рождения. Его мать — Амина бинт Вахб.\n\nЕго дед Абдуль-Мутталиб дал ему имя Мухаммад.`),
-  b6: Array.from({length: 10}, (_, i) => `Глава ${i+1}\n\nОбязательные части молитвы\n\nМолитва имеет обязательные части, без которых она недействительна:\n\n1. Стояние (аль-кийям)\n2. Произнесение такбира «Аллаху Акбар»\n3. Чтение суры Аль-Фатиха\n4. Поясной поклон (руку)\n5. Выпрямление из поклона\n6. Земной поклон (суджуд)\n7. Сидение между двумя поклонами`),
+/* ═══════════════════════════════════════════════════════════
+   ХРАНИЛИЩЕ ДАННЫХ
+═══════════════════════════════════════════════════════════ */
+const Storage = {
+  get(key, def = null) {
+    try {
+      const v = localStorage.getItem(key);
+      return v ? JSON.parse(v) : def;
+    } catch { return def; }
+  },
+  set(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+  },
+  remove(key) {
+    try { localStorage.removeItem(key); } catch {}
+  }
 };
 
-// ============ AUDIO PLAYER ============
-const audio = new Audio();
-audio.preload = 'metadata';
+/* ═══════════════════════════════════════════════════════════
+   ДАННЫЕ ПРИЛОЖЕНИЯ
+═══════════════════════════════════════════════════════════ */
+const Data = {
+  sections: [],
+  lessons: [],
+  books: [],
 
-audio.addEventListener('timeupdate', () => {
-  if (!state.currentLesson) return;
-  const pct = (audio.currentTime / audio.duration) * 100 || 0;
-  const mp = document.getElementById('mp-progress');
-  if (mp) mp.style.width = pct + '%';
-  updatePlayerUI();
-});
-
-audio.addEventListener('ended', () => {
-  if (state.currentLesson) {
-    saveProgress(state.currentLesson.id, 'lesson', state.currentLesson.duration, 100);
-    playNextInQueue();
-  }
-});
-
-audio.addEventListener('loadedmetadata', () => {
-  const saved = state.progress[state.currentLesson?.id];
-  if (saved && saved.position > 0 && saved.position < audio.duration - 5) {
-    audio.currentTime = saved.position;
-  }
-  updatePlayerUI();
-});
-
-function playLesson(lesson) {
-  state.currentLesson = lesson;
-  localStorage.setItem('currentLesson', JSON.stringify(lesson));
-  audio.src = lesson.audioUrl;
-  audio.playbackRate = state.playbackSpeed;
-  audio.play().catch(e => console.log('Play error:', e));
-  document.getElementById('mini-player').classList.add('active');
-  updatePlayerUI();
-  showToast('▶ Воспроизведение: ' + lesson.title);
-  addToHistory({ type: 'lesson', id: lesson.id, title: lesson.title, at: Date.now() });
-}
-
-function togglePlay() {
-  if (!state.currentLesson) return;
-  if (audio.paused) {
-    audio.play();
-  } else {
-    audio.pause();
-  }
-  updatePlayerUI();
-}
-
-function seek(delta) {
-  if (!state.currentLesson) return;
-  audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + delta));
-}
-
-function setSpeed(speed) {
-  state.playbackSpeed = speed;
-  audio.playbackRate = speed;
-  localStorage.setItem('playbackSpeed', speed);
-  updatePlayerUI();
-  showToast('Скорость: ' + speed + 'x');
-}
-
-function updatePlayerUI() {
-  const icon = document.getElementById('mp-play-icon');
-  if (icon) {
-    if (audio.paused) {
-      icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+  async load() {
+    // Пытаемся загрузить из localStorage (админские изменения)
+    const saved = Storage.get('app_data');
+    if (saved) {
+      this.sections = saved.sections || [];
+      this.lessons = saved.lessons || [];
+      this.books = saved.books || [];
     } else {
-      icon.innerHTML = '<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>';
+      this.sections = [...DemoData.sections];
+      this.lessons = [...DemoData.lessons];
+      this.books = [...DemoData.books];
     }
+  },
+
+  save() {
+    Storage.set('app_data', {
+      sections: this.sections,
+      lessons: this.lessons,
+      books: this.books
+    });
+  },
+
+  getSection(id) { return this.sections.find(s => s.id === id); },
+  getLesson(id) { return this.lessons.find(l => l.id === id); },
+  getBook(id) { return this.books.find(b => b.id === id); },
+
+  getChildren(parentId) {
+    return this.sections.filter(s => s.parentId === parentId).sort((a,b) => a.order - b.order);
+  },
+
+  getSectionLessons(sectionId) {
+    return this.lessons.filter(l => l.sectionId === sectionId);
+  },
+
+  getSectionBooks(sectionId) {
+    return this.books.filter(b => b.sectionId === sectionId);
+  },
+
+  getBreadcrumbs(sectionId) {
+    const crumbs = [];
+    let current = this.getSection(sectionId);
+    while (current) {
+      crumbs.unshift(current);
+      current = current.parentId ? this.getSection(current.parentId) : null;
+    }
+    return crumbs;
+  },
+
+  getAllItems() {
+    return [
+      ...this.sections.map(s => ({...s, _type: 'section'})),
+      ...this.lessons.map(l => ({...l, _type: 'lesson'})),
+      ...this.books.map(b => ({...b, _type: 'book'}))
+    ];
   }
-  if (state.currentLesson) {
-    const t = document.getElementById('mp-title');
-    const s = document.getElementById('mp-speaker');
-    if (t) t.textContent = state.currentLesson.title;
-    if (s) s.textContent = state.currentLesson.speaker;
+};
+
+/* ═══════════════════════════════════════════════════════════
+   ИЗБРАННОЕ
+═══════════════════════════════════════════════════════════ */
+const Favorites = {
+  get() { return Storage.get('favorites', []); },
+  has(id) { return this.get().includes(id); },
+  toggle(id) {
+    const favs = this.get();
+    const idx = favs.indexOf(id);
+    if (idx >= 0) favs.splice(idx, 1);
+    else favs.push(id);
+    Storage.set('favorites', favs);
+    if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+    return idx < 0;
+  },
+  getAll() {
+    const ids = this.get();
+    return Data.getAllItems().filter(i => ids.includes(i.id));
   }
-  // Update full player if open
-  const fp = document.getElementById('full-player');
-  if (fp && fp.style.display !== 'none') renderFullPlayer();
-}
+};
 
-function playNextInQueue() {
-  // Simple: find next lesson in same subsection
-  if (!state.currentLesson) return;
-  const idx = LESSONS.findIndex(l => l.id === state.currentLesson.id);
-  if (idx >= 0 && idx < LESSONS.length - 1) {
-    playLesson(LESSONS[idx + 1]);
-  }
-}
+/* ═══════════════════════════════════════════════════════════
+   АУДИО ПЛЕЕР
+═══════════════════════════════════════════════════════════ */
+const AudioPlayer = {
+  audio: null,
+  currentLesson: null,
+  speeds: [0.75, 1, 1.25, 1.5, 2],
+  speedIdx: 1,
+  updateInterval: null,
 
-// ============ PROGRESS ============
-function saveProgress(id, type, position, progressPct) {
-  state.progress[id] = { type, position, progressPct, updatedAt: Date.now() };
-  localStorage.setItem('progress', JSON.stringify(state.progress));
-}
+  init() {
+    this.audio = new Audio();
+    this.audio.addEventListener('timeupdate', () => this.onTimeUpdate());
+    this.audio.addEventListener('ended', () => this.onEnded());
+    this.audio.addEventListener('loadedmetadata', () => this.onLoaded());
+  },
 
-function addToHistory(item) {
-  state.history = [item, ...state.history.filter(h => h.id !== item.id || h.type !== item.type)].slice(0, 50);
-  localStorage.setItem('history', JSON.stringify(state.history));
-}
-
-function toggleBookmark(bookId, page) {
-  const key = bookId + '_' + page;
-  if (state.bookmarks[key]) {
-    delete state.bookmarks[key];
-    showToast('🔖 Закладка удалена');
-  } else {
-    state.bookmarks[key] = { bookId, page, at: Date.now() };
-    showToast('🔖 Закладка добавлена');
-  }
-  localStorage.setItem('bookmarks', JSON.stringify(state.bookmarks));
-}
-
-// ============ ROUTER ============
-function navigate(route, params = {}) {
-  state.route = route;
-  state.params = params;
-  render();
-  window.scrollTo(0, 0);
-  // Update nav
-  document.querySelectorAll('.nav-item').forEach(n => {
-    n.classList.toggle('active', n.dataset.route === route || 
-      (route === 'section' && n.dataset.route === 'home') ||
-      (route === 'lesson' && n.dataset.route === 'home') ||
-      (route === 'book' && n.dataset.route === 'home'));
-  });
-  // Haptic
-  if (tg?.HapticFeedback) {
-    try { tg.HapticFeedback.impactOccurred('light'); } catch(e) {}
-  }
-}
-
-function openFullPlayer() {
-  state.route = 'player';
-  render();
-}
-
-// ============ UTILS ============
-function formatTime(sec) {
-  if (!sec || isNaN(sec)) return '0:00';
-  const h = Math.floor(sec / 3600);
-  const m = Math.floor((sec % 3600) / 60);
-  const s = Math.floor(sec % 60);
-  if (h > 0) return `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-  return `${m}:${s.toString().padStart(2,'0')}`;
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), 2000);
-}
-
-function getStats() {
-  const lessons = Object.values(state.progress).filter(p => p.type === 'lesson');
-  const books = Object.values(state.progress).filter(p => p.type === 'book');
-  const totalListenSec = lessons.reduce((s, p) => s + (p.position || 0), 0);
-  const totalPages = books.reduce((s, p) => s + (p.position || 0), 0);
-  const completedLessons = lessons.filter(p => p.progressPct >= 95).length;
-  const completedBooks = books.filter(p => p.progressPct >= 95).length;
-  return {
-    listenHours: Math.round(totalListenSec / 3600 * 10) / 10,
-    totalPages,
-    completedLessons,
-    completedBooks,
-    totalLessons: lessons.length,
-    totalBooks: books.length
-  };
-}
-
-// ============ RENDER ============
-function render() {
-  const app = document.getElementById('app');
-  let html = '';
-  switch(state.route) {
-    case 'home': html = renderHome(); break;
-    case 'search': html = renderSearch(); break;
-    case 'progress': html = renderProgress(); break;
-    case 'settings': html = renderSettings(); break;
-    case 'section': html = renderSection(); break;
-    case 'lesson-list': html = renderLessonList(); break;
-    case 'player': html = renderFullPlayer(); break;
-    case 'book': html = renderBook(); break;
-    case 'admin': html = renderAdmin(); break;
-    default: html = renderHome();
-  }
-  app.innerHTML = html;
-}
-
-function renderHome() {
-  const stats = getStats();
-  const continueItems = state.history.slice(0, 3).map(h => {
-    if (h.type === 'lesson') {
-      const lesson = LESSONS.find(l => l.id === h.id);
-      if (!lesson) return null;
-      const prog = state.progress[lesson.id];
-      return { ...lesson, type: 'lesson', progress: prog?.progressPct || 0 };
+  load(lesson) {
+    this.currentLesson = lesson;
+    if (lesson.audioUrl) {
+      this.audio.src = lesson.audioUrl;
     } else {
-      const book = BOOKS.find(b => b.id === h.id);
-      if (!book) return null;
-      const prog = state.progress[book.id];
-      return { ...book, type: 'book', progress: prog?.progressPct || 0 };
+      // Демо: нет реального аудио
+      this.audio.src = '';
     }
-  }).filter(Boolean);
+    const progress = Storage.get(`lesson_${lesson.id}_progress`);
+    if (progress && progress > 5) {
+      this.showResumeDialog(progress, lesson.duration);
+    }
+    this.updateMiniPlayer();
+  },
 
-  return `
-    <div class="fade-in">
-      <!-- Header -->
-      <div class="pattern-bg" style="padding: 24px 20px 32px; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%); color: white; border-radius: 0 0 24px 24px; margin-bottom: 20px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-          <div>
-            <div style="font-size:13px;opacity:0.85">Ас-саляму алейкум,</div>
-            <div style="font-size:22px;font-weight:700">${state.user.name} 👋</div>
-          </div>
-          <div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer" onclick="navigate('settings')">
-            ${state.user.avatar || '👤'}
-          </div>
-        </div>
-        <div style="display:flex;gap:12px;overflow-x:auto;padding-bottom:4px">
-          <div style="background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);padding:12px 16px;border-radius:14px;min-width:120px">
-            <div style="font-size:11px;opacity:0.85">Прослушано</div>
-            <div style="font-size:22px;font-weight:700">${stats.listenHours}ч</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);padding:12px 16px;border-radius:14px;min-width:120px">
-            <div style="font-size:11px;opacity:0.85">Прочитано</div>
-            <div style="font-size:22px;font-weight:700">${stats.totalPages} стр.</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);padding:12px 16px;border-radius:14px;min-width:120px">
-            <div style="font-size:11px;opacity:0.85">Завершено</div>
-            <div style="font-size:22px;font-weight:700">${stats.completedLessons + stats.completedBooks}</div>
-          </div>
+  showResumeDialog(progress, duration) {
+    const timeStr = this.formatTime(progress);
+    const overlay = document.createElement('div');
+    overlay.className = 'dialog-overlay';
+    overlay.innerHTML = `
+      <div class="dialog">
+        <h3>Продолжить прослушивание?</h3>
+        <p>Вы остановились на ${timeStr}</p>
+        <div class="dialog-actions">
+          <button class="btn-secondary" onclick="this.closest('.dialog-overlay').remove()">Сначала</button>
+          <button class="btn-primary" onclick="App.resumeFromProgress(${progress}); this.closest('.dialog-overlay').remove()">Продолжить</button>
         </div>
       </div>
+    `;
+    document.body.appendChild(overlay);
+  },
 
-      <div style="padding: 0 20px">
-        ${continueItems.length ? `
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <h2 style="font-size:18px;font-weight:700;margin:0">Продолжить</h2>
-          </div>
-          <div style="display:flex;gap:12px;overflow-x:auto;margin:0 -20px;padding:0 20px 16px">
-            ${continueItems.map(item => `
-              <div class="card" style="min-width:260px;padding:14px;cursor:pointer" onclick="${item.type === 'lesson' ? `playLesson(LESSONS.find(l=>l.id==='${item.id}'));openFullPlayer()` : `navigate('book',{id:'${item.id}'})`}">
-                <div style="display:flex;gap:12px;align-items:center">
-                  <div style="width:52px;height:52px;border-radius:10px;background:${item.type === 'lesson' ? 'var(--accent)' : item.cover || 'var(--accent)'};display:flex;align-items:center;justify-content:center;color:white;font-size:22px;flex-shrink:0">
-                    ${item.type === 'lesson' ? '🎧' : '📖'}
-                  </div>
-                  <div style="flex:1;min-width:0">
-                    <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">${item.type === 'lesson' ? 'Урок' : 'Книга'}</div>
-                    <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.title}</div>
-                    <div class="progress-bar" style="margin-top:6px">
-                      <div class="progress-fill" style="width:${item.progress}%"></div>
-                    </div>
-                    <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${Math.round(item.progress)}%</div>
-                  </div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        ` : ''}
+  play() {
+    if (!this.audio.src) return;
+    this.audio.play().catch(() => {});
+    this.startTracking();
+  },
 
-        <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 12px">
-          <h2 style="font-size:18px;font-weight:700;margin:0">Разделы знаний</h2>
-          <span style="font-size:13px;color:var(--accent);cursor:pointer;font-weight:500">${SECTIONS.length} разделов</span>
-        </div>
+  pause() {
+    this.audio.pause();
+    this.stopTracking();
+  },
 
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px">
-          ${SECTIONS.map(s => `
-            <div class="section-card" style="background:${s.color}" onclick="navigate('section',{id:'${s.id}'})">
-              <div style="font-size:32px;margin-bottom:8px">${s.icon}</div>
-              <div style="font-size:16px;font-weight:700">${s.title}</div>
-              <div style="font-size:12px;opacity:0.85;margin-top:2px">${s.subtitle}</div>
-              <div style="font-size:11px;opacity:0.7;margin-top:6px">${(SUBSECTIONS[s.id] || []).length} подразделов</div>
-            </div>
-          `).join('')}
-        </div>
+  toggle() {
+    if (this.audio.paused) this.play();
+    else this.pause();
+    this.updateUI();
+  },
 
-        <h2 style="font-size:18px;font-weight:700;margin:8px 0 12px">Рекомендуемые уроки</h2>
-        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
-          ${LESSONS.slice(0, 4).map(l => `
-            <div class="card" style="padding:14px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="playLesson(LESSONS.find(x=>x.id==='${l.id}'));openFullPlayer()">
-              <div style="width:48px;height:48px;border-radius:10px;background:var(--accent-bg);display:flex;align-items:center;justify-content:center;color:var(--accent);flex-shrink:0">
-                <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              </div>
-              <div style="flex:1;min-width:0">
-                <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.title}</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${l.speaker}</div>
-                <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${formatTime(l.duration)}</div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
+  seek(time) {
+    if (this.audio.duration) {
+      this.audio.currentTime = Math.max(0, Math.min(time, this.audio.duration));
+    }
+  },
 
-        <h2 style="font-size:18px;font-weight:700;margin:8px 0 12px">Библиотека книг</h2>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px">
-          ${BOOKS.slice(0, 4).map(b => `
-            <div class="card" style="padding:12px;cursor:pointer" onclick="navigate('book',{id:'${b.id}'})">
-              <div style="aspect-ratio:3/4;border-radius:10px;background:${b.cover};margin-bottom:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:36px">📖</div>
-              <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${b.title}</div>
-              <div style="font-size:11px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${b.author}</div>
-              <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${b.pages} стр.</div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    </div>
-  `;
-}
+  skip(seconds) {
+    this.seek(this.audio.currentTime + seconds);
+  },
 
-function renderSection() {
-  const section = SECTIONS.find(s => s.id === state.params.id);
-  if (!section) return '<div style="padding:40px;text-align:center">Раздел не найден</div>';
-  const subs = SUBSECTIONS[section.id] || [];
+  changeSpeed() {
+    this.speedIdx = (this.speedIdx + 1) % this.speeds.length;
+    this.audio.playbackRate = this.speeds[this.speedIdx];
+    this.updateUI();
+    if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+  },
 
-  return `
-    <div class="fade-in">
-      <div style="padding:20px">
-        <button onclick="navigate('home')" style="background:none;border:none;color:var(--accent);font-size:14px;font-weight:500;padding:8px 0;display:flex;align-items:center;gap:6px;cursor:pointer">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-          Назад
+  startTracking() {
+    this.stopTracking();
+    this.updateInterval = setInterval(() => this.saveProgress(), 3000);
+  },
+
+  stopTracking() {
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+      this.updateInterval = null;
+    }
+    this.saveProgress();
+  },
+
+  saveProgress() {
+    if (this.currentLesson && this.audio.currentTime > 0) {
+      Storage.set(`lesson_${this.currentLesson.id}_progress`, this.audio.currentTime);
+      // Статистика
+      const stats = Storage.get('stats', { lessonsListened: 0, pagesRead: 0, timeSpent: 0 });
+      stats.timeSpent = (stats.timeSpent || 0) + 3;
+      Storage.set('stats', stats);
+    }
+  },
+
+  onTimeUpdate() {
+    this.updateUI();
+  },
+
+  onLoaded() {
+    const progress = Storage.get(`lesson_${this.currentLesson?.id}_progress`);
+    if (progress && this.audio.duration) {
+      // Не устанавливаем автоматически, ждём выбора пользователя
+    }
+    this.updateUI();
+  },
+
+  onEnded() {
+    this.stopTracking();
+    if (this.currentLesson) {
+      const listened = Storage.get('listened_lessons', []);
+      if (!listened.includes(this.currentLesson.id)) {
+        listened.push(this.currentLesson.id);
+        Storage.set('listened_lessons', listened);
+        const stats = Storage.get('stats', { lessonsListened: 0, pagesRead: 0, timeSpent: 0 });
+        stats.lessonsListened = listened.length;
+        Storage.set('stats', stats);
+      }
+    }
+    this.updateUI();
+  },
+
+  setProgress(time, duration) {
+    if (this.audio.src && duration) {
+      this.audio.currentTime = time;
+    }
+  },
+
+  formatTime(sec) {
+    if (!sec || isNaN(sec)) return '0:00';
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  },
+
+  updateUI() {
+    const fill = document.getElementById('progressFill');
+    const cur = document.getElementById('currentTime');
+    const dur = document.getElementById('totalTime');
+    const playBtn = document.getElementById('playBtn');
+    const speedBtn = document.getElementById('speedBtn');
+
+    if (fill && this.audio.duration) {
+      fill.style.width = (this.audio.currentTime / this.audio.duration * 100) + '%';
+    }
+    if (cur) cur.textContent = this.formatTime(this.audio.currentTime);
+    if (dur) dur.textContent = this.formatTime(this.audio.duration || this.currentLesson?.duration || 0);
+    if (playBtn) playBtn.innerHTML = this.audio.paused ? Icons.play : Icons.pause;
+    if (speedBtn) speedBtn.textContent = this.speeds[this.speedIdx] + 'x';
+  },
+
+  updateMiniPlayer() {
+    const mp = document.getElementById('miniPlayer');
+    const title = document.getElementById('miniPlayerTitle');
+    const btn = document.getElementById('miniPlayerBtn');
+    if (this.currentLesson) {
+      mp.classList.add('visible');
+      title.textContent = this.currentLesson.title;
+      btn.innerHTML = this.audio.paused ? Icons.play : Icons.pause;
+    } else {
+      mp.classList.remove('visible');
+    }
+  },
+
+  isPlaying() { return this.audio && !this.audio.paused; }
+};
+
+/* ═══════════════════════════════════════════════════════════
+   PDF ЧИТАЛКА
+═══════════════════════════════════════════════════════════ */
+const Reader = {
+  pdf: null,
+  currentPage: 1,
+  totalPages: 0,
+  scale: 1.2,
+  currentBook: null,
+  darkMode: false,
+
+  async load(book) {
+    this.currentBook = book;
+    this.currentPage = Storage.get(`book_${book.id}_page`, 1);
+    this.totalPages = book.pages || 1;
+
+    if (book.pdfUrl && window.pdfjsLib) {
+      try {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        this.pdf = await pdfjsLib.getDocument(book.pdfUrl).promise;
+        this.totalPages = this.pdf.numPages;
+        if (this.currentPage > this.totalPages) this.currentPage = 1;
+      } catch (e) {
+        console.error('PDF load error:', e);
+        this.pdf = null;
+      }
+    }
+    this.renderPage();
+  },
+
+  async renderPage() {
+    const canvas = document.getElementById('readerCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    if (this.pdf) {
+      try {
+        const page = await this.pdf.getPage(this.currentPage);
+        const viewport = page.getViewport({ scale: this.scale * window.devicePixelRatio });
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        canvas.style.width = (viewport.width / window.devicePixelRatio) + 'px';
+        await page.render({ canvasContext: ctx, viewport }).promise;
+      } catch (e) {
+        console.error('Render error:', e);
+      }
+    } else {
+      // Демо-режим: показываем заглушку
+      canvas.width = 400;
+      canvas.height = 600;
+      canvas.style.width = '100%';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#333';
+      ctx.font = '20px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText(this.currentBook?.title || 'Книга', canvas.width/2, 100);
+      ctx.font = '14px system-ui';
+      ctx.fillStyle = '#666';
+      ctx.fillText(`Страница ${this.currentPage} из ${this.totalPages}`, canvas.width/2, 140);
+      ctx.fillText('(Демо-режим: PDF не загружен)', canvas.width/2, 180);
+      // Имитация текста
+      ctx.fillStyle = '#999';
+      for (let i = 0; i < 20; i++) {
+        const y = 220 + i * 18;
+        const w = 200 + Math.random() * 150;
+        ctx.fillRect((canvas.width - w)/2, y, w, 2);
+      }
+    }
+
+    this.updateToolbar();
+    Storage.set(`book_${this.currentBook.id}_page`, this.currentPage);
+  },
+
+  goToPage(page) {
+    page = parseInt(page);
+    if (page < 1) page = 1;
+    if (page > this.totalPages) page = this.totalPages;
+    this.currentPage = page;
+    this.renderPage();
+    // Статистика
+    const stats = Storage.get('stats', { lessonsListened: 0, pagesRead: 0, timeSpent: 0 });
+    stats.pagesRead = Math.max(stats.pagesRead || 0, this.currentPage);
+    Storage.set('stats', stats);
+  },
+
+  nextPage() { this.goToPage(this.currentPage + 1); },
+  prevPage() { this.goToPage(this.currentPage - 1); },
+
+  zoomIn() { this.scale = Math.min(3, this.scale + 0.2); this.renderPage(); },
+  zoomOut() { this.scale = Math.max(0.5, this.scale - 0.2); this.renderPage(); },
+
+  toggleDark() {
+    this.darkMode = !this.darkMode;
+    const wrap = document.querySelector('.reader-container');
+    if (wrap) wrap.classList.toggle('reader-dark', this.darkMode);
+    const btn = document.getElementById('darkModeBtn');
+    if (btn) btn.innerHTML = this.darkMode ? Icons.sun : Icons.moon;
+  },
+
+  toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.();
+    } else {
+      document.exitFullscreen?.();
+    }
+  },
+
+  updateToolbar() {
+    const pageInput = document.getElementById('pageInput');
+    const pageTotal = document.getElementById('pageTotal');
+    if (pageInput) pageInput.value = this.currentPage;
+    if (pageTotal) pageTotal.textContent = `/ ${this.totalPages}`;
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════
+   ГЛАВНЫЙ МОДУЛЬ ПРИЛОЖЕНИЯ
+═══════════════════════════════════════════════════════════ */
+const App = {
+  currentRoute: 'home',
+  currentSectionId: null,
+  debounceTimer: null,
+
+  async init() {
+    await Data.load();
+    AudioPlayer.init();
+    this.handleRoute();
+    window.addEventListener('hashchange', () => this.handleRoute());
+    // Telegram тема
+    if (tg) {
+      tg.onEvent('themeChanged', () => this.applyTheme());
+    }
+  },
+
+  applyTheme() {
+    // Telegram автоматически обновляет CSS переменные
+  },
+
+  navigate(route, params = {}) {
+    let hash = '#' + route;
+    if (params.id) hash += '/' + params.id;
+    if (params.sub) hash += '/' + params.sub;
+    window.location.hash = hash;
+  },
+
+  handleRoute() {
+    const hash = window.location.hash.slice(1) || 'home';
+    const parts = hash.split('/');
+    const route = parts[0];
+    const id = parts[1];
+    const sub = parts[2];
+
+    this.currentRoute = route;
+    this.updateNav(route);
+
+    // Скрываем нижнюю навигацию для плеера и читалки
+    const hideNav = ['player', 'reader', 'admin'].includes(route);
+    document.getElementById('bottomNav').style.display = hideNav ? 'none' : 'flex';
+
+    const app = document.getElementById('app');
+
+    switch (route) {
+      case 'home': this.renderHome(app); break;
+      case 'section': this.renderSection(app, id); break;
+      case 'player': this.renderPlayer(app, id); break;
+      case 'reader': this.renderReader(app, id); break;
+      case 'search': this.renderSearch(app); break;
+      case 'favorites': this.renderFavorites(app); break;
+      case 'profile': this.renderProfile(app); break;
+      case 'admin': this.renderAdmin(app); break;
+      default: this.renderHome(app);
+    }
+
+    window.scrollTo(0, 0);
+  },
+
+  updateNav(route) {
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.toggle('active', item.dataset.route === route);
+    });
+  },
+
+  /* ═══════════════════════════════════════════════════════
+     ГЛАВНАЯ СТРАНИЦА
+  ═══════════════════════════════════════════════════════ */
+  renderHome(app) {
+    const roots = Data.getChildren(null);
+    let html = `
+      <header class="app-header">
+        <h1>Исламские уроки</h1>
+        <button class="icon-btn" onclick="App.navigate('admin')" aria-label="Админ">
+          ${Icons.settings}
         </button>
+      </header>
+      <main>
+    `;
+
+    if (roots.length === 0) {
+      html += `<div class="empty-state">${Icons.book}<p>Нет разделов. Добавьте через админ-панель.</p></div>`;
+    } else {
+      html += `<div class="section-title">Разделы</div>`;
+      roots.forEach(s => {
+        html += this.renderSectionCard(s);
+      });
+    }
+
+    html += '</main>';
+    app.innerHTML = html;
+  },
+
+  renderSectionCard(section) {
+    const children = Data.getChildren(section.id);
+    const lessons = Data.getSectionLessons(section.id);
+    const books = Data.getSectionBooks(section.id);
+    const count = children.length + lessons.length + books.length;
+    const subtitle = count > 0 ? `${count} элемент${count === 1 ? '' : count < 5 ? 'а' : 'ов'}` : 'Пусто';
+
+    return `
+      <article class="card" onclick="App.navigate('section', {id: '${section.id}'})" role="button" tabindex="0">
+        <div class="card-icon">${Icons[section.icon] || Icons.folder}</div>
+        <div class="card-content">
+          <div class="card-title">${section.title}</div>
+          <div class="card-subtitle">${section.description || subtitle}</div>
+        </div>
+        <div class="card-arrow">${Icons.arrowRight}</div>
+      </article>
+    `;
+  },
+
+  /* ═══════════════════════════════════════════════════════
+     СТРАНИЦА РАЗДЕЛА
+  ═══════════════════════════════════════════════════════ */
+  renderSection(app, sectionId) {
+    const section = Data.getSection(sectionId);
+    if (!section) { this.renderHome(app); return; }
+
+    const crumbs = Data.getBreadcrumbs(sectionId);
+    const children = Data.getChildren(sectionId);
+    const lessons = Data.getSectionLessons(sectionId);
+    const books = Data.getSectionBooks(sectionId);
+
+    let html = `
+      <header class="app-header">
+        <button class="icon-btn" onclick="history.back()" aria-label="Назад">${Icons.arrowLeft}</button>
+        <h1>${section.title}</h1>
+      </header>
+      <nav class="breadcrumbs" aria-label="Навигация">
+        <a href="#home">Главная</a>
+    `;
+    crumbs.forEach((c, i) => {
+      html += `<span> › </span>`;
+      if (i < crumbs.length - 1) {
+        html += `<a href="#section/${c.id}">${c.title}</a>`;
+      } else {
+        html += `<span>${c.title}</span>`;
+      }
+    });
+    html += '</nav><main>';
+
+    if (children.length > 0) {
+      html += `<div class="section-title">Подразделы</div>`;
+      children.forEach(s => { html += this.renderSectionCard(s); });
+    }
+
+    if (lessons.length > 0) {
+      html += `<div class="section-title">Уроки</div>`;
+      lessons.forEach(l => { html += this.renderLessonCard(l); });
+    }
+
+    if (books.length > 0) {
+      html += `<div class="section-title">Книги</div>`;
+      books.forEach(b => { html += this.renderBookCard(b); });
+    }
+
+    if (children.length === 0 && lessons.length === 0 && books.length === 0) {
+      html += `<div class="empty-state">${Icons.folder}<p>Этот раздел пуст</p></div>`;
+    }
+
+    html += '</main>';
+    app.innerHTML = html;
+  },
+
+  renderLessonCard(lesson) {
+    const isFav = Favorites.has(lesson.id);
+    const progress = Storage.get(`lesson_${lesson.id}_progress`);
+    const progressPct = progress && lesson.duration ? Math.min(100, (progress / lesson.duration) * 100) : 0;
+
+    return `
+      <article class="card" onclick="App.navigate('player', {id: '${lesson.id}'})" role="button" tabindex="0">
+        <div class="card-icon">${Icons.headphones}</div>
+        <div class="card-content">
+          <div class="card-title">${lesson.title}</div>
+          <div class="card-subtitle">${lesson.description || AudioPlayer.formatTime(lesson.duration)}</div>
+          ${progressPct > 0 ? `<div style="height:2px;background:var(--secondary-bg-color);border-radius:1px;margin-top:4px;"><div style="height:100%;width:${progressPct}%;background:var(--link-color);border-radius:1px;"></div></div>` : ''}
+        </div>
+        <button class="fav-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); App.toggleFav('${lesson.id}', this)" aria-label="В избранное">
+          ${isFav ? Icons.heartFill : Icons.heart}
+        </button>
+      </article>
+    `;
+  },
+
+  renderBookCard(book) {
+    const isFav = Favorites.has(book.id);
+    return `
+      <article class="card" onclick="App.navigate('reader', {id: '${book.id}'})" role="button" tabindex="0">
+        <div class="card-icon">${Icons.book}</div>
+        <div class="card-content">
+          <div class="card-title">${book.title}</div>
+          <div class="card-subtitle">${book.author || ''} · ${book.pages} стр.</div>
+        </div>
+        <button class="fav-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); App.toggleFav('${book.id}', this)" aria-label="В избранное">
+          ${isFav ? Icons.heartFill : Icons.heart}
+        </button>
+      </article>
+    `;
+  },
+
+  toggleFav(id, btn) {
+    const added = Favorites.toggle(id);
+    btn.classList.toggle('active', added);
+    btn.innerHTML = added ? Icons.heartFill : Icons.heart;
+  },
+
+  /* ═══════════════════════════════════════════════════════
+     АУДИОПЛЕЕР
+  ═══════════════════════════════════════════════════════ */
+  renderPlayer(app, lessonId) {
+    const lesson = Data.getLesson(lessonId);
+    if (!lesson) { this.renderHome(app); return; }
+
+    const section = Data.getSection(lesson.sectionId);
+
+    app.innerHTML = `
+      <header class="app-header">
+        <button class="icon-btn" onclick="history.back()" aria-label="Назад">${Icons.arrowLeft}</button>
+        <h1>${lesson.title}</h1>
+        <button class="icon-btn" id="playerFavBtn" onclick="App.togglePlayerFav('${lesson.id}')" aria-label="В избранное">
+          ${Favorites.has(lesson.id) ? Icons.heartFill : Icons.heart}
+        </button>
+      </header>
+      <main class="player-container">
+        <div class="player-cover">${Icons.headphones}</div>
+        <div class="player-title">${lesson.title}</div>
+        <div class="player-subtitle">${section?.title || ''}</div>
+        <div class="progress-bar" id="progressBar" onclick="App.seekAudio(event)">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-times">
+          <span id="currentTime">0:00</span>
+          <span id="totalTime">${AudioPlayer.formatTime(lesson.duration)}</span>
+        </div>
+        <div class="player-controls">
+          <button class="ctrl-btn" onclick="AudioPlayer.skip(-15)" aria-label="Назад 15 сек">${Icons.rewind}</button>
+          <button class="ctrl-btn play-btn" id="playBtn" onclick="AudioPlayer.toggle()" aria-label="Воспроизведение">${Icons.play}</button>
+          <button class="ctrl-btn" onclick="AudioPlayer.skip(15)" aria-label="Вперёд 15 сек">${Icons.forward}</button>
+        </div>
+        <button class="speed-btn" id="speedBtn" onclick="AudioPlayer.changeSpeed()">1x</button>
+      </main>
+    `;
+
+    AudioPlayer.load(lesson);
+    AudioPlayer.updateUI();
+    // Обновляем мини-плеер
+    AudioPlayer.updateMiniPlayer();
+  },
+
+  seekAudio(e) {
+    const bar = document.getElementById('progressBar');
+    const rect = bar.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    const duration = AudioPlayer.audio.duration || AudioPlayer.currentLesson?.duration || 0;
+    AudioPlayer.seek(pct * duration);
+  },
+
+  resumeFromProgress(time) {
+    AudioPlayer.setProgress(time);
+    AudioPlayer.play();
+    AudioPlayer.updateUI();
+  },
+
+  togglePlayerFav(id) {
+    const added = Favorites.toggle(id);
+    const btn = document.getElementById('playerFavBtn');
+    if (btn) btn.innerHTML = added ? Icons.heartFill : Icons.heart;
+  },
+
+  goToCurrentLesson() {
+    if (AudioPlayer.currentLesson) {
+      this.navigate('player', { id: AudioPlayer.currentLesson.id });
+    }
+  },
+
+  toggleMiniPlayer() {
+    AudioPlayer.toggle();
+    AudioPlayer.updateMiniPlayer();
+  },
+
+  /* ═══════════════════════════════════════════════════════
+     PDF ЧИТАЛКА
+  ═══════════════════════════════════════════════════════ */
+  renderReader(app, bookId) {
+    const book = Data.getBook(bookId);
+    if (!book) { this.renderHome(app); return; }
+
+    app.innerHTML = `
+      <header class="app-header">
+        <button class="icon-btn" onclick="history.back()" aria-label="Назад">${Icons.arrowLeft}</button>
+        <h1>${book.title}</h1>
+        <button class="icon-btn" onclick="App.toggleReaderFav('${book.id}')" aria-label="В избранное">
+          ${Favorites.has(book.id) ? Icons.heartFill : Icons.heart}
+        </button>
+      </header>
+      <div class="reader-container">
+        <div class="reader-canvas-wrap">
+          <canvas id="readerCanvas"></canvas>
+        </div>
+        <div class="reader-toolbar">
+          <button class="icon-btn" onclick="Reader.zoomOut()" aria-label="Уменьшить">${Icons.zoomOut}</button>
+          <button class="icon-btn" onclick="Reader.prevPage()" aria-label="Предыдущая">${Icons.arrowLeft}</button>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <input type="number" class="page-input" id="pageInput" min="1" value="1" onchange="Reader.goToPage(this.value)">
+            <span id="pageTotal" style="font-size:13px;color:var(--hint-color);"></span>
+          </div>
+          <button class="icon-btn" onclick="Reader.nextPage()" aria-label="Следующая">${Icons.arrowRight}</button>
+          <button class="icon-btn" id="darkModeBtn" onclick="Reader.toggleDark()" aria-label="Ночной режим">${Icons.moon}</button>
+          <button class="icon-btn" onclick="Reader.zoomIn()" aria-label="Увеличить">${Icons.zoomIn}</button>
+          <button class="icon-btn" onclick="Reader.toggleFullscreen()" aria-label="Полный экран">${Icons.fullscreen}</button>
+        </div>
       </div>
-      <div style="padding:0 20px 20px">
-        <div class="card" style="padding:24px;background:${section.color};color:white;margin-bottom:20px">
-          <div style="font-size:48px;margin-bottom:12px">${section.icon}</div>
-          <h1 style="font-size:28px;font-weight:700;margin:0">${section.title}</h1>
-          <p style="font-size:14px;opacity:0.9;margin:6px 0 0">${section.subtitle}</p>
-          <div style="display:flex;gap:16px;margin-top:16px;font-size:13px">
-            <span>📚 ${subs.length} подразделов</span>
-            <span>🎧 ${LESSONS.filter(l => l.sectionId === section.id).length} уроков</span>
-            <span>📖 ${BOOKS.filter(b => b.sectionId === section.id).length} книг</span>
+    `;
+
+    Reader.load(book);
+  },
+
+  toggleReaderFav(id) {
+    const added = Favorites.toggle(id);
+    const btn = document.querySelector('.app-header .icon-btn:last-child');
+    if (btn) btn.innerHTML = added ? Icons.heartFill : Icons.heart;
+  },
+
+  /* ═══════════════════════════════════════════════════════
+     ПОИСК
+  ═══════════════════════════════════════════════════════ */
+  renderSearch(app) {
+    app.innerHTML = `
+      <header class="app-header">
+        <h1>Поиск</h1>
+      </header>
+      <div class="search-input-wrap">
+        ${Icons.close.replace('viewBox', 'viewBox').replace('M18 6', 'M11 11').replace('M6 18', 'M11 11').replace('line x1="18"', 'circle cx="11"').replace('line x2="6"', 'r="8"/')}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:28px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:var(--hint-color);pointer-events:none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" class="search-input" id="searchInput" placeholder="Поиск уроков, книг, разделов..." autofocus>
+      </div>
+      <main id="searchResults">
+        <div class="empty-state">
+          ${Icons.close}
+          <p>Введите запрос для поиска</p>
+        </div>
+      </main>
+    `;
+
+    const input = document.getElementById('searchInput');
+    input.addEventListener('input', (e) => {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(() => this.performSearch(e.target.value), 300);
+    });
+    input.focus();
+  },
+
+  performSearch(query) {
+    const results = document.getElementById('searchResults');
+    if (!query.trim()) {
+      results.innerHTML = `<div class="empty-state">${Icons.close}<p>Введите запрос для поиска</p></div>`;
+      return;
+    }
+
+    const q = query.toLowerCase();
+    const sections = Data.sections.filter(s => s.title.toLowerCase().includes(q) || (s.description || '').toLowerCase().includes(q));
+    const lessons = Data.lessons.filter(l => l.title.toLowerCase().includes(q) || (l.description || '').toLowerCase().includes(q));
+    const books = Data.books.filter(b => b.title.toLowerCase().includes(q) || (b.description || '').toLowerCase().includes(q) || (b.author || '').toLowerCase().includes(q));
+
+    let html = '';
+
+    if (sections.length > 0) {
+      html += `<div class="section-title">Разделы (${sections.length})</div>`;
+      sections.forEach(s => { html += this.renderSectionCard(s); });
+    }
+    if (lessons.length > 0) {
+      html += `<div class="section-title">Уроки (${lessons.length})</div>`;
+      lessons.forEach(l => { html += this.renderLessonCard(l); });
+    }
+    if (books.length > 0) {
+      html += `<div class="section-title">Книги (${books.length})</div>`;
+      books.forEach(b => { html += this.renderBookCard(b); });
+    }
+
+    if (!html) {
+      html = `<div class="empty-state">${Icons.close}<p>Ничего не найдено</p></div>`;
+    }
+
+    results.innerHTML = html;
+  },
+
+  /* ═══════════════════════════════════════════════════════
+     ИЗБРАННОЕ
+  ═══════════════════════════════════════════════════════ */
+  renderFavorites(app) {
+    const items = Favorites.getAll();
+
+    app.innerHTML = `
+      <header class="app-header">
+        <h1>Избранное</h1>
+      </header>
+      <main id="favoritesList"></main>
+    `;
+
+    const list = document.getElementById('favoritesList');
+    if (items.length === 0) {
+      list.innerHTML = `<div class="empty-state">${Icons.heart}<p>Нет избранных элементов</p></div>`;
+      return;
+    }
+
+    let html = '';
+    items.forEach(item => {
+      if (item._type === 'section') html += this.renderSectionCard(item);
+      else if (item._type === 'lesson') html += this.renderLessonCard(item);
+      else if (item._type === 'book') html += this.renderBookCard(item);
+    });
+    list.innerHTML = html;
+  },
+
+  /* ═══════════════════════════════════════════════════════
+     ПРОФИЛЬ
+  ═══════════════════════════════════════════════════════ */
+  renderProfile(app) {
+    const user = tg?.initDataUnsafe?.user;
+    const stats = Storage.get('stats', { lessonsListened: 0, pagesRead: 0, timeSpent: 0 });
+    const theme = Storage.get('theme', 'auto');
+    const fontSize = Storage.get('fontSize', 16);
+
+    const avatarHtml = user?.photo_url
+      ? `<img src="${user.photo_url}" alt="Аватар">`
+      : Icons.user;
+
+    app.innerHTML = `
+      <header class="app-header">
+        <h1>Профиль</h1>
+      </header>
+      <main>
+        <div class="profile-header">
+          <div class="profile-avatar">${avatarHtml}</div>
+          <div class="profile-name">${user?.first_name || 'Гость'} ${user?.last_name || ''}</div>
+          ${user?.username ? `<div class="profile-username">@${user.username}</div>` : ''}
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">${stats.lessonsListened || 0}</div>
+            <div class="stat-label">Уроков</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${stats.pagesRead || 0}</div>
+            <div class="stat-label">Страниц</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${Math.floor((stats.timeSpent || 0) / 60)}</div>
+            <div class="stat-label">Минут</div>
           </div>
         </div>
 
-        <h2 style="font-size:18px;font-weight:700;margin:0 0 12px">Подразделы</h2>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          ${subs.map(sub => `
-            <div class="card" style="padding:16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center" onclick="navigate('lesson-list',{sectionId:'${section.id}',subId:'${sub.id}',title:'${sub.title}'})">
-              <div style="flex:1">
-                <div style="font-size:15px;font-weight:600">${sub.title}</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:4px">${LESSONS.filter(l => l.subId === sub.id).length} уроков · ${BOOKS.filter(b => b.subId === sub.id).length} книг</div>
-              </div>
-              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--text-muted)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        <div class="settings-list">
+          <div class="setting-item">
+            <span class="setting-label">Тема</span>
+            <div class="setting-control">
+              <select onchange="App.setTheme(this.value)">
+                <option value="auto" ${theme==='auto'?'selected':''}>Авто</option>
+                <option value="light" ${theme==='light'?'selected':''}>Светлая</option>
+                <option value="dark" ${theme==='dark'?'selected':''}>Тёмная</option>
+              </select>
             </div>
-          `).join('')}
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function renderLessonList() {
-  const { sectionId, subId, title } = state.params;
-  const lessons = LESSONS.filter(l => l.subId === subId);
-  const books = BOOKS.filter(b => b.subId === subId);
-
-  return `
-    <div class="fade-in">
-      <div style="padding:20px">
-        <button onclick="navigate('section',{id:'${sectionId}'})" style="background:none;border:none;color:var(--accent);font-size:14px;font-weight:500;padding:8px 0;display:flex;align-items:center;gap:6px;cursor:pointer">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-          Назад
-        </button>
-        <h1 style="font-size:24px;font-weight:700;margin:12px 0 4px">${title}</h1>
-        <p style="font-size:13px;color:var(--text-muted);margin:0">${lessons.length} уроков · ${books.length} книг</p>
-      </div>
-      <div style="padding:0 20px 20px">
-        ${books.length ? `
-          <h2 style="font-size:16px;font-weight:600;margin:0 0 12px">📖 Книги</h2>
-          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
-            ${books.map(b => {
-              const prog = state.progress[b.id];
-              return `
-                <div class="card" style="padding:14px;display:flex;gap:12px;cursor:pointer" onclick="navigate('book',{id:'${b.id}'})">
-                  <div style="width:56px;height:72px;border-radius:8px;background:${b.cover};display:flex;align-items:center;justify-content:center;color:white;font-size:24px;flex-shrink:0">📖</div>
-                  <div style="flex:1;min-width:0">
-                    <div style="font-size:14px;font-weight:600">${b.title}</div>
-                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${b.author}</div>
-                    <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${b.pages} страниц</div>
-                    ${prog ? `<div class="progress-bar" style="margin-top:6px"><div class="progress-fill" style="width:${prog.progressPct}%"></div></div>` : ''}
-                  </div>
-                </div>
-              `;
-            }).join('')}
           </div>
-        ` : ''}
-
-        <h2 style="font-size:16px;font-weight:600;margin:0 0 12px">🎧 Уроки</h2>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          ${lessons.map((l, i) => {
-            const prog = state.progress[l.id];
-            return `
-              <div class="card" style="padding:14px;display:flex;gap:12px;cursor:pointer;align-items:center" onclick="playLesson(LESSONS.find(x=>x.id==='${l.id}'));openFullPlayer()">
-                <div style="width:44px;height:44px;border-radius:50%;background:var(--accent);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0">${i+1}</div>
-                <div style="flex:1;min-width:0">
-                  <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.title}</div>
-                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${l.speaker}</div>
-                  <div style="display:flex;gap:10px;font-size:11px;color:var(--text-muted);margin-top:4px">
-                    <span>⏱ ${formatTime(l.duration)}</span>
-                    ${prog ? `<span>✓ ${Math.round(prog.progressPct)}%</span>` : ''}
-                  </div>
-                </div>
-                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="color:var(--accent);flex-shrink:0"><path d="M8 5v14l11-7z"/></svg>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function renderFullPlayer() {
-  const l = state.currentLesson;
-  if (!l) return '<div style="padding:40px;text-align:center">Нет активного урока</div>';
-  const prog = state.progress[l.id];
-  const pct = (audio.currentTime / audio.duration) * 100 || 0;
-  const speeds = [0.5, 1, 1.5, 2];
-
-  return `
-    <div id="full-player" class="fade-in" style="min-height:100vh;background:linear-gradient(180deg,var(--accent) 0%,var(--accent-light) 50%,var(--bg) 100%);padding:20px;color:white">
-      <button onclick="navigate('home')" style="background:rgba(255,255,255,0.2);border:none;color:white;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-bottom:20px">
-        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      </button>
-
-      <div style="text-align:center;padding:20px 0 30px">
-        <div style="width:200px;height:200px;border-radius:24px;background:rgba(255,255,255,0.15);margin:0 auto 24px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(0,0,0,0.2)">
-          <div style="font-size:80px">🎧</div>
-        </div>
-        <h1 style="font-size:22px;font-weight:700;margin:0 0 8px">${l.title}</h1>
-        <p style="font-size:14px;opacity:0.85;margin:0">${l.speaker}</p>
-      </div>
-
-      <div style="padding:0 10px 30px">
-        <div class="progress-bar" style="height:6px;background:rgba(255,255,255,0.2);margin-bottom:8px;cursor:pointer" onclick="audio.currentTime = (event.offsetX / event.target.offsetWidth) * audio.duration">
-          <div class="progress-fill" style="width:${pct}%;background:white"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;opacity:0.85">
-          <span>${formatTime(audio.currentTime)}</span>
-          <span>${formatTime(audio.duration)}</span>
-        </div>
-      </div>
-
-      <div style="display:flex;justify-content:center;align-items:center;gap:20px;margin-bottom:30px">
-        <button onclick="seek(-15)" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative">
-          <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg>
-          <span style="position:absolute;bottom:-18px;font-size:10px;opacity:0.85">15с</span>
-        </button>
-        <button onclick="togglePlay()" style="width:72px;height:72px;border-radius:50%;background:white;color:var(--accent);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,0.2)">
-          ${audio.paused ? 
-            '<svg width="32" height="32" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>' :
-            '<svg width="32" height="32" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>'}
-        </button>
-        <button onclick="seek(15)" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative">
-          <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
-          <span style="position:absolute;bottom:-18px;font-size:10px;opacity:0.85">15с</span>
-        </button>
-      </div>
-
-      <div style="background:rgba(255,255,255,0.1);border-radius:16px;padding:16px;backdrop-filter:blur(10px)">
-        <div style="font-size:12px;opacity:0.85;margin-bottom:10px;text-align:center">Скорость воспроизведения</div>
-        <div style="display:flex;gap:8px;justify-content:center">
-          ${speeds.map(s => `
-            <button onclick="setSpeed(${s})" style="padding:8px 16px;border-radius:999px;background:${state.playbackSpeed === s ? 'white' : 'rgba(255,255,255,0.15)'};color:${state.playbackSpeed === s ? 'var(--accent)' : 'white'};border:none;font-weight:600;font-size:13px;cursor:pointer">${s}x</button>
-          `).join('')}
-        </div>
-      </div>
-
-      <div style="margin-top:20px;background:rgba(255,255,255,0.1);border-radius:16px;padding:16px;backdrop-filter:blur(10px)">
-        <div style="font-size:12px;opacity:0.85;margin-bottom:6px">Об уроке</div>
-        <div style="font-size:14px;line-height:1.6">
-          ${l.title} — это урок из раздела «${SECTIONS.find(s => s.id === l.sectionId)?.title}». Спикер: ${l.speaker}. Длительность: ${formatTime(l.duration)}.
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function renderBook() {
-  const book = BOOKS.find(b => b.id === state.params.id);
-  if (!book) return '<div style="padding:40px;text-align:center">Книга не найдена</div>';
-  const content = BOOK_CONTENT[book.id] || Array.from({length: 5}, (_, i) => `Страница ${i+1}\n\nСодержимое книги "${book.title}"...`);
-  const prog = state.progress[book.id] || { position: 0, progressPct: 0 };
-  const currentPage = Math.max(0, Math.min(content.length - 1, prog.position || 0));
-  const theme = state.theme;
-  const isBookmarked = state.bookmarks[book.id + '_' + currentPage];
-
-  return `
-    <div class="fade-in" style="min-height:100vh">
-      <div style="position:sticky;top:0;background:var(--bg-card);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px;z-index:10">
-        <button onclick="navigate('home')" style="background:none;border:none;color:var(--accent);padding:8px;cursor:pointer">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-        </button>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${book.title}</div>
-          <div style="font-size:11px;color:var(--text-muted)">Стр. ${currentPage + 1} из ${content.length}</div>
-        </div>
-        <button onclick="toggleBookmark('${book.id}', ${currentPage});render()" style="background:none;border:none;font-size:20px;cursor:pointer;padding:8px">${isBookmarked ? '🔖' : '📑'}</button>
-      </div>
-
-      <div class="reader-page" style="margin:16px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.05)">
-        <div style="white-space:pre-wrap;font-size:17px;line-height:1.9">${content[currentPage]}</div>
-      </div>
-
-      <div style="padding:16px 20px;display:flex;gap:10px;align-items:center">
-        <button onclick="changeBookPage(${book.id}, ${currentPage - 1})" ${currentPage === 0 ? 'disabled' : ''} style="flex:1;padding:12px;border-radius:12px;background:var(--bg-card);border:1px solid var(--border);color:var(--text);font-weight:600;cursor:pointer;opacity:${currentPage === 0 ? 0.4 : 1}">← Назад</button>
-        <div style="font-size:13px;color:var(--text-muted);padding:0 8px">${currentPage + 1}/${content.length}</div>
-        <button onclick="changeBookPage(${book.id}, ${currentPage + 1})" ${currentPage >= content.length - 1 ? 'disabled' : ''} style="flex:1;padding:12px;border-radius:12px;background:var(--accent);border:none;color:white;font-weight:600;cursor:pointer;opacity:${currentPage >= content.length - 1 ? 0.4 : 1}">Далее →</button>
-      </div>
-
-      <div style="padding:0 20px 20px">
-        <div class="progress-bar">
-          <div class="progress-fill" style="width:${((currentPage + 1) / content.length) * 100}%"></div>
-        </div>
-        <div style="text-align:center;font-size:12px;color:var(--text-muted);margin-top:8px">Прогресс: ${Math.round(((currentPage + 1) / content.length) * 100)}%</div>
-      </div>
-    </div>
-  `;
-}
-
-function changeBookPage(bookId, page) {
-  const book = BOOKS.find(b => b.id === bookId);
-  if (!book) return;
-  const content = BOOK_CONTENT[bookId] || [];
-  if (page < 0 || page >= content.length) return;
-  const pct = ((page + 1) / content.length) * 100;
-  saveProgress(bookId, 'book', page, pct);
-  addToHistory({ type: 'book', id: bookId, title: book.title, at: Date.now() });
-  render();
-}
-
-function renderSearch() {
-  const q = state.searchQuery.toLowerCase().trim();
-  const lessons = q ? LESSONS.filter(l => l.title.toLowerCase().includes(q) || l.speaker.toLowerCase().includes(q)) : [];
-  const books = q ? BOOKS.filter(b => b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q)) : [];
-
-  return `
-    <div class="fade-in" style="padding:20px">
-      <h1 style="font-size:24px;font-weight:700;margin:0 0 16px">Поиск</h1>
-      <div style="position:relative;margin-bottom:20px">
-        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted)"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        <input type="text" placeholder="Поиск уроков и книг..." value="${state.searchQuery}" oninput="state.searchQuery=this.value;render()" style="padding-left:44px">
-      </div>
-      ${q ? `
-        <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Найдено: ${lessons.length} уроков, ${books.length} книг</div>
-        ${lessons.length ? `
-          <h2 style="font-size:16px;font-weight:600;margin:16px 0 10px">🎧 Уроки</h2>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            ${lessons.map(l => `
-              <div class="card" style="padding:14px;display:flex;gap:12px;cursor:pointer;align-items:center" onclick="playLesson(LESSONS.find(x=>x.id==='${l.id}'));openFullPlayer()">
-                <div style="width:44px;height:44px;border-radius:10px;background:var(--accent-bg);display:flex;align-items:center;justify-content:center;color:var(--accent);flex-shrink:0">🎧</div>
-                <div style="flex:1;min-width:0">
-                  <div style="font-size:14px;font-weight:600">${l.title}</div>
-                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${l.speaker} · ${formatTime(l.duration)}</div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        ` : ''}
-        ${books.length ? `
-          <h2 style="font-size:16px;font-weight:600;margin:16px 0 10px">📖 Книги</h2>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            ${books.map(b => `
-              <div class="card" style="padding:14px;display:flex;gap:12px;cursor:pointer" onclick="navigate('book',{id:'${b.id}'})">
-                <div style="width:44px;height:56px;border-radius:8px;background:${b.cover};display:flex;align-items:center;justify-content:center;color:white;font-size:20px;flex-shrink:0">📖</div>
-                <div style="flex:1;min-width:0">
-                  <div style="font-size:14px;font-weight:600">${b.title}</div>
-                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${b.author} · ${b.pages} стр.</div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        ` : ''}
-        ${!lessons.length && !books.length ? `
-          <div style="text-align:center;padding:60px 20px;color:var(--text-muted)">
-            <div style="font-size:48px;margin-bottom:12px">🔍</div>
-            <div>Ничего не найдено по запросу «${q}»</div>
-          </div>
-        ` : ''}
-      ` : `
-        <div style="text-align:center;padding:60px 20px;color:var(--text-muted)">
-          <div style="font-size:48px;margin-bottom:12px">🔎</div>
-          <div>Введите запрос для поиска</div>
-          <div style="font-size:13px;margin-top:8px">По урокам, книгам и спикерам</div>
-        </div>
-      `}
-    </div>
-  `;
-}
-
-function renderProgress() {
-  const stats = getStats();
-  const recent = state.history.slice(0, 10);
-
-  return `
-    <div class="fade-in" style="padding:20px">
-      <h1 style="font-size:24px;font-weight:700;margin:0 0 16px">Мой прогресс</h1>
-
-      <div class="card" style="padding:20px;margin-bottom:16px;background:linear-gradient(135deg,var(--accent) 0%,var(--accent-light) 100%);color:white;border:none">
-        <div style="display:flex;justify-content:space-around;text-align:center">
-          <div>
-            <div style="font-size:28px;font-weight:700">${stats.listenHours}ч</div>
-            <div style="font-size:12px;opacity:0.85;margin-top:4px">Прослушано</div>
-          </div>
-          <div style="width:1px;background:rgba(255,255,255,0.2)"></div>
-          <div>
-            <div style="font-size:28px;font-weight:700">${stats.totalPages}</div>
-            <div style="font-size:12px;opacity:0.85;margin-top:4px">Страниц</div>
-          </div>
-          <div style="width:1px;background:rgba(255,255,255,0.2)"></div>
-          <div>
-            <div style="font-size:28px;font-weight:700">${stats.completedLessons + stats.completedBooks}</div>
-            <div style="font-size:12px;opacity:0.85;margin-top:4px">Завершено</div>
-          </div>
-        </div>
-      </div>
-
-      <h2 style="font-size:16px;font-weight:600;margin:20px 0 12px">Прогресс по урокам</h2>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
-        ${Object.entries(state.progress).filter(([_, p]) => p.type === 'lesson').slice(0, 5).map(([id, p]) => {
-          const l = LESSONS.find(x => x.id === id);
-          if (!l) return '';
-          return `
-            <div class="card" style="padding:14px;cursor:pointer" onclick="playLesson(LESSONS.find(x=>x.id==='${id}'));openFullPlayer()">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                <div style="font-size:14px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:10px">${l.title}</div>
-                <div style="font-size:12px;color:var(--text-muted);flex-shrink:0">${Math.round(p.progressPct)}%</div>
-              </div>
-              <div class="progress-bar"><div class="progress-fill" style="width:${p.progressPct}%"></div></div>
+          <div class="setting-item">
+            <span class="setting-label">Размер шрифта</span>
+            <div class="setting-control">
+              <select onchange="App.setFontSize(this.value)">
+                <option value="14" ${fontSize==14?'selected':''}>Мелкий</option>
+                <option value="16" ${fontSize==16?'selected':''}>Обычный</option>
+                <option value="18" ${fontSize==18?'selected':''}>Крупный</option>
+                <option value="20" ${fontSize==20?'selected':''}>Большой</option>
+              </select>
             </div>
-          `;
-        }).join('') || '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Пока нет прослушанных уроков</div>'}
-      </div>
-
-      <h2 style="font-size:16px;font-weight:600;margin:20px 0 12px">Прогресс по книгам</h2>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
-        ${Object.entries(state.progress).filter(([_, p]) => p.type === 'book').slice(0, 5).map(([id, p]) => {
-          const b = BOOKS.find(x => x.id === id);
-          if (!b) return '';
-          return `
-            <div class="card" style="padding:14px;cursor:pointer" onclick="navigate('book',{id:'${id}'})">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                <div style="font-size:14px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:10px">${b.title}</div>
-                <div style="font-size:12px;color:var(--text-muted);flex-shrink:0">${Math.round(p.progressPct)}%</div>
-              </div>
-              <div class="progress-bar"><div class="progress-fill" style="width:${p.progressPct}%"></div></div>
+          </div>
+          <div class="setting-item">
+            <span class="setting-label">Сбросить прогресс</span>
+            <div class="setting-control">
+              <button class="btn-secondary" style="padding:6px 12px;border-radius:var(--radius-btn);border:none;cursor:pointer;color:#e53935;" onclick="App.resetProgress()">Сбросить</button>
             </div>
-          `;
-        }).join('') || '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Пока нет прочитанных книг</div>'}
-      </div>
-
-      <h2 style="font-size:16px;font-weight:600;margin:20px 0 12px">История активности</h2>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        ${recent.length ? recent.map(h => {
-          const item = h.type === 'lesson' ? LESSONS.find(l => l.id === h.id) : BOOKS.find(b => b.id === h.id);
-          if (!item) return '';
-          const time = new Date(h.at);
-          return `
-            <div class="card" style="padding:12px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="${h.type === 'lesson' ? `playLesson(LESSONS.find(x=>x.id==='${h.id}'));openFullPlayer()` : `navigate('book',{id:'${h.id}'})`}">
-              <div style="width:40px;height:40px;border-radius:10px;background:${h.type === 'lesson' ? 'var(--accent-bg)' : (item.cover || 'var(--accent)')};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;color:${h.type === 'lesson' ? 'var(--accent)' : 'white'}">
-                ${h.type === 'lesson' ? '🎧' : '📖'}
-              </div>
-              <div style="flex:1;min-width:0">
-                <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.title}</div>
-                <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${time.toLocaleDateString('ru')} · ${time.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'})}</div>
-              </div>
-            </div>
-          `;
-        }).join('') : '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">История пуста</div>'}
-      </div>
-    </div>
-  `;
-}
-
-function renderSettings() {
-  return `
-    <div class="fade-in" style="padding:20px">
-      <h1 style="font-size:24px;font-weight:700;margin:0 0 16px">Настройки</h1>
-
-      <div class="card" style="padding:20px;margin-bottom:16px">
-        <div style="display:flex;gap:14px;align-items:center">
-          <div style="width:56px;height:56px;border-radius:50%;background:var(--accent);color:white;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700">${state.user.name[0]}</div>
-          <div style="flex:1">
-            <div style="font-size:16px;font-weight:600">${state.user.name}</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">ID: ${state.user.telegramId}</div>
-            ${state.user.isAdmin ? '<div class="admin-badge" style="margin-top:6px;display:inline-block">АДМИН</div>' : ''}
           </div>
         </div>
-      </div>
+      </main>
+    `;
+  },
 
-      <h2 style="font-size:16px;font-weight:600;margin:20px 0 12px">Оформление</h2>
-      <div class="card" style="padding:16px;margin-bottom:16px">
-        <div style="font-size:14px;font-weight:600;margin-bottom:12px">Тема</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-          ${['light', 'dark', 'sepia'].map(t => `
-            <button onclick="setTheme('${t}')" style="padding:12px;border-radius:12px;border:2px solid ${state.theme === t ? 'var(--accent)' : 'var(--border)'};background:${t === 'light' ? '#ffffff' : t === 'dark' ? '#1f2937' : '#f5ecd7'};color:${t === 'dark' ? 'white' : 'var(--text)'};cursor:pointer;font-weight:500;font-size:13px">
-              ${t === 'light' ? '☀️ Светлая' : t === 'dark' ? '🌙 Тёмная' : '📜 Сепия'}
-            </button>
-          `).join('')}
+  setTheme(theme) {
+    Storage.set('theme', theme);
+    if (theme === 'dark') {
+      document.documentElement.style.colorScheme = 'dark';
+    } else if (theme === 'light') {
+      document.documentElement.style.colorScheme = 'light';
+    } else {
+      document.documentElement.style.colorScheme = '';
+    }
+  },
+
+  setFontSize(size) {
+    Storage.set('fontSize', parseInt(size));
+    document.body.style.fontSize = size + 'px';
+  },
+
+  resetProgress() {
+    const doReset = () => {
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('lesson_') || key.startsWith('book_') || key === 'stats' || key === 'listened_lessons') {
+          keys.push(key);
+        }
+      }
+      keys.forEach(k => localStorage.removeItem(k));
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+      this.renderProfile(document.getElementById('app'));
+    };
+
+    if (tg?.showConfirm) {
+      tg.showConfirm('Сбросить весь прогресс прослушивания и чтения?', (ok) => {
+        if (ok) doReset();
+      });
+    } else if (confirm('Сбросить весь прогресс?')) {
+      doReset();
+    }
+  },
+
+  /* ═══════════════════════════════════════════════════════
+     АДМИН-ПАНЕЛЬ
+  ═══════════════════════════════════════════════════════ */
+  adminAuth: false,
+  adminTab: 'sections',
+  adminEditing: null,
+
+  renderAdmin(app) {
+    if (!this.adminAuth) {
+      const savedHash = Storage.get('admin_hash');
+      app.innerHTML = `
+        <header class="app-header">
+          <button class="icon-btn" onclick="history.back()" aria-label="Назад">${Icons.arrowLeft}</button>
+          <h1>Админ-панель</h1>
+        </header>
+        <div class="admin-login">
+          <h3 style="margin-bottom:16px;">${savedHash ? 'Введите пароль' : 'Установите пароль'}</h3>
+          <input type="password" id="adminPass" placeholder="Пароль" onkeypress="if(event.key==='Enter')App.adminLogin()">
+          ${savedHash ? '' : '<input type="password" id="adminPass2" placeholder="Повторите пароль" style="margin-top:8px;">'}
+          <button class="btn-primary" style="width:100%;padding:12px;border-radius:var(--radius-btn);border:none;font-size:15px;cursor:pointer;margin-top:12px;" onclick="App.adminLogin()">Войти</button>
+          <p style="font-size:12px;color:var(--hint-color);margin-top:12px;">Пароль по умолчанию: admin</p>
         </div>
+      `;
+      return;
+    }
+
+    app.innerHTML = `
+      <header class="app-header">
+        <button class="icon-btn" onclick="history.back()" aria-label="Назад">${Icons.arrowLeft}</button>
+        <h1>Админ-панель</h1>
+        <button class="icon-btn" onclick="App.adminLogout()" aria-label="Выход">${Icons.close}</button>
+      </header>
+      <div class="admin-tabs">
+        <button class="admin-tab ${this.adminTab==='sections'?'active':''}" onclick="App.adminSwitchTab('sections')">Разделы</button>
+        <button class="admin-tab ${this.adminTab==='lessons'?'active':''}" onclick="App.adminSwitchTab('lessons')">Уроки</button>
+        <button class="admin-tab ${this.adminTab==='books'?'active':''}" onclick="App.adminSwitchTab('books')">Книги</button>
+        <button class="admin-tab ${this.adminTab==='export'?'active':''}" onclick="App.adminSwitchTab('export')">Экспорт</button>
       </div>
+      <div id="adminContent"></div>
+    `;
 
-      <h2 style="font-size:16px;font-weight:600;margin:20px 0 12px">Приложение</h2>
-      <div class="card" style="overflow:hidden;margin-bottom:16px">
-        ${state.user.isAdmin ? `
-          <button onclick="navigate('admin')" style="width:100%;padding:16px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
-            <div style="display:flex;gap:12px;align-items:center">
-              <span style="font-size:20px">⚙️</span>
-              <span style="font-weight:500">Админ-панель</span>
-            </div>
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--text-muted)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-          </button>
-        ` : ''}
-        <button onclick="if(confirm('Сбросить весь прогресс?')){localStorage.clear();location.reload()}" style="width:100%;padding:16px;background:none;border:none;color:#dc2626;text-align:left;cursor:pointer;display:flex;gap:12px;align-items:center">
-          <span style="font-size:20px">🗑️</span>
-          <span style="font-weight:500">Сбросить прогресс</span>
-        </button>
+    this.renderAdminContent();
+  },
+
+  adminLogin() {
+    const pass = document.getElementById('adminPass').value;
+    const pass2El = document.getElementById('adminPass2');
+    const savedHash = Storage.get('admin_hash');
+
+    if (!savedHash) {
+      // Установка пароля
+      const pass2 = pass2El?.value;
+      if (pass !== pass2) { alert('Пароли не совпадают'); return; }
+      if (pass.length < 3) { alert('Минимум 3 символа'); return; }
+      Storage.set('admin_hash', this.simpleHash(pass));
+      this.adminAuth = true;
+      this.renderAdmin(document.getElementById('app'));
+    } else {
+      if (this.simpleHash(pass) === savedHash) {
+        this.adminAuth = true;
+        this.renderAdmin(document.getElementById('app'));
+      } else {
+        alert('Неверный пароль');
+      }
+    }
+  },
+
+  adminLogout() {
+    this.adminAuth = false;
+    this.adminEditing = null;
+    history.back();
+  },
+
+  simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const c = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + c;
+      hash |= 0;
+    }
+    return hash.toString(36);
+  },
+
+  adminSwitchTab(tab) {
+    this.adminTab = tab;
+    this.adminEditing = null;
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    this.renderAdminContent();
+  },
+
+  renderAdminContent() {
+    const content = document.getElementById('adminContent');
+    if (!content) return;
+
+    switch (this.adminTab) {
+      case 'sections': this.renderAdminSections(content); break;
+      case 'lessons': this.renderAdminLessons(content); break;
+      case 'books': this.renderAdminBooks(content); break;
+      case 'export': this.renderAdminExport(content); break;
+    }
+  },
+
+  renderAdminSections(container) {
+    if (this.adminEditing) {
+      this.renderSectionForm(container);
+      return;
+    }
+
+    let html = `
+      <div class="admin-actions">
+        <button class="btn-primary" onclick="App.adminEditSection(null)">${Icons.plus} Добавить раздел</button>
       </div>
+    `;
 
-      <div class="card" style="padding:16px;margin-bottom:16px">
-        <div style="font-size:14px;font-weight:600;margin-bottom:8px">О приложении</div>
-        <div style="font-size:13px;color:var(--text-muted);line-height:1.6">
-          <div>IlmHub · Версия 1.0</div>
-          <div style="margin-top:4px">Платформа исламских знаний</div>
-          <div style="margin-top:8px;font-size:12px">Telegram Mini App</div>
-        </div>
-      </div>
-    </div>
-  `;
-}
+    const renderTree = (parentId, depth = 0) => {
+      const children = Data.getChildren(parentId);
+      children.forEach(s => {
+        html += `
+          <div style="padding:8px 16px 8px ${16 + depth * 20}px;border-bottom:1px solid var(--secondary-bg-color);display:flex;align-items:center;gap:8px;">
+            <span style="flex:1;font-size:14px;">${'—'.repeat(depth)} ${s.title}</span>
+            <button class="icon-btn" style="width:32px;height:32px;" onclick="App.adminEditSection('${s.id}')">${Icons.settings}</button>
+            <button class="icon-btn" style="width:32px;height:32px;color:#e53935;" onclick="App.adminDeleteSection('${s.id}')">${Icons.trash}</button>
+          </div>
+        `;
+        renderTree(s.id, depth + 1);
+      });
+    };
+    renderTree(null);
 
-function renderAdmin() {
-  if (!state.user.isAdmin) return '<div style="padding:40px;text-align:center">Доступ запрещён</div>';
+    if (Data.sections.length === 0) {
+      html += `<div class="empty-state"><p>Нет разделов</p></div>`;
+    }
 
-  return `
-    <div class="fade-in" style="padding:20px">
-      <button onclick="navigate('settings')" style="background:none;border:none;color:var(--accent);font-size:14px;font-weight:500;padding:8px 0;display:flex;align-items:center;gap:6px;cursor:pointer;margin-bottom:12px">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-        Назад
-      </button>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-        <h1 style="font-size:24px;font-weight:700;margin:0">Админ-панель</h1>
-        <span class="admin-badge">ADMIN</span>
-      </div>
+    container.innerHTML = html;
+  },
 
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px">
-        <div class="card" style="padding:16px;text-align:center">
-          <div style="font-size:24px;font-weight:700;color:var(--accent)">${LESSONS.length}</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Уроков</div>
-        </div>
-        <div class="card" style="padding:16px;text-align:center">
-          <div style="font-size:24px;font-weight:700;color:var(--accent)">${BOOKS.length}</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Книг</div>
-        </div>
-        <div class="card" style="padding:16px;text-align:center">
-          <div style="font-size:24px;font-weight:700;color:var(--accent)">${SECTIONS.length}</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Разделов</div>
-        </div>
-        <div class="card" style="padding:16px;text-align:center">
-          <div style="font-size:24px;font-weight:700;color:var(--accent)">${Object.keys(state.progress).length}</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Активных</div>
-        </div>
-      </div>
+  renderSectionForm(container) {
+    const section = this.adminEditing ? Data.getSection(this.adminEditing) : null;
+    const parents = Data.sections.filter(s => s.id !== this.adminEditing);
 
-      <div class="card" style="padding:20px;margin-bottom:16px">
-        <h2 style="font-size:16px;font-weight:600;margin:0 0 14px">➕ Добавить урок</h2>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <input type="text" placeholder="Название урока" id="admin-lesson-title">
-          <input type="text" placeholder="Спикер" id="admin-lesson-speaker">
-          <select id="admin-lesson-section">
-            <option value="">Выберите раздел</option>
-            ${SECTIONS.map(s => `<option value="${s.id}">${s.title}</option>`).join('')}
+    container.innerHTML = `
+      <div class="admin-form">
+        <h3 style="margin-bottom:16px;">${section ? 'Редактировать' : 'Новый'} раздел</h3>
+        <div class="form-group">
+          <label>ID (латиница)</label>
+          <input type="text" id="f_id" value="${section?.id || ''}" ${section ? 'readonly' : ''} placeholder="например: quran">
+        </div>
+        <div class="form-group">
+          <label>Название</label>
+          <input type="text" id="f_title" value="${section?.title || ''}" placeholder="Название раздела">
+        </div>
+        <div class="form-group">
+          <label>Описание</label>
+          <textarea id="f_description" placeholder="Описание раздела">${section?.description || ''}</textarea>
+        </div>
+        <div class="form-group">
+          <label>Родительский раздел</label>
+          <select id="f_parentId">
+            <option value="">— Корневой —</option>
+            ${parents.map(p => `<option value="${p.id}" ${section?.parentId === p.id ? 'selected' : ''}>${p.title}</option>`).join('')}
           </select>
-          <input type="url" placeholder="URL аудиофайла" id="admin-lesson-audio">
-          <button class="btn-primary" onclick="adminAddLesson()" style="border:none;cursor:pointer">Добавить урок</button>
         </div>
-      </div>
-
-      <div class="card" style="padding:20px;margin-bottom:16px">
-        <h2 style="font-size:16px;font-weight:600;margin:0 0 14px">📖 Добавить книгу</h2>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <input type="text" placeholder="Название книги" id="admin-book-title">
-          <input type="text" placeholder="Автор" id="admin-book-author">
-          <select id="admin-book-section">
-            <option value="">Выберите раздел</option>
-            ${SECTIONS.map(s => `<option value="${s.id}">${s.title}</option>`).join('')}
+        <div class="form-group">
+          <label>Иконка</label>
+          <select id="f_icon">
+            ${Object.keys(Icons).filter(k => ['book','headphones','folder','heart'].includes(k)).map(k =>
+              `<option value="${k}" ${section?.icon === k ? 'selected' : ''}>${k}</option>`
+            ).join('')}
           </select>
-          <input type="number" placeholder="Количество страниц" id="admin-book-pages">
-          <button class="btn-primary" onclick="adminAddBook()" style="border:none;cursor:pointer">Добавить книгу</button>
+        </div>
+        <div class="form-group">
+          <label>Порядок</label>
+          <input type="number" id="f_order" value="${section?.order || 1}" min="1">
+        </div>
+        <div class="admin-actions" style="padding:0;">
+          <button class="btn-secondary" onclick="App.adminEditing=null;App.renderAdminContent()">Отмена</button>
+          <button class="btn-primary" onclick="App.adminSaveSection()">Сохранить</button>
         </div>
       </div>
+    `;
+  },
 
-      <div class="card" style="padding:20px">
-        <h2 style="font-size:16px;font-weight:600;margin:0 0 14px">📂 Управление разделами</h2>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          ${SECTIONS.map(s => `
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-elevated);border-radius:10px">
-              <div style="display:flex;gap:10px;align-items:center">
-                <span style="font-size:20px">${s.icon}</span>
-                <div>
-                  <div style="font-size:14px;font-weight:600">${s.title}</div>
-                  <div style="font-size:11px;color:var(--text-muted)">${(SUBSECTIONS[s.id] || []).length} подразделов</div>
-                </div>
-              </div>
-              <button onclick="showToast('Редактирование: ${s.title}')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:13px;font-weight:500">Изм.</button>
-            </div>
-          `).join('')}
+  adminEditSection(id) {
+    this.adminEditing = id || 'new_' + Date.now();
+    if (!id) {
+      // Создаём временный объект
+    }
+    this.renderAdminContent();
+  },
+
+  adminSaveSection() {
+    const id = document.getElementById('f_id').value.trim();
+    const title = document.getElementById('f_title').value.trim();
+    if (!id || !title) { alert('ID и название обязательны'); return; }
+
+    const data = {
+      id,
+      title,
+      description: document.getElementById('f_description').value.trim(),
+      parentId: document.getElementById('f_parentId').value || null,
+      icon: document.getElementById('f_icon').value,
+      order: parseInt(document.getElementById('f_order').value) || 1
+    };
+
+    const idx = Data.sections.findIndex(s => s.id === id);
+    if (idx >= 0) Data.sections[idx] = data;
+    else Data.sections.push(data);
+
+    Data.save();
+    this.adminEditing = null;
+    this.renderAdminContent();
+  },
+
+  adminDeleteSection(id) {
+    if (!confirm('Удалить раздел и все вложенные?')) return;
+    // Рекурсивное удаление
+    const toDelete = [id];
+    const findChildren = (pid) => {
+      Data.sections.filter(s => s.parentId === pid).forEach(s => {
+        toDelete.push(s.id);
+        findChildren(s.id);
+      });
+    };
+    findChildren(id);
+    Data.sections = Data.sections.filter(s => !toDelete.includes(s.id));
+    Data.lessons = Data.lessons.filter(l => !toDelete.includes(l.sectionId));
+    Data.books = Data.books.filter(b => !toDelete.includes(b.sectionId));
+    Data.save();
+    this.renderAdminContent();
+  },
+
+  renderAdminLessons(container) {
+    if (this.adminEditing) {
+      this.renderLessonForm(container);
+      return;
+    }
+
+    let html = `
+      <div class="admin-actions">
+        <button class="btn-primary" onclick="App.adminEditLesson(null)">${Icons.plus} Добавить урок</button>
+      </div>
+    `;
+
+    Data.lessons.forEach(l => {
+      const section = Data.getSection(l.sectionId);
+      html += `
+        <div style="padding:12px 16px;border-bottom:1px solid var(--secondary-bg-color);display:flex;align-items:center;gap:8px;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.title}</div>
+            <div style="font-size:12px;color:var(--hint-color);">${section?.title || 'Без раздела'} · ${AudioPlayer.formatTime(l.duration)}</div>
+          </div>
+          <button class="icon-btn" style="width:32px;height:32px;" onclick="App.adminEditLesson('${l.id}')">${Icons.settings}</button>
+          <button class="icon-btn" style="width:32px;height:32px;color:#e53935;" onclick="App.adminDeleteLesson('${l.id}')">${Icons.trash}</button>
+        </div>
+      `;
+    });
+
+    if (Data.lessons.length === 0) {
+      html += `<div class="empty-state"><p>Нет уроков</p></div>`;
+    }
+
+    container.innerHTML = html;
+  },
+
+  renderLessonForm(container) {
+    const lesson = this.adminEditing && !this.adminEditing.startsWith('new_') ? Data.getLesson(this.adminEditing) : null;
+
+    container.innerHTML = `
+      <div class="admin-form">
+        <h3 style="margin-bottom:16px;">${lesson ? 'Редактировать' : 'Новый'} урок</h3>
+        <div class="form-group">
+          <label>ID</label>
+          <input type="text" id="f_id" value="${lesson?.id || 'lesson_' + Date.now()}" ${lesson ? 'readonly' : ''}>
+        </div>
+        <div class="form-group">
+          <label>Название</label>
+          <input type="text" id="f_title" value="${lesson?.title || ''}">
+        </div>
+        <div class="form-group">
+          <label>Описание</label>
+          <textarea id="f_description">${lesson?.description || ''}</textarea>
+        </div>
+        <div class="form-group">
+          <label>Раздел</label>
+          <select id="f_sectionId">
+            ${Data.sections.map(s => `<option value="${s.id}" ${lesson?.sectionId === s.id ? 'selected' : ''}>${s.title}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>URL аудио</label>
+          <input type="text" id="f_audioUrl" value="${lesson?.audioUrl || ''}" placeholder="/media/audio/lesson.mp3">
+        </div>
+        <div class="form-group">
+          <label>Длительность (сек)</label>
+          <input type="number" id="f_duration" value="${lesson?.duration || 0}" min="0">
+        </div>
+        <div class="admin-actions" style="padding:0;">
+          <button class="btn-secondary" onclick="App.adminEditing=null;App.renderAdminContent()">Отмена</button>
+          <button class="btn-primary" onclick="App.adminSaveLesson()">Сохранить</button>
         </div>
       </div>
-    </div>
-  `;
-}
+    `;
+  },
 
-function adminAddLesson() {
-  const title = document.getElementById('admin-lesson-title').value;
-  const speaker = document.getElementById('admin-lesson-speaker').value;
-  const sectionId = document.getElementById('admin-lesson-section').value;
-  const audioUrl = document.getElementById('admin-lesson-audio').value;
-  if (!title || !speaker || !sectionId) { showToast('Заполните все поля'); return; }
-  const newLesson = {
-    id: 'l' + (LESSONS.length + 1),
-    sectionId,
-    subId: (SUBSECTIONS[sectionId] || [])[0]?.id || '',
-    title, speaker,
-    duration: 1800,
-    audioUrl: audioUrl || 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
-  };
-  LESSONS.push(newLesson);
-  showToast('✓ Урок добавлен');
-  render();
-}
+  adminEditLesson(id) {
+    this.adminEditing = id || 'new_' + Date.now();
+    this.renderAdminContent();
+  },
 
-function adminAddBook() {
-  const title = document.getElementById('admin-book-title').value;
-  const author = document.getElementById('admin-book-author').value;
-  const sectionId = document.getElementById('admin-book-section').value;
-  const pages = parseInt(document.getElementById('admin-book-pages').value) || 100;
-  if (!title || !author || !sectionId) { showToast('Заполните все поля'); return; }
-  const newBook = {
-    id: 'b' + (BOOKS.length + 1),
-    sectionId,
-    subId: (SUBSECTIONS[sectionId] || [])[0]?.id || '',
-    title, author, pages,
-    cover: 'linear-gradient(135deg, #0f766e, #14b8a6)'
-  };
-  BOOKS.push(newBook);
-  BOOK_CONTENT[newBook.id] = Array.from({length: Math.min(pages, 10)}, (_, i) => `Страница ${i+1}\n\nСодержимое книги "${title}" автора ${author}...`);
-  showToast('✓ Книга добавлена');
-  render();
-}
+  adminSaveLesson() {
+    const id = document.getElementById('f_id').value.trim();
+    const title = document.getElementById('f_title').value.trim();
+    if (!id || !title) { alert('ID и название обязательны'); return; }
 
-function setTheme(theme) {
-  state.theme = theme;
-  document.body.setAttribute('data-theme', theme);
-  localStorage.setItem('theme', theme);
-  if (tg?.setHeaderColor) {
+    const data = {
+      id,
+      title,
+      description: document.getElementById('f_description').value.trim(),
+      sectionId: document.getElementById('f_sectionId').value,
+      audioUrl: document.getElementById('f_audioUrl').value.trim(),
+      duration: parseInt(document.getElementById('f_duration').value) || 0
+    };
+
+    const idx = Data.lessons.findIndex(l => l.id === id);
+    if (idx >= 0) Data.lessons[idx] = data;
+    else Data.lessons.push(data);
+
+    Data.save();
+    this.adminEditing = null;
+    this.renderAdminContent();
+  },
+
+  adminDeleteLesson(id) {
+    if (!confirm('Удалить урок?')) return;
+    Data.lessons = Data.lessons.filter(l => l.id !== id);
+    Data.save();
+    this.renderAdminContent();
+  },
+
+  renderAdminBooks(container) {
+    if (this.adminEditing) {
+      this.renderBookForm(container);
+      return;
+    }
+
+    let html = `
+      <div class="admin-actions">
+        <button class="btn-primary" onclick="App.adminEditBook(null)">${Icons.plus} Добавить книгу</button>
+      </div>
+    `;
+
+    Data.books.forEach(b => {
+      const section = Data.getSection(b.sectionId);
+      html += `
+        <div style="padding:12px 16px;border-bottom:1px solid var(--secondary-bg-color);display:flex;align-items:center;gap:8px;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${b.title}</div>
+            <div style="font-size:12px;color:var(--hint-color);">${section?.title || 'Без раздела'} · ${b.pages} стр.</div>
+          </div>
+          <button class="icon-btn" style="width:32px;height:32px;" onclick="App.adminEditBook('${b.id}')">${Icons.settings}</button>
+          <button class="icon-btn" style="width:32px;height:32px;color:#e53935;" onclick="App.adminDeleteBook('${b.id}')">${Icons.trash}</button>
+        </div>
+      `;
+    });
+
+    if (Data.books.length === 0) {
+      html += `<div class="empty-state"><p>Нет книг</p></div>`;
+    }
+
+    container.innerHTML = html;
+  },
+
+  renderBookForm(container) {
+    const book = this.adminEditing && !this.adminEditing.startsWith('new_') ? Data.getBook(this.adminEditing) : null;
+
+    container.innerHTML = `
+      <div class="admin-form">
+        <h3 style="margin-bottom:16px;">${book ? 'Редактировать' : 'Новая'} книга</h3>
+        <div class="form-group">
+          <label>ID</label>
+          <input type="text" id="f_id" value="${book?.id || 'book_' + Date.now()}" ${book ? 'readonly' : ''}>
+        </div>
+        <div class="form-group">
+          <label>Название</label>
+          <input type="text" id="f_title" value="${book?.title || ''}">
+        </div>
+        <div class="form-group">
+          <label>Автор</label>
+          <input type="text" id="f_author" value="${book?.author || ''}">
+        </div>
+        <div class="form-group">
+          <label>Описание</label>
+          <textarea id="f_description">${book?.description || ''}</textarea>
+        </div>
+        <div class="form-group">
+          <label>Раздел</label>
+          <select id="f_sectionId">
+            ${Data.sections.map(s => `<option value="${s.id}" ${book?.sectionId === s.id ? 'selected' : ''}>${s.title}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>URL PDF</label>
+          <input type="text" id="f_pdfUrl" value="${book?.pdfUrl || ''}" placeholder="/media/books/book.pdf">
+        </div>
+        <div class="form-group">
+          <label>Количество страниц</label>
+          <input type="number" id="f_pages" value="${book?.pages || 0}" min="0">
+        </div>
+        <div class="admin-actions" style="padding:0;">
+          <button class="btn-secondary" onclick="App.adminEditing=null;App.renderAdminContent()">Отмена</button>
+          <button class="btn-primary" onclick="App.adminSaveBook()">Сохранить</button>
+        </div>
+      </div>
+    `;
+  },
+
+  adminEditBook(id) {
+    this.adminEditing = id || 'new_' + Date.now();
+    this.renderAdminContent();
+  },
+
+  adminSaveBook() {
+    const id = document.getElementById('f_id').value.trim();
+    const title = document.getElementById('f_title').value.trim();
+    if (!id || !title) { alert('ID и название обязательны'); return; }
+
+    const data = {
+      id,
+      title,
+      author: document.getElementById('f_author').value.trim(),
+      description: document.getElementById('f_description').value.trim(),
+      sectionId: document.getElementById('f_sectionId').value,
+      pdfUrl: document.getElementById('f_pdfUrl').value.trim(),
+      pages: parseInt(document.getElementById('f_pages').value) || 0
+    };
+
+    const idx = Data.books.findIndex(b => b.id === id);
+    if (idx >= 0) Data.books[idx] = data;
+    else Data.books.push(data);
+
+    Data.save();
+    this.adminEditing = null;
+    this.renderAdminContent();
+  },
+
+  adminDeleteBook(id) {
+    if (!confirm('Удалить книгу?')) return;
+    Data.books = Data.books.filter(b => b.id !== id);
+    Data.save();
+    this.renderAdminContent();
+  },
+
+  renderAdminExport(container) {
+    const data = {
+      sections: Data.sections,
+      lessons: Data.lessons,
+      books: Data.books
+    };
+
+    container.innerHTML = `
+      <div class="admin-form">
+        <h3 style="margin-bottom:16px;">Экспорт / Импорт данных</h3>
+        <p style="font-size:13px;color:var(--hint-color);margin-bottom:16px;">
+          Скопируйте JSON ниже и сохраните в файлы data/sections.json, data/lessons.json, data/books.json. 
+          Затем закоммитьте в репозиторий.
+        </p>
+        <div class="admin-actions" style="padding:0;margin-bottom:12px;">
+          <button class="btn-secondary" onclick="App.adminCopyJson()">${Icons.download} Копировать JSON</button>
+          <button class="btn-secondary" onclick="App.adminDownloadJson()">${Icons.download} Скачать файл</button>
+        </div>
+        <div class="form-group">
+          <label>Импорт JSON</label>
+          <textarea id="importJson" placeholder='Вставьте JSON сюда...' style="min-height:120px;font-family:monospace;font-size:11px;"></textarea>
+        </div>
+        <button class="btn-primary" style="width:100%;padding:10px;border-radius:var(--radius-btn);border:none;cursor:pointer;" onclick="App.adminImportJson()">Импортировать</button>
+        
+        <div style="margin-top:24px;">
+          <label style="font-size:13px;color:var(--hint-color);display:block;margin-bottom:8px;">Текущие данные (JSON):</label>
+          <div class="json-output">${JSON.stringify(data, null, 2)}</div>
+        </div>
+      </div>
+    `;
+  },
+
+  adminCopyJson() {
+    const data = JSON.stringify({ sections: Data.sections, lessons: Data.lessons, books: Data.books }, null, 2);
+    navigator.clipboard.writeText(data).then(() => {
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+      alert('JSON скопирован!');
+    });
+  },
+
+  adminDownloadJson() {
+    const data = JSON.stringify({ sections: Data.sections, lessons: Data.lessons, books: Data.books }, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'app_data.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  },
+
+  adminImportJson() {
+    const text = document.getElementById('importJson').value.trim();
+    if (!text) return;
     try {
-      const colors = { light: '#faf7f2', dark: '#111827', sepia: '#f5ecd7' };
-      tg.setHeaderColor(colors[theme]);
-    } catch(e) {}
+      const data = JSON.parse(text);
+      if (data.sections) Data.sections = data.sections;
+      if (data.lessons) Data.lessons = data.lessons;
+      if (data.books) Data.books = data.books;
+      Data.save();
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+      alert('Данные импортированы!');
+      this.renderAdminContent();
+    } catch (e) {
+      alert('Ошибка JSON: ' + e.message);
+    }
   }
-  render();
-}
+};
 
-// ============ INIT ============
-document.body.setAttribute('data-theme', state.theme);
-if (tg?.setHeaderColor) {
-  try {
-    const colors = { light: '#faf7f2', dark: '#111827', sepia: '#f5ecd7' };
-    tg.setHeaderColor(colors[state.theme]);
-  } catch(e) {}
-}
+/* ═══════════════════════════════════════════════════════════
+   ЗАПУСК
+═══════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  App.init();
+});
 
-// Restore current lesson
-if (state.currentLesson) {
-  audio.src = state.currentLesson.audioUrl;
-  audio.playbackRate = state.playbackSpeed;
-  document.getElementById('mini-player').classList.add('active');
-  const t = document.getElementById('mp-title');
-  const s = document.getElementById('mp-speaker');
-  if (t) t.textContent = state.currentLesson.title;
-  if (s) s.textContent = state.currentLesson.speaker;
-}
-
-// Auto-save progress every 5 seconds
-setInterval(() => {
-  if (state.currentLesson && !audio.paused) {
-    const pct = (audio.currentTime / audio.duration) * 100 || 0;
-    saveProgress(state.currentLesson.id, 'lesson', audio.currentTime, pct);
-  }
-}, 5000);
-
-// Initial render
-render();
+// Восстановление размера шрифта
+const savedFontSize = Storage.get('fontSize');
+if (savedFontSize) document.body.style.fontSize = savedFontSize + 'px';
 </script>
-
 </body>
 </html>
