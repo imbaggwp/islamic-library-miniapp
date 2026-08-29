@@ -70,7 +70,6 @@ body {
     padding-bottom: 80px;
 }
 
-/* HEADER */
 .header {
     background: var(--glass-bg);
     backdrop-filter: blur(20px);
@@ -100,10 +99,8 @@ body {
 .icon-btn:hover { background: var(--border); transform: scale(1.05); }
 .icon-btn svg { width: 18px; height: 18px; }
 
-/* CONTENT */
 .content { padding: 16px; }
 
-/* TABS */
 .tab { display: none; animation: slideIn 0.3s ease; }
 .tab.active { display: block; }
 
@@ -122,18 +119,12 @@ body {
     to { opacity: 1; transform: scale(1); }
 }
 
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
 @keyframes wave {
     0% { transform: scaleY(0.3); }
     50% { transform: scaleY(1); }
     100% { transform: scaleY(0.3); }
 }
 
-/* NAV */
 .nav {
     position: fixed;
     bottom: 0;
@@ -169,7 +160,6 @@ body {
 .nav-btn.active { color: var(--accent); }
 .nav-btn.active svg { transform: translateY(-2px); }
 
-/* CARDS */
 .card {
     background: var(--bg-secondary);
     border: 1px solid var(--border);
@@ -180,6 +170,7 @@ body {
     transition: all 0.2s;
     box-shadow: var(--shadow-sm);
     animation: scaleIn 0.3s ease;
+    position: relative;
 }
 .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .card-title {
@@ -191,7 +182,27 @@ body {
 }
 .card-sub { font-size: 13px; color: var(--text-secondary); margin-top: 4px; display: flex; align-items: center; gap: 6px; }
 
-/* GLASSMORPHISM CARDS */
+.card-menu-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--bg-tertiary);
+    border: none;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+}
+.card-menu-btn:hover { background: var(--border); }
+.card-menu-btn svg { width: 16px; height: 16px; }
+
+.editor-mode .card-menu-btn { display: flex; }
+
 .glass {
     background: var(--glass-bg);
     backdrop-filter: blur(20px);
@@ -218,7 +229,6 @@ body {
     pointer-events: none;
 }
 
-/* BUTTONS */
 .btn {
     padding: 12px 20px;
     border: none;
@@ -246,7 +256,6 @@ body {
 
 .btn-sm { padding: 8px 12px; font-size: 12px; width: auto; margin: 0; }
 
-/* INPUTS */
 input, textarea, select {
     width: 100%;
     padding: 12px 14px;
@@ -272,7 +281,6 @@ label {
     color: var(--text-secondary);
 }
 
-/* SEARCH */
 .search-box {
     position: relative;
     margin-bottom: 16px;
@@ -291,7 +299,6 @@ label {
     margin: 0;
 }
 
-/* PROGRESS BARS */
 .progress-bar {
     background: var(--bg-tertiary);
     height: 6px;
@@ -306,7 +313,6 @@ label {
     transition: width 0.5s ease;
 }
 
-/* BADGES */
 .badge {
     display: inline-flex;
     align-items: center;
@@ -323,7 +329,6 @@ label {
 .badge-purple { background: rgba(139, 92, 246, 0.15); color: var(--purple); }
 .badge svg { width: 12px; height: 12px; }
 
-/* MODAL */
 .modal {
     display: none;
     position: fixed;
@@ -369,7 +374,33 @@ label {
 }
 .close-btn svg { width: 16px; height: 16px; }
 
-/* AUDIO PLAYER */
+.context-menu {
+    position: fixed;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-xl);
+    z-index: 200;
+    min-width: 200px;
+    animation: scaleIn 0.2s ease;
+    overflow: hidden;
+}
+.context-menu-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    transition: background 0.2s;
+    border-bottom: 1px solid var(--border);
+}
+.context-menu-item:last-child { border-bottom: none; }
+.context-menu-item:hover { background: var(--bg-tertiary); }
+.context-menu-item svg { width: 18px; height: 18px; color: var(--text-secondary); }
+.context-menu-item.danger { color: var(--danger); }
+.context-menu-item.danger svg { color: var(--danger); }
+
 .audio-player {
     background: var(--gradient-1);
     border-radius: 20px;
@@ -412,7 +443,6 @@ label {
 }
 .play-btn svg { width: 28px !important; height: 28px !important; }
 
-/* WAVE ANIMATION */
 .wave-container {
     display: flex;
     align-items: center;
@@ -437,7 +467,28 @@ label {
 .wave-bar:nth-child(6) { animation-delay: 0.3s; }
 .wave-bar:nth-child(7) { animation-delay: 0.2s; }
 
-/* PDF VIEWER */
+.speed-selector {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin: 12px 0;
+}
+.speed-btn {
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.speed-btn.active {
+    background: white;
+    color: var(--accent);
+}
+
 .pdf-viewer {
     background: var(--bg-tertiary);
     min-height: 400px;
@@ -467,7 +518,6 @@ label {
 }
 .pdf-controls button svg { width: 14px; height: 14px; }
 
-/* ACHIEVEMENTS */
 .achievement {
     display: flex;
     align-items: center;
@@ -484,7 +534,6 @@ label {
 }
 .achievement.earned .ach-desc { color: rgba(255,255,255,0.8); }
 
-/* HEATMAP */
 .heat-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -501,7 +550,6 @@ label {
 .heat-3 { background: #30a14e; }
 .heat-4 { background: #216e39; }
 
-/* STREAK */
 .streak-row {
     display: flex;
     gap: 6px;
@@ -527,7 +575,6 @@ label {
     border: 2px solid var(--warning);
 }
 
-/* STATS */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -537,10 +584,8 @@ label {
 .stat-value { font-size: 24px; font-weight: 700; }
 .stat-label { font-size: 11px; opacity: 0.8; margin-top: 2px; }
 
-/* RING PROGRESS */
 .ring-container { display: flex; justify-content: center; margin: 10px 0; }
 
-/* WEEK CHART */
 .week-chart {
     display: flex;
     align-items: flex-end;
@@ -572,7 +617,6 @@ label {
     margin-top: 6px;
 }
 
-/* EMPTY STATE */
 .empty {
     text-align: center;
     padding: 40px 20px;
@@ -585,34 +629,6 @@ label {
     opacity: 0.5;
 }
 
-/* EDITOR */
-.editor-tree-item {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 8px;
-}
-.editor-actions {
-    display: flex;
-    gap: 6px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-}
-.editor-actions button {
-    padding: 6px 10px;
-    font-size: 11px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    cursor: pointer;
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    display: flex; align-items: center; gap: 4px;
-}
-.editor-actions button svg { width: 12px; height: 12px; }
-.editor-actions button:hover { background: var(--border); }
-
-/* BOOKMARKS */
 .bookmark-item {
     background: var(--bg-tertiary);
     border-radius: 10px;
@@ -625,7 +641,6 @@ label {
 }
 .bookmark-item:hover { background: var(--border); }
 
-/* SECTION */
 .section {
     margin-bottom: 20px;
 }
@@ -642,7 +657,6 @@ label {
 }
 .section-title svg { width: 14px; height: 14px; }
 
-/* QUICK ACTION */
 .quick-action {
     background: var(--bg-secondary);
     border: 1px solid var(--border);
@@ -668,7 +682,6 @@ label {
 .quick-action-title { font-weight: 600; font-size: 14px; }
 .quick-action-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 
-/* TABS INSIDE */
 .subtabs {
     display: flex;
     gap: 4px;
@@ -697,7 +710,6 @@ label {
     box-shadow: var(--shadow-sm);
 }
 
-/* TOGGLE */
 .toggle {
     position: relative;
     width: 44px;
@@ -732,18 +744,51 @@ label {
 .setting-label { display: flex; align-items: center; gap: 10px; font-size: 14px; }
 .setting-label svg { width: 18px; height: 18px; color: var(--text-secondary); }
 
-/* LOADING */
-.loading {
-    display: inline-block;
-    width: 20px; height: 20px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+.add-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+.add-buttons .btn { margin: 0; font-size: 12px; padding: 10px; }
 
-/* UTILS */
+.confirm-modal {
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    padding: 24px;
+    text-align: center;
+    max-width: 320px;
+}
+.confirm-icon {
+    width: 64px; height: 64px;
+    margin: 0 auto 16px;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--danger);
+}
+.confirm-icon svg { width: 32px; height: 32px; }
+.confirm-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.confirm-text { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; }
+.confirm-buttons { display: flex; gap: 8px; }
+.confirm-buttons .btn { flex: 1; margin: 0; }
+
+.cat-stat {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+}
+.cat-stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.cat-stat-title { font-weight: 600; font-size: 14px; }
+.cat-stat-percent { font-size: 13px; color: var(--accent); font-weight: 600; }
+
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
 .items-center { align-items: center; }
@@ -763,16 +808,14 @@ label {
 </head>
 <body>
 
-<div class="app">
+<div class="app" id="app">
     <div class="header">
         <div class="header-info">
             <h1 id="header-title">Уроки и Книги</h1>
             <p id="header-sub">Загрузка...</p>
         </div>
         <div class="header-actions">
-            <button class="icon-btn" onclick="toggleTheme()" id="theme-btn" title="Сменить тему">
-                <!-- иконка подставится JS -->
-            </button>
+            <button class="icon-btn" onclick="toggleTheme()" id="theme-btn" title="Сменить тему"></button>
         </div>
     </div>
 
@@ -782,7 +825,6 @@ label {
         <div id="tab-books" class="tab"></div>
         <div id="tab-progress" class="tab"></div>
         <div id="tab-profile" class="tab"></div>
-        <div id="tab-editor" class="tab"></div>
     </div>
 
     <div class="nav" id="main-nav"></div>
@@ -806,9 +848,17 @@ label {
     </div>
 </div>
 
+<div id="context-menu" class="context-menu" style="display: none;"></div>
+
 <audio id="audio-player"></audio>
 
 <script>
+// ============ КОНФИГУРАЦИЯ АДМИНОВ ============
+const ADMIN_TELEGRAM_IDS = [8690178977
+    // Добавь сюда Telegram ID администраторов
+    // Пример: 123456789, 987654321
+];
+
 // ============ SVG ИКОНКИ ============
 const ICONS = {
     home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
@@ -820,20 +870,16 @@ const ICONS = {
     search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
     play: '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
     pause: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>',
-    prev: '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/></svg>',
-    next: '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>',
     back15: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><text x="12" y="16" font-size="8" text-anchor="middle" fill="currentColor" stroke="none" font-weight="bold">15</text></svg>',
     fwd15: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><text x="12" y="16" font-size="8" text-anchor="middle" fill="currentColor" stroke="none" font-weight="bold">15</text></svg>',
     heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
     heartFill: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
     bookmark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
-    bookmarkFill: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
     folder: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
     plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
     edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
     trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
     fire: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
-    star: '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
     trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
     x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
@@ -843,14 +889,15 @@ const ICONS = {
     moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
     clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
     zap: '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
-    target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
     award: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
     shuffle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>',
     arrowLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>',
     bell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
-    logout: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
     info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
-    pages: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
+    pages: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+    moreVertical: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>',
+    copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+    skipForward: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>'
 };
 
 const icon = (name, size = 20) => `<span style="display:inline-flex;width:${size}px;height:${size}px;">${ICONS[name] || ''}</span>`;
@@ -881,22 +928,51 @@ const state = {
     theme: localStorage.getItem('la_theme') || 'light',
     searchQuery: '',
     lessonsSubTab: 'all',
-    booksSubTab: 'all'
+    booksSubTab: 'all',
+    editorMode: false,
+    audioSpeed: 1,
+    playlist: [],
+    playlistIndex: -1
 };
 
 // ============ INIT ============
 function init() {
     applyTheme();
+    checkAdminAccess();
+    
     let user = DB.get('user', null);
     if (!user) {
         const name = prompt('Как тебя зовут?') || 'Пользователь';
-        user = { id: 1, name, isAdmin: true, created: new Date().toISOString() };
+        user = { id: 1, name, created: new Date().toISOString() };
         DB.set('user', user);
     }
     state.user = user;
     document.getElementById('header-sub').textContent = `Привет, ${user.name}!`;
+    
     renderNav();
     renderTab();
+}
+
+function checkAdminAccess() {
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+        const tgUser = tg.initDataUnsafe?.user;
+        if (tgUser && ADMIN_TELEGRAM_IDS.includes(tgUser.id)) {
+            state.editorMode = true;
+        }
+    } else {
+        state.editorMode = DB.get('editorMode', false);
+    }
+    updateEditorMode();
+}
+
+function updateEditorMode() {
+    const app = document.getElementById('app');
+    if (state.editorMode) {
+        app.classList.add('editor-mode');
+    } else {
+        app.classList.remove('editor-mode');
+    }
 }
 
 // ============ THEME ============
@@ -921,9 +997,6 @@ function renderNav() {
         { id: 'progress', label: 'Прогресс', icon: 'chart' },
         { id: 'profile', label: 'Профиль', icon: 'user' }
     ];
-    if (state.user?.isAdmin) {
-        tabs.push({ id: 'editor', label: 'Редактор', icon: 'settings' });
-    }
     document.getElementById('main-nav').innerHTML = tabs.map(t => `
         <button class="nav-btn ${state.currentTab === t.id ? 'active' : ''}" onclick="switchTab('${t.id}')">
             ${icon(t.icon, 22)}
@@ -948,8 +1021,7 @@ function renderTab() {
         lessons: renderLessons,
         books: renderBooks,
         progress: renderProgress,
-        profile: renderProfile,
-        editor: renderEditor
+        profile: renderProfile
     };
     (map[state.currentTab] || renderHome)();
 }
@@ -1058,6 +1130,55 @@ function getAllBooks() {
     return flat;
 }
 
+// ============ CONTEXT MENU ============
+function showContextMenu(event, items) {
+    event.stopPropagation();
+    const menu = document.getElementById('context-menu');
+    menu.innerHTML = items.map(item => `
+        <div class="context-menu-item ${item.danger ? 'danger' : ''}" onclick="${item.action}">
+            ${icon(item.icon, 18)}
+            <span>${item.label}</span>
+        </div>
+    `).join('');
+    
+    const rect = event.target.getBoundingClientRect();
+    menu.style.display = 'block';
+    menu.style.left = Math.min(rect.left, window.innerWidth - 220) + 'px';
+    menu.style.top = (rect.bottom + 4) + 'px';
+    
+    setTimeout(() => {
+        document.addEventListener('click', hideContextMenu, { once: true });
+    }, 0);
+}
+
+function hideContextMenu() {
+    document.getElementById('context-menu').style.display = 'none';
+}
+
+// ============ CONFIRM MODAL ============
+function showConfirm(title, text, onConfirm) {
+    const modal = document.getElementById('modal');
+    const body = document.getElementById('modal-body');
+    
+    body.innerHTML = `
+        <div class="confirm-modal">
+            <div class="confirm-icon">${icon('trash', 32)}</div>
+            <div class="confirm-title">${title}</div>
+            <div class="confirm-text">${text}</div>
+            <div class="confirm-buttons">
+                <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                <button class="btn btn-danger" id="confirm-btn">Удалить</button>
+            </div>
+        </div>
+    `;
+    
+    modal.classList.add('active');
+    document.getElementById('confirm-btn').onclick = () => {
+        closeModal();
+        onConfirm();
+    };
+}
+
 // ============ ГЛАВНАЯ ============
 function renderHome() {
     const container = document.getElementById('tab-home');
@@ -1065,7 +1186,6 @@ function renderHome() {
     const lessons = getAllLessons();
     const books = getAllBooks();
     
-    // Продолжить (последний открытый)
     const lastAccessed = [...progress].sort((a, b) => new Date(b.lastAccess) - new Date(a.lastAccess)).find(p => !p.completed && p.percent > 0);
     let continueItem = null;
     if (lastAccessed) {
@@ -1073,15 +1193,11 @@ function renderHome() {
         else continueItem = { ...books.find(b => b.id === lastAccessed.contentId), type: 'book', progress: lastAccessed };
     }
     
-    // Серия дней
     const streak = calculateStreak();
-    
-    // Топ достижения
     const earned = DB.get('achievements');
     const allAch = getAchievementsList();
     const topAch = earned.slice(-3).map(a => allAch.find(x => x.type === a.type)).filter(Boolean);
     
-    // Рекомендации (недавно добавленные)
     const recentLessons = [...lessons].sort((a, b) => new Date(b.created || 0) - new Date(a.created || 0)).slice(0, 3);
     const recentBooks = [...books].sort((a, b) => new Date(b.created || 0) - new Date(a.created || 0)).slice(0, 3);
     
@@ -1124,7 +1240,6 @@ function renderHome() {
         </div>
     `;
     
-    // Продолжить
     if (continueItem) {
         html += `
             <div class="section">
@@ -1146,7 +1261,6 @@ function renderHome() {
         `;
     }
     
-    // Быстрые действия
     html += `
         <div class="section">
             <div class="section-title">${icon('zap', 14)} Быстрые действия</div>
@@ -1175,7 +1289,6 @@ function renderHome() {
         </div>
     `;
     
-    // Топ достижения
     if (topAch.length > 0) {
         html += `
             <div class="section">
@@ -1192,7 +1305,6 @@ function renderHome() {
         `;
     }
     
-    // Рекомендации
     if (recentLessons.length > 0) {
         html += `
             <div class="section">
@@ -1216,8 +1328,7 @@ function renderHome() {
             <div class="empty">
                 <div class="empty-icon">${icon('folder', 64)}</div>
                 <div style="font-weight: 600; margin-bottom: 6px; color: var(--text-primary);">Пока пусто</div>
-                <div style="font-size: 13px;">Перейди в Редактор, чтобы добавить контент</div>
-                ${state.user.isAdmin ? `<button class="btn btn-primary mt-3" style="width: auto; margin: 12px auto 0;" onclick="switchTab('editor')">${icon('plus', 16)} Создать</button>` : ''}
+                <div style="font-size: 13px;">${state.editorMode ? 'Добавь первый раздел в Уроках или Книгах' : 'Контент скоро появится!'}</div>
             </div>
         `;
     }
@@ -1228,7 +1339,7 @@ function renderHome() {
 function renderStreakDays(streak) {
     const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
     const today = new Date();
-    const todayIdx = (today.getDay() + 6) % 7; // Пн=0
+    const todayIdx = (today.getDay() + 6) % 7;
     
     return days.map((d, i) => {
         const isActive = i <= todayIdx && i >= todayIdx - streak.count + 1;
@@ -1255,7 +1366,7 @@ function calculateStreak() {
         d.setDate(d.getDate() - i);
         const key = d.toISOString().split('T')[0];
         if (dates.includes(key)) count++;
-        else if (i === 0) continue; // сегодня может ещё не быть активности
+        else if (i === 0) continue;
         else break;
     }
     return { count };
@@ -1267,6 +1378,7 @@ function renderLessonCard(l) {
     const fav = isFavorite('lesson', l.id);
     return `
         <div class="card" onclick="openLesson(${l.id})">
+            <button class="card-menu-btn" onclick="showLessonMenu(event, ${l.id})">${icon('moreVertical', 16)}</button>
             <div class="card-title">
                 <span style="width: 32px; height: 32px; border-radius: 8px; background: var(--gradient-1); display: inline-flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;">
                     ${icon('headphones', 16)}
@@ -1290,6 +1402,7 @@ function renderBookCard(b) {
     const fav = isFavorite('book', b.id);
     return `
         <div class="card" onclick="openBook(${b.id})">
+            <button class="card-menu-btn" onclick="showBookMenu(event, ${b.id})">${icon('moreVertical', 16)}</button>
             <div class="card-title">
                 <span style="width: 32px; height: 32px; border-radius: 8px; background: var(--gradient-2); display: inline-flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;">
                     ${icon('book', 16)}
@@ -1323,1133 +1436,4 @@ function openRandomBook() {
     openBook(b.id);
 }
 
-// ============ УРОКИ ============
-function renderLessons() {
-    const container = document.getElementById('tab-lessons');
-    if (state.currentCategory) {
-        renderCategoryView(container, 'lesson');
-    } else {
-        renderContentList(container, 'lesson');
-    }
-}
-
-function renderBooks() {
-    const container = document.getElementById('tab-books');
-    if (state.currentCategory) {
-        renderCategoryView(container, 'book');
-    } else {
-        renderContentList(container, 'book');
-    }
-}
-
-function renderContentList(container, type) {
-    const allItems = type === 'lesson' ? getAllLessons() : getAllBooks();
-    const favs = DB.get('favorites').filter(f => f.type === type);
-    
-    const title = type === 'lesson' ? 'Уроки' : 'Книги';
-    const iconType = type === 'lesson' ? 'headphones' : 'book';
-    
-    let html = `
-        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-            ${icon(iconType, 24)} ${title}
-        </h2>
-        
-        <div class="search-box">
-            ${icon('search', 18)}
-            <input type="text" placeholder="Поиск по названию и описанию..." value="${escapeHtml(state.searchQuery)}" oninput="handleSearch(this.value, '${type}')">
-        </div>
-        
-        <div class="subtabs">
-            <button class="subtab ${(state[type === 'lesson' ? 'lessonsSubTab' : 'booksSubTab'] || 'all') === 'all' ? 'active' : ''}" onclick="setSubTab('${type}', 'all')">
-                ${icon('folder', 14)} Все
-            </button>
-            <button class="subtab ${(state[type === 'lesson' ? 'lessonsSubTab' : 'booksSubTab'] || 'all') === 'progress' ? 'active' : ''}" onclick="setSubTab('${type}', 'progress')">
-                ${icon('clock', 14)} В процессе
-            </button>
-            <button class="subtab ${(state[type === 'lesson' ? 'lessonsSubTab' : 'booksSubTab'] || 'all') === 'done' ? 'active' : ''}" onclick="setSubTab('${type}', 'done')">
-                ${icon('check', 14)} Готово
-            </button>
-            <button class="subtab ${(state[type === 'lesson' ? 'lessonsSubTab' : 'booksSubTab'] || 'all') === 'fav' ? 'active' : ''}" onclick="setSubTab('${type}', 'fav')">
-                ${icon('heart', 14)} ❤️
-            </button>
-        </div>
-    `;
-    
-    const subTab = state[type === 'lesson' ? 'lessonsSubTab' : 'booksSubTab'] || 'all';
-    let filteredItems = allItems;
-    
-    // Поиск
-    if (state.searchQuery) {
-        const q = state.searchQuery.toLowerCase();
-        filteredItems = filteredItems.filter(i => 
-            i.title.toLowerCase().includes(q) || 
-            (i.description || '').toLowerCase().includes(q) ||
-            (i.author || '').toLowerCase().includes(q)
-        );
-    }
-    
-    // Фильтр по подтабу
-    if (subTab === 'fav') {
-        const favIds = favs.map(f => f.contentId);
-        filteredItems = filteredItems.filter(i => favIds.includes(i.id));
-    } else if (subTab === 'progress') {
-        filteredItems = filteredItems.filter(i => {
-            const p = getProgress(type, i.id);
-            return p && !p.completed && p.percent > 0;
-        });
-    } else if (subTab === 'done') {
-        filteredItems = filteredItems.filter(i => {
-            const p = getProgress(type, i.id);
-            return p?.completed;
-        });
-    }
-    
-    if (filteredItems.length === 0 && state.searchQuery) {
-        html += `<div class="empty"><div class="empty-icon">${icon('search', 48)}</div>Ничего не найдено</div>`;
-    } else if (filteredItems.length === 0) {
-        const emptyMsg = subTab === 'fav' ? 'Нет избранных' : subTab === 'progress' ? 'Нет незавершённых' : subTab === 'done' ? 'Нет завершённых' : 'Нет контента';
-        html += `<div class="empty"><div class="empty-icon">${icon('folder', 48)}</div>${emptyMsg}</div>`;
-    } else {
-        // Группируем по категориям
-        const byCategory = {};
-        filteredItems.forEach(i => {
-            const key = i.categoryId || 'root';
-            if (!byCategory[key]) byCategory[key] = { name: i.categoryName || 'Без раздела', emoji: i.categoryEmoji || '📂', items: [] };
-            byCategory[key].items.push(i);
-        });
-        
-        Object.values(byCategory).forEach(group => {
-            html += `
-                <div class="section">
-                    <div class="section-title">${group.emoji} ${escapeHtml(group.name)} <span class="badge">${group.items.length}</span></div>
-                    ${group.items.map(i => type === 'lesson' ? renderLessonCard(i) : renderBookCard(i)).join('')}
-                </div>
-            `;
-        });
-    }
-    
-    container.innerHTML = html;
-}
-
-function handleSearch(q, type) {
-    state.searchQuery = q;
-    renderTab();
-}
-
-function setSubTab(type, tab) {
-    if (type === 'lesson') state.lessonsSubTab = tab;
-    else state.booksSubTab = tab;
-    renderTab();
-}
-
-function renderCategoryView(container, type) {
-    const cat = findCategory(state.currentCategory);
-    if (!cat) { state.currentCategory = null; renderTab(); return; }
-    
-    const path = getCategoryPath(cat.id);
-    const lessons = getLessons().filter(l => l.categoryId === cat.id);
-    const books = getBooks().filter(b => b.categoryId === cat.id);
-    const subcats = getCategories().filter(c => c.parentId === cat.id);
-    
-    let html = `
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-            <button onclick="goBack()" style="background: var(--bg-tertiary); border: none; width: 32px; height: 32px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-primary);">
-                ${icon('arrowLeft', 16)}
-            </button>
-            <div style="font-size: 12px; color: var(--text-secondary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                ${path.map(p => escapeHtml(p.title)).join(' / ')}
-            </div>
-        </div>
-        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 24px;">${cat.emoji || '📂'}</span>
-            ${escapeHtml(cat.title)}
-        </h2>
-        ${cat.description ? `<p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 16px;">${escapeHtml(cat.description)}</p>` : '<div style="height: 12px;"></div>'}
-    `;
-    
-    if (subcats.length > 0) {
-        html += `<div class="section"><div class="section-title">${icon('folder', 14)} Подразделы</div>`;
-        subcats.forEach(c => {
-            const totalL = countItemsInTree({ ...c, children: buildTree(c.id), lessons: getLessons().filter(l => l.categoryId === c.id), books: getBooks().filter(b => b.categoryId === c.id) }, 'lesson');
-            const totalB = countItemsInTree({ ...c, children: buildTree(c.id), lessons: getLessons().filter(l => l.categoryId === c.id), books: getBooks().filter(b => b.categoryId === c.id) }, 'book');
-            html += `
-                <div class="card" onclick="openCategory(${c.id})">
-                    <div class="card-title">
-                        <span style="font-size: 20px;">${c.emoji || '📂'}</span>
-                        <span style="flex: 1;">${escapeHtml(c.title)}</span>
-                        ${icon('chevronRight', 16)}
-                    </div>
-                    <div class="card-sub">
-                        ${totalL > 0 ? `${icon('headphones', 12)} ${totalL}` : ''}
-                        ${totalL > 0 && totalB > 0 ? ' • ' : ''}
-                        ${totalB > 0 ? `${icon('book', 12)} ${totalB}` : ''}
-                    </div>
-                </div>
-            `;
-        });
-        html += `</div>`;
-    }
-    
-    if (lessons.length > 0) {
-        html += `<div class="section"><div class="section-title">${icon('headphones', 14)} Уроки</div>`;
-        lessons.forEach(l => html += renderLessonCard(l));
-        html += `</div>`;
-    }
-    
-    if (books.length > 0) {
-        html += `<div class="section"><div class="section-title">${icon('book', 14)} Книги</div>`;
-        books.forEach(b => html += renderBookCard(b));
-        html += `</div>`;
-    }
-    
-    if (lessons.length === 0 && books.length === 0 && subcats.length === 0) {
-        html += `<div class="empty"><div class="empty-icon">${icon('folder', 48)}</div>Раздел пуст</div>`;
-    }
-    
-    container.innerHTML = html;
-}
-
-function openCategory(id) {
-    state.currentCategory = id;
-    renderTab();
-}
-
-function goBack() {
-    const cat = findCategory(state.currentCategory);
-    state.currentCategory = cat?.parentId || null;
-    renderTab();
-}
-
-// ============ АУДИОПЛЕЕР ============
-function openLesson(id) {
-    const lesson = getAllLessons().find(l => l.id === id);
-    if (!lesson) return;
-    state.currentLesson = lesson;
-    state.currentCategory = lesson.categoryId;
-    
-    const p = getProgress('lesson', id);
-    state.audio.src = lesson.audioUrl;
-    if (p) state.audio.currentTime = p.position || 0;
-    
-    const fav = isFavorite('lesson', id);
-    
-    document.getElementById('audio-body').innerHTML = `
-        <div class="audio-player">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; position: relative; z-index: 1;">
-                <div style="flex: 1; min-width: 0;">
-                    <div style="font-size: 18px; font-weight: 700;" class="truncate">${escapeHtml(lesson.title)}</div>
-                    ${lesson.description ? `<div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">${escapeHtml(lesson.description).substring(0, 80)}${lesson.description.length > 80 ? '...' : ''}</div>` : ''}
-                </div>
-                <button onclick="closeAudio()" style="background: rgba(255,255,255,0.2); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    ${icon('x', 16)}
-                </button>
-            </div>
-            
-            <div class="wave-container" id="wave">
-                ${Array(7).fill(0).map(() => '<div class="wave-bar"></div>').join('')}
-            </div>
-            
-            <div style="margin-bottom: 16px; position: relative; z-index: 1;">
-                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; opacity: 0.9;">
-                    <span id="cur-time">0:00</span>
-                    <span id="total-time">${formatDuration(lesson.duration)}</span>
-                </div>
-                <input type="range" id="seek" min="0" max="100" value="0" step="0.1"
-                       style="width: 100%; margin: 0; accent-color: white;" oninput="seekAudio(this.value)">
-            </div>
-            
-            <div class="audio-controls">
-                <button onclick="skipAudio(-15)" title="Назад 15с">${icon('back15', 22)}</button>
-                <button class="play-btn" id="play-btn" onclick="togglePlay()">${icon('play', 28)}</button>
-                <button onclick="skipAudio(15)" title="Вперёд 15с">${icon('fwd15', 22)}</button>
-            </div>
-            
-            <div style="display: flex; gap: 8px; position: relative; z-index: 1;">
-                <button onclick="handleFav('lesson', ${id})" class="btn" style="background: rgba(255,255,255,0.2); color: white; margin: 0; flex: 1;">
-                    ${fav ? icon('heartFill', 16) : icon('heart', 16)}
-                    ${fav ? 'В избранном' : 'В избранное'}
-                </button>
-                <button onclick="completeLesson()" class="btn" style="background: rgba(255,255,255,0.2); color: white; margin: 0; flex: 1;">
-                    ${icon('check', 16)} Завершить
-                </button>
-            </div>
-        </div>
-    `;
-    
-    document.getElementById('audio-modal').classList.add('active');
-    updateAudioTime();
-}
-
-function togglePlay() {
-    if (state.audio.paused) {
-        state.audio.play().catch(e => {
-            alert('Не удалось воспроизвести. Проверь ссылку и убедись, что файл доступен.');
-        });
-        document.getElementById('play-btn').innerHTML = icon('pause', 28);
-        document.querySelectorAll('.wave-bar').forEach(b => b.classList.add('playing'));
-    } else {
-        state.audio.pause();
-        document.getElementById('play-btn').innerHTML = icon('play', 28);
-        document.querySelectorAll('.wave-bar').forEach(b => b.classList.remove('playing'));
-    }
-}
-
-function seekAudio(v) {
-    if (state.audio.duration) {
-        state.audio.currentTime = (parseFloat(v) / 100) * state.audio.duration;
-    }
-}
-
-function skipAudio(sec) {
-    state.audio.currentTime = Math.max(0, Math.min(state.audio.duration || 0, state.audio.currentTime + sec));
-}
-
-function updateAudioTime() {
-    const ct = document.getElementById('cur-time');
-    const seek = document.getElementById('seek');
-    if (ct) ct.textContent = formatDuration(state.audio.currentTime);
-    if (seek && state.audio.duration && !seek.matches(':active')) {
-        seek.value = (state.audio.currentTime / state.audio.duration) * 100;
-    }
-    
-    if (state.currentLesson && state.audio.duration) {
-        const pct = (state.audio.currentTime / state.audio.duration) * 100;
-        saveProgress('lesson', state.currentLesson.id, pct, state.audio.currentTime, false);
-    }
-}
-
-state.audio.addEventListener('timeupdate', updateAudioTime);
-state.audio.addEventListener('loadedmetadata', () => {
-    const tt = document.getElementById('total-time');
-    if (tt && state.audio.duration && isFinite(state.audio.duration)) {
-        tt.textContent = formatDuration(state.audio.duration);
-        // Автоматически обновляем длительность в базе
-        if (state.currentLesson && state.currentLesson.duration !== Math.floor(state.audio.duration)) {
-            const lessons = getLessons();
-            const idx = lessons.findIndex(l => l.id === state.currentLesson.id);
-            if (idx >= 0) {
-                lessons[idx].duration = Math.floor(state.audio.duration);
-                DB.set('lessons', lessons);
-                state.currentLesson.duration = Math.floor(state.audio.duration);
-            }
-        }
-    }
-});
-state.audio.addEventListener('ended', () => {
-    if (state.currentLesson) {
-        saveProgress('lesson', state.currentLesson.id, 100, state.currentLesson.duration, true);
-        document.getElementById('play-btn').innerHTML = icon('play', 28);
-        document.querySelectorAll('.wave-bar').forEach(b => b.classList.remove('playing'));
-    }
-});
-
-function completeLesson() {
-    if (!state.currentLesson) return;
-    saveProgress('lesson', state.currentLesson.id, 100, state.currentLesson.duration, true);
-    closeAudio();
-    showToast('🎉 Урок завершён!');
-}
-
-function closeAudio() {
-    state.audio.pause();
-    document.getElementById('audio-modal').classList.remove('active');
-    renderTab();
-}
-
-// ============ PDF РИДЕР ============
-async function openBook(id) {
-    const book = getAllBooks().find(b => b.id === id);
-    if (!book) return;
-    state.currentBook = book;
-    state.currentCategory = book.categoryId;
-    
-    const p = getProgress('book', id);
-    state.pdfPage = p ? (p.position || 1) : 1;
-    
-    const fav = isFavorite('book', id);
-    const bookmarks = DB.get('bookmarks_' + id);
-    
-    document.getElementById('pdf-body').innerHTML = `
-        <div style="display: flex; flex-direction: column; height: 100vh; background: var(--bg-secondary);">
-            <div style="padding: 12px 16px; background: var(--bg-secondary); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-                <div style="flex: 1; min-width: 0;">
-                    <div style="font-weight: 700; font-size: 15px;" class="truncate">${escapeHtml(book.title)}</div>
-                    ${book.author ? `<div style="font-size: 12px; color: var(--text-secondary);">${escapeHtml(book.author)}</div>` : ''}
-                </div>
-                <div style="display: flex; gap: 6px;">
-                    <button onclick="showBookmarks(${id})" style="background: var(--bg-tertiary); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; color: var(--text-primary); display: flex; align-items: center; justify-content: center; position: relative;">
-                        ${icon('bookmark', 16)}
-                        ${bookmarks.length > 0 ? `<span style="position: absolute; top: -4px; right: -4px; background: var(--accent); color: white; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">${bookmarks.length}</span>` : ''}
-                    </button>
-                    <button onclick="closePdf()" style="background: var(--bg-tertiary); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; color: var(--text-primary); display: flex; align-items: center; justify-content: center;">
-                        ${icon('x', 16)}
-                    </button>
-                </div>
-            </div>
-            <div class="pdf-viewer" id="pdf-viewer" style="flex: 1; overflow: auto;">
-                <canvas id="pdf-canvas"></canvas>
-            </div>
-            <div class="pdf-controls">
-                <button onclick="pdfPrev()">${icon('chevronLeft', 14)} Назад</button>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span id="p-cur">${state.pdfPage}</span> / <span id="p-total">${book.pages}</span>
-                    <button onclick="addBookmark()" title="Добавить закладку" style="background: var(--accent); color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 12px;">
-                        ${icon('bookmark', 12)} Закладка
-                    </button>
-                </div>
-                <button onclick="pdfNext()">Вперёд ${icon('chevronRight', 14)}</button>
-            </div>
-            <div style="padding: 12px 16px; background: var(--bg-secondary); border-top: 1px solid var(--border); display: flex; gap: 8px;">
-                <button onclick="handleFav('book', ${id})" style="flex: 1; padding: 10px; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px;">
-                    ${fav ? icon('heartFill', 16) : icon('heart', 16)}
-                    ${fav ? 'В избранном' : 'В избранное'}
-                </button>
-                <button onclick="completeBook()" style="flex: 1; padding: 10px; background: var(--success); color: white; border: none; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 600;">
-                    ${icon('check', 16)} Прочитано
-                </button>
-            </div>
-        </div>
-    `;
-    
-    document.getElementById('pdf-modal').classList.add('active');
-    
-    try {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        state.pdfDoc = await pdfjsLib.getDocument(book.pdfUrl).promise;
-        document.getElementById('p-total').textContent = state.pdfDoc.numPages;
-        renderPdfPage();
-    } catch (e) {
-        document.getElementById('pdf-viewer').innerHTML = `<div style="color: var(--text-primary); text-align: center; padding: 20px;">Не удалось загрузить PDF<br><small style="color: var(--text-secondary);">${e.message}</small></div>`;
-    }
-}
-
-async function renderPdfPage() {
-    if (!state.pdfDoc) return;
-    const page = await state.pdfDoc.getPage(state.pdfPage);
-    const scale = 1.5;
-    const viewport = page.getViewport({ scale });
-    const canvas = document.getElementById('pdf-canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
-    await page.render({ canvasContext: ctx, viewport }).promise;
-    document.getElementById('p-cur').textContent = state.pdfPage;
-    
-    if (state.currentBook) {
-        const pct = (state.pdfPage / state.currentBook.pages) * 100;
-        saveProgress('book', state.currentBook.id, pct, state.pdfPage, false);
-    }
-}
-
-function pdfNext() {
-    if (state.pdfDoc && state.pdfPage < state.pdfDoc.numPages) {
-        state.pdfPage++;
-        renderPdfPage();
-    }
-}
-
-function pdfPrev() {
-    if (state.pdfPage > 1) {
-        state.pdfPage--;
-        renderPdfPage();
-    }
-}
-
-function addBookmark() {
-    if (!state.currentBook) return;
-    const bookmarks = DB.get('bookmarks_' + state.currentBook.id);
-    const existing = bookmarks.findIndex(b => b.page === state.pdfPage);
-    if (existing >= 0) {
-        if (confirm('Удалить закладку с этой страницы?')) {
-            bookmarks.splice(existing, 1);
-            DB.set('bookmarks_' + state.currentBook.id, bookmarks);
-            showToast('Закладка удалена');
-            openBook(state.currentBook.id);
-        }
-    } else {
-        bookmarks.push({ page: state.pdfPage, date: new Date().toISOString() });
-        bookmarks.sort((a, b) => a.page - b.page);
-        DB.set('bookmarks_' + state.currentBook.id, bookmarks);
-        showToast('🔖 Закладка добавлена');
-        openBook(state.currentBook.id);
-    }
-}
-
-function showBookmarks(bookId) {
-    const bookmarks = DB.get('bookmarks_' + bookId);
-    const modal = document.getElementById('modal');
-    const body = document.getElementById('modal-body');
-    
-    body.innerHTML = `
-        <div class="modal-title">
-            🔖 Закладки
-            <button class="close-btn" onclick="closeModal()">${icon('x', 16)}</button>
-        </div>
-        ${bookmarks.length === 0 ? `<div class="empty"><div class="empty-icon">${icon('bookmark', 48)}</div>Нет закладок</div>` : 
-        bookmarks.map(b => `
-            <div class="bookmark-item" onclick="goToBookmark(${b.page})">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="color: var(--accent);">${icon('bookmark', 18)}</span>
-                    <div>
-                        <div style="font-weight: 600;">Страница ${b.page}</div>
-                        <div style="font-size: 11px; color: var(--text-secondary);">${new Date(b.date).toLocaleString('ru')}</div>
-                    </div>
-                </div>
-                <button onclick="event.stopPropagation(); deleteBookmark(${bookId}, ${b.page})" style="background: none; border: none; color: var(--danger); cursor: pointer; padding: 4px;">
-                    ${icon('trash', 16)}
-                </button>
-            </div>
-        `).join('')}
-    `;
-    modal.classList.add('active');
-}
-
-function goToBookmark(page) {
-    state.pdfPage = page;
-    closeModal();
-    renderPdfPage();
-}
-
-function deleteBookmark(bookId, page) {
-    let bookmarks = DB.get('bookmarks_' + bookId);
-    bookmarks = bookmarks.filter(b => b.page !== page);
-    DB.set('bookmarks_' + bookId, bookmarks);
-    showBookmarks(bookId);
-}
-
-function completeBook() {
-    if (!state.currentBook) return;
-    saveProgress('book', state.currentBook.id, 100, state.currentBook.pages, true);
-    closePdf();
-    showToast('🎉 Книга прочитана!');
-}
-
-function closePdf() {
-    document.getElementById('pdf-modal').classList.remove('active');
-    state.pdfDoc = null;
-    renderTab();
-}
-
-function handleFav(type, id) {
-    toggleFavorite(type, id);
-    if (type === 'lesson' && state.currentLesson) openLesson(id);
-    if (type === 'book' && state.currentBook) openBook(id);
-}
-
-// ============ ПРОГРЕСС ============
-function renderProgress() {
-    const container = document.getElementById('tab-progress');
-    const progress = DB.get('progress');
-    const lessons = getAllLessons();
-    const books = getAllBooks();
-    
-    const totalL = lessons.length;
-    const totalB = books.length;
-    const doneL = progress.filter(p => p.type === 'lesson' && p.completed).length;
-    const doneB = progress.filter(p => p.type === 'book' && p.completed).length;
-    
-    const avgPct = progress.length ? progress.reduce((s, p) => s + (p.percent || 0), 0) / progress.length : 0;
-    const totalTime = progress.reduce((s, p) => s + (p.position || 0), 0);
-    const hours = Math.floor(totalTime / 3600);
-    const mins = Math.floor((totalTime % 3600) / 60);
-    
-    // График за неделю
-    const weekData = getWeekData();
-    const maxVal = Math.max(...weekData.map(d => d.value), 1);
-    
-    // Тепловая карта
-    const heatData = {};
-    progress.forEach(p => { if (p.date) heatData[p.date] = (heatData[p.date] || 0) + 1; });
-    let heatCells = '';
-    for (let i = 27; i >= 0; i--) {
-        const d = new Date(); d.setDate(d.getDate() - i);
-        const key = d.toISOString().split('T')[0];
-        const count = heatData[key] || 0;
-        const level = count === 0 ? 0 : count === 1 ? 1 : count === 2 ? 2 : count <= 4 ? 3 : 4;
-        heatCells += `<div class="heat-cell heat-${level}" title="${key}: ${count} действий"></div>`;
-    }
-    
-    // Достижения
-    const achievements = getAchievementsList();
-    const earned = DB.get('achievements').map(a => a.type);
-    
-    container.innerHTML = `
-        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-            ${icon('chart', 24)} Прогресс
-        </h2>
-        
-        <div class="gradient-card" style="background: var(--gradient-1); margin-bottom: 16px;">
-            <div style="position: relative; z-index: 1;">
-                <div class="ring-container">
-                    <svg width="140" height="140" style="transform: rotate(-90deg);">
-                        <circle cx="70" cy="70" r="58" stroke="rgba(255,255,255,0.2)" stroke-width="10" fill="none"/>
-                        <circle cx="70" cy="70" r="58" stroke="white" stroke-width="10" fill="none"
-                                stroke-dasharray="${2 * Math.PI * 58}"
-                                stroke-dashoffset="${2 * Math.PI * 58 * (1 - avgPct / 100)}"
-                                stroke-linecap="round" style="transition: stroke-dashoffset 1s ease;"/>
-                        <text x="70" y="70" text-anchor="middle" dy=".3em" font-size="28" font-weight="bold" fill="white" transform="rotate(90 70 70)">${Math.round(avgPct)}%</text>
-                    </svg>
-                </div>
-                <div class="stats-grid" style="margin-top: 12px;">
-                    <div><div class="stat-value">${doneL}/${totalL}</div><div class="stat-label">Уроков</div></div>
-                    <div><div class="stat-value">${doneB}/${totalB}</div><div class="stat-label">Книг</div></div>
-                    <div><div class="stat-value">${hours}ч ${mins}м</div><div class="stat-label">Время</div></div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card" style="cursor: default;">
-            <div class="section-title" style="margin-bottom: 12px;">${icon('chart', 14)} Активность за неделю</div>
-            <div class="week-chart">
-                ${weekData.map(d => `
-                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                        <div class="week-bar" style="height: 100%;">
-                            <div class="week-bar-fill" style="height: ${(d.value / maxVal) * 100}%;"></div>
-                        </div>
-                        <div class="week-label">${d.label}</div>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-        
-        <div class="card" style="cursor: default; margin-top: 12px;">
-            <div class="section-title" style="margin-bottom: 12px;">${icon('fire', 14)} Активность (28 дней)</div>
-            <div class="heat-grid">${heatCells}</div>
-            <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-tertiary); margin-top: 6px;">
-                <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 4px; justify-content: flex-end; margin-top: 8px; font-size: 10px; color: var(--text-tertiary);">
-                <span>Меньше</span>
-                <div class="heat-cell" style="width: 10px; height: 10px;"></div>
-                <div class="heat-cell heat-1" style="width: 10px; height: 10px;"></div>
-                <div class="heat-cell heat-2" style="width: 10px; height: 10px;"></div>
-                <div class="heat-cell heat-3" style="width: 10px; height: 10px;"></div>
-                <div class="heat-cell heat-4" style="width: 10px; height: 10px;"></div>
-                <span>Больше</span>
-            </div>
-        </div>
-        
-        <div class="card" style="cursor: default; margin-top: 12px;">
-            <div class="section-title" style="margin-bottom: 12px;">
-                ${icon('trophy', 14)} Достижения 
-                <span class="badge badge-purple">${earned.length}/${achievements.length}</span>
-            </div>
-            ${achievements.map(a => `
-                <div class="achievement ${earned.includes(a.type) ? 'earned' : ''}">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="font-size: 24px;">${a.icon}</div>
-                        <div>
-                            <div style="font-weight: 600;">${a.title}</div>
-                            <div class="ach-desc" style="font-size: 12px; color: var(--text-secondary);">${a.desc}</div>
-                        </div>
-                    </div>
-                    <div style="font-size: 20px;">${earned.includes(a.type) ? icon('check', 20) : '🔒'}</div>
-                </div>
-            `).join('')}
-        </div>
-    `;
-}
-
-function getWeekData() {
-    const progress = DB.get('progress');
-    const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-    const result = [];
-    const today = new Date();
-    
-    for (let i = 6; i >= 0; i--) {
-        const d = new Date(today);
-        d.setDate(d.getDate() - i);
-        const key = d.toISOString().split('T')[0];
-        const count = progress.filter(p => p.date === key).length;
-        result.push({
-            label: days[(d.getDay() + 6) % 7],
-            value: count,
-            date: key
-        });
-    }
-    return result;
-}
-
-// ============ ДОСТИЖЕНИЯ ============
-function getAchievementsList() {
-    const progress = DB.get('progress');
-    const doneL = progress.filter(p => p.type === 'lesson' && p.completed).length;
-    const doneB = progress.filter(p => p.type === 'book' && p.completed).length;
-    const totalSec = progress.reduce((s, p) => s + (p.position || 0), 0);
-    const streak = calculateStreak().count;
-    
-    return [
-        { type: 'first_lesson', icon: '🌱', title: 'Первые шаги', desc: 'Пройти 1 урок', cond: doneL >= 1 },
-        { type: 'first_book', icon: '📖', title: 'Первая книга', desc: 'Завершить 1 книгу', cond: doneB >= 1 },
-        { type: 'five_lessons', icon: '🎯', title: 'Пятёрка', desc: '5 уроков', cond: doneL >= 5 },
-        { type: 'ten_lessons', icon: '🎖', title: 'Десятка', desc: '10 уроков', cond: doneL >= 10 },
-        { type: 'five_books', icon: '📚', title: 'Книжный червь', desc: '5 книг', cond: doneB >= 5 },
-        { type: 'ten_books', icon: '🏆', title: 'Марафонец', desc: '10 книг', cond: doneB >= 10 },
-        { type: 'hour', icon: '⏱', title: 'Час знаний', desc: '1 час прослушано', cond: totalSec >= 3600 },
-        { type: 'ten_hours', icon: '🎧', title: 'Аудиофил', desc: '10 часов', cond: totalSec >= 36000 },
-        { type: 'streak_3', icon: '🔥', title: 'Разогрев', desc: '3 дня подряд', cond: streak >= 3 },
-        { type: 'streak_7', icon: '⚡', title: 'Неделя огня', desc: '7 дней подряд', cond: streak >= 7 },
-        { type: 'streak_30', icon: '💎', title: 'Месяц силы', desc: '30 дней подряд', cond: streak >= 30 }
-    ];
-}
-
-function checkAchievements() {
-    const list = getAchievementsList();
-    const earned = DB.get('achievements').map(a => a.type);
-    let newOnes = [];
-    list.forEach(a => {
-        if (a.cond && !earned.includes(a.type)) {
-            DB.set('achievements', [...DB.get('achievements'), { type: a.type, date: new Date().toISOString() }]);
-            newOnes.push(a);
-        }
-    });
-    if (newOnes.length > 0) {
-        setTimeout(() => {
-            showToast('🎉 Новая награда: ' + newOnes.map(a => a.title).join(', '));
-        }, 300);
-    }
-}
-
-// ============ ПРОФИЛЬ ============
-function renderProfile() {
-    const container = document.getElementById('tab-profile');
-    const progress = DB.get('progress');
-    const doneL = progress.filter(p => p.type === 'lesson' && p.completed).length;
-    const doneB = progress.filter(p => p.type === 'book' && p.completed).length;
-    const totalSec = progress.reduce((s, p) => s + (p.position || 0), 0);
-    const h = Math.floor(totalSec / 3600);
-    const m = Math.floor((totalSec % 3600) / 60);
-    const streak = calculateStreak().count;
-    const earned = DB.get('achievements').length;
-    
-    container.innerHTML = `
-        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-            ${icon('user', 24)} Профиль
-        </h2>
-        
-        <div class="gradient-card" style="background: var(--gradient-2); margin-bottom: 16px;">
-            <div style="position: relative; z-index: 1; display: flex; align-items: center; gap: 16px;">
-                <div style="width: 70px; height: 70px; border-radius: 50%; background: rgba(255,255,255,0.25); color: white; font-size: 28px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    ${state.user.name[0].toUpperCase()}
-                </div>
-                <div style="flex: 1; min-width: 0;">
-                    <div style="font-size: 20px; font-weight: 700;" class="truncate">${escapeHtml(state.user.name)}</div>
-                    <div style="font-size: 12px; opacity: 0.9; margin-top: 2px;">С нами с ${new Date(state.user.created).toLocaleDateString('ru')}</div>
-                    <div style="display: flex; gap: 12px; margin-top: 8px; font-size: 12px;">
-                        <span style="display: flex; align-items: center; gap: 4px;">${icon('fire', 12)} ${streak} дней</span>
-                        <span style="display: flex; align-items: center; gap: 4px;">${icon('trophy', 12)} ${earned} наград</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card" style="cursor: default;">
-            <div class="section-title">${icon('chart', 14)} Моя статистика</div>
-            <div class="stats-grid">
-                <div><div class="stat-value" style="color: var(--accent);">${doneL}</div><div class="stat-label">Уроков</div></div>
-                <div><div class="stat-value" style="color: var(--purple);">${doneB}</div><div class="stat-label">Книг</div></div>
-                <div><div class="stat-value" style="color: var(--success);">${h}ч ${m}м</div><div class="stat-label">Время</div></div>
-            </div>
-        </div>
-        
-        <div class="card" style="cursor: default; margin-top: 12px;">
-            <div class="section-title">${icon('settings', 14)} Настройки</div>
-            <div class="setting-row">
-                <div class="setting-label">
-                    ${icon('moon', 18)}
-                    <span>Тёмная тема</span>
-                </div>
-                <div class="toggle ${state.theme === 'dark' ? 'active' : ''}" onclick="toggleTheme()"></div>
-            </div>
-            <div class="setting-row">
-                <div class="setting-label">
-                    ${icon('bell', 18)}
-                    <span>Уведомления</span>
-                </div>
-                <div class="toggle active" onclick="this.classList.toggle('active'); showToast('Настройка сохранена')"></div>
-            </div>
-        </div>
-        
-        <div class="card" style="cursor: default; margin-top: 12px;">
-            <div class="section-title">${icon('user', 14)} Аккаунт</div>
-            <button class="btn btn-ghost" onclick="changeName()">${icon('edit', 16)} Изменить имя</button>
-            <button class="btn btn-danger" onclick="resetData()">${icon('trash', 16)} Сбросить все данные</button>
-        </div>
-        
-        <div style="text-align: center; color: var(--text-tertiary); font-size: 12px; margin-top: 20px; padding: 16px;">
-            <div>📱 Уроки и Книги v2.0</div>
-            <div style="margin-top: 4px;">Сделано с ❤️</div>
-        </div>
-    `;
-}
-
-function changeName() {
-    const name = prompt('Новое имя:', state.user.name);
-    if (name && name.trim()) {
-        state.user.name = name.trim();
-        DB.set('user', state.user);
-        document.getElementById('header-sub').textContent = `Привет, ${state.user.name}!`;
-        renderProfile();
-    }
-}
-
-function resetData() {
-    if (confirm('Удалить ВСЕ данные? Это нельзя отменить!')) {
-        if (confirm('Точно-точно? Все уроки, книги, прогресс — всё пропадёт!')) {
-            Object.keys(localStorage).filter(k => k.startsWith('la_')).forEach(k => localStorage.removeItem(k));
-            alert('Данные сброшены');
-            location.reload();
-        }
-    }
-}
-
-// ============ РЕДАКТОР ============
-function renderEditor() {
-    const container = document.getElementById('tab-editor');
-    const tree = buildTree(null);
-    const totalL = getLessons().length;
-    const totalB = getBooks().length;
-    const totalC = getCategories().length;
-    
-    let html = `
-        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-            ${icon('settings', 24)} Редактор
-        </h2>
-        
-        <div class="gradient-card" style="background: var(--gradient-3); margin-bottom: 16px;">
-            <div style="position: relative; z-index: 1;" class="stats-grid">
-                <div><div class="stat-value">${totalC}</div><div class="stat-label">Разделов</div></div>
-                <div><div class="stat-value">${totalL}</div><div class="stat-label">Уроков</div></div>
-                <div><div class="stat-value">${totalB}</div><div class="stat-label">Книг</div></div>
-            </div>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
-            <button class="btn btn-primary" onclick="showCatForm()" style="margin: 0;">
-                ${icon('folder', 16)} Раздел
-            </button>
-            <button class="btn btn-success" onclick="showLessonForm()" style="margin: 0;">
-                ${icon('headphones', 16)} Урок
-            </button>
-            <button class="btn btn-purple" onclick="showBookForm()" style="margin: 0; grid-column: span 2;">
-                ${icon('book', 16)} Книга
-            </button>
-        </div>
-        
-        <div class="section-title">${icon('folder', 14)} Структура контента</div>
-    `;
-    
-    if (tree.length === 0) {
-        html += `<div class="empty"><div class="empty-icon">${icon('folder', 48)}</div>Создай первый раздел!</div>`;
-    } else {
-        html += renderEditorTree(tree);
-    }
-    
-    container.innerHTML = html;
-}
-
-function renderEditorTree(tree) {
-    return tree.map(cat => {
-        const lessons = getLessons().filter(l => l.categoryId === cat.id);
-        const books = getBooks().filter(b => b.categoryId === cat.id);
-        
-        let html = `
-            <div class="editor-tree-item">
-                <div style="display: flex; justify-content: space-between; align-items: start;">
-                    <div style="flex: 1; min-width: 0;">
-                        <div style="font-weight: 600; display: flex; align-items: center; gap: 6px;">
-                            <span style="font-size: 18px;">${cat.emoji || '📂'}</span>
-                            <span class="truncate">${escapeHtml(cat.title)}</span>
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px; display: flex; gap: 10px;">
-                            ${lessons.length ? `<span style="display: flex; align-items: center; gap: 3px;">${icon('headphones', 12)} ${lessons.length}</span>` : ''}
-                            ${books.length ? `<span style="display: flex; align-items: center; gap: 3px;">${icon('book', 12)} ${books.length}</span>` : ''}
-                            ${!lessons.length && !books.length ? '<span style="color: var(--text-tertiary);">пусто</span>' : ''}
-                        </div>
-                    </div>
-                </div>
-                <div class="editor-actions">
-                    <button onclick="showCatForm(${cat.id})">${icon('edit', 12)} Ред.</button>
-                    <button onclick="showCatForm(null, ${cat.id})">${icon('plus', 12)} Подраздел</button>
-                    <button onclick="showLessonForm(${cat.id})">${icon('headphones', 12)} Урок</button>
-                    <button onclick="showBookForm(${cat.id})">${icon('book', 12)} Книга</button>
-                    <button onclick="deleteCat(${cat.id})" style="color: var(--danger);">${icon('trash', 12)}</button>
-                </div>
-            </div>
-        `;
-        
-        if (cat.children.length > 0) {
-            html += `<div style="margin-left: 16px; border-left: 2px solid var(--border); padding-left: 8px;">${renderEditorTree(cat.children)}</div>`;
-        }
-        
-        return html;
-    }).join('');
-}
-
-// ============ ФОРМЫ РЕДАКТОРА ============
-function showCatForm(editId = null, parentId = null) {
-    const cat = editId ? findCategory(editId) : null;
-    const title = cat ? 'Редактировать раздел' : 'Новый раздел';
-    
-    const allCats = getCategories();
-    const parentOptions = '<option value="">— Корневой —</option>' + 
-        allCats.filter(c => c.id !== editId).map(c => 
-            `<option value="${c.id}" ${(cat?.parentId || parentId) === c.id ? 'selected' : ''}>${c.emoji || '📂'} ${escapeHtml(c.title)}</option>`
-        ).join('');
-    
-    document.getElementById('modal-body').innerHTML = `
-        <div class="modal-title">
-            ${title}
-            <button class="close-btn" onclick="closeModal()">${icon('x', 16)}</button>
-        </div>
-        <form onsubmit="saveCat(event, ${editId || 'null'})">
-            <label>Название *</label>
-            <input type="text" id="f-title" value="${cat ? escapeHtml(cat.title) : ''}" required>
-            
-            <label>Эмодзи</label>
-            <input type="text" id="f-emoji" value="${cat?.emoji || ''}" maxlength="4" placeholder="📂">
-            
-            <label>Родитель</label>
-            <select id="f-parent">${parentOptions}</select>
-            
-            <label>Описание</label>
-            <textarea id="f-desc" rows="3" placeholder="О чём этот раздел...">${cat?.description || ''}</textarea>
-            
-            <button type="submit" class="btn btn-primary">${icon('check', 16)} Сохранить</button>
-            <button type="button" onclick="closeModal()" class="btn btn-secondary">Отмена</button>
-        </form>
-    `;
-    document.getElementById('modal').classList.add('active');
-}
-
-function saveCat(e, editId) {
-    e.preventDefault();
-    const cats = getCategories();
-    const data = {
-        title: document.getElementById('f-title').value.trim(),
-        emoji: document.getElementById('f-emoji').value.trim(),
-        parentId: document.getElementById('f-parent').value ? parseInt(document.getElementById('f-parent').value) : null,
-        description: document.getElementById('f-desc').value.trim()
-    };
-    
-    if (editId) {
-        const idx = cats.findIndex(c => c.id === editId);
-        cats[idx] = { ...cats[idx], ...data };
-    } else {
-        cats.push({ id: DB.nextId('categories'), ...data, order: cats.length });
-    }
-    
-    DB.set('categories', cats);
-    closeModal();
-    renderEditor();
-    showToast(editId ? '✅ Раздел обновлён' : '✅ Раздел создан');
-}
-
-function deleteCat(id) {
-    if (!confirm('Удалить раздел и ВСЁ его содержимое?')) return;
-    const ids = getAllDescendantIds(id);
-    DB.set('categories', getCategories().filter(c => !ids.includes(c.id)));
-    DB.set('lessons', getLessons().filter(l => !ids.includes(l.categoryId)));
-    DB.set('books', getBooks().filter(b => !ids.includes(b.categoryId)));
-    renderEditor();
-    showToast('🗑 Раздел удалён');
-}
-
-function showLessonForm(catId = null, editId = null) {
-    const lesson = editId ? getLessons().find(l => l.id === editId) : null;
-    const title = lesson ? 'Редактировать урок' : 'Новый урок';
-    
-    const allCats = getCategories();
-    if (allCats.length === 0) {
-        alert('Сначала создай хотя бы один раздел!');
-        return;
-    }
-    
-    const catOptions = allCats.map(c => 
-        `<option value="${c.id}" ${(lesson?.categoryId || catId) === c.id ? 'selected' : ''}>${c.emoji || '📂'} ${escapeHtml(c.title)}</option>`
-    ).join('');
-    
-    document.getElementById('modal-body').innerHTML = `
-        <div class="modal-title">
-            ${title}
-            <button class="close-btn" onclick="closeModal()">${icon('x', 16)}</button>
-        </div>
-        <form onsubmit="saveLesson(event, ${editId || 'null'})">
-            <label>Раздел *</label>
-            <select id="f-cat" required>${catOptions}</select>
-            
-            <label>Название *</label>
-            <input type="text" id="f-title" value="${lesson ? escapeHtml(lesson.title) : ''}" required>
-            
-            <label>Описание</label>
-            <textarea id="f-desc" rows="3" placeholder="О чём этот урок...">${lesson?.description || ''}</textarea>
-            
-            <label>Ссылка на аудио (mp3) *</label>
-            <input type="url" id="f-url" value="${lesson?.audioUrl || ''}" required placeholder="https://...">
-            <div style="font-size: 11px; color: var(--text-secondary); margin: -8px 0 12px;">
-                Длительность определится автоматически при первом прослушивании
-            </div>
-            
-            ${editId ? `<button type="button" onclick="deleteLesson(${editId})" class="btn btn-danger">${icon('trash', 16)} Удалить</button>` : ''}
-            <button type="submit" class="btn btn-success">${icon('check', 16)} Сохранить</button>
-            <button type="button" onclick="closeModal()" class="btn btn-secondary">Отмена</button>
-        </form>
-    `;
-    document.getElementById('modal').classList.add('active');
-}
-
-function saveLesson(e, editId) {
-    e.preventDefault();
-    const lessons = getLessons();
-    const data = {
-        categoryId: parseInt(document.getElementById('f-cat').value),
-        title: document.getElementById('f-title').value.trim(),
-        description: document.getElementById('f-desc').value.trim(),
-        audioUrl: document.getElementById('f-url').value.trim(),
-        duration: 60 // заглушка, обновится автоматически
-    };
-    
-    if (editId) {
-        const idx = lessons.findIndex(l => l.id === editId);
-        const oldDur = lessons[idx].duration;
-        lessons[idx] = { ...lessons[idx], ...data, duration: oldDur || 60 };
-    } else {
-        lessons.push({ id: DB.nextId('lessons'), ...data, created: new Date().toISOString() });
-    }
-    
-    DB.set('lessons', lessons);
-    closeModal();
-    renderEditor();
-    showToast(editId ? '✅ Урок обновлён' : '✅ Урок создан');
-}
-
-function deleteLesson(id) {
-    if (!confirm('Удалить урок?')) return;
-    DB.set('lessons', getLessons().filter(l => l.id !== id));
-    closeModal();
-    renderEditor();
-    showToast('🗑 Урок удалён');
-}
-
-function showBookForm(catId = null, editId = null) {
-    const book = editId ? getBooks().find(b => b.id === editId) : null;
-    const title = book ? 'Редактировать книгу' : 'Новая книга';
-    
-    const allCats = getCategories();
-    if (allCats.length === 0) {
-        alert('Сначала создай хотя бы один раздел!');
-        return;
-    }
-    
-    const catOptions = allCats.map(c => 
-        `<option value="${c.id}" ${(book?.categoryId || catId) === c.id ? 'selected' : ''}>${c.emoji || '📂'} ${escapeHtml(c.title)}</option>`
-    ).join('');
-    
-    document.getElementById('modal-body').innerHTML = `
-        <div class="modal-title">
-            ${title}
-            <button class="close-btn" onclick="closeModal()">${icon('x', 16)}</button>
-        </div>
-        <form onsubmit="saveBook(event, ${editId || 'null'})">
-            <label>Раздел *</label>
-            <select id="f-cat" required>${catOptions}</select>
-            
-            <label>Название *</label>
-            <input type="text" id="f-title" value="${book ? escapeHtml(book.title) : ''}" required>
-            
-            <label>Автор</label>
-            <input type="text" id="f-author" value="${book?.author || ''}">
-            
-            <label>Описание</label>
-            <textarea id="f-desc" rows="3" placeholder="О чём эта книга...">${book?.description || ''}</textarea>
-            
-            <label>Ссылка на PDF *</label>
-            <input type="url" id="f-url" value="${book?.pdfUrl || ''}" required placeholder="https://...">
-            
-            <label>Количество страниц *</label>
-            <input type="number" id="f-pages" value="${book?.pages || ''}" required min="1">
-            
-            ${editId ? `<button type="button" onclick="deleteBook(${editId})" class="btn btn-danger">${icon('trash', 16)} Удалить</button>` : ''}
-            <button type="submit" class="btn btn-purple">${icon('check', 16)} Сохранить</button>
-            <button type="button" onclick="closeModal()" class="btn btn-secondary">Отмена</button>
-        </form>
-    `;
-    document.getElementById('modal').classList.add('active');
-}
-
-function saveBook(e, editId) {
-    e.preventDefault();
-    const books = getBooks();
-    const data = {
-        categoryId: parseInt(document.getElementById('f-cat').value),
-        title: document.getElementById('f-title').value.trim(),
-        author: document.getElementById('f-author').value.trim(),
-        description: document.getElementById('f-desc').value.trim(),
-        pdfUrl: document.getElementById('f-url').value.trim(),
-        pages: parseInt(document.getElementById('f-pages').value)
-    };
-    
-    if (editId) {
-        const idx = books.findIndex(b => b.id === editId);
-        books[idx] = { ...books[idx], ...data };
-    } else {
-        books.push({ id: DB.nextId('books'), ...data, created: new Date().toISOString() });
-    }
-    
-    DB.set('books', books);
-    closeModal();
-    renderEditor();
-    showToast(editId ? '✅ Книга обновлена' : '✅ Книга создана');
-}
-
-function deleteBook(id) {
-    if (!confirm('Удалить книгу?')) return;
-    DB.set('books', getBooks().filter(b => b.id !== id));
-    closeModal();
-    renderEditor();
-    showToast('🗑 Книга удалена');
-}
-
-function closeModal() {
-    document.getElementById('modal').classList.remove('active');
-}
-
-// ============ TOAST УВЕДОМЛЕНИЯ ============
-function showToast(message) {
-    const existing = document.querySelector('.toast');
-    if (existing) existing.remove();
-    
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.style.cssText = `
-        position: fixed;
-        bottom: 100px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: var(--text-primary);
-        color: var(--bg-primary);
-        padding: 12px 20px;
-        border-radius: 12px;
-        font-size: 14px;
-        font-weight: 500;
-        box-shadow: var(--shadow-xl);
-        z-index: 1000;
-        animation: slideUp 0.3s ease;
-        max-width: 90%;
-        text-align: center;
-    `;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.3s';
-        setTimeout(() => toast.remove(), 300);
-    }, 2500);
-}
-
-// ============ СТАРТ ============
-init();
-</script>
-</body>
-</html>
+//
