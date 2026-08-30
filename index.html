@@ -694,6 +694,10 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
 <audio id="audio-player"></audio>
 
 <script>
+// ============================================
+// ВАЖНО: Добавь сюда свой Telegram ID
+// Узнать ID можно у бота @userinfobot
+// ============================================
 const ADMIN_TELEGRAM_IDS = [8690178977];
 
 const DEFAULT_QUOTES = [
@@ -857,18 +861,16 @@ function init() {
 
 function checkAdminAccess() {
     const tg = window.Telegram?.WebApp;
-    let isAdmin = false;
     
-    if (tg && tg.initDataUnsafe?.user) {
-        const tgUser = tg.initDataUnsafe.user;
-        isAdmin = ADMIN_TELEGRAM_IDS.includes(tgUser.id);
+    if (tg) {
+        tg.ready();
+        tg.expand();
     }
     
-    if (!tg) {
-        isAdmin = DB.get('editorMode', false);
-    }
+    // Проверяем сохранённый статус редактора
+    const savedEditorMode = DB.get('editorMode', false);
+    state.editorMode = savedEditorMode;
     
-    state.editorMode = isAdmin;
     updateEditorMode();
 }
 
@@ -1273,7 +1275,7 @@ function renderHome() {
                     </div>
                     <div class="quick-action-content">
                         <div class="quick-action-title truncate">${escapeHtml(continueItem.title)}</div>
-                        <div class="quick-action-sub">${continueItem.type === 'lesson' ? '⏱ ' + formatDuration(continueItem.duration) : ' стр. ' + continueItem.progress.position + ' / ' + continueItem.pages}</div>
+                        <div class="quick-action-sub">${continueItem.type === 'lesson' ? '⏱ ' + formatDuration(continueItem.duration) : '📄 стр. ' + continueItem.progress.position + ' / ' + continueItem.pages}</div>
                         <div class="progress-bar" style="margin-top: 6px;">
                             <div class="progress-fill" style="width: ${continueItem.progress.percent}%"></div>
                         </div>
@@ -1331,7 +1333,7 @@ function renderStreakDays(streak) {
     return days.map((d, i) => {
         const isActive = i <= todayIdx && i >= todayIdx - streak.count + 1;
         const isToday = i === todayIdx;
-        return `<div class="streak-day ${isActive ? 'active' : ''} ${isToday ? 'today' : ''}" title="${d}">${isActive ? '🔥' : ''}</div>`;
+        return `<div class="streak-day ${isActive ? 'active' : ''} ${isToday ? 'today' : ''}" title="${d}">${isActive ? '' : ''}</div>`;
     }).join('');
 }
 
@@ -1626,7 +1628,7 @@ function renderCategoryView(container, type) {
             ${state.editorMode ? `<button class="icon-btn" onclick="showCategoryMenu(event, ${cat.id})">${icon('moreVertical', 16)}</button>` : ''}
         </div>
         <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 24px;">${cat.emoji || '📂'}</span>
+            <span style="font-size: 24px;">${cat.emoji || ''}</span>
             ${escapeHtml(cat.title)}
         </h2>
         ${cat.description ? `<p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 16px;">${escapeHtml(cat.description)}</p>` : '<div style="height: 12px;"></div>'}
@@ -1643,7 +1645,7 @@ function renderCategoryView(container, type) {
                 <div class="card" onclick="openCategory(${c.id})">
                     <button class="card-menu-btn" onclick="event.stopPropagation(); showCategoryMenu(event, ${c.id})">${icon('moreVertical', 16)}</button>
                     <div class="card-title">
-                        <span style="font-size: 20px;">${c.emoji || ''}</span>
+                        <span style="font-size: 20px;">${c.emoji || '📂'}</span>
                         <span style="flex: 1; padding-right: 30px;" class="truncate">${escapeHtml(c.title)}</span>
                         ${icon('chevronRight', 16)}
                     </div>
@@ -1944,7 +1946,7 @@ function completeLesson() {
     if (!state.currentLesson) return;
     saveProgress('lesson', state.currentLesson.id, 100, state.currentLesson.duration, true);
     closeAudio();
-    showToast('🎉 Урок завершён!');
+    showToast(' Урок завершён!');
 }
 
 function closeAudio() {
@@ -2103,7 +2105,7 @@ function completeBook() {
     if (!state.currentBook) return;
     saveProgress('book', state.currentBook.id, 100, state.currentBook.pages, true);
     closePdf();
-    showToast('🎉 Книга прочитана!');
+    showToast(' Книга прочитана!');
 }
 
 function closePdf() {
@@ -2321,30 +2323,63 @@ function renderProfile() {
         </div>
         
         <div style="text-align: center; color: var(--text-tertiary); font-size: 12px; margin-top: 20px; padding: 16px;">
-            <div>Уроки и Книги v4.3</div>
+            <div>Уроки и Книги v4.4</div>
             <div style="margin-top: 4px;">Сделано с ❤️</div>
         </div>
     `;
 }
 
 function activateEditorMode() {
-    const tg = window.Telegram?.WebApp;
-    const tgUserId = tg?.initDataUnsafe?.user?.id;
+    // Показываем модальное окно с вводом ID
+    const body = document.getElementById('modal-body');
+    body.innerHTML = `
+        <div class="modal-title">
+            Активация режима редактора
+            <button class="close-btn" onclick="closeModal()">${icon('x', 16)}</button>
+        </div>
+        <div style="margin-bottom: 16px;">
+            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">
+                Введите ваш Telegram ID для активации режима редактора.
+            </p>
+            <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 16px;">
+                Узнать ID можно у бота @userinfobot в Telegram
+            </p>
+            <label>Ваш Telegram ID</label>
+            <input type="number" id="admin-id-input" placeholder="Например: 123456789">
+        </div>
+        <button class="btn btn-primary" onclick="submitAdminId()">${icon('check', 16)} Активировать</button>
+        <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+    `;
+    document.getElementById('modal').classList.add('active');
+}
+
+function submitAdminId() {
+    const inputId = document.getElementById('admin-id-input').value.trim();
     
-    if (!tgUserId) {
-        alert('Не удалось получить ваш Telegram ID. Откройте приложение в Telegram.');
+    if (!inputId) {
+        alert('Введите Telegram ID');
         return;
     }
     
-    if (ADMIN_TELEGRAM_IDS.includes(tgUserId)) {
+    const userId = parseInt(inputId);
+    
+    if (ADMIN_TELEGRAM_IDS.includes(userId)) {
         state.editorMode = true;
         DB.set('editorMode', true);
+        DB.set('adminId', userId);
         updateEditorMode();
+        closeModal();
         renderProfile();
         renderNav();
         showToast('✅ Режим редактора активирован!');
     } else {
-        alert(`Ваш Telegram ID: ${tgUserId}\n\nЭтот ID не найден в списке админов.\n\nДобавьте его в код:\nconst ADMIN_TELEGRAM_IDS = [${tgUserId}];`);
+        alert(
+            `ID ${userId} не найден в списке админов.\n\n` +
+            `Откройте файл index.html и замените:\n` +
+            `const ADMIN_TELEGRAM_IDS = [8690178977];\n` +
+            `на:\n` +
+            `const ADMIN_TELEGRAM_IDS = [${userId}];`
+        );
     }
 }
 
@@ -2453,7 +2488,7 @@ function deleteQuote(index) {
     quotes.splice(index, 1);
     DB.set('quotes', quotes);
     renderAdmin();
-    showToast(' Цитата удалена');
+    showToast('🗑 Цитата удалена');
 }
 
 function resetQuotes() {
