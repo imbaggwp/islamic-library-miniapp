@@ -58,7 +58,6 @@ body {
 }
 .app { max-width: 500px; margin: 0 auto; background: var(--bg-primary); min-height: 100vh; position: relative; padding-bottom: 140px; }
 
-/* HEADER - максимально компактный, только иконка профиля */
 .header {
     background: var(--glass-bg);
     backdrop-filter: blur(20px);
@@ -76,11 +75,10 @@ body {
     color: var(--text-primary); transition: all 0.2s;
 }
 .icon-btn:hover { transform: scale(1.05); }
-.icon-btn svg { width: 18px; height: 18px; }
+.icon-btn svg { width: 20px; height: 20px; }
 
 .content { padding: 16px; position: relative; }
 
-/* TABS с анимациями */
 .tab { display: none; }
 .tab.active { display: block; animation: tabSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 @keyframes tabSlideIn {
@@ -189,10 +187,10 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
 .search-box svg {
     position: absolute; left: 14px; top: 50%;
     transform: translateY(-50%);
-    width: 18px; height: 18px; color: var(--text-tertiary);
+    width: 20px; height: 20px; color: var(--text-tertiary);
     pointer-events: none;
 }
-.search-box input { padding-left: 42px; margin: 0; }
+.search-box input { padding-left: 44px; margin: 0; }
 
 .progress-bar { background: var(--bg-tertiary); height: 6px; border-radius: 3px; margin-top: 8px; overflow: hidden; }
 .progress-fill { background: var(--gradient-3); height: 100%; border-radius: 3px; transition: width 0.5s ease; }
@@ -473,7 +471,6 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
     margin-left: 8px;
 }
 
-/* SCROLL TO TOP */
 .scroll-top-btn {
     position: fixed;
     bottom: 90px;
@@ -496,7 +493,6 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
 .scroll-top-btn:hover { transform: scale(1.1); }
 .scroll-top-btn svg { width: 20px; height: 20px; }
 
-/* MINI PLAYER */
 .mini-player {
     position: fixed;
     bottom: 70px;
@@ -540,7 +536,6 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
 }
 .mini-player-play svg { width: 16px; height: 16px; }
 
-/* SKELETON LOADING */
 .skeleton {
     background: linear-gradient(90deg, var(--bg-tertiary) 0%, var(--border) 50%, var(--bg-tertiary) 100%);
     background-size: 200% 100%;
@@ -557,9 +552,7 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
 .skeleton-line { height: 14px; margin-bottom: 8px; border-radius: 4px; }
 .skeleton-line.short { width: 60%; }
 .skeleton-line.medium { width: 80%; }
-.skeleton-circle { width: 32px; height: 32px; border-radius: 8px; }
 
-/* PULL TO REFRESH */
 .pull-indicator {
     text-align: center;
     padding: 12px;
@@ -573,7 +566,6 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
 .pull-indicator.visible { display: flex; }
 .pull-indicator svg { width: 16px; height: 16px; animation: pulse 1s infinite; }
 
-/* QUOTE */
 .quote-card {
     background: var(--bg-secondary);
     border: 1px solid var(--glass-border);
@@ -605,6 +597,34 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
     font-size: 12px;
 }
 
+.quote-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 10px;
+}
+.quote-item-text { flex: 1; font-size: 13px; line-height: 1.4; }
+.quote-item-author { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; font-style: italic; }
+.quote-item-delete {
+    background: var(--danger);
+    color: white;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.quote-item-delete svg { width: 14px; height: 14px; }
+
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
 </head>
@@ -612,7 +632,12 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
 
 <div class="app" id="app">
     <div class="header">
-        <button class="icon-btn" onclick="switchTab('profile')" title="Профиль"></button>
+        <button class="icon-btn" onclick="switchTab('profile')" title="Профиль">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+            </svg>
+        </button>
     </div>
 
     <div class="content" id="main-content">
@@ -626,12 +651,12 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
         <div id="tab-favorites" class="tab"></div>
         <div id="tab-progress" class="tab"></div>
         <div id="tab-profile" class="tab"></div>
+        <div id="tab-admin" class="tab"></div>
     </div>
 
     <div class="nav" id="main-nav"></div>
 </div>
 
-<!-- Mini Player -->
 <div class="mini-player" id="mini-player" onclick="openFullPlayer()">
     <div class="mini-player-icon"></div>
     <div class="mini-player-info">
@@ -641,7 +666,6 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
     <button class="mini-player-play" id="mini-play-btn" onclick="event.stopPropagation(); togglePlay()"></button>
 </div>
 
-<!-- Scroll to top -->
 <button class="scroll-top-btn" id="scroll-top-btn" onclick="scrollToTop()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
@@ -669,11 +693,9 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
 <audio id="audio-player"></audio>
 
 <script>
-// ============ КОНФИГУРАЦИЯ АДМИНОВ ============
 const ADMIN_TELEGRAM_IDS = [8690178977];
 
-// ============ ЦИТАТЫ ДНЯ ============
-const QUOTES = [
+const DEFAULT_QUOTES = [
     { text: 'Образование — это самое мощное оружие, которое можно использовать для изменения мира.', author: 'Нельсон Мандела' },
     { text: 'Живи так, будто завтра умрёшь. Учись так, будто будешь жить вечно.', author: 'Махатма Ганди' },
     { text: 'Единственный способ делать великие дела — любить то, что делаешь.', author: 'Стив Джобс' },
@@ -689,31 +711,24 @@ const QUOTES = [
     { text: 'Учение — свет, а неучение — тьма.', author: 'Русская пословица' },
     { text: 'Кто много читает, тот много знает.', author: 'Русская пословица' },
     { text: 'Повторение — мать учения.', author: 'Цицерон' },
-    { text: 'Семь раз отмерь, один раз отрежь.', author: 'Русская пословица' },
     { text: 'Дорогу осилит идущий.', author: 'Русская пословица' },
     { text: 'Знание лучше богатства.', author: 'Русская пословица' },
     { text: 'Век живи — век учись.', author: 'Русская пословица' },
     { text: 'Книга — лучший подарок.', author: 'Русская пословица' },
     { text: 'Не стыдно не знать, стыдно не учиться.', author: 'Русская пословица' },
     { text: 'Ум хорошо, а два лучше.', author: 'Русская пословица' },
-    { text: 'Поспешишь — людей насмешишь.', author: 'Русская пословица' },
-    { text: 'Тише едешь — дальше будешь.', author: 'Русская пословица' },
+    { text: 'Глаза боятся, а руки делают.', author: 'Русская пословица' },
+    { text: 'Кто рано встаёт, тому бог подаёт.', author: 'Русская пословица' },
     { text: 'Без труда не выловишь и рыбку из пруда.', author: 'Русская пословица' },
     { text: 'Делу время, потехе час.', author: 'Русская пословица' },
     { text: 'Семь бед — один ответ.', author: 'Русская пословица' },
-    { text: 'Глаза боятся, а руки делают.', author: 'Русская пословица' },
-    { text: 'Кто рано встаёт, тому бог подаёт.', author: 'Русская пословица' },
-    { text: 'Одна голова хорошо, а две лучше.', author: 'Русская пословица' },
-    { text: 'Слово не воробей, вылетит — не поймаешь.', author: 'Русская пословица' }
+    { text: 'Поспешишь — людей насмешишь.', author: 'Русская пословица' },
+    { text: 'Тише едешь — дальше будешь.', author: 'Русская пословица' },
+    { text: 'Слово не воробей, вылетит — не поймаешь.', author: 'Русская пословица' },
+    { text: 'Семь раз отмерь, один раз отрежь.', author: 'Русская пословица' },
+    { text: 'Одна голова хорошо, а две лучше.', author: 'Русская пословица' }
 ];
 
-function getQuoteOfDay() {
-    const today = new Date();
-    const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
-    return QUOTES[dayOfYear % QUOTES.length];
-}
-
-// ============ SVG ИКОНКИ ============
 const ICONS = {
     home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
     headphones: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
@@ -755,7 +770,6 @@ const ICONS = {
 
 const icon = (name, size = 20) => `<span style="display:inline-flex;width:${size}px;height:${size}px;">${ICONS[name] || ''}</span>`;
 
-// ============ LOCALSTORAGE ============
 const DB = {
     get(key, def = []) {
         try { return JSON.parse(localStorage.getItem('la_' + key)) || def; }
@@ -768,7 +782,6 @@ const DB = {
     }
 };
 
-// ============ STATE ============
 const state = {
     user: null,
     currentTab: 'home',
@@ -786,13 +799,12 @@ const state = {
     playlist: [],
     playlistIndex: -1,
     isPlaying: false,
-    theme: null, // null = системная
+    theme: null,
     pullStartY: 0,
     pullCurrentY: 0,
     isPulling: false
 };
 
-// ============ THEME ============
 function getSystemTheme() {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
@@ -818,7 +830,6 @@ function initTheme() {
     });
 }
 
-// ============ INIT ============
 function init() {
     initTheme();
     checkAdminAccess();
@@ -845,18 +856,19 @@ function init() {
 
 function checkAdminAccess() {
     const tg = window.Telegram?.WebApp;
-    if (tg) {
-        tg.ready();
-        tg.expand();
-        const tgUser = tg.initDataUnsafe?.user;
-        if (tgUser && ADMIN_TELEGRAM_IDS.includes(tgUser.id)) {
-            state.editorMode = true;
-        } else {
-            state.editorMode = false;
-        }
-    } else {
-        state.editorMode = DB.get('editorMode', false);
+    let isAdmin = false;
+    
+    if (tg && tg.initDataUnsafe?.user) {
+        const tgUser = tg.initDataUnsafe.user;
+        isAdmin = ADMIN_TELEGRAM_IDS.includes(tgUser.id);
     }
+    
+    // Для локального тестирования — проверяем сохранённое значение
+    if (!tg) {
+        isAdmin = DB.get('editorMode', false);
+    }
+    
+    state.editorMode = isAdmin;
     updateEditorMode();
 }
 
@@ -866,7 +878,6 @@ function updateEditorMode() {
     else app.classList.remove('editor-mode');
 }
 
-// ============ SKELETON ============
 function showSkeleton() {
     const container = document.getElementById('tab-home');
     container.innerHTML = `
@@ -881,7 +892,6 @@ function showSkeleton() {
     container.classList.add('active');
 }
 
-// ============ NAV ============
 function renderNav() {
     const tabs = [
         { id: 'home', label: 'Главная', icon: 'home' },
@@ -890,6 +900,11 @@ function renderNav() {
         { id: 'favorites', label: 'Избранное', icon: 'heart' },
         { id: 'progress', label: 'Прогресс', icon: 'chart' }
     ];
+    
+    if (state.editorMode) {
+        tabs.push({ id: 'admin', label: 'Админ', icon: 'shield' });
+    }
+    
     document.getElementById('main-nav').innerHTML = tabs.map(t => `
         <button class="nav-btn ${state.currentTab === t.id ? 'active' : ''}" onclick="switchTab('${t.id}')">
             ${icon(t.icon, 22)}
@@ -916,12 +931,12 @@ function renderTab() {
         books: renderBooks,
         favorites: renderFavorites,
         progress: renderProgress,
-        profile: renderProfile
+        profile: renderProfile,
+        admin: renderAdmin
     };
     (map[state.currentTab] || renderHome)();
 }
 
-// ============ UTILS ============
 function escapeHtml(str) {
     if (!str) return '';
     return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -1025,7 +1040,6 @@ function getAllBooks() {
     return flat;
 }
 
-// ============ CONTEXT MENU ============
 function showContextMenu(event, items) {
     event.stopPropagation();
     event.preventDefault();
@@ -1086,7 +1100,6 @@ function closeModal() {
     document.getElementById('modal').classList.remove('active');
 }
 
-// ============ SCROLL TO TOP ============
 function setupScrollListener() {
     window.addEventListener('scroll', () => {
         const btn = document.getElementById('scroll-top-btn');
@@ -1102,7 +1115,6 @@ function scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ============ PULL TO REFRESH ============
 function setupPullToRefresh() {
     const content = document.getElementById('main-content');
     
@@ -1151,7 +1163,6 @@ function setupPullToRefresh() {
     });
 }
 
-// ============ MINI PLAYER ============
 function setupMiniPlayer() {
     const miniPlayer = document.getElementById('mini-player');
     const miniTitle = document.getElementById('mini-title');
@@ -1185,7 +1196,13 @@ function openFullPlayer() {
     }
 }
 
-// ============ ГЛАВНАЯ ============
+function getQuoteOfDay() {
+    const quotes = DB.get('quotes', DEFAULT_QUOTES);
+    const today = new Date();
+    const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+    return quotes[dayOfYear % quotes.length];
+}
+
 function renderHome() {
     const container = document.getElementById('tab-home');
     const progress = DB.get('progress');
@@ -1256,7 +1273,7 @@ function renderHome() {
                     </div>
                     <div class="quick-action-content">
                         <div class="quick-action-title truncate">${escapeHtml(continueItem.title)}</div>
-                        <div class="quick-action-sub">${continueItem.type === 'lesson' ? '⏱ ' + formatDuration(continueItem.duration) : '📄 стр. ' + continueItem.progress.position + ' / ' + continueItem.pages}</div>
+                        <div class="quick-action-sub">${continueItem.type === 'lesson' ? ' ' + formatDuration(continueItem.duration) : '📄 стр. ' + continueItem.progress.position + ' / ' + continueItem.pages}</div>
                         <div class="progress-bar" style="margin-top: 6px;">
                             <div class="progress-fill" style="width: ${continueItem.progress.percent}%"></div>
                         </div>
@@ -1392,7 +1409,6 @@ function openRandomBook() {
     openBook(books[Math.floor(Math.random() * books.length)].id);
 }
 
-// ============ МЕНЮ КОНТЕКСТНЫЕ ============
 function showLessonMenu(event, id) {
     const items = [
         { icon: 'heart', label: isFavorite('lesson', id) ? 'Убрать из избранного' : 'В избранное', action: `toggleFavorite('lesson', ${id}); renderTab();` },
@@ -1458,7 +1474,6 @@ function confirmDeleteCat(id) {
     });
 }
 
-// ============ УРОКИ ============
 function renderLessons() {
     const container = document.getElementById('tab-lessons');
     if (state.currentCategory) renderCategoryView(container, 'lesson');
@@ -1486,7 +1501,7 @@ function renderContentList(container, type) {
         </div>
         
         <div class="search-box">
-            ${icon('search', 18)}
+            ${icon('search', 20)}
             <input type="text" placeholder="Поиск..." value="${escapeHtml(state.searchQuery)}" oninput="handleSearch(this.value)">
         </div>
         
@@ -1557,7 +1572,7 @@ function renderContentList(container, type) {
                     <div class="card" onclick="openCategory(${cat.id})">
                         <button class="card-menu-btn" onclick="event.stopPropagation(); showCategoryMenu(event, ${cat.id})">${icon('moreVertical', 16)}</button>
                         <div class="card-title">
-                            <span style="font-size: 20px;">${cat.emoji || ''}</span>
+                            <span style="font-size: 20px;">${cat.emoji || '📂'}</span>
                             <span style="flex: 1; padding-right: 30px;" class="truncate">${escapeHtml(cat.title)}</span>
                             <span class="badge">${total}</span>
                         </div>
@@ -1683,7 +1698,6 @@ function goBack() {
     renderTab();
 }
 
-// ============ ИЗБРАННОЕ ============
 function renderFavorites() {
     const container = document.getElementById('tab-favorites');
     const favs = DB.get('favorites');
@@ -1723,7 +1737,6 @@ function renderFavorites() {
     container.innerHTML = html;
 }
 
-// ============ АУДИОПЛЕЕР ============
 function openLesson(id) {
     const lesson = getAllLessons().find(l => l.id === id);
     if (!lesson) return;
@@ -1931,7 +1944,7 @@ function completeLesson() {
     if (!state.currentLesson) return;
     saveProgress('lesson', state.currentLesson.id, 100, state.currentLesson.duration, true);
     closeAudio();
-    showToast('🎉 Урок завершён!');
+    showToast(' Урок завершён!');
 }
 
 function closeAudio() {
@@ -1941,7 +1954,6 @@ function closeAudio() {
     renderTab();
 }
 
-// ============ PDF РИДЕР ============
 async function openBook(id) {
     const book = getAllBooks().find(b => b.id === id);
     if (!book) return;
@@ -2062,7 +2074,7 @@ function showBookmarks(bookId) {
     const body = document.getElementById('modal-body');
     body.innerHTML = `
         <div class="modal-title">
-            🔖 Закладки
+             Закладки
             <button class="close-btn" onclick="closeModal()">${icon('x', 16)}</button>
         </div>
         ${bookmarks.length === 0 ? `<div class="empty"><div class="empty-icon">${icon('bookmark', 48)}</div>Нет закладок</div>` : 
@@ -2091,7 +2103,7 @@ function completeBook() {
     if (!state.currentBook) return;
     saveProgress('book', state.currentBook.id, 100, state.currentBook.pages, true);
     closePdf();
-    showToast(' Книга прочитана!');
+    showToast('🎉 Книга прочитана!');
 }
 
 function closePdf() {
@@ -2106,7 +2118,6 @@ function handleFav(type, id) {
     if (type === 'book' && state.currentBook) openBook(id);
 }
 
-// ============ ПРОГРЕСС ============
 function renderProgress() {
     const container = document.getElementById('tab-progress');
     const progress = DB.get('progress');
@@ -2231,7 +2242,6 @@ function getWeekData() {
     return result;
 }
 
-// ============ ПРОФИЛЬ ============
 function renderProfile() {
     const container = document.getElementById('tab-profile');
     const progress = DB.get('progress');
@@ -2303,7 +2313,7 @@ function renderProfile() {
         </div>
         
         <div style="text-align: center; color: var(--text-tertiary); font-size: 12px; margin-top: 20px; padding: 16px;">
-            <div>Уроки и Книги v4.1</div>
+            <div>Уроки и Книги v4.2</div>
             <div style="margin-top: 4px;">Сделано с ❤️</div>
         </div>
     `;
@@ -2314,6 +2324,7 @@ function toggleEditorMode() {
     DB.set('editorMode', state.editorMode);
     updateEditorMode();
     renderProfile();
+    renderNav();
     showToast(state.editorMode ? '🔓 Режим редактора включён' : '🔒 Режим редактора выключен');
 }
 
@@ -2336,7 +2347,94 @@ function resetData() {
     }
 }
 
-// ============ ФОРМЫ РЕДАКТОРА ============
+function renderAdmin() {
+    const container = document.getElementById('tab-admin');
+    const quotes = DB.get('quotes', DEFAULT_QUOTES);
+    
+    let html = `
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+            <button onclick="switchTab('home')" style="background: var(--bg-tertiary); border: none; width: 32px; height: 32px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-primary);">${icon('arrowLeft', 16)}</button>
+            <h2 style="font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                ${icon('shield', 24)} Админ-панель
+            </h2>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">${icon('quote', 14)} Управление цитатами (${quotes.length})</div>
+            <button class="btn btn-primary" onclick="showAddQuoteForm()" style="margin-bottom: 12px;">${icon('plus', 16)} Добавить цитату</button>
+            
+            ${quotes.map((q, i) => `
+                <div class="quote-item">
+                    <div style="flex: 1;">
+                        <div class="quote-item-text">${escapeHtml(q.text)}</div>
+                        <div class="quote-item-author">— ${escapeHtml(q.author)}</div>
+                    </div>
+                    <button class="quote-item-delete" onclick="deleteQuote(${i})">
+                        ${icon('trash', 14)}
+                    </button>
+                </div>
+            `).join('')}
+            
+            <button class="btn btn-secondary" onclick="resetQuotes()" style="margin-top: 12px;">${icon('refresh', 16)} Сбросить к стандартным</button>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+function showAddQuoteForm() {
+    const body = document.getElementById('modal-body');
+    body.innerHTML = `
+        <div class="modal-title">
+            Новая цитата
+            <button class="close-btn" onclick="closeModal()">${icon('x', 16)}</button>
+        </div>
+        <form onsubmit="saveQuote(event)">
+            <label>Текст цитаты *</label>
+            <textarea id="q-text" rows="4" required placeholder="Введите текст цитаты..."></textarea>
+            
+            <label>Автор *</label>
+            <input type="text" id="q-author" required placeholder="Имя автора">
+            
+            <button type="submit" class="btn btn-primary">${icon('check', 16)} Сохранить</button>
+            <button type="button" onclick="closeModal()" class="btn btn-secondary">Отмена</button>
+        </form>
+    `;
+    document.getElementById('modal').classList.add('active');
+}
+
+function saveQuote(e) {
+    e.preventDefault();
+    const text = document.getElementById('q-text').value.trim();
+    const author = document.getElementById('q-author').value.trim();
+    
+    if (!text || !author) return;
+    
+    const quotes = DB.get('quotes', DEFAULT_QUOTES);
+    quotes.push({ text, author });
+    DB.set('quotes', quotes);
+    
+    closeModal();
+    renderAdmin();
+    showToast('✅ Цитата добавлена');
+}
+
+function deleteQuote(index) {
+    const quotes = DB.get('quotes', DEFAULT_QUOTES);
+    quotes.splice(index, 1);
+    DB.set('quotes', quotes);
+    renderAdmin();
+    showToast('🗑 Цитата удалена');
+}
+
+function resetQuotes() {
+    if (confirm('Сбросить все цитаты к стандартным? Ваши добавленные цитаты будут удалены.')) {
+        localStorage.removeItem('la_quotes');
+        renderAdmin();
+        showToast('✨ Цитаты сброшены к стандартным');
+    }
+}
+
 function showCatForm(editId = null, parentId = null) {
     const cat = editId ? findCategory(editId) : null;
     const title = cat ? 'Редактировать раздел' : 'Новый раздел';
@@ -2357,7 +2455,7 @@ function showCatForm(editId = null, parentId = null) {
             <input type="text" id="f-title" value="${cat ? escapeHtml(cat.title) : ''}" required>
             
             <label>Эмодзи</label>
-            <input type="text" id="f-emoji" value="${cat?.emoji || ''}" maxlength="4" placeholder="📂">
+            <input type="text" id="f-emoji" value="${cat?.emoji || ''}" maxlength="4" placeholder="">
             
             <label>Родитель</label>
             <select id="f-parent">${parentOptions}</select>
@@ -2406,7 +2504,7 @@ function showLessonForm(catId = null, editId = null) {
     }
     
     const catOptions = allCats.map(c => 
-        `<option value="${c.id}" ${(lesson?.categoryId || catId) === c.id ? 'selected' : ''}>${c.emoji || '📂'} ${escapeHtml(c.title)}</option>`
+        `<option value="${c.id}" ${(lesson?.categoryId || catId) === c.id ? 'selected' : ''}>${c.emoji || ''} ${escapeHtml(c.title)}</option>`
     ).join('');
     
     document.getElementById('modal-body').innerHTML = `
@@ -2532,7 +2630,6 @@ function saveBook(e, editId) {
     showToast(editId ? '✅ Книга обновлена' : '✅ Книга создана');
 }
 
-// ============ TOAST ============
 function showToast(message) {
     const existing = document.querySelector('.toast');
     if (existing) existing.remove();
@@ -2559,7 +2656,6 @@ function showToast(message) {
     }, 2500);
 }
 
-// ============ СТАРТ ============
 init();
 </script>
 </body>
