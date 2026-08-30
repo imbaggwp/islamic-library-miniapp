@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ru">
-<head>    
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#101214">
@@ -308,6 +308,2892 @@ input,textarea{font:inherit;color:var(--ink)}
 .m-btns .btn{flex:1}
 textarea.ex{width:100%;height:150px;background:var(--card2);border-radius:14px;border:0;padding:12px;font-size:11.5px;font-family:ui-monospace,monospace;color:var(--ink);outline:none;resize:none}
 [data-dark="1"] .bcover img{filter:brightness(.92)}
+/* ===== DARK PREMIUM VARIANT ===== */
+body{
+background:
+radial-gradient(circle at 50% -12%, rgba(112,96,68,.10), transparent 40%),
+radial-gradient(circle at 0% 100%, rgba(44,68,57,.07), transparent 38%),
+var(--bg);
+}
+.card,.home-continue,.home-stat,.home-quick-btn,.tile,.sec-card,.sec-gcard,.lrow,.bcard,.sum,.prof-card{
+background:var(--card);
+border-color:rgba(255,255,255,.055);
+}
+.icbtn{
+background:var(--card2);
+color:var(--ink);
+border:1px solid rgba(255,255,255,.055);
+}
+.home-quote{
+background:linear-gradient(145deg,var(--card),var(--card2));
+border:1px solid rgba(255,255,255,.055);
+}
+.home-continue{
+border:1px solid rgba(255,255,255,.06);
+box-shadow:0 18px 42px -30px rgba(0,0,0,.8);
+}
+.home-continue .hc-play{
+box-shadow:0 10px 28px -13px rgba(244,81,30,.75);
+}
+.home-quick-btn{
+border:1px solid rgba(255,255,255,.055);
+box-shadow:0 12px 30px -25px rgba(0,0,0,.9);
+}
+#tabbar{
+background:var(--tab);
+border:1px solid rgba(255,255,255,.055);
+box-shadow:0 18px 42px -25px rgba(0,0,0,.9);
+}
+.tab.on{
+background:var(--acc);
+color:#fff;
+}
+.tab.on .ic{color:#fff}
+#miniplayer{
+background:var(--card);
+border:1px solid rgba(255,255,255,.055);
+}
+.search-bar input{
+background:var(--card);
+color:var(--ink);
+}
+/* ===== DESIGN V2 — clean mobile / soft cards / navy + orange ===== */
+:root{
+--bg:#101316;
+--card:#171A1D;
+--card2:#20242A;
+--ink:#F1F0EC;
+--ink2:#969A9D;
+--line:#292E32;
+}
+:root{
+--acc:#F4511E;
+--acc-ink:#FFF9F6;
+--acc-soft:rgba(244,81,30,.11);
+--pine:#17352B;
+--pine-ink:#F4F8FC;
+--fd:'Golos Text',system-ui,sans-serif;
+--fb:'Golos Text',system-ui,sans-serif;
+}
+body{font-size:15px;background:var(--bg)}
+.scr{
+padding:calc(env(safe-area-inset-top) + 16px) 16px calc(var(--tb) + 10px);
+}
+.card{
+border:0;
+border-radius:24px;
+box-shadow:0 10px 35px -24px rgba(16,43,74,.34);
+}
+.home-continue,.home-stat,.home-quick-btn,.tile,.sec-card,.sec-gcard,.lrow,.bcard,.sum,.prof-card{
+background:var(--card);
+}
+.icbtn{
+width:44px;height:44px;border-radius:15px;
+border:0;background:var(--card);
+box-shadow:0 8px 22px -16px rgba(16,43,74,.45);
+}
+.btn{border-radius:16px}
+.btn.pr{box-shadow:0 12px 26px -15px var(--acc)}
+.hdr{margin-bottom:16px}
+.hdr-c{margin-bottom:16px}
+.ttl{font-size:23px}
+.kick{letter-spacing:.08em}
+.hquote{
+border:0;border-radius:24px;
+background:var(--card);
+box-shadow:0 10px 35px -24px rgba(16,43,74,.28);
+padding:18px 18px 16px;
+}
+.hquote::before{opacity:.035}
+.tile{
+border:0;border-radius:22px;
+background:var(--card);
+box-shadow:0 10px 30px -23px rgba(16,43,74,.32);
+padding:15px;
+}
+.tile-ic{border-radius:15px}
+.cont{
+border-radius:26px;
+background:linear-gradient(135deg,#102B4A,#183B61);
+box-shadow:0 18px 38px -25px rgba(16,43,74,.7);
+padding:20px;
+}
+.cont::before{opacity:.55}
+.cont-t{font-size:20px;max-width:80%}
+.cont-play{width:50px;height:50px;border-radius:17px;right:18px;bottom:18px}
+.launch-grid{gap:12px}
+.sec-card,.sec-gcard,.lrow,.bcard,.sum,.prof-card{
+border:0;
+box-shadow:0 10px 30px -24px rgba(16,43,74,.32);
+}
+.sec-card,.lrow{border-radius:20px}
+.sec-gcard{border-radius:22px}
+.bcard{border-radius:24px}
+.search-bar input{border:0;background:var(--card);box-shadow:0 8px 24px -20px rgba(16,43,74,.35)}
+#tabbar{
+left:12px;right:12px;
+bottom:calc(10px + env(safe-area-inset-bottom));
+height:62px;
+border:0;
+border-radius:22px;
+background:rgba(255,255,255,.92);
+box-shadow:0 16px 38px -24px rgba(16,43,74,.45);
+padding:5px;
+}
+[data-dark="1"] #tabbar{background:rgba(24,28,34,.92)}
+.tab{
+position:relative;
+border-radius:17px;
+gap:3px;
+font-size:10px;
+transition:background .2s,color .2s,transform .15s;
+}
+.tab.on{
+color:var(--acc-ink);
+background:var(--pine);
+}
+.tab.on .ic{color:var(--acc-ink)}
+.tab:active{transform:scale(.96)}
+#miniplayer{
+border:0;border-radius:20px;
+box-shadow:0 14px 34px -22px rgba(16,43,74,.48);
+}
+#miniplayer .icbtn{box-shadow:none;background:var(--card2)}
+#toast{border-radius:16px}
+.m-card{border-radius:28px 28px 0 0}
+.seg{border-radius:16px}
+.seg button{border-radius:12px}
+.chip,.ep-tab{border-radius:12px}
+.reader{border-radius:22px}
+/* Home V2 */
+.home-v2{padding-bottom:4px}
+.home-head{
+display:flex;align-items:center;justify-content:space-between;
+gap:12px;margin-bottom:18px;
+}
+.home-greet{min-width:0}
+.home-bismillah{
+font-family:'Amiri',serif;
+direction:rtl;
+font-size:20px;
+line-height:1.35;
+font-weight:600;
+color:var(--ink);
+letter-spacing:0;
+margin-bottom:4px;
+}
+.home-eyebrow{
+font-size:12px;color:var(--ink2);margin-bottom:3px;
+}
+.home-name{
+font-size:25px;font-weight:700;line-height:1.12;
+letter-spacing:-.02em;
+}
+.home-actions{display:flex;gap:8px;flex:none}
+.home-actions .icbtn{background:var(--card)}
+.home-quote{
+position:relative;overflow:hidden;
+background:linear-gradient(135deg,#102B4A,#1C4269);
+color:#F7FAFD;border-radius:26px;
+padding:20px;margin-bottom:14px;
+box-shadow:0 18px 38px -25px rgba(16,43,74,.7);
+}
+.home-quote::after{
+content:'';
+position:absolute;width:150px;height:150px;border-radius:50%;
+right:-58px;top:-72px;
+background:rgba(255,255,255,.08);
+}
+.home-quote-t{position:relative;z-index:1;font-size:14px;line-height:1.6;max-width:90%}
+.home-quote-s{position:relative;z-index:1;margin-top:9px;font-size:11px;opacity:.68}
+.home-section-title{
+display:flex;align-items:center;justify-content:space-between;
+margin:20px 2px 10px;
+}
+.home-section-title h2{margin:0;font-size:16px;font-weight:700}
+.home-section-title span{font-size:11px;color:var(--ink2)}
+.home-continue{
+position:relative;overflow:hidden;
+background:var(--card);border-radius:26px;
+padding:18px;margin-bottom:6px;
+box-shadow:0 10px 32px -24px rgba(16,43,74,.35);
+border:1px solid rgba(16,43,74,.045);
+}
+.home-continue .hc-label{
+display:flex;align-items:center;gap:8px;
+color:var(--ink2);font-size:11px;font-weight:700;
+text-transform:uppercase;letter-spacing:.08em;
+}
+.home-continue .hc-title{
+margin:10px 0 4px;
+font-size:18px;font-weight:700;line-height:1.25;
+max-width:78%;
+}
+.home-continue .hc-meta{font-size:12px;color:var(--ink2);max-width:78%;line-height:1.4}
+.home-continue .hc-bar{
+height:5px;background:var(--card2);border-radius:99px;
+overflow:hidden;margin-top:15px;max-width:78%;
+}
+.home-continue .hc-bar i{display:block;height:100%;background:var(--acc);border-radius:99px}
+.home-continue .hc-play{
+position:absolute;right:18px;bottom:18px;
+width:52px;height:52px;border-radius:17px;
+display:grid;place-items:center;
+background:var(--acc);color:var(--acc-ink);
+box-shadow:0 12px 26px -14px var(--acc);
+}
+.home-quick{
+display:grid;grid-template-columns:repeat(4,1fr);gap:9px;
+}
+.home-quick-btn{
+min-width:0;background:var(--card);border-radius:20px;
+padding:13px 6px 11px;
+display:flex;flex-direction:column;align-items:center;gap:8px;
+box-shadow:0 9px 28px -23px rgba(16,43,74,.35);
+transition:transform .15s;
+}
+.home-quick-btn:active{transform:scale(.96)}
+.home-quick-ic{
+width:40px;height:40px;border-radius:14px;
+display:grid;place-items:center;
+}
+.home-quick-ic .ic{width:20px;height:20px}
+.home-quick-t{
+font-size:10.5px;font-weight:600;text-align:center;
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;
+}
+.home-stat{
+display:flex;align-items:center;gap:14px;
+background:var(--card);border-radius:24px;padding:16px 17px;
+box-shadow:0 9px 28px -23px rgba(16,43,74,.35);
+}
+.home-stat-ring{
+width:54px;height:54px;border-radius:50%;
+display:grid;place-items:center;flex:none;
+background:conic-gradient(var(--acc) var(--p,0%),var(--card2) 0);
+position:relative;
+}
+.home-stat-ring::after{
+content:'';position:absolute;inset:6px;border-radius:50%;background:var(--card);
+}
+.home-stat-ring b{position:relative;z-index:1;font-size:13px}
+.home-stat-copy{min-width:0}
+.home-stat-title{font-weight:700;font-size:14px}
+.home-stat-meta{font-size:11.5px;color:var(--ink2);margin-top:3px}
+@media(max-width:370px){
+.home-quick{gap:6px}
+.home-quick-btn{padding-left:3px;padding-right:3px}
+.home-name{font-size:22px}
+}
+/* =========================================================
+PREMIUM DARK DESIGN — inspired by the reference
+========================================================= */
+:root{
+--premium-bg:#17212B;
+--premium-surface:#151719;
+--premium-surface-2:#1B1E21;
+--premium-border:rgba(151,201,171,.13);
+--premium-muted:#969BA1;
+--premium-text:#F2F5F1;
+--premium-orange:#F4511E;
+--premium-orange-soft:rgba(244,81,30,.15);
+}
+body{
+background:
+radial-gradient(900px 500px at 50% -140px,rgba(244,81,30,.16),transparent 65%),
+radial-gradient(700px 500px at 100% 55%,rgba(244,81,30,.10),transparent 65%),
+var(--bg) !important;
+color:var(--premium-text);
+}
+/* Header / top controls */
+.icbtn{
+background:rgba(255,255,255,.045) !important;
+border:1px solid var(--premium-border) !important;
+color:#EDECE9 !important;
+box-shadow:0 10px 25px -18px rgba(0,0,0,.9) !important;
+backdrop-filter:blur(12px);
+}
+/* Main cards */
+.card,
+.home-continue,
+.home-stat,
+.sec-card,
+.sec-gcard,
+.lrow,
+.bcard,
+.sum,
+.prof-card{
+background:linear-gradient(145deg,#17191B,#121416) !important;
+border:1px solid var(--premium-border) !important;
+box-shadow:
+0 20px 50px -34px rgba(0,0,0,.95),
+inset 0 1px 0 rgba(255,255,255,.025) !important;
+}
+/* Continue learning card */
+.home-continue{
+position:relative;
+overflow:hidden;
+}
+.home-continue:before{
+content:"";
+position:absolute;
+width:230px;
+height:230px;
+right:-100px;
+top:-120px;
+border-radius:50%;
+background:rgba(244,81,30,.08);
+filter:blur(18px);
+pointer-events:none;
+}
+.home-continue .hc-play{
+background:var(--premium-orange) !important;
+box-shadow:
+0 12px 35px -12px rgba(244,81,30,.85),
+0 0 0 7px rgba(244,81,30,.07) !important;
+}
+.home-continue .hc-bar{
+background:#292C30 !important;
+}
+.home-continue .hc-fill{
+background:var(--premium-orange) !important;
+}
+/* Quick access — keep the existing buttons/layout, only restyle them */
+.home-quick-btn{
+background:linear-gradient(145deg,#1A1C1F,#141618) !important;
+border:1px solid rgba(255,255,255,.075) !important;
+box-shadow:0 14px 35px -27px rgba(0,0,0,.95) !important;
+color:var(--premium-text) !important;
+}
+.home-quick-btn .ic{
+color:#F2C6B5 !important;
+}
+.home-quick-btn:active{
+transform:scale(.98);
+border-color:rgba(244,81,30,.35) !important;
+}
+/* Section titles / links */
+.sec-title,
+.home-section-title{
+color:var(--premium-text) !important;
+}
+a,.link,.accent,.home-see-all{
+color:var(--premium-orange) !important;
+}
+/* Book/recommendation cards */
+.bcard,.lrow{
+background:linear-gradient(145deg,#191B1E,#141618) !important;
+}
+.bcard:hover,.lrow:hover{
+border-color:rgba(244,81,30,.22) !important;
+}
+/* Bottom navigation */
+#tabbar{
+background:rgba(17,19,21,.92) !important;
+border:1px solid rgba(255,255,255,.07) !important;
+box-shadow:0 -8px 35px -25px rgba(0,0,0,.95) !important;
+backdrop-filter:blur(20px);
+}
+.tab{
+color:#8D9298 !important;
+}
+.tab.on{
+color:#fff !important;
+background:transparent !important;
+}
+.tab.on .ic{
+color:var(--premium-orange) !important;
+filter:drop-shadow(0 5px 10px rgba(244,81,30,.45));
+}
+/* Main floating add button */
+#tabbar .fab,
+.fab{
+background:var(--premium-orange) !important;
+color:#fff !important;
+box-shadow:
+0 12px 32px -10px rgba(244,81,30,.8),
+0 0 0 7px rgba(244,81,30,.055) !important;
+}
+/* Settings */
+.grp-t{
+color:#8F959C !important;
+letter-spacing:.08em;
+}
+.row.card{
+background:linear-gradient(145deg,#17191B,#121416) !important;
+}
+.seg{
+background:#202327 !important;
+border:1px solid rgba(255,255,255,.045) !important;
+}
+.seg button{
+color:#A9AEB4 !important;
+}
+.seg button.on{
+background:#17191C !important;
+color:#fff !important;
+box-shadow:0 3px 10px -7px rgba(0,0,0,.9);
+}
+/* New theme picker cards */
+.appearance-panel{
+background:linear-gradient(145deg,#17191B,#121416) !important;
+}
+.theme-preview{
+border-color:rgba(255,255,255,.09) !important;
+}
+.theme-choice.on .theme-preview{
+border-color:var(--premium-orange) !important;
+box-shadow:0 0 0 2px rgba(244,81,30,.12),0 8px 20px -14px rgba(0,0,0,.8) !important;
+}
+.accent-choice.on span{
+box-shadow:0 0 0 3px #17191B,0 0 0 5px var(--premium-orange) !important;
+}
+/* Inputs/search */
+.search-bar input{
+background:#181A1D !important;
+border:1px solid rgba(255,255,255,.07) !important;
+color:#F4F4F2 !important;
+}
+.search-bar input::placeholder{
+color:#777D84 !important;
+}
+/* Audio player */
+.player-card,
+.audio-card,
+.reader-player{
+background:linear-gradient(145deg,#17191B,#111315) !important;
+border:1px solid rgba(255,255,255,.07) !important;
+}
+.player-progress,
+.audio-progress{
+background:#2B2E32 !important;
+}
+.player-progress .fill,
+.audio-progress .fill{
+background:var(--premium-orange) !important;
+}
+/* Bookmark active state */
+.bookmark.on,
+.bookmark.active,
+[data-bookmark].on{
+color:var(--premium-orange) !important;
+}
+/* Small pills/statuses */
+.badge,.pill{
+background:rgba(244,81,30,.12) !important;
+color:#FF9A78 !important;
+border-color:rgba(244,81,30,.18) !important;
+}
+/* Scrollbars */
+*{
+scrollbar-color:#30343A transparent;
+}
+/* Mobile spacing */
+@media(max-width:560px){
+body{
+background:
+radial-gradient(500px 300px at 50% -90px,rgba(62,150,96,.10),transparent 70%),
+var(--bg) !important;
+}
+}
+/* =========================================================
+V11 — FULL REFERENCE DESIGN
+Visual direction: premium black / graphite / orange
+========================================================= */
+:root{
+--acc:#F4511E;
+--acc-ink:#FFF8F4;
+--acc-soft:rgba(244,81,30,.14);
+--bg:#0B0D0F;
+--card:#151719;
+--card2:#1B1E21;
+--ink:#F4F3F0;
+--ink2:#969BA1;
+--line:rgba(255,255,255,.075);
+--wv:rgba(255,255,255,.18);
+--tab:rgba(15,17,19,.94);
+--sh:0 20px 50px -34px rgba(0,0,0,.95);
+--sh-s:0 10px 25px -18px rgba(0,0,0,.9);
+}
+html,body{
+background:var(--bg) !important;
+background-color:#17212B !important;
+}
+body{
+font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Inter","Segoe UI",sans-serif !important;
+color:#F4F3F0 !important;
+font-size:15px;
+letter-spacing:-.01em;
+}
+.ambient{
+background:
+radial-gradient(620px 420px at 85% -5%,rgba(244,81,30,.065),transparent 64%),
+radial-gradient(560px 420px at -10% 105%,rgba(90,100,110,.035),transparent 62%) !important;
+}
+.girih{
+opacity:.025 !important;
+}
+/* Screen shell */
+.scr{
+padding:
+calc(env(safe-area-inset-top) + 18px)
+max(18px,calc((100vw - 620px)/2))
+calc(98px + env(safe-area-inset-bottom)) !important;
+}
+.scr.on{
+display:block;
+}
+/* Generic surfaces */
+.card,.tile,.sec-card,.sec-gcard,.lrow,.bcard,.sum,.prof-card,.home-stat,
+.cont,.quote,.hquote{
+background:linear-gradient(145deg,#181A1D,#121416) !important;
+border:1px solid rgba(255,255,255,.07) !important;
+box-shadow:0 18px 45px -34px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,.02) !important;
+}
+.icbtn{
+width:42px !important;
+height:42px !important;
+border-radius:14px !important;
+display:grid !important;
+place-items:center !important;
+background:#181A1D !important;
+border:1px solid rgba(255,255,255,.07) !important;
+color:#F1EFEB !important;
+}
+.icbtn .ic{width:20px;height:20px}
+/* ===== Reference home ===== */
+.home-v3{
+max-width:620px;
+margin:0 auto;
+padding-bottom:18px;
+}
+.ref-head{
+height:48px;
+display:grid;
+grid-template-columns:48px 1fr 48px;
+align-items:center;
+gap:8px;
+margin-bottom:25px;
+}
+.ref-bismillah{
+text-align:center;
+direction:rtl;
+white-space:nowrap;
+font-family:'Amiri',serif;
+font-size:23px;
+line-height:1;
+font-weight:400;
+color:#F5F1EC;
+transform:translateY(1px);
+}
+.ref-icon{
+width:42px;
+height:42px;
+border-radius:50%;
+display:grid;
+place-items:center;
+color:#E9E5DF;
+background:rgba(255,255,255,.045);
+border:1px solid rgba(255,255,255,.08);
+position:relative;
+box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+.ref-icon .ic{width:22px;height:22px}
+.ref-bell i{
+position:absolute;
+width:7px;
+height:7px;
+border-radius:50%;
+right:3px;
+top:3px;
+background:var(--acc);
+box-shadow:0 0 0 3px #101214;
+}
+.ref-section{margin-bottom:27px}
+.ref-title-row{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+margin-bottom:12px;
+}
+.ref-title-row h2{
+margin:0;
+font-size:19px;
+line-height:1.2;
+font-weight:600;
+letter-spacing:-.025em;
+color:#F2F1EE;
+}
+.ref-see{
+color:var(--acc);
+font-size:14px;
+font-weight:500;
+}
+.ref-continue{
+width:100%;
+min-height:142px;
+display:flex;
+align-items:center;
+gap:16px;
+padding:13px;
+text-align:left;
+border-radius:18px;
+background:linear-gradient(145deg,#181A1D,#121416);
+border:1px solid rgba(255,255,255,.075);
+box-shadow:0 20px 45px -33px rgba(0,0,0,.95);
+position:relative;
+overflow:hidden;
+}
+.ref-continue:before{
+content:"";
+position:absolute;
+width:180px;height:180px;
+right:-110px;top:-110px;
+border-radius:50%;
+background:rgba(244,81,30,.06);
+filter:blur(15px);
+}
+.ref-cover{
+width:112px;
+height:112px;
+flex:0 0 112px;
+border-radius:14px;
+overflow:hidden;
+background:
+linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.025)),
+radial-gradient(circle at 35% 30%,#A99479,transparent 38%),
+linear-gradient(150deg,#403D35,#17191B);
+display:grid;
+place-items:center;
+color:#D7C6B0;
+}
+.ref-cover img{
+width:100%;height:100%;object-fit:cover;display:block;
+}
+.ref-cover .ic{width:34px;height:34px}
+.ref-cont-body{
+min-width:0;
+flex:1;
+padding-right:40px;
+}
+.ref-cont-title{
+font-size:17px;
+line-height:1.25;
+font-weight:600;
+color:#F4F2EE;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+.ref-cont-time{
+margin-top:8px;
+color:#B0B3B6;
+font-size:14px;
+}
+.ref-progress{
+position:relative;
+height:5px;
+margin-top:16px;
+border-radius:99px;
+background:#2B2E32;
+overflow:visible;
+}
+.ref-progress i{
+display:block;
+height:100%;
+border-radius:99px;
+background:var(--acc);
+box-shadow:0 0 14px rgba(244,81,30,.28);
+}
+.ref-progress b{
+position:absolute;
+top:50%;
+left:calc(var(--progress,0%));
+width:13px;height:13px;
+border-radius:50%;
+background:var(--acc);
+transform:translate(-50%,-50%);
+box-shadow:0 0 0 4px rgba(244,81,30,.08);
+}
+.ref-play{
+position:absolute;
+right:15px;
+bottom:17px;
+width:48px;
+height:48px;
+border-radius:50%;
+display:grid;
+place-items:center;
+color:#fff;
+background:var(--acc);
+box-shadow:0 10px 28px -10px rgba(244,81,30,.9);
+}
+.ref-play .ic{width:20px;height:20px}
+.ref-continue.empty .ref-cover{opacity:.8}
+/* Quick access exactly six compact tiles */
+.ref-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+}
+.ref-tile{
+min-height:108px;
+border-radius:15px;
+padding:17px 10px 13px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:11px;
+color:#F0EFEC;
+background:linear-gradient(145deg,#181A1D,#131517);
+border:1px solid rgba(255,255,255,.075);
+box-shadow:0 14px 30px -27px rgba(0,0,0,.95);
+transition:transform .15s,border-color .15s;
+}
+.ref-tile:active{
+transform:scale(.975);
+border-color:rgba(244,81,30,.3);
+}
+.ref-tile-ic{
+width:35px;height:35px;
+display:grid;
+place-items:center;
+color:var(--tile-color);
+}
+.ref-tile-ic .ic{width:28px;height:28px}
+.ref-tile>span:last-child{
+font-size:14px;
+font-weight:500;
+}
+/* Recommendation */
+.ref-book{
+width:100%;
+min-height:124px;
+display:flex;
+align-items:center;
+gap:16px;
+text-align:left;
+padding:12px;
+border-radius:17px;
+background:linear-gradient(145deg,#181A1D,#131517);
+border:1px solid rgba(255,255,255,.075);
+}
+.ref-book-cover{
+width:80px;height:100px;
+flex:0 0 80px;
+border-radius:7px;
+overflow:hidden;
+background:#29241D;
+display:grid;
+place-items:center;
+color:#C5B59C;
+}
+.ref-book-cover img{width:100%;height:100%;object-fit:cover}
+.ref-book-cover .ic{width:32px;height:32px}
+.ref-book-copy{
+min-width:0;
+flex:1;
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+.ref-book-copy strong{
+font-size:16px;
+line-height:1.3;
+font-weight:600;
+color:#F1EFEB;
+}
+.ref-book-copy span{
+color:#9EA2A7;
+font-size:13px;
+}
+.ref-book-arrow{
+color:#A5A9AE;
+}
+.ref-book-arrow .ic{width:21px;height:21px}
+.ref-bottom-space{height:10px}
+/* ===== Bottom navigation ===== */
+#tabbar{
+left:50% !important;
+right:auto !important;
+bottom:max(10px,env(safe-area-inset-bottom)) !important;
+transform:translateX(-50%);
+width:min(620px,calc(100% - 24px)) !important;
+height:72px !important;
+padding:7px 8px !important;
+border-radius:24px !important;
+background:rgba(20,22,24,.92) !important;
+border:1px solid rgba(255,255,255,.08) !important;
+box-shadow:0 20px 50px -24px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,.025) !important;
+backdrop-filter:blur(22px);
+-webkit-backdrop-filter:blur(22px);
+z-index:50;
+}
+#tabbar .tab{
+color:#8E9399 !important;
+border-radius:17px !important;
+}
+#tabbar .tab.on{
+color:var(--acc) !important;
+background:rgba(244,81,30,.10) !important;
+}
+#tabbar .tab .ic{
+width:22px;height:22px;
+}
+#tabbar .tab.on .ic{
+filter:drop-shadow(0 5px 10px rgba(244,81,30,.42));
+}
+#tabbar .fab{
+width:56px !important;
+height:56px !important;
+border-radius:50% !important;
+background:var(--acc) !important;
+color:#fff !important;
+box-shadow:0 14px 32px -9px rgba(244,81,30,.85),0 0 0 7px rgba(244,81,30,.06) !important;
+}
+/* ===== Settings / theme chooser ===== */
+.appearance-panel{
+background:linear-gradient(145deg,#151719,#101214) !important;
+border:1px solid rgba(255,255,255,.075) !important;
+border-radius:24px !important;
+padding:22px !important;
+}
+.theme-grid{
+display:grid !important;
+grid-template-columns:repeat(5,1fr) !important;
+gap:12px !important;
+}
+.theme-preview{
+height:118px !important;
+border-radius:20px !important;
+border:1px solid rgba(255,255,255,.10) !important;
+box-shadow:0 15px 30px -23px rgba(0,0,0,.95) !important;
+}
+.theme-choice.on .theme-preview{
+border-color:var(--acc) !important;
+box-shadow:0 0 0 2px rgba(244,81,30,.12),0 15px 30px -23px rgba(0,0,0,.95) !important;
+}
+.theme-choice strong{
+display:block;
+margin-top:4px;
+font-size:13px !important;
+font-weight:500 !important;
+}
+.accent-grid{gap:16px !important}
+.accent-choice span{
+width:44px !important;
+height:44px !important;
+}
+.appearance-label{
+font-size:16px !important;
+}
+.appearance-divider{
+margin:24px 0 !important;
+}
+/* ===== Other screens inherit the same visual language ===== */
+.hdr,.p-top,.r-top{
+color:#F2F1EE;
+}
+.ttl,h1,h2,h3{
+letter-spacing:-.025em;
+}
+.row,.list-row,.book-row{
+background:linear-gradient(145deg,#181A1D,#131517) !important;
+border-color:rgba(255,255,255,.07) !important;
+}
+.chip,.pill,.badge{
+background:#1D2024 !important;
+border:1px solid rgba(255,255,255,.07) !important;
+color:#C9CDD1 !important;
+}
+button:focus-visible{
+outline:2px solid rgba(244,81,30,.55);
+outline-offset:2px;
+}
+/* Player */
+#scr-player .p-play,#scr-player .play,#p-playbtn{
+background:var(--acc) !important;
+color:#fff !important;
+box-shadow:0 16px 35px -12px rgba(244,81,30,.85) !important;
+}
+#scr-player input[type=range]::-webkit-slider-thumb{
+background:var(--acc) !important;
+}
+#scr-player input[type=range]::-moz-range-thumb{
+background:var(--acc) !important;
+}
+/* Reader bookmark */
+#r-bm.bm-on,
+.bookmark.bm-on,
+.bookmark.active{
+color:var(--acc) !important;
+}
+/* Modals */
+.m-card{
+background:#151719 !important;
+border:1px solid rgba(255,255,255,.08) !important;
+box-shadow:0 -20px 60px -30px rgba(0,0,0,.95) !important;
+}
+.m-ttl{color:#F4F3F0 !important}
+.m-txt{color:#9EA3A9 !important}
+/* Responsive */
+@media(max-width:560px){
+.scr{
+padding-left:16px !important;
+padding-right:16px !important;
+}
+.home-v3{max-width:none}
+.ref-bismillah{font-size:21px}
+.ref-continue{min-height:128px;padding:11px}
+.ref-cover{width:96px;height:96px;flex-basis:96px}
+.ref-cont-title{font-size:15px}
+.ref-play{width:44px;height:44px;right:12px;bottom:13px}
+.ref-grid{gap:8px}
+.ref-tile{min-height:102px;padding:14px 8px 12px}
+.ref-tile>span:last-child{font-size:13px}
+.ref-book-cover{width:72px;height:90px;flex-basis:72px}
+.theme-grid{grid-template-columns:repeat(3,1fr) !important}
+}
+@media(max-width:380px){
+.ref-bismillah{font-size:18px}
+.ref-icon{width:39px;height:39px}
+.ref-head{grid-template-columns:42px 1fr 42px}
+.ref-tile{min-height:96px}
+}
+/* V12 requested refinements */
+.ref-head{
+grid-template-columns:42px 1fr auto !important;
+}
+.ref-head-actions{
+display:flex;
+align-items:center;
+gap:7px;
+}
+.ref-bismillah{
+font-family:'Noto Sans Arabic','Segoe UI',Arial,sans-serif !important;
+font-size:20px !important;
+font-weight:500 !important;
+letter-spacing:-.035em;
+line-height:1.1;
+}
+.ref-home-quote{
+margin-top:-3px;
+margin-bottom:25px;
+}
+.ref-home-quote .hquote-t{
+font-style:normal;
+font-size:14px;
+line-height:1.65;
+color:#E7E5E1;
+}
+.ref-home-quote .hquote-s{
+font-size:11px;
+color:#858A90;
+}
+.ref-continue-no-cover{
+min-height:126px !important;
+padding:20px 72px 20px 20px !important;
+}
+.ref-continue-no-cover .ref-cont-body{
+padding-right:0 !important;
+}
+.ref-continue-no-cover .ref-cont-title{
+font-size:18px;
+}
+.ref-continue-no-cover .ref-cont-time{
+margin-top:7px;
+}
+.ref-continue-no-cover .ref-progress{
+margin-top:20px;
+}
+.ref-connect-grid{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:10px;
+}
+.ref-connect-grid .btn{
+width:100%;
+padding:11px 12px;
+font-size:13px;
+}
+@media(max-width:560px){
+.ref-bismillah{font-size:18px !important}
+.ref-continue-no-cover{min-height:118px !important}
+}
+@media(max-width:380px){
+.ref-bismillah{font-size:16px !important}
+.ref-head-actions{gap:4px}
+.ref-icon{width:39px;height:39px}
+}
+/* V13 navigation/contact fixes */
+.ref-connect-grid{
+display:grid !important;
+grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+gap:10px !important;
+}
+.ref-connect-grid .btn{
+width:100% !important;
+min-height:44px;
+}
+/* V14 — clean 3-option theme selector */
+.theme-grid.theme-grid-3{
+display:grid !important;
+grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+gap:14px !important;
+width:100% !important;
+align-items:stretch !important;
+}
+.theme-grid.theme-grid-3 .theme-choice{
+min-width:0 !important;
+width:100% !important;
+display:flex !important;
+flex-direction:column !important;
+align-items:center !important;
+justify-content:flex-start !important;
+gap:10px !important;
+padding:0 !important;
+background:transparent !important;
+border:0 !important;
+color:var(--ink) !important;
+}
+.theme-grid.theme-grid-3 .theme-preview{
+width:100% !important;
+height:118px !important;
+display:block !important;
+overflow:hidden !important;
+border-radius:18px !important;
+}
+.theme-grid.theme-grid-3 .theme-choice strong{
+margin:0 !important;
+font-size:15px !important;
+line-height:1.2 !important;
+text-align:center !important;
+}
+.theme-grid.theme-grid-3 .theme-choice.on .theme-preview{
+border-color:var(--acc) !important;
+box-shadow:0 0 0 2px rgba(244,81,30,.14),0 12px 25px -20px rgba(0,0,0,.9) !important;
+}
+@media(max-width:420px){
+.appearance-panel{padding:16px !important}
+.theme-grid.theme-grid-3{gap:8px !important}
+.theme-grid.theme-grid-3 .theme-preview{height:92px !important;border-radius:14px !important}
+.theme-grid.theme-grid-3 .theme-choice strong{font-size:13px !important}
+}
+/* =========================================================
+V15 — working application themes
+The previous premium design used hard-coded dark colors,
+which visually masked theme changes. These rules bind the
+main UI to the selected theme variables.
+========================================================= */
+html[data-theme="light"] body,
+html[data-theme="light"] .scr{
+background:var(--bg) !important;
+color:var(--ink) !important;
+}
+html[data-theme="light"] .card,
+html[data-theme="light"] .home-continue,
+html[data-theme="light"] .home-stat,
+html[data-theme="light"] .home-quick-btn,
+html[data-theme="light"] .tile,
+html[data-theme="light"] .sec-card,
+html[data-theme="light"] .sec-gcard,
+html[data-theme="light"] .lrow,
+html[data-theme="light"] .bcard,
+html[data-theme="light"] .sum,
+html[data-theme="light"] .prof-card,
+html[data-theme="light"] .appearance-panel{
+background:var(--card) !important;
+color:var(--ink) !important;
+border-color:var(--line) !important;
+box-shadow:var(--sh) !important;
+}
+html[data-theme="light"] .row,
+html[data-theme="light"] .list-row,
+html[data-theme="light"] .book-row,
+html[data-theme="light"] .quote,
+html[data-theme="light"] .home-quote{
+background:var(--card) !important;
+color:var(--ink) !important;
+border-color:var(--line) !important;
+}
+html[data-theme="light"] .icbtn,
+html[data-theme="light"] #tabbar{
+background:var(--tab) !important;
+color:var(--ink) !important;
+border-color:var(--line) !important;
+}
+html[data-theme="light"] .tab,
+html[data-theme="light"] .p-side,
+html[data-theme="light"] .appearance-hint,
+html[data-theme="light"] .appearance-label span{
+color:var(--ink2) !important;
+}
+html[data-theme="light"] .ttl,
+html[data-theme="light"] h1,
+html[data-theme="light"] h2,
+html[data-theme="light"] h3,
+html[data-theme="light"] .grp-t,
+html[data-theme="light"] .row-t,
+html[data-theme="light"] .row-m,
+html[data-theme="light"] .home-section-title,
+html[data-theme="light"] .sec-title,
+html[data-theme="light"] .theme-choice strong{
+color:var(--ink) !important;
+}
+html[data-theme="light"] .theme-preview{
+border-color:rgba(23,32,42,.12) !important;
+}
+html[data-theme="light"] .theme-preview.dark{
+background:linear-gradient(145deg,#17191b,#0f1113) !important;
+}
+html[data-theme="light"] .theme-preview.light{
+background:linear-gradient(145deg,#ffffff,#e8ebee) !important;
+}
+html[data-theme="light"] .theme-preview.auto{
+background:linear-gradient(90deg,#17191b 0 50%,#f4f5f6 50% 100%) !important;
+}
+/* Dark theme */
+html[data-theme="dark"] body,
+html[data-theme="dark"] .scr{
+background:var(--bg) !important;
+color:var(--ink) !important;
+}
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .home-continue,
+html[data-theme="dark"] .home-stat,
+html[data-theme="dark"] .home-quick-btn,
+html[data-theme="dark"] .tile,
+html[data-theme="dark"] .sec-card,
+html[data-theme="dark"] .sec-gcard,
+html[data-theme="dark"] .lrow,
+html[data-theme="dark"] .bcard,
+html[data-theme="dark"] .sum,
+html[data-theme="dark"] .prof-card,
+html[data-theme="dark"] .appearance-panel{
+background:var(--card) !important;
+color:var(--ink) !important;
+border-color:var(--line) !important;
+}
+html[data-theme="dark"] .row,
+html[data-theme="dark"] .list-row,
+html[data-theme="dark"] .book-row,
+html[data-theme="dark"] .quote,
+html[data-theme="dark"] .home-quote,
+html[data-theme="dark"] .icbtn,
+html[data-theme="dark"] #tabbar{
+background:var(--card) !important;
+color:var(--ink) !important;
+border-color:var(--line) !important;
+}
+/* Auto follows the effective Telegram/system scheme. */
+html[data-theme="auto"] body,
+html[data-theme="auto"] .scr{
+background:var(--bg) !important;
+color:var(--ink) !important;
+}
+/* Theme selector itself — unmistakable selection state. */
+.theme-grid.theme-grid-3 .theme-choice{
+cursor:pointer !important;
+position:relative !important;
+border-radius:18px !important;
+}
+.theme-grid.theme-grid-3 .theme-choice .theme-preview{
+border:2px solid var(--line) !important;
+box-sizing:border-box !important;
+transition:border-color .18s ease, box-shadow .18s ease, transform .18s ease !important;
+}
+.theme-grid.theme-grid-3 .theme-choice.on{
+color:var(--acc) !important;
+}
+.theme-grid.theme-grid-3 .theme-choice.on .theme-preview{
+border-color:var(--acc) !important;
+box-shadow:0 0 0 3px var(--acc-soft),0 12px 28px -18px rgba(0,0,0,.65) !important;
+transform:translateY(-1px);
+}
+.theme-grid.theme-grid-3 .theme-choice:active .theme-preview{
+transform:scale(.98);
+}
+/* Accent choices use the same working handler/state. */
+.accent-choice{cursor:pointer !important}
+/* V16 — clean appearance settings: only Auto / Dark / Light */
+.theme-grid.theme-grid-3{
+display:grid !important;
+grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+gap:14px !important;
+width:100% !important;
+margin:0 !important;
+}
+.theme-grid.theme-grid-3 .theme-choice{
+min-width:0 !important;
+width:100% !important;
+padding:12px !important;
+}
+.appearance-panel{
+overflow:hidden !important;
+}
+/* Prevent the mixed light/dark look shown in the screenshot.
+The selected theme controls the whole app surface. */
+html[data-theme="light"] body,
+html[data-theme="light"] .scr,
+html[data-theme="light"] #app{
+background:var(--bg) !important;
+color:var(--ink) !important;
+}
+html[data-theme="dark"] body,
+html[data-theme="dark"] .scr,
+html[data-theme="dark"] #app{
+background:var(--bg) !important;
+color:var(--ink) !important;
+}
+/* V16.1 — remove the mixed light-background/dark-card appearance */
+html[data-theme="light"] .home-quote{
+background:var(--card) !important;
+color:var(--ink) !important;
+border:1px solid var(--line) !important;
+box-shadow:var(--sh) !important;
+}
+html[data-theme="light"] .home-quote-t,
+html[data-theme="light"] .home-quote-s{
+color:var(--ink) !important;
+}
+html[data-theme="light"] .home-continue,
+html[data-theme="light"] .tile,
+html[data-theme="light"] .home-quick-btn,
+html[data-theme="light"] .sec-card,
+html[data-theme="light"] .sec-gcard,
+html[data-theme="light"] .lrow,
+html[data-theme="light"] .bcard,
+html[data-theme="light"] .sum,
+html[data-theme="light"] .prof-card,
+html[data-theme="light"] .cont{
+background:var(--card) !important;
+color:var(--ink) !important;
+border-color:var(--line) !important;
+box-shadow:var(--sh) !important;
+}
+html[data-theme="light"] .cont{
+background:var(--card) !important;
+}
+html[data-theme="light"] #tabbar{
+background:var(--tab) !important;
+color:var(--ink) !important;
+}
+html[data-theme="light"] .tab{
+color:var(--ink2) !important;
+}
+html[data-theme="light"] .tab.on{
+background:var(--acc) !important;
+color:#fff !important;
+}
+html[data-theme="light"] .tab.on .ic{
+color:#fff !important;
+}
+/* =========================================================
+V18 — FINAL LIGHT THEME OVERRIDE
+Fixes legacy hard-coded dark V11/V12 styles overriding
+the actual selected light theme.
+========================================================= */
+html[data-theme="light"] body{
+background:var(--bg) !important;
+color:var(--ink) !important;
+}
+html[data-theme="light"] .scr{
+background:transparent !important;
+color:var(--ink) !important;
+}
+/* Home header */
+html[data-theme="light"] .ref-head,
+html[data-theme="light"] .ref-head *{
+color:var(--ink) !important;
+}
+html[data-theme="light"] .ref-bismillah{
+color:var(--ink) !important;
+}
+html[data-theme="light"] .ref-icon{
+color:var(--ink2) !important;
+background:rgba(255,255,255,.72) !important;
+border-color:var(--line) !important;
+box-shadow:0 4px 14px -10px rgba(20,30,40,.25) !important;
+}
+html[data-theme="light"] .ref-bismillah{
+font-family:system-ui,-apple-system,"Segoe UI",sans-serif !important;
+font-size:20px !important;
+font-weight:500 !important;
+letter-spacing:0 !important;
+}
+/* Quote */
+html[data-theme="light"] .hquote,
+html[data-theme="light"] .ref-home-quote{
+background:var(--card) !important;
+color:var(--ink) !important;
+border:1px solid var(--line) !important;
+box-shadow:var(--sh) !important;
+}
+html[data-theme="light"] .hquote-t{
+color:var(--ink) !important;
+}
+html[data-theme="light"] .hquote-s{
+color:var(--ink2) !important;
+}
+/* Section headings */
+html[data-theme="light"] .ref-title-row h2,
+html[data-theme="light"] .ref-section h2{
+color:var(--ink) !important;
+}
+/* Continue learning */
+html[data-theme="light"] .ref-continue{
+background:var(--card) !important;
+color:var(--ink) !important;
+border:1px solid var(--line) !important;
+box-shadow:var(--sh) !important;
+}
+html[data-theme="light"] .ref-continue:before{
+opacity:.25;
+}
+html[data-theme="light"] .ref-cont-title{
+color:var(--ink) !important;
+}
+html[data-theme="light"] .ref-cont-time{
+color:var(--ink2) !important;
+}
+html[data-theme="light"] .ref-progress{
+background:var(--card2) !important;
+}
+html[data-theme="light"] .ref-progress i{
+background:var(--acc) !important;
+}
+/* Quick access */
+html[data-theme="light"] .ref-tile{
+background:var(--card) !important;
+color:var(--ink) !important;
+border:1px solid var(--line) !important;
+box-shadow:var(--sh) !important;
+}
+html[data-theme="light"] .ref-tile>span:last-child{
+color:var(--ink) !important;
+}
+html[data-theme="light"] .ref-tile-ic{
+filter:none !important;
+}
+/* Recommendation */
+html[data-theme="light"] .ref-book{
+background:var(--card) !important;
+color:var(--ink) !important;
+border:1px solid var(--line) !important;
+box-shadow:var(--sh) !important;
+}
+html[data-theme="light"] .ref-book-copy strong{
+color:var(--ink) !important;
+}
+html[data-theme="light"] .ref-book-copy span,
+html[data-theme="light"] .ref-book-arrow{
+color:var(--ink2) !important;
+}
+html[data-theme="light"] .ref-book-cover{
+background:var(--card2) !important;
+color:var(--ink2) !important;
+}
+/* Bottom navigation */
+html[data-theme="light"] #tabbar{
+background:rgba(255,255,255,.92) !important;
+border:1px solid var(--line) !important;
+box-shadow:0 18px 42px -25px rgba(30,40,50,.28) !important;
+}
+html[data-theme="light"] #tabbar .tab{
+color:var(--ink2) !important;
+}
+html[data-theme="light"] #tabbar .tab.on{
+background:var(--acc) !important;
+color:#fff !important;
+}
+html[data-theme="light"] #tabbar .tab.on .ic{
+color:#fff !important;
+}
+/* Generic cards on all light-theme screens */
+html[data-theme="light"] .card,
+html[data-theme="light"] .row,
+html[data-theme="light"] .list-row,
+html[data-theme="light"] .book-row,
+html[data-theme="light"] .quote,
+html[data-theme="light"] .cont,
+html[data-theme="light"] .sec-card,
+html[data-theme="light"] .sec-gcard,
+html[data-theme="light"] .lrow,
+html[data-theme="light"] .bcard,
+html[data-theme="light"] .sum,
+html[data-theme="light"] .prof-card,
+html[data-theme="light"] .m-card,
+html[data-theme="light"] .appearance-panel{
+background:var(--card) !important;
+color:var(--ink) !important;
+border-color:var(--line) !important;
+box-shadow:var(--sh) !important;
+}
+/* Generic text that was hard-coded white by the old design */
+html[data-theme="light"] .ttl,
+html[data-theme="light"] h1,
+html[data-theme="light"] h2,
+html[data-theme="light"] h3,
+html[data-theme="light"] .row-t,
+html[data-theme="light"] .row-m,
+html[data-theme="light"] .quote-t,
+html[data-theme="light"] .quote-s,
+html[data-theme="light"] .cont-t,
+html[data-theme="light"] .cont-m{
+color:var(--ink) !important;
+}
+/* Appearance screen — only three theme choices */
+html[data-theme="light"] .theme-choice{
+background:var(--card) !important;
+color:var(--ink) !important;
+border-color:var(--line) !important;
+}
+html[data-theme="light"] .theme-choice strong{
+color:var(--ink) !important;
+}
+html[data-theme="light"] .theme-choice.on{
+border-color:var(--acc) !important;
+}
+/* Keep dark theme as intended */
+html[data-theme="dark"] .ref-bismillah{
+color:var(--ink) !important;
+}
+/* =========================================================
+V19 — LIGHT / AUTO CONTRAST FIX
+The light theme must not leave dark components behind.
+========================================================= */
+/* Strong, readable light palette */
+html[data-theme="light"],
+html[data-theme="auto"][data-dark="99"]{
+--bg:#EEF0F3 !important;
+--card:#FFFFFF !important;
+--card2:#F6F7F9 !important;
+--ink:#171A1E !important;
+--ink2:#68717A !important;
+--line:rgba(23,26,30,.12) !important;
+--wv:rgba(23,26,30,.18) !important;
+--tab:rgba(28,32,37,.97) !important;
+--acc:#F4511E !important;
+--acc-ink:#FFFFFF !important;
+--acc-soft:rgba(244,81,30,.14) !important;
+--sh:0 18px 42px -30px rgba(25,31,38,.28) !important;
+--sh-s:0 8px 20px -14px rgba(25,31,38,.20) !important;
+}
+/* Page / screens */
+html[data-theme="light"] body,
+html[data-theme="light"] .scr,
+html[data-theme="auto"][data-dark="99"] body,
+html[data-theme="auto"][data-dark="99"] .scr{
+background:var(--bg) !important;
+color:var(--ink) !important;
+}
+/* All major cards: no black cards in light mode */
+html[data-theme="light"] .card,
+html[data-theme="light"] .tile,
+html[data-theme="light"] .sec-card,
+html[data-theme="light"] .sec-gcard,
+html[data-theme="light"] .lrow,
+html[data-theme="light"] .bcard,
+html[data-theme="light"] .sum,
+html[data-theme="light"] .prof-card,
+html[data-theme="light"] .home-stat,
+html[data-theme="light"] .cont,
+html[data-theme="light"] .quote,
+html[data-theme="light"] .hquote,
+html[data-theme="light"] .home-quote,
+html[data-theme="light"] .ref-continue,
+html[data-theme="light"] .ref-tile,
+html[data-theme="light"] .ref-card,
+html[data-theme="light"] .appearance-panel,
+html[data-theme="auto"][data-dark="99"] .card,
+html[data-theme="auto"][data-dark="99"] .tile,
+html[data-theme="auto"][data-dark="99"] .sec-card,
+html[data-theme="auto"][data-dark="99"] .sec-gcard,
+html[data-theme="auto"][data-dark="99"] .lrow,
+html[data-theme="auto"][data-dark="99"] .bcard,
+html[data-theme="auto"][data-dark="99"] .sum,
+html[data-theme="auto"][data-dark="99"] .prof-card,
+html[data-theme="auto"][data-dark="99"] .home-stat,
+html[data-theme="auto"][data-dark="99"] .cont,
+html[data-theme="auto"][data-dark="99"] .quote,
+html[data-theme="auto"][data-dark="99"] .hquote,
+html[data-theme="auto"][data-dark="99"] .home-quote,
+html[data-theme="auto"][data-dark="99"] .ref-continue,
+html[data-theme="auto"][data-dark="99"] .ref-tile,
+html[data-theme="auto"][data-dark="99"] .ref-card,
+html[data-theme="auto"][data-dark="99"] .appearance-panel{
+background:var(--card) !important;
+color:var(--ink) !important;
+border-color:var(--line) !important;
+box-shadow:var(--sh) !important;
+}
+/* Text that was hard-coded white */
+html[data-theme="light"] .ref-bismillah,
+html[data-theme="light"] .ref-title-row h2,
+html[data-theme="light"] .ref-cont-title,
+html[data-theme="light"] .home-quote-t,
+html[data-theme="light"] .home-quote-s,
+html[data-theme="light"] .row-t,
+html[data-theme="light"] .grp-t,
+html[data-theme="light"] .h2,
+html[data-theme="light"] h1,
+html[data-theme="light"] h2,
+html[data-theme="light"] h3,
+html[data-theme="light"] .ttl,
+html[data-theme="light"] .theme-choice strong,
+html[data-theme="auto"][data-dark="99"] .ref-bismillah,
+html[data-theme="auto"][data-dark="99"] .ref-title-row h2,
+html[data-theme="auto"][data-dark="99"] .ref-cont-title,
+html[data-theme="auto"][data-dark="99"] .home-quote-t,
+html[data-theme="auto"][data-dark="99"] .home-quote-s,
+html[data-theme="auto"][data-dark="99"] .row-t,
+html[data-theme="auto"][data-dark="99"] .grp-t,
+html[data-theme="auto"][data-dark="99"] .h2,
+html[data-theme="auto"][data-dark="99"] h1,
+html[data-theme="auto"][data-dark="99"] h2,
+html[data-theme="auto"][data-dark="99"] h3,
+html[data-theme="auto"][data-dark="99"] .ttl,
+html[data-theme="auto"][data-dark="99"] .theme-choice strong{
+color:var(--ink) !important;
+}
+/* Secondary text */
+html[data-theme="light"] .ref-cont-time,
+html[data-theme="light"] .row-m,
+html[data-theme="light"] .appearance-label span,
+html[data-theme="light"] .appearance-hint,
+html[data-theme="light"] .p-side,
+html[data-theme="light"] .tab,
+html[data-theme="auto"][data-dark="99"] .ref-cont-time,
+html[data-theme="auto"][data-dark="99"] .row-m,
+html[data-theme="auto"][data-dark="99"] .appearance-label span,
+html[data-theme="auto"][data-dark="99"] .appearance-hint,
+html[data-theme="auto"][data-dark="99"] .p-side,
+html[data-theme="auto"][data-dark="99"] .tab{
+color:var(--ink2) !important;
+}
+/* Header / circular controls */
+html[data-theme="light"] .ref-icon,
+html[data-theme="light"] .icbtn,
+html[data-theme="auto"][data-dark="99"] .ref-icon,
+html[data-theme="auto"][data-dark="99"] .icbtn{
+background:#FFFFFF !important;
+color:var(--ink) !important;
+border-color:var(--line) !important;
+box-shadow:0 6px 18px -12px rgba(25,31,38,.28) !important;
+}
+/* Quick-access tiles and their icons */
+html[data-theme="light"] .ref-tile,
+html[data-theme="light"] .home-quick-btn,
+html[data-theme="light"] .tile,
+html[data-theme="auto"][data-dark="99"] .ref-tile,
+html[data-theme="auto"][data-dark="99"] .home-quick-btn,
+html[data-theme="auto"][data-dark="99"] .tile{
+background:#FFFFFF !important;
+color:var(--ink) !important;
+border:1px solid var(--line) !important;
+}
+html[data-theme="light"] .ref-tile .ic,
+html[data-theme="light"] .home-quick-btn .ic,
+html[data-theme="auto"][data-dark="99"] .ref-tile .ic,
+html[data-theme="auto"][data-dark="99"] .home-quick-btn .ic{
+color:var(--acc) !important;
+}
+/* Bottom navigation */
+html[data-theme="light"] #tabbar,
+html[data-theme="auto"][data-dark="99"] #tabbar{
+background:rgba(255,255,255,.97) !important;
+color:var(--ink) !important;
+border-color:var(--line) !important;
+box-shadow:0 12px 30px -18px rgba(25,31,38,.32) !important;
+}
+html[data-theme="light"] #tabbar .tab,
+html[data-theme="auto"][data-dark="99"] #tabbar .tab{
+color:#737C85 !important;
+}
+html[data-theme="light"] #tabbar .tab.on,
+html[data-theme="auto"][data-dark="99"] #tabbar .tab.on{
+background:rgba(244,81,30,.12) !important;
+color:var(--acc) !important;
+}
+html[data-theme="light"] #tabbar .tab.on .ic,
+html[data-theme="auto"][data-dark="99"] #tabbar .tab.on .ic{
+color:var(--acc) !important;
+}
+/* Progress bars */
+html[data-theme="light"] .ref-progress,
+html[data-theme="auto"][data-dark="99"] .ref-progress{
+background:#D8DDE2 !important;
+}
+html[data-theme="light"] .ref-progress i,
+html[data-theme="light"] .ref-progress b,
+html[data-theme="auto"][data-dark="99"] .ref-progress i,
+html[data-theme="auto"][data-dark="99"] .ref-progress b{
+background:var(--acc) !important;
+}
+/* Search / inputs / chips */
+html[data-theme="light"] input,
+html[data-theme="light"] textarea,
+html[data-theme="light"] select,
+html[data-theme="light"] .chip,
+html[data-theme="auto"][data-dark="99"] input,
+html[data-theme="auto"][data-dark="99"] textarea,
+html[data-theme="auto"][data-dark="99"] select,
+html[data-theme="auto"][data-dark="99"] .chip{
+background:#FFFFFF !important;
+color:var(--ink) !important;
+border-color:var(--line) !important;
+}
+html[data-theme="light"] input::placeholder,
+html[data-theme="light"] textarea::placeholder,
+html[data-theme="auto"][data-dark="99"] input::placeholder,
+html[data-theme="auto"][data-dark="99"] textarea::placeholder{
+color:#8A929A !important;
+}
+/* Theme selector cards */
+html[data-theme="light"] .theme-choice,
+html[data-theme="auto"][data-dark="99"] .theme-choice{
+color:var(--ink) !important;
+}
+html[data-theme="light"] .theme-choice .theme-preview,
+html[data-theme="auto"][data-dark="99"] .theme-choice .theme-preview{
+border-color:rgba(23,26,30,.16) !important;
+}
+/* Never let a legacy hard-coded white/dark foreground disappear */
+html[data-theme="light"] .ic,
+html[data-theme="auto"][data-dark="99"] .ic{
+color:inherit;
+}
+html[data-theme="light"] .ref-icon .ic,
+html[data-theme="auto"][data-dark="99"] .ref-icon .ic{
+color:var(--ink) !important;
+}
+/* Keep the light mode accent orange, not the old red/pink accent. */
+html[data-theme="light"],
+html[data-theme="auto"][data-dark="99"]{
+--acc:#F4511E !important;
+--acc-ink:#FFFFFF !important;
+--acc-soft:rgba(244,81,30,.14) !important;
+}
+/* Auto must use the same readable light rules when Telegram reports light. */
+html[data-theme="auto"][data-dark="99"]{
+color-scheme:light !important;
+}
+html[data-theme="dark"]{
+color-scheme:dark !important;
+}
+/* =========================================================
+V20 — AUTO FOLLOWS PHONE / TELEGRAM THEME
+Auto uses Telegram/device colors instead of a forced bright palette.
+========================================================= */
+html[data-theme="auto"]{
+color-scheme:light dark;
+}
+html[data-theme="auto"][data-dark="0"] body,
+html[data-theme="auto"][data-dark="0"] .scr{
+color:var(--ink) !important;
+}
+html[data-theme="auto"][data-dark="0"] h1,
+html[data-theme="auto"][data-dark="0"] h2,
+html[data-theme="auto"][data-dark="0"] h3,
+html[data-theme="auto"][data-dark="0"] .ttl,
+html[data-theme="auto"][data-dark="0"] .row-t,
+html[data-theme="auto"][data-dark="0"] .grp-t,
+html[data-theme="auto"][data-dark="0"] .ref-cont-title,
+html[data-theme="auto"][data-dark="0"] .ref-bismillah{
+color:var(--ink) !important;
+}
+html[data-theme="auto"][data-dark="0"] .row-m,
+html[data-theme="auto"][data-dark="0"] .ref-cont-time,
+html[data-theme="auto"][data-dark="0"] .appearance-hint,
+html[data-theme="auto"][data-dark="0"] .appearance-label span{
+color:var(--ink2) !important;
+}
+html[data-theme="auto"][data-dark="0"] .icbtn,
+html[data-theme="auto"][data-dark="0"] .ref-icon{
+color:var(--ink) !important;
+background:var(--card) !important;
+border-color:var(--line) !important;
+}
+/* V21 — unified darker neutral surfaces */
+:root{
+--surface-deep:#15181C;
+--surface:#1A1D21;
+--surface-card:#20242A;
+--surface-soft:#2A2F36;
+--surface-line:rgba(255,255,255,.09);
+}
+body,
+.scr,
+main,
+.app,
+.page,
+.view,
+.content{
+background-color:var(--bg);
+}
+.card,
+.panel,
+.section,
+.modal,
+.sheet,
+.search-panel,
+.settings-card,
+.list-card{
+background-color:var(--card);
+border-color:var(--line);
+}
+/* V22 — unified quick-access icon color + cleaner quote typography */
+.ref-tile-ic{
+color:var(--acc) !important;
+}
+.ref-tile-ic .ic{
+color:inherit !important;
+stroke:currentColor !important;
+}
+.hquote-t{
+font-family:'Golos Text',system-ui,sans-serif !important;
+font-size:16px !important;
+line-height:1.55 !important;
+font-style:normal !important;
+font-weight:500 !important;
+letter-spacing:-.01em;
+}
+.hquote-s{
+font-family:'Golos Text',system-ui,sans-serif !important;
+font-style:normal !important;
+font-weight:400 !important;
+letter-spacing:0 !important;
+}
+/* V23 — Требуй знания! */
+.bismillah,
+.hero-bismillah,
+.home-bismillah {
+font-family: 'Golos Text', system-ui, sans-serif !important;
+font-size: clamp(20px, 2.2vw, 28px) !important;
+line-height: 1.2 !important;
+font-weight: 600 !important;
+letter-spacing: -0.02em !important;
+font-style: normal !important;
+}
+/* V24 — правильное расположение восклицательного знака */
+.bismillah,
+.hero-bismillah,
+.home-bismillah {
+direction: ltr !important;
+unicode-bidi: plaintext !important;
+}
+/* V25 — fix actual home heading direction and typography */
+.ref-bismillah{
+direction:ltr !important;
+unicode-bidi:isolate !important;
+text-align:center !important;
+font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif !important;
+font-size:20px !important;
+line-height:1.2 !important;
+font-weight:500 !important;
+font-style:normal !important;
+letter-spacing:-0.015em !important;
+white-space:nowrap !important;
+}
+/* V26 — description for Telegram reminders */
+.remind-info{
+margin: -2px 2px 14px;
+color: var(--muted, #8f969f);
+font-size: 13px;
+line-height: 1.5;
+max-width: 620px;
+}
+/* V27 — нижняя навигация: иконка и подпись одного цвета */
+.tab{
+color:var(--ink2) !important;
+}
+.tab .ic{
+color:var(--ink2) !important;
+}
+.tab.on{
+color:var(--acc) !important;
+background:rgba(244,81,30,.12) !important;
+}
+.tab.on .ic{
+color:var(--acc) !important;
+filter:none !important;
+}
+/* V28 — все кнопки нижней навигации одного цвета */
+.bottom-nav .tab,
+.bottom-nav .tab .ic,
+.bottom-nav .tab.on,
+.bottom-nav .tab.on .ic{
+color:#8E9399 !important;
+filter:none !important;
+}
+/* V29 — новая светлая тема + минималистичный заголовок + компактная цитата */
+html[data-theme="light"],
+html[data-theme="auto"][data-dark="99"]{
+--bg:#E7E8E9 !important;
+--card:#F0F1F2 !important;
+--card2:#E2E4E6 !important;
+--ink:#202326 !important;
+--ink2:#6F7479 !important;
+--line:rgba(32,35,38,.12) !important;
+--wv:rgba(32,35,38,.18) !important;
+--tab:#D9DBDD !important;
+--acc:#F4511E !important;
+--acc-ink:#FFFFFF !important;
+--acc-soft:rgba(244,81,30,.12) !important;
+--sh:0 16px 36px -28px rgba(32,35,38,.28) !important;
+--sh-s:0 8px 18px -14px rgba(32,35,38,.18) !important;
+}
+/* Светлый фон без чистого белого */
+html[data-theme="light"] body,
+html[data-theme="light"] .scr,
+html[data-theme="auto"][data-dark="99"] body,
+html[data-theme="auto"][data-dark="99"] .scr{
+background:var(--bg) !important;
+color:var(--ink) !important;
+}
+/* Карточки и внутренние поверхности */
+html[data-theme="light"] .card,
+html[data-theme="light"] .tile,
+html[data-theme="light"] .sec-card,
+html[data-theme="light"] .sec-gcard,
+html[data-theme="light"] .lrow,
+html[data-theme="light"] .bcard,
+html[data-theme="light"] .sum,
+html[data-theme="light"] .prof-card,
+html[data-theme="light"] .home-stat,
+html[data-theme="light"] .cont,
+html[data-theme="light"] .ref-continue,
+html[data-theme="light"] .ref-tile,
+html[data-theme="light"] .ref-card,
+html[data-theme="light"] .appearance-panel,
+html[data-theme="auto"][data-dark="99"] .card,
+html[data-theme="auto"][data-dark="99"] .tile,
+html[data-theme="auto"][data-dark="99"] .sec-card,
+html[data-theme="auto"][data-dark="99"] .sec-gcard,
+html[data-theme="auto"][data-dark="99"] .lrow,
+html[data-theme="auto"][data-dark="99"] .bcard,
+html[data-theme="auto"][data-dark="99"] .sum,
+html[data-theme="auto"][data-dark="99"] .prof-card,
+html[data-theme="auto"][data-dark="99"] .home-stat,
+html[data-theme="auto"][data-dark="99"] .cont,
+html[data-theme="auto"][data-dark="99"] .ref-continue,
+html[data-theme="auto"][data-dark="99"] .ref-tile,
+html[data-theme="auto"][data-dark="99"] .ref-card,
+html[data-theme="auto"][data-dark="99"] .appearance-panel{
+background:var(--card) !important;
+color:var(--ink) !important;
+border-color:var(--line) !important;
+}
+/* Строгий минималистичный заголовок */
+.ref-bismillah{
+font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif !important;
+font-size:18px !important;
+line-height:1.2 !important;
+font-weight:500 !important;
+letter-spacing:-.02em !important;
+font-style:normal !important;
+direction:ltr !important;
+text-align:center !important;
+color:#F5F1EC !important;
+}
+html[data-theme="light"] .ref-bismillah,
+html[data-theme="auto"][data-dark="99"] .ref-bismillah{
+color:#202326 !important;
+}
+@media(max-width:560px){
+.ref-bismillah{font-size:17px !important}
+}
+@media(max-width:380px){
+.ref-bismillah{font-size:16px !important}
+}
+/* Небольшая элегантная цитата */
+.ref-home-quote{
+margin:0 auto 22px !important;
+padding:16px 18px 14px !important;
+border-radius:18px !important;
+max-width:620px !important;
+}
+.ref-home-quote .hquote-t{
+font-family:'Golos Text',system-ui,sans-serif !important;
+font-size:14px !important;
+line-height:1.5 !important;
+font-weight:500 !important;
+font-style:normal !important;
+letter-spacing:-.01em !important;
+}
+.ref-home-quote .hquote-s{
+margin-top:9px !important;
+font-size:11px !important;
+line-height:1.35 !important;
+font-weight:400 !important;
+}
+html[data-theme="light"] .ref-home-quote,
+html[data-theme="auto"][data-dark="99"] .ref-home-quote{
+background:#F0F1F2 !important;
+color:#202326 !important;
+border-color:rgba(32,35,38,.12) !important;
+box-shadow:0 12px 28px -22px rgba(32,35,38,.30) !important;
+}
+html[data-theme="light"] .ref-home-quote .hquote-t,
+html[data-theme="auto"][data-dark="99"] .ref-home-quote .hquote-t{
+color:#202326 !important;
+}
+html[data-theme="light"] .ref-home-quote .hquote-s,
+html[data-theme="auto"][data-dark="99"] .ref-home-quote .hquote-s{
+color:#6F7479 !important;
+}
+/* V29 — все основные светлые текстовые элементы читаемы */
+html[data-theme="light"] h1,
+html[data-theme="light"] h2,
+html[data-theme="light"] h3,
+html[data-theme="light"] .ttl,
+html[data-theme="light"] .grp-t,
+html[data-theme="light"] .row-t,
+html[data-theme="auto"][data-dark="99"] h1,
+html[data-theme="auto"][data-dark="99"] h2,
+html[data-theme="auto"][data-dark="99"] h3,
+html[data-theme="auto"][data-dark="99"] .ttl,
+html[data-theme="auto"][data-dark="99"] .grp-t,
+html[data-theme="auto"][data-dark="99"] .row-t{
+color:#202326 !important;
+}
+html[data-theme="light"] .row-m,
+html[data-theme="light"] .appearance-hint,
+html[data-theme="light"] .appearance-label span,
+html[data-theme="auto"][data-dark="99"] .row-m,
+html[data-theme="auto"][data-dark="99"] .appearance-hint,
+html[data-theme="auto"][data-dark="99"] .appearance-label span{
+color:#6F7479 !important;
+}
+/* V30 — компактнее кнопки «Быстрого доступа» */
+.ref-grid{
+gap:9px !important;
+}
+.ref-tile{
+min-height:96px !important;
+padding:12px 8px 10px !important;
+border-radius:14px !important;
+gap:8px !important;
+}
+.ref-tile-ic{
+width:31px !important;
+height:31px !important;
+}
+.ref-tile-ic .ic{
+width:25px !important;
+height:25px !important;
+}
+.ref-tile>span:last-child{
+font-size:13px !important;
+font-weight:500 !important;
+}
+@media(max-width:560px){
+.ref-grid{gap:8px !important}
+.ref-tile{
+min-height:94px !important;
+padding:11px 7px 9px !important;
+}
+}
+@media(max-width:380px){
+.ref-tile{
+min-height:90px !important;
+padding:10px 6px 8px !important;
+}
+.ref-tile-ic{
+width:29px !important;
+height:29px !important;
+}
+.ref-tile-ic .ic{
+width:24px !important;
+height:24px !important;
+}
+}
+/* V34 — выравнивание кнопок «Прочитано» в карточках книг */
+.bcard{display:flex !important;flex-direction:column !important;height:100% !important;}
+.bmeta{display:flex !important;flex:1 1 auto !important;flex-direction:column !important;}
+.brow{margin-top:auto !important;}
+/* V31 — книги: три обложки в ряд */
+.bgrid{
+grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+gap:14px 10px !important;
+}
+.bcover{
+width:100% !important;
+aspect-ratio:3/4 !important;
+border-radius:12px !important;
+padding:10px 9px !important;
+}
+.bc-t{
+font-size:11px !important;
+line-height:1.25 !important;
+}
+.bc-a{
+font-size:9px !important;
+margin-top:4px !important;
+}
+.bc-open{
+width:24px !important;
+height:24px !important;
+top:7px !important;
+right:7px !important;
+border-radius:7px !important;
+}
+.bmeta{
+padding:7px 1px 0 !important;
+}
+.bt{
+font-size:11.5px !important;
+line-height:1.25 !important;
+}
+.ba{
+font-size:10px !important;
+margin:3px 0 6px !important;
+}
+.brow{
+gap:4px !important;
+}
+.chip{
+font-size:9.5px !important;
+padding:5px 7px !important;
+}
+@media(max-width:380px){
+.bgrid{
+gap:12px 7px !important;
+}
+.bcover{
+border-radius:10px !important;
+padding:8px 7px !important;
+}
+.bc-t{font-size:10px !important}
+.bc-a{font-size:8px !important}
+.bt{font-size:10.5px !important}
+.ba{font-size:9px !important}
+.chip{
+font-size:9px !important;
+padding:4px 6px !important;
+}
+}
+/* V32 — понятное состояние кнопки «Прочитано» */
+.chip{
+transition:background-color .18s ease,color .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.chip.on{
+background:var(--acc) !important;
+color:#fff !important;
+border-color:var(--acc) !important;
+box-shadow:0 5px 14px -9px rgba(244,81,30,.75);
+}
+.chip.on .ic{
+color:#fff !important;
+stroke:currentColor !important;
+}
+/* V33 — календарь активности в разделе «Прогресс» */
+.activity-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--card2);padding:4px;border-radius:11px;margin-bottom:14px}
+.activity-tabs button{border:0;background:transparent;color:var(--ink2);padding:8px 6px;border-radius:8px;font:600 12px var(--fb);cursor:pointer}
+.activity-tabs button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 5px rgba(0,0,0,.18)}
+.activity-year{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 12px}
+.activity-month{min-width:0}
+.activity-month-title{font:700 12px var(--fd);color:var(--ink);margin-bottom:7px}
+.activity-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;color:var(--ink2);font-size:8px;text-align:center}
+.activity-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+.activity-grid i,.activity-week i{display:block;aspect-ratio:1;border-radius:3px;min-width:0;cursor:pointer}
+.activity-grid i.muted{opacity:.24}
+.activity-grid i.on-day,.activity-week i.on-day{outline:2px solid var(--acc);outline-offset:1px}
+.activity-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.activity-week-labels{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:6px;color:var(--ink2);font-size:10px;text-align:center}
+@media(max-width:560px){.activity-year{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 10px}.activity-grid{gap:2px}.activity-week{gap:6px}.activity-week-labels{gap:6px}}
+/* v71: lock Continue Learning play button to the lower-right corner */
+.cont .cont-play{
+position:absolute !important;
+left:auto !important;
+top:auto !important;
+right:18px !important;
+bottom:18px !important;
+width:54px !important;
+height:54px !important;
+border-radius:50% !important;
+margin:0 !important;
+}
+@media (max-width:520px){
+.cont .cont-play{
+right:16px !important;
+bottom:16px !important;
+width:52px !important;
+height:52px !important;
+}
+}
+</style>
+<style id="v36-book-card-alignment">
+/* V36 — одинаковая высота карточек книг и ровная нижняя линия */
+.bgrid{
+align-items:stretch !important;
+}
+.bcard{
+display:grid !important;
+grid-template-rows:auto minmax(112px,1fr) !important;
+align-self:stretch !important;
+height:100% !important;
+min-height:0 !important;
+}
+.bmeta{
+display:flex !important;
+flex-direction:column !important;
+min-height:112px !important;
+height:100% !important;
+padding:9px 2px 0 !important;
+}
+.bt{
+min-height:34px !important;
+max-height:34px !important;
+overflow:hidden !important;
+display:-webkit-box !important;
+-webkit-line-clamp:2 !important;
+-webkit-box-orient:vertical !important;
+}
+.ba{
+min-height:29px !important;
+max-height:29px !important;
+overflow:hidden !important;
+display:-webkit-box !important;
+-webkit-line-clamp:2 !important;
+-webkit-box-orient:vertical !important;
+margin:3px 0 8px !important;
+}
+.brow{
+margin-top:auto !important;
+min-height:38px !important;
+height:38px !important;
+align-items:center !important;
+flex-wrap:nowrap !important;
+}
+.brow .chip{
+flex:none !important;
+white-space:nowrap !important;
+}
+.brow .heart{
+flex:none !important;
+margin-left:auto !important;
+}
+@media(max-width:380px){
+.bcard{grid-template-rows:auto minmax(104px,1fr) !important}
+.bmeta{min-height:104px !important}
+.bt{min-height:30px !important;max-height:30px !important}
+.ba{min-height:25px !important;max-height:25px !important}
+.brow{min-height:34px !important;height:34px !important}
+}
+</style>
+<style id="v38-books-no-contours-final">
+/* V38 — библиотека: убираем видимые контуры карточек книг */
+.bcard{
+background:transparent !important;
+border:0 !important;
+outline:0 !important;
+box-shadow:none !important;
+border-radius:0 !important;
+}
+.bcard:hover{
+border:0 !important;
+outline:0 !important;
+box-shadow:none !important;
+}
+.bcover{
+border:0 !important;
+outline:0 !important;
+box-shadow:0 12px 28px -20px rgba(0,0,0,.9) !important;
+}
+.bcover::before{
+display:none !important;
+}
+</style>
+<style id="v39-book-card-border-kill">
+/* V39 — полностью убираем контур контейнера книги.
+Контур оставляем только у самой обложки, если он задан её изображением/стилем. */
+html body .bgrid > .bcard,
+html body .bgrid > .bcard:hover,
+html body .bgrid > .bcard:focus,
+html body .bgrid > .bcard:active {
+border: none !important;
+border-width: 0 !important;
+border-style: none !important;
+border-color: transparent !important;
+outline: none !important;
+outline-width: 0 !important;
+box-shadow: none !important;
+background: transparent !important;
+background-image: none !important;
+border-radius: 0 !important;
+}
+html body .bgrid > .bcard::before,
+html body .bgrid > .bcard::after {
+content: none !important;
+display: none !important;
+border: 0 !important;
+box-shadow: none !important;
+}
+/* Убираем возможный контур и у оболочки обложки; сама цветная обложка остаётся. */
+html body .bgrid > .bcard .bcover {
+border: none !important;
+outline: none !important;
+box-shadow: none !important;
+}
+html body .bgrid > .bcard .bcover::before,
+html body .bgrid > .bcard .bcover::after {
+content: none !important;
+display: none !important;
+border: 0 !important;
+}
+/* =========================================================
+V40 — DARK GREEN / ISLAMIC MINIMAL THEME
+========================================================= */
+html[data-dark="1"] body{
+background:
+radial-gradient(850px 520px at 50% -160px,rgba(244,81,30,.12),transparent 66%),
+radial-gradient(700px 520px at 100% 55%,rgba(244,81,30,.08),transparent 68%),
+#17212B !important;
+color:#F2F4F0 !important;
+}
+html[data-dark="1"] .ambient{
+background:
+radial-gradient(620px 420px at 108% -8%,rgba(244,81,30,.10),transparent 62%),
+radial-gradient(560px 420px at -18% 112%,rgba(244,81,30,.08),transparent 60%) !important;
+}
+html[data-dark="1"] .girih{
+opacity:.035 !important;
+background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'%3E%3Cg fill='none' stroke='%2367A77F' stroke-width='1.1'%3E%3Crect x='45' y='45' width='60' height='60'/%3E%3Crect x='45' y='45' width='60' height='60' transform='rotate(45 75 75)'/%3E%3Cpath d='M75 0v30M75 120v30M0 75h30M120 75h30'/%3E%3Ccircle cx='75' cy='75' r='7'/%3E%3C/g%3E%3C/svg%3E") !important;
+}
+html[data-dark="1"] .card,
+html[data-dark="1"] .home-continue,
+html[data-dark="1"] .home-stat,
+html[data-dark="1"] .home-quick-btn,
+html[data-dark="1"] .tile,
+html[data-dark="1"] .sec-card,
+html[data-dark="1"] .sec-gcard,
+html[data-dark="1"] .lrow,
+html[data-dark="1"] .bcard,
+html[data-dark="1"] .sum,
+html[data-dark="1"] .prof-card,
+html[data-dark="1"] .appearance-panel{
+background:linear-gradient(145deg,#13201B,#101914) !important;
+border-color:rgba(255,255,255,.10) !important;
+box-shadow:0 20px 50px -34px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,.025) !important;
+}
+html[data-dark="1"] .icbtn{
+background:rgba(31,51,43,.72) !important;
+border-color:rgba(255,255,255,.10) !important;
+color:#EAF0EB !important;
+}
+html[data-dark="1"] .home-quote,
+html[data-dark="1"] .hquote{
+background:linear-gradient(145deg,#15241D,#101914) !important;
+border-color:rgba(255,255,255,.10) !important;
+}
+html[data-dark="1"] .home-continue:before{
+background:rgba(65,155,96,.08) !important;
+}
+html[data-dark="1"] .home-continue .hc-play,
+html[data-dark="1"] .cont-play,
+html[data-dark="1"] .p-play,
+html[data-dark="1"] .fab,
+html[data-dark="1"] #tabbar .fab{
+background:#F4511E !important;
+box-shadow:0 12px 35px -12px rgba(244,81,30,.60),0 0 0 7px rgba(244,81,30,.055) !important;
+}
+html[data-dark="1"] .home-continue .hc-bar,
+html[data-dark="1"] .bar,
+html[data-dark="1"] .home-quick-btn .bar{
+background:#24362D !important;
+}
+html[data-dark="1"] .home-continue .hc-fill,
+html[data-dark="1"] .bar i,
+html[data-dark="1"] .wave:after,
+html[data-dark="1"] .wave i{
+background:#FF7A45 !important;
+}
+html[data-dark="1"] .home-quick-btn{
+background:linear-gradient(145deg,#17241F,#111A16) !important;
+color:#F2F4F0 !important;
+}
+html[data-dark="1"] .home-quick-btn .ic,
+html[data-dark="1"] .home-quick-btn .ic *{
+color:#DCE8DF !important;
+}
+html[data-dark="1"] .home-quick-btn:active{border-color:rgba(255,122,69,.35) !important}
+html[data-dark="1"] .tab{color:#8E9A93 !important}
+html[data-dark="1"] .tab.on{color:#F2F4F0 !important;background:rgba(244,81,30,.16) !important}
+html[data-dark="1"] .tab.on .ic{color:#FF7A45 !important;filter:drop-shadow(0 5px 10px rgba(244,81,30,.28))}
+html[data-dark="1"] a,
+html[data-dark="1"] .link,
+html[data-dark="1"] .accent,
+html[data-dark="1"] .home-see-all{color:#FF7A45 !important}
+html[data-dark="1"] .chip.on,
+html[data-dark="1"] .btn.on-attach,
+html[data-dark="1"] .addbtn{background:rgba(244,81,30,.14) !important;color:#FF7A45 !important}
+html[data-dark="1"] .btn.pr,
+html[data-dark="1"] .ep-tab.on{background:#F4511E !important;color:#F5FFF8 !important}
+html[data-dark="1"] .seg button.on{background:#17231D !important;color:#F2F4F0 !important}
+html[data-dark="1"] .seg{background:#1B2922 !important;border-color:rgba(255,255,255,.08) !important}
+html[data-dark="1"] #tabbar{background:rgba(13,22,18,.94) !important;border-color:rgba(255,255,255,.10) !important}
+html[data-dark="1"] #miniplayer{background:rgba(18,31,25,.96) !important;border-color:rgba(255,255,255,.10) !important}
+html[data-dark="1"] .activity-tabs,
+html[data-dark="1"] .activity-month,
+html[data-dark="1"] .st-sec{background:linear-gradient(145deg,#13201B,#101914) !important}
+html[data-dark="1"] .activity-tabs button.on{background:#1A3024 !important;color:#F2F4F0 !important}
+html[data-dark="1"] .heat-cell.selected,
+html[data-dark="1"] .week-cell.selected,
+html[data-dark="1"] .activity-grid i.selected{outline-color:#FF7A45 !important}
+html[data-dark="1"] .sw.on{background:#F4511E !important;border-color:#F4511E !important}
+html[data-dark="1"] .sw::after{background:#EEF5F0 !important}
+html[data-dark="1"] .hint{background:rgba(244,81,30,.10) !important;color:#E7F0EA !important}
+/* =========================================================
+V43 — OCTAGONAL / STAR ISLAMIC PATTERN
+Sixth visual variant: graphite background + subtle
+octagons and eight-point stars. Dark mode only.
+========================================================= */
+html[data-dark="1"]{
+--bg:#101316 !important;
+--card:#171A1D !important;
+--card2:#20242A !important;
+--ink:#F1F0EC !important;
+--ink2:#969A9D !important;
+--line:#292E32 !important;
+--acc:#F4511E !important;
+--acc-ink:#FFF9F6 !important;
+--acc-soft:rgba(244,81,30,.11) !important;
+--pine:#18352B !important;
+--pine-ink:#F1F4F0 !important;
+}
+html[data-dark="1"] body{
+background:
+radial-gradient(720px 500px at 50% -170px,rgba(118,101,68,.105),transparent 68%),
+radial-gradient(620px 500px at 100% 70%,rgba(53,76,63,.065),transparent 70%),
+#101316 !important;
+color:#F1F0EC !important;
+}
+html[data-dark="1"] .ambient{
+background:
+radial-gradient(620px 420px at 108% -8%,rgba(145,112,65,.075),transparent 64%),
+radial-gradient(560px 420px at -18% 112%,rgba(57,83,69,.055),transparent 62%) !important;
+}
+html[data-dark="1"] .girih{
+opacity:.075 !important;
+background-size:190px 190px !important;
+background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='190' height='190' viewBox='0 0 190 190'%3E%3Cg fill='none' stroke='%237A705D' stroke-width='1.05' opacity='.8'%3E%3Cpath d='M95 27L118 33L137 47L148 68L148 92L137 113L118 127L95 133L72 127L53 113L42 92L42 68L53 47L72 33Z'/%3E%3Cpath d='M95 48L112 53L125 65L132 82L132 96L125 113L112 125L95 130L78 125L65 113L58 96L58 82L65 65L78 53Z'/%3E%3Cpath d='M95 48L103 70L126 70L108 84L115 107L95 94L75 107L82 84L64 70L87 70Z' opacity='.72'/%3E%3Cpath d='M95 27V48M137 47L125 65M148 68L132 82M148 92L132 96M137 113L125 113M118 127L112 125M95 133V130M72 127L78 125M53 113L65 113M42 92L58 96M42 68L58 82M53 47L65 65M72 33L78 53' opacity='.45'/%3E%3Cpath d='M0 0L28 28M190 0L162 28M0 190L28 162M190 190L162 162' opacity='.22'/%3E%3C/g%3E%3C/svg%3E") !important;
+}
+html[data-dark="1"] .card,
+html[data-dark="1"] .home-continue,
+html[data-dark="1"] .home-stat,
+html[data-dark="1"] .home-quick-btn,
+html[data-dark="1"] .tile,
+html[data-dark="1"] .sec-card,
+html[data-dark="1"] .sec-gcard,
+html[data-dark="1"] .lrow,
+html[data-dark="1"] .bcard,
+html[data-dark="1"] .sum,
+html[data-dark="1"] .prof-card,
+html[data-dark="1"] .appearance-panel,
+html[data-dark="1"] .activity-month,
+html[data-dark="1"] .activity-tabs,
+html[data-dark="1"] .st-sec{
+background:linear-gradient(145deg,#181B1E,#131619) !important;
+border-color:rgba(255,255,255,.055) !important;
+box-shadow:0 20px 50px -34px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,.018) !important;
+}
+html[data-dark="1"] #tabbar{
+background:rgba(20,23,26,.94) !important;
+border-color:rgba(255,255,255,.06) !important;
+}
+html[data-dark="1"] .tab.on{
+background:rgba(244,81,30,.13) !important;
+color:#F4511E !important;
+}
+html[data-dark="1"] .tab.on .ic{color:#F4511E !important}
+html[data-dark="1"] .btn.pr,
+html[data-dark="1"] .ep-tab.on,
+html[data-dark="1"] .sw.on{
+background:#F4511E !important;
+border-color:#F4511E !important;
+color:#FFF9F6 !important;
+}
+html[data-dark="1"] .seg,
+html[data-dark="1"] .activity-tabs{
+background:#20242A !important;
+}
+html[data-dark="1"] .seg button.on,
+html[data-dark="1"] .activity-tabs button.on{
+background:#181B1E !important;
+color:#F1F0EC !important;
+}
+html[data-dark="1"] .heat-cell.selected,
+html[data-dark="1"] .week-cell.selected,
+html[data-dark="1"] .activity-grid i.selected{
+outline-color:#F4511E !important;
+}
+html[data-dark="1"] .home-see-all,
+html[data-dark="1"] .addbtn,
+html[data-dark="1"] .chip.on,
+html[data-dark="1"] .btn.on-attach{
+color:#F4511E !important;
+}
+html[data-dark="1"] .addbtn,
+html[data-dark="1"] .chip.on,
+html[data-dark="1"] .btn.on-attach{
+background:rgba(244,81,30,.11) !important;
+}
+</style>
+<style id="editor-buttons-fix-v44">
+/* V44 — editor controls on book cards: compact, aligned, never overlap status buttons */
+.bcard .brow{
+display:flex !important;
+align-items:center !important;
+gap:7px !important;
+flex-wrap:nowrap !important;
+width:100% !important;
+min-width:0 !important;
+}
+.bcard .brow .chip{
+flex:0 1 auto !important;
+min-width:0 !important;
+white-space:nowrap !important;
+}
+.bcard .brow .heart{
+margin-left:auto !important;
+flex:0 0 30px !important;
+width:30px !important;
+height:30px !important;
+}
+.bcard .brow .edit-book-btn{
+flex:0 0 30px !important;
+width:30px !important;
+min-width:30px !important;
+max-width:30px !important;
+height:30px !important;
+min-height:30px !important;
+max-height:30px !important;
+padding:0 !important;
+margin:0 !important;
+border-radius:10px !important;
+display:grid !important;
+place-items:center !important;
+background:var(--card2) !important;
+border:1px solid var(--line) !important;
+color:var(--ink2) !important;
+box-shadow:none !important;
+}
+.bcard .brow .edit-book-btn .ic{
+width:16px !important;
+height:16px !important;
+}
+.bcard .brow .edit-book-btn:active{
+transform:scale(.92) !important;
+background:var(--acc-soft) !important;
+color:var(--acc) !important;
+}
+@media(max-width:380px){
+.bcard .brow .edit-book-btn,.bcard .brow .heart{
+flex-basis:28px !important;
+width:28px !important;
+min-width:28px !important;
+max-width:28px !important;
+height:28px !important;
+}
+.bcard .brow .edit-book-btn .ic{width:15px !important;height:15px !important;}
+}
+<style id="v45-book-actions-clean">
+/* V45 — карточки книг: чистая нижняя панель без налезания редактора */
+.bcard .brow{
+display:flex !important;
+align-items:center !important;
+justify-content:flex-start !important;
+gap:8px !important;
+flex-wrap:nowrap !important;
+width:100% !important;
+min-height:38px !important;
+height:38px !important;
+margin-top:auto !important;
+}
+.bcard .brow .chip{
+flex:0 0 auto !important;
+white-space:nowrap !important;
+}
+.bcard .brow .heart{
+flex:0 0 30px !important;
+width:30px !important;
+height:30px !important;
+margin-left:0 !important;
+display:grid !important;
+place-items:center !important;
+}
+@media(max-width:380px){
+.bcard .brow{height:34px !important;min-height:34px !important}
+.bcard .brow .heart{flex-basis:28px !important;width:28px !important;height:28px !important}
+}
+</style>
+<style id="v46-book-editor-restored">
+/* V46 — возвращаем редактор книги в нижнюю панель, без налезания */
+.bcard .brow{
+display:flex !important;
+align-items:center !important;
+gap:6px !important;
+flex-wrap:nowrap !important;
+width:100% !important;
+min-width:0 !important;
+}
+.bcard .brow .edit-book-btn{
+order:1 !important;
+flex:0 0 28px !important;
+width:28px !important;
+min-width:28px !important;
+max-width:28px !important;
+height:28px !important;
+min-height:28px !important;
+max-height:28px !important;
+padding:0 !important;
+margin:0 !important;
+border:1px solid var(--line) !important;
+border-radius:9px !important;
+background:var(--card2) !important;
+color:var(--ink2) !important;
+display:grid !important;
+place-items:center !important;
+box-shadow:none !important;
+}
+.bcard .brow .edit-book-btn .ic{width:15px !important;height:15px !important}
+.bcard .brow .chip{
+order:2 !important;
+flex:1 1 auto !important;
+min-width:0 !important;
+white-space:nowrap !important;
+overflow:hidden !important;
+justify-content:center !important;
+}
+.bcard .brow .heart{
+order:3 !important;
+flex:0 0 28px !important;
+width:28px !important;
+min-width:28px !important;
+height:28px !important;
+margin-left:0 !important;
+display:grid !important;
+place-items:center !important;
+}
+.bcard .brow .edit-book-btn:active{
+transform:scale(.94) !important;
+background:var(--acc-soft) !important;
+color:var(--acc) !important;
+}
+@media(max-width:380px){
+.bcard .brow{gap:4px !important}
+.bcard .brow .edit-book-btn,.bcard .brow .heart{
+flex-basis:26px !important;
+width:26px !important;
+min-width:26px !important;
+max-width:26px !important;
+height:26px !important;
+}
+.bcard .brow .edit-book-btn .ic{width:14px !important;height:14px !important}
+}
+</style>
+<style id="v47-telegram-dark-orange">
+/* V47 — Telegram Dark palette + orange accent. Green accent/surfaces removed. */
+html[data-dark="1"]{
+--bg:#17212B !important;
+--card:#202B36 !important;
+--card2:#242F3D !important;
+--ink:#F5F7FA !important;
+--ink2:#8F9AA6 !important;
+--line:rgba(255,255,255,.09) !important;
+--acc:#F4511E !important;
+--acc-ink:#FFF7F2 !important;
+--acc-soft:rgba(244,81,30,.14) !important;
+--pine:#3A2A24 !important;
+--pine-ink:#FFF1E9 !important;
+--glow1:rgba(244,81,30,.12) !important;
+--glow1c:rgba(244,81,30,.24) !important;
+--glow2:rgba(244,81,30,.06) !important;
+}
+html[data-dark="1"] body{
+background:#17212B !important;
+color:#F5F7FA !important;
+}
+html[data-dark="1"] .ambient{
+background:
+radial-gradient(700px 500px at 50% -140px,rgba(244,81,30,.055),transparent 68%),
+radial-gradient(600px 500px at 100% 70%,rgba(244,81,30,.035),transparent 70%) !important;
+}
+html[data-dark="1"] .girih{
+opacity:.045 !important;
+background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='190' height='190' viewBox='0 0 190 190'%3E%3Cg fill='none' stroke='%23F4511E' stroke-width='1' opacity='.55'%3E%3Cpath d='M95 27L118 33L137 47L148 68L148 92L137 113L118 127L95 133L72 127L53 113L42 92L42 68L53 47L72 33Z'/%3E%3Cpath d='M95 48L112 53L125 65L132 82L132 96L125 113L112 125L95 130L78 125L65 113L58 96L58 82L65 65L78 53Z'/%3E%3Cpath d='M95 48L103 70L126 70L108 84L115 107L95 94L75 107L82 84L64 70L87 70Z' opacity='.7'/%3E%3C/g%3E%3C/svg%3E") !important;
+}
+html[data-dark="1"] .card,
+html[data-dark="1"] .home-continue,
+html[data-dark="1"] .home-stat,
+html[data-dark="1"] .home-quick-btn,
+html[data-dark="1"] .tile,
+html[data-dark="1"] .sec-card,
+html[data-dark="1"] .sec-gcard,
+html[data-dark="1"] .lrow,
+html[data-dark="1"] .bcard,
+html[data-dark="1"] .sum,
+html[data-dark="1"] .prof-card,
+html[data-dark="1"] .appearance-panel,
+html[data-dark="1"] .activity-month,
+html[data-dark="1"] .activity-tabs,
+html[data-dark="1"] .st-sec{
+background:#202B36 !important;
+border-color:rgba(255,255,255,.08) !important;
+box-shadow:0 16px 40px -30px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.02) !important;
+}
+html[data-dark="1"] #tabbar{
+background:rgba(32,43,54,.96) !important;
+border-color:rgba(255,255,255,.08) !important;
+}
+html[data-dark="1"] .icbtn{
+background:#202B36 !important;
+border-color:rgba(255,255,255,.08) !important;
+color:#F0F3F6 !important;
+}
+html[data-dark="1"] .home-quote,
+html[data-dark="1"] .hquote{
+background:#202B36 !important;
+border-color:rgba(255,255,255,.08) !important;
+}
+html[data-dark="1"] .home-continue .hc-play,
+html[data-dark="1"] .cont-play,
+html[data-dark="1"] .p-play,
+html[data-dark="1"] .fab,
+html[data-dark="1"] #tabbar .fab,
+html[data-dark="1"] .btn.pr,
+html[data-dark="1"] .ep-tab.on,
+html[data-dark="1"] .sw.on{
+background:#F4511E !important;
+border-color:#F4511E !important;
+color:#FFF7F2 !important;
+box-shadow:0 10px 28px -12px rgba(244,81,30,.65) !important;
+}
+html[data-dark="1"] .home-continue .hc-bar,
+html[data-dark="1"] .bar,
+html[data-dark="1"] .home-quick-btn .bar{
+background:#34424F !important;
+}
+html[data-dark="1"] .home-continue .hc-fill,
+html[data-dark="1"] .bar i,
+html[data-dark="1"] .wave:after,
+html[data-dark="1"] .wave i{
+background:#F4511E !important;
+}
+html[data-dark="1"] .home-quick-btn{
+background:#202B36 !important;
+color:#F5F7FA !important;
+}
+html[data-dark="1"] .home-quick-btn .ic,
+html[data-dark="1"] .home-quick-btn .ic *{
+color:#F4511E !important;
+}
+html[data-dark="1"] .tab{color:#8F9AA6 !important}
+html[data-dark="1"] .tab.on{
+color:#F4511E !important;
+background:rgba(244,81,30,.14) !important;
+}
+html[data-dark="1"] .tab.on .ic{color:#F4511E !important;filter:drop-shadow(0 5px 10px rgba(244,81,30,.25))}
+html[data-dark="1"] a,
+html[data-dark="1"] .link,
+html[data-dark="1"] .accent,
+html[data-dark="1"] .home-see-all{
+color:#F4511E !important;
+}
+html[data-dark="1"] .addbtn,
+html[data-dark="1"] .chip.on,
+html[data-dark="1"] .btn.on-attach{
+background:rgba(244,81,30,.13) !important;
+color:#F4511E !important;
+border-color:rgba(244,81,30,.24) !important;
+}
+html[data-dark="1"] .seg,
+html[data-dark="1"] .activity-tabs{
+background:#242F3D !important;
+}
+html[data-dark="1"] .seg button.on,
+html[data-dark="1"] .activity-tabs button.on{
+background:#202B36 !important;
+color:#F5F7FA !important;
+}
+html[data-dark="1"] .heat-cell.selected,
+html[data-dark="1"] .week-cell.selected,
+html[data-dark="1"] .activity-grid i.selected{
+outline-color:#F4511E !important;
+}
+html[data-dark="1"] .sw::after{background:#F1F4F7 !important}
+html[data-dark="1"] .hint{
+background:rgba(244,81,30,.10) !important;
+color:#F3E9E4 !important;
+}
+html[data-dark="1"] .bcard .brow .edit-book-btn{
+background:#242F3D !important;
+border-color:rgba(255,255,255,.09) !important;
+color:#F4511E !important;
+}
+html[data-dark="1"] .bcard .brow .edit-book-btn:active{
+background:rgba(244,81,30,.16) !important;
+color:#F4511E !important;
+}
+/* Remove legacy green appearance from controls and covers. */
+html[data-dark="1"] .premium,
+html[data-dark="1"] .green,
+html[data-dark="1"] .pine{background:#202B36 !important;color:#F5F7FA !important;border-color:rgba(255,255,255,.08) !important}
+</style>
+<style id="v50-telegram-surfaces">
+/* =========================================================
+V50 — TELEGRAM DARK SURFACES / NO DECORATIVE GRADIENTS
+The home quick-access and continue-learning surfaces are
+intentionally flat and use the same Telegram-dark palette.
+Orange is reserved for actions/icons.
+========================================================= */
+:root{
+--tg-bg:#17212B;
+--tg-surface:#1B2733;
+--tg-surface-2:#202B36;
+--tg-line:rgba(255,255,255,.055);
+--tg-text:#F2F4F5;
+--tg-muted:#9AA5AF;
+--tg-orange:#F4511E;
+}
+/* App background — flat Telegram dark blue-gray */
+html body,
+html[data-theme="dark"] body,
+html[data-theme="auto"] body{
+background:var(--tg-bg) !important;
+color:var(--tg-text) !important;
+}
+html[data-theme="dark"] .scr,
+html[data-theme="auto"] .scr{
+background:transparent !important;
+}
+/* Remove the old decorative ambient gradients */
+.ambient{display:none !important;}
+body::before,body::after{background:none !important;}
+/* Continue learning: flat surface, no brown/blue gradient, no glow */
+.home-continue{
+background:var(--tg-surface) !important;
+border:1px solid var(--tg-line) !important;
+box-shadow:none !important;
+}
+.home-continue::before{
+display:none !important;
+}
+.home-continue .hc-play{
+background:var(--tg-orange) !important;
+box-shadow:none !important;
+}
+.home-continue .hc-bar{
+background:var(--tg-surface-2) !important;
+}
+.home-continue .hc-fill,
+.home-continue .hc-bar i{
+background:var(--tg-orange) !important;
+}
+/* Quick access: all buttons identical, flat Telegram surface */
+.home-quick-btn{
+background:var(--tg-surface) !important;
+background-image:none !important;
+border:1px solid var(--tg-line) !important;
+box-shadow:none !important;
+color:var(--tg-text) !important;
+}
+.home-quick-btn .ic,
+.home-quick-ic .ic{
+color:var(--tg-orange) !important;
+}
+.home-quick-ic{
+background:transparent !important;
+box-shadow:none !important;
+}
+.home-quick-btn:active{
+border-color:var(--tg-line) !important;
+transform:scale(.98);
+}
+/* Header/search/profile controls use the same surface family */
+.icbtn,
+.home-actions .icbtn{
+background:var(--tg-surface) !important;
+background-image:none !important;
+border:1px solid var(--tg-line) !important;
+box-shadow:none !important;
+}
+/* Quote and other home surfaces: no colored gradients */
+.home-quote,
+.hquote{
+background:var(--tg-surface) !important;
+background-image:none !important;
+border:1px solid var(--tg-line) !important;
+box-shadow:none !important;
+}
+.home-quote::after{display:none !important;}
+/* Generic home cards — keep the same Telegram family */
+.home-stat,
+.tile,
+.sec-card,
+.sec-gcard,
+.lrow,
+.bcard,
+.sum,
+.prof-card,
+.card{
+background:var(--tg-surface) !important;
+background-image:none !important;
+border-color:var(--tg-line) !important;
+box-shadow:none !important;
+}
+/* Accent only: no green/pine states on navigation or controls */
+.tab.on{
+background:var(--tg-orange) !important;
+color:#fff !important;
+}
+.tab.on .ic{color:#fff !important;}
+</style>
+<style id="v56-audio-save-no-jump">
+/* V56 — saving notes/content must never reset or animate the audio position. */
+.wave i{transition:none !important;}
+</style>
+<style id="hide-recommend-section">
+/* v74: remove the Recommendations section from the home screen */
+.ref-recommend { display: none !important; }
+</style>
+<style id="v76-fix-profile-buttons">
+/* V76 — выравнивание кнопок канала и поддержки в профиле */
+.ref-connect-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+  margin-top: 8px !important;
+}
+.ref-connect-grid .btn {
+  width: 100% !important;
+  min-height: 48px !important;
+  height: 48px !important;
+  padding: 0 12px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  border-radius: 14px !important;
+  background: var(--card) !important;
+  border: 1px solid var(--line) !important;
+  color: var(--ink) !important;
+  box-sizing: border-box !important;
+}
+.ref-connect-grid .btn .ic {
+  width: 18px !important;
+  height: 18px !important;
+  flex-shrink: 0 !important;
+}
+@media(max-width:380px){
+  .ref-connect-grid{gap:8px !important;}
+  .ref-connect-grid .btn{min-height:44px !important;height:44px !important;font-size:12px !important;padding:0 8px !important;}
+}
 </style>
 </head>
 <body>
@@ -369,7 +3255,7 @@ const eqBars=()=>'<i></i><i></i><i></i><i></i>';
 const LS_OLD='miniapp_db_v1';
 const LS='ilm_db_v2_'+(TG_USER?TG_USER.id:'guest');
 const SWATCHES=['#EE4A18','#A44722','#2B50C4','#D9971B','#8A3FC0','#C22F4F','#3A3F47'];
-const EMOJI_PACKS=[{id:'study',name:'📚 Учёба',list:['📚','📖','️','✍️','','','','💡','','','️','📌','','️','','️','💭','']},{id:'relig',name:'🕌 Вера',list:['🕌','🕋','','⭐','','🤲','️','️','','','️','','⛰️','','','','','',]}, {id:'face',name:'😊 Лица',list:['😊','😃','😄','🙂','😌','😍','','','','','😢','😭','😡','','','','','😅']},{id:'sym',name:'⭐ Символы',list:['⭐','✨','⚡','','❤️','💚','💙','💜','🤍','','','✅','','❗','','','','']},{id:'nat',name:'🌍 Природа',list:['🌍','','','','','','️','️','','','🐫','','','🍎','','','','','']}];
+const EMOJI_PACKS=[{id:'study',name:' Учёба',list:['📚','','️','✍️','','','','','','','️','📌','','️','','️','💭','']},{id:'relig',name:'🕌 Вера',list:['','🕋','','⭐','','🤲','️','️','','','️','','⛰️','','','','','',]}, {id:'face',name:'😊 Лица',list:['😊','😃','😄','🙂','😌','😍','','','','','😢','😭','😡','','','','','😅']},{id:'sym',name:'⭐ Символы',list:['⭐','✨','','','❤️','💚','💙','','🤍','','','✅','','❗','','','','']},{id:'nat',name:'🌍 Природа',list:['🌍','','','','','','️','️','','','🐫','','','','','','','','']}];
 const COVERS=[['#E8431C','#6E1D08'],['#A44722','#4A1D0F'],['#2B50C4','#131F55'],['#C22F4F','#4E0F1F'],['#8A3FC0','#35165A'],['#C98A12','#5C3D05']];
 const DEFAULT_QUOTES=['Требуй знания! — поистине, стремление к знанию — обязанность каждого мусульманина. — Хадис (Ибн Маджа)','Поистине, за трудностью приходит облегчение. — Коран, 94:6','Аллах возвышает степенями тех из вас, кто уверовал и кому даровано знание. — Коран, 58:11','Кто встал на путь в поисках знания, тому Аллах облегчает путь в Рай. — Хадис (Муслим)','Знание — не то, что заучено, а то, что приносит пользу. — Имам аш-Шафии','Лучший из вас тот, кто изучает Коран и обучает ему других. — Хадис (Бухари)','Не стесняйся спрашивать: вопрос — половина знания.'];
 function seed(){const SH=n=>'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-'+n+'.mp3';return{v:1,settings:{onboarded:false,admin:false,theme:'dark',accent:'green',speed:1,skipStep:15,autoNext:true,appName:'',channel:'',question:'',support:'',myEmojis:[],appIcon:'',appLogo:'',secView:'list',reminderOn:false,reminderTime:'19:00'},sections:[{id:'sec1',title:'Основы',emoji:'🧭',color:'#EE4A18',desc:'С чего начинается путь: базовые понятия и настройка на занятие.',lessons:[{id:'l1',title:'Знакомство с курсом',desc:'О чём этот путь и как заниматься.',url:SH(1)},{id:'l2',title:'Первые шаги',desc:'Практика: слушать, повторять, закреплять.',url:SH(2)},{id:'l3',title:'Главные термины',desc:'Словарь, без которого дальше будет сложно.',url:SH(3)},{id:'l4',title:'Частые ошибки',desc:'Разбираем, что обычно идёт не так.',url:SH(4)}],subs:[]},{id:'sec2',title:'Практика',emoji:'🎧',color:'#A44722',desc:'Уроки для отработки: слушайте и повторяйте.',lessons:[{id:'l5',title:'Разминка',desc:'Короткая настройка перед занятием.',url:SH(5)}],subs:[{id:'sub1',title:'Тренировка темпа',desc:'',lessons:[{id:'l6',title:'Тренировка темпа',desc:'Учимся держать ритм.',url:SH(6)}],subs:[{id:'sub1a',title:'Продвинутый темп',desc:'',lessons:[{id:'l7',title:'Закрепление',desc:'Итоговая практика раздела.',url:SH(7)}],subs:[]}]}]},{id:'sec3',title:'Углублённый уровень',emoji:'🚀',color:'#2B50C4',desc:'Для тех, кто прошёл основу.',lessons:[{id:'l8',title:'Продвинутые приёмы',desc:'Сложные кейсы и нюансы.',url:SH(8)}],subs:[]}],books:[{id:'b1',title:'Хрестоматия. Том 1',author:'Материалы курса',cat:'',url:'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf'},{id:'b2',title:'Практический сборник',author:'Материалы курса',cat:'',url:'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'},{id:'b3',title:'Конспект занятий',author:'Черновик',cat:'',url:'https://pdfobject.com/pdf/sample.pdf'}],quotes:DEFAULT_QUOTES.slice(),notes:{},progress:{},favL:[],favB:[],readB:[],days:{},listenSec:0,last:null,pages:{},bookmarks:{}};}
@@ -486,6 +3372,7 @@ const ACCENTS={orange:'#F4511E',blue:'#3B63B5',green:'#2F9A67',purple:'#7A43B6',
 function applyTheme(){let t=['auto','dark','light'].includes(db.settings.theme)?db.settings.theme:'auto';if(db.settings.theme!==t){db.settings.theme=t;save();}const d=isDark();let p=Object.assign({},d?PAL.dark:PAL.light);
 if(t==='auto'&&tg&&tg.themeParams){
 const tp=tg.themeParams;
+/* Telegram theme parameters are the source of truth in Auto mode. */
 if(tp.bg_color)p.bg=tp.bg_color;
 if(tp.secondary_bg_color)p.card=tp.secondary_bg_color;
 if(tp.section_bg_color)p.card2=tp.section_bg_color;
@@ -601,7 +3488,7 @@ function vBooks(){let h='<header class="hdr"><div><div class="kick">'+db.books.l
 function vReader(p){const b=db.books.find(x=>x.id===p.id);if(!b)return'<div style="padding:40px;text-align:center">Книга не найдена</div>';return'<header class="hdr r-head" style="margin-bottom:10px"><button class="icbtn" data-action="back">'+ic('back')+'</button><div class="hdr-r"><button class="icbtn" id="r-bm" data-action="bm-toggle" aria-label="Закладка">'+ic('bookmark')+'</button><button class="icbtn" data-action="bm-list" aria-label="Список закладок">'+ic('list')+'</button><button class="icbtn" data-action="r-fs" aria-label="Во весь экран">'+ic('expand')+'</button><button class="icbtn" data-action="open-ext" data-id="'+b.id+'" aria-label="Открыть во внешнем просмотрщике">'+ic('ext')+'</button></div></header><div class="r-titleline"><div class="r-title">'+esc(b.title)+'</div></div><div class="reader" id="reader"><div class="r-load">Загрузка книги…</div></div><div class="r-bar"><button class="icbtn" data-action="r-zoom" data-z="-1" aria-label="Уменьшить">'+ic('minus')+'</button><button class="icbtn" data-action="r-prev" aria-label="Предыдущая страница">'+ic('back')+'</button><div class="r-page" id="r-page">…</div><button class="icbtn" data-action="r-next" aria-label="Следующая страница">'+ic('chev')+'</button><button class="icbtn" data-action="r-zoom" data-z="1" aria-label="Увеличить">'+ic('plus')+'</button></div>';}
 function vSearch(){return'<header class="hdr"><button class="icbtn" data-action="back">'+ic('back')+'</button><h1 class="ttl" style="font-size:19px">Поиск</h1><span style="width:42px"></span></header><div class="search-bar"><input id="search-input" placeholder="Уроки, подразделы, книги…" autocomplete="off"></div><div id="search-results"></div>';}
 function renderSearchResults(){const box=$('#search-results');if(!box)return;const q=searchQ.trim().toLowerCase();if(q.length<2){box.innerHTML='<div class="m-txt" style="text-align:center;padding:34px 10px">Введите минимум 2 символа для поиска</div>';return;}const r=searchAll(q);const cnt=r.sections.length+r.subs.length+r.lessons.length+r.books.length;if(!cnt){box.innerHTML='<div class="empty" style="padding:34px"><div class="e-ic">🔍</div><div class="e-t">Ничего не найдено</div><div class="e-m">Попробуйте другое слово</div></div>';return;}let h='';const row=(act,attrs,iconHtml,t,m)=>'<div class="lrow card" '+act+' '+attrs+'><div class="lrow-n" style="background:var(--card2)">'+iconHtml+'</div><div class="lrow-t"><div class="t">'+esc(t)+'</div><div class="m">'+esc(m)+'</div></div><div class="sec-go">'+ic('chev')+'</div></div>';if(r.sections.length){h+='<div class="sr-group">Разделы</div>';r.sections.forEach(s=>{h+=row('data-action="open-section"','data-id="'+s.id+'"',secIconHTML(s,'ic-s'),s.title,'раздел · '+flatLessons(s).length+' уроков');});}if(r.subs.length){h+='<div class="sr-group">Подразделы</div>';r.subs.forEach(x=>{h+=row('data-action="open-sub"','data-id="'+x.sb.id+'" data-sec="'+x.s.id+'"',ic('folder','ic-s'),x.sb.title,x.s.title);});}if(r.lessons.length){h+='<div class="sr-group">Уроки</div>';r.lessons.forEach(x=>{h+=row('data-action="open-lesson"','data-id="'+x.l.id+'"',ic('play','ic-s'),x.l.title,x.s.title+(durOf(x.l)?' · '+fmt(durOf(x.l)):''));});}if(r.books.length){h+='<div class="sr-group">Книги</div>';r.books.forEach(b=>{h+=row('data-action="open-pdf"','data-id="'+b.id+'"',ic('doc','ic-s'),b.title,b.author||'PDF');});}box.innerHTML=h;}
-function vFavs(){let h='<header class="hdr"><div><div class="kick">ваша коллекция</div><h1 class="ttl">Избранное</h1></div><div class="hdr-r"><button class="icbtn" data-action="search" aria-label="Поиск">'+ic('search')+'</button><button class="icbtn" data-action="profile" aria-label="Профиль">'+ic('user')+'</button></div></header><div class="seg" style="margin-bottom:18px"><button class="'+(favTab==='l'?'on':'')+'" data-action="fav-tab" data-v="l">Уроки</button><button class="'+(favTab==='b'?'on':'')+'" data-action="fav-tab" data-v="b">Книги</button><button class="'+(favTab==='n'?'on':'')+'" data-action="fav-tab" data-v="n">Заметки</button></div>';if(favTab==='l'){const items=db.favL.map(findLesson).filter(Boolean);if(!items.length)return h+emptyBox('Здесь пока тихо','Отмечайте уроки сердечком — они соберутся в этом списке.');items.forEach((f,i)=>{const done=prOf(f.l.id)&&prOf(f.l.id).done;h+='<div class="lrow card fade'+(done?' done':'')+'" style="animation-delay:'+(i*.04)+'s" data-action="open-lesson" data-id="'+f.l.id+'"><div class="lrow-n" style="background:'+hexA(f.s.color,.15)+';color:'+f.s.color+'">'+(f.s.emoji||'🎧')+'</div><div class="lrow-t"><div class="t">'+esc(f.l.title)+'</div><div class="m">'+esc(f.s.title)+(f.sub?' · '+esc(f.sub.title):'')+'</div></div><button class="heart on" data-action="fav-l" data-id="'+f.l.id+'">'+ic('heart','ic-s')+'</button></div>';});}else if(favTab==='b'){const items=db.books.filter(b=>db.favB.includes(b.id));if(!items.length)return h+emptyBox('Нет избранных книг','Отметьте книги сердечком на вкладке «Книги».');items.forEach((b,i)=>{h+='<div class="lrow card fade" style="animation-delay:'+(i*.04)+'s" data-action="open-pdf" data-id="'+b.id+'"><div class="lrow-n" style="background:'+coverGrad(b)+';color:#fff">'+ic('doc','ic-s')+'</div><div class="lrow-t"><div class="t">'+esc(b.title)+'</div><div class="m">'+esc(b.author||'PDF')+'</div></div><button class="heart on" data-action="fav-b" data-id="'+b.id+'">'+ic('heart','ic-s')+'</button></div>';});}else{const entries=[];Object.keys(db.notes||{}).forEach(lid=>{const f=findLesson(lid);if(!f)return;(db.notes[lid]||[]).forEach(n=>entries.push({f,n}));});if(!entries.length)return h+emptyBox('Заметок пока нет','Откройте плеер и нажмите на карандашик — сохраняйте мысли и закладки на момент аудио.');entries.forEach((e,i)=>{h+='<div class="lrow card fade" style="animation-delay:'+(i*.04)+'s" data-action="open-lesson" data-id="'+e.f.l.id+'"><div class="lrow-n" style="background:'+hexA(e.f.s.color,.15)+';color:'+e.f.s.color+'">'+ic('pen','ic-s')+'</div><div class="lrow-t"><div class="t">'+esc(e.f.l.title)+'</div><div class="m">'+esc(trunc(e.n.text,60))+(e.n.at!=null?' · ⏱ '+fmt(e.n.at):'')+'</div></div><div class="sec-go">'+ic('chev')+'</div></div>';});}return h;}
+function vFavs(){let h='<header class="hdr"><div><div class="kick">ваша коллекция</div><h1 class="ttl">Избранное</h1></div><div class="hdr-r"><button class="icbtn" data-action="search" aria-label="Поиск">'+ic('search')+'</button><button class="icbtn" data-action="profile" aria-label="Профиль">'+ic('user')+'</button></div></header><div class="seg" style="margin-bottom:18px"><button class="'+(favTab==='l'?'on':'')+'" data-action="fav-tab" data-v="l">Уроки</button><button class="'+(favTab==='b'?'on':'')+'" data-action="fav-tab" data-v="b">Книги</button><button class="'+(favTab==='n'?'on':'')+'" data-action="fav-tab" data-v="n">Заметки</button></div>';if(favTab==='l'){const items=db.favL.map(findLesson).filter(Boolean);if(!items.length)return h+emptyBox('Здесь пока тихо','Отмечайте уроки сердечком — они соберутся в этом списке.');items.forEach((f,i)=>{const done=prOf(f.l.id)&&prOf(f.l.id).done;h+='<div class="lrow card fade'+(done?' done':'')+'" style="animation-delay:'+(i*.04)+'s" data-action="open-lesson" data-id="'+f.l.id+'"><div class="lrow-n" style="background:'+hexA(f.s.color,.15)+';color:'+f.s.color+'">'+(f.s.emoji||'')+'</div><div class="lrow-t"><div class="t">'+esc(f.l.title)+'</div><div class="m">'+esc(f.s.title)+(f.sub?' · '+esc(f.sub.title):'')+'</div></div><button class="heart on" data-action="fav-l" data-id="'+f.l.id+'">'+ic('heart','ic-s')+'</button></div>';});}else if(favTab==='b'){const items=db.books.filter(b=>db.favB.includes(b.id));if(!items.length)return h+emptyBox('Нет избранных книг','Отметьте книги сердечком на вкладке «Книги».');items.forEach((b,i)=>{h+='<div class="lrow card fade" style="animation-delay:'+(i*.04)+'s" data-action="open-pdf" data-id="'+b.id+'"><div class="lrow-n" style="background:'+coverGrad(b)+';color:#fff">'+ic('doc','ic-s')+'</div><div class="lrow-t"><div class="t">'+esc(b.title)+'</div><div class="m">'+esc(b.author||'PDF')+'</div></div><button class="heart on" data-action="fav-b" data-id="'+b.id+'">'+ic('heart','ic-s')+'</button></div>';});}else{const entries=[];Object.keys(db.notes||{}).forEach(lid=>{const f=findLesson(lid);if(!f)return;(db.notes[lid]||[]).forEach(n=>entries.push({f,n}));});if(!entries.length)return h+emptyBox('Заметок пока нет','Откройте плеер и нажмите на карандашик — сохраняйте мысли и закладки на момент аудио.');entries.forEach((e,i)=>{h+='<div class="lrow card fade" style="animation-delay:'+(i*.04)+'s" data-action="open-lesson" data-id="'+e.f.l.id+'"><div class="lrow-n" style="background:'+hexA(e.f.s.color,.15)+';color:'+e.f.s.color+'">'+ic('pen','ic-s')+'</div><div class="lrow-t"><div class="t">'+esc(e.f.l.title)+'</div><div class="m">'+esc(trunc(e.n.text,60))+(e.n.at!=null?' · ⏱ '+fmt(e.n.at):'')+'</div></div><div class="sec-go">'+ic('chev')+'</div></div>';});}return h;}
 function vStats(){const total=lessonCount(),done=doneCount(),pct=total?Math.round(done/total*100):0;let h='<header class="hdr"><div><div class="kick">'+dateLine()+'</div><h1 class="ttl">Прогресс</h1></div><div class="hdr-r"><button class="icbtn" data-action="search" aria-label="Поиск">'+ic('search')+'</button><button class="icbtn" data-action="profile" aria-label="Профиль">'+ic('user')+'</button></div></header><div class="st-big fade">'+pct+'<span>%</span></div><div class="st-lbl">курса пройдено</div><div class="st-grid"><div class="st-card card fade" style="animation-delay:.06s"><div class="st-v" style="color:var(--acc)">'+ic('play','ic-s')+fmtMin(db.listenSec||0)+'</div><div class="st-l">прослушано</div></div><div class="st-card card fade" style="animation-delay:.1s"><div class="st-v" style="color:var(--acc)">'+ic('flame','ic-s')+streak()+'</div><div class="st-l">дней подряд</div></div><div class="st-card card fade" style="animation-delay:.14s"><div class="st-v">'+done+'/'+total+'</div><div class="st-l">уроков пройдено</div></div><div class="st-card card fade" style="animation-delay:.18s"><div class="st-v">'+db.readB.length+'/'+db.books.length+'</div><div class="st-l">книг прочитано</div></div></div><div class="st-sec card fade" style="animation-delay:.2s"><div class="st-st"><span style="color:var(--ink)">Активность за 12 недель</span></div>'+heatHTML()+'</div><div class="sec-head"><h2 class="h2">По разделам</h2></div>';if(!db.sections.length)return h+emptyBox('Разделов пока нет','Скоро здесь появятся материалы курса.');db.sections.forEach((s,i)=>{const fl=flatLessons(s);const dn=fl.filter(l=>prOf(l.id)&&prOf(l.id).done).length;const pc=fl.length?Math.round(dn/fl.length*100):0;h+='<div class="st-sec card fade" style="animation-delay:'+(i*.05)+'s" data-action="open-section" data-id="'+s.id+'"><div class="st-st"><span style="color:var(--ink)">'+secIconHTML(s,'ic-s')+' '+esc(s.title)+'</span><span>'+pc+'%</span></div><div class="bar big"><i style="width:'+pc+'%;background:'+s.color+'"></i></div></div>';});return h;}
 function setAppTheme(v){
 const theme=['auto','dark','light'].includes(v)?v:'auto';
@@ -646,7 +3533,7 @@ h+='</div></div>';
 return h;
 }function gListen(){const step=db.settings.skipStep||15,spd=db.settings.speed||1;return'<div class="grp"><div class="grp-t">Прослушивание</div><div class="row card" data-action="set-autonext"><div><div class="row-t">Автопереход к следующему уроку</div><div class="row-m">После окончания текущего</div></div><div class="sw'+(db.settings.autoNext!==false?' on':'')+'"></div></div><div class="row card" data-action="set-skipstep"><div><div class="row-t">Шаг перемотки ⏪ </div><div class="row-m">Кнопки перемотки в плеере</div></div><span class="chip on">'+step+' сек</span></div><div class="row card" data-action="set-speed"><div><div class="row-t">Скорость по умолчанию</div><div class="row-m">Нажмите, чтобы поменять</div></div><span class="chip on">'+spd+'×</span></div></div>';}
 function gRemind(){return'<div class="grp"><div class="grp-t">Напоминания</div><div class="remind-info">Настройте здесь напоминания, и уведомления будут приходить вам в Telegram-бот в выбранное время.</div><div class="row card" data-action="remind-toggle"><div><div class="row-t">Ежедневное напоминание</div><div class="row-m">«Пора заняться» в Telegram</div></div><div class="sw'+(db.settings.reminderOn?' on':'')+'"></div></div><div class="row card" data-action="remind-time"><div><div class="row-t">Время</div><div class="row-m">по вашему местному времени</div></div><span class="chip on">'+(db.settings.reminderTime||'19:00')+'</span></div></div>';}
-function gContent(){const ch=db.settings.channel||'',qu=db.settings.question||'',sup=db.settings.support||'';return'<div class="grp"><div class="grp-t">Контент</div><div class="row card" data-action="admin-toggle"><div><div class="row-t">Режим автора</div><div class="row-m">Добавление и правки разделов, уроков, книг</div></div><div class="sw'+(db.settings.admin?' on':'')+'"></div></div><div class="row card" data-action="publish"><div><div class="row-t">Опубликовать для всех 🚀</div><div class="row-m">Загрузить content.json на GitHub</div></div>'+ic('ul','ic-s')+'</div><div class="row card" data-action="appname-edit"><div><div class="row-t">Название приложения</div><div class="row-m">'+esc(appName())+'</div></div>'+ic('pen','ic-s')+'</div><div class="row card" data-action="channel-edit"><div><div class="row-t">📣 Наш канал</div><div class="row-m">'+(ch?esc(trunc(ch,32)):'Ссылка для учеников')+'</div></div>'+ic('pen','ic-s')+'</div><div class="row card" data-action="question-edit"><div><div class="row-t">❓ Задать вопрос</div><div class="row-m">'+(qu?esc(trunc(qu,32)):'Куда писать вопросы')+'</div></div>'+ic('pen','ic-s')+'</div><div class="row card" data-action="support-edit"><div><div class="row-t">🛟 Ссылка поддержки</div><div class="row-m">'+(sup?esc(trunc(sup,32)):'Куда слать «не открывается»')+'</div></div>'+ic('pen','ic-s')+'</div><div class="row card" data-action="quotes-edit"><div><div class="row-t">Цитаты дня</div><div class="row-m">'+(db.quotes||[]).length+' цитат</div></div>'+ic('pen','ic-s')+'</div><div class="row card" data-action="gh-token"><div><div class="row-t">GitHub токен</div><div class="row-m">'+(getGhToken()?'Добавлен ✓':'Нужен для «Опубликовать»')+'</div></div>'+ic('pen','ic-s')+'</div><div class="row card" data-action="export"><div class="row-t">Экспорт контента</div>'+ic('dl','ic-s')+'</div><div class="row card" data-action="import"><div class="row-t">Импорт контента</div>'+ic('ul','ic-s')+'</div></div>';}
+function gContent(){const ch=db.settings.channel||'',qu=db.settings.question||'',sup=db.settings.support||'';return'<div class="grp"><div class="grp-t">Контент</div><div class="row card" data-action="admin-toggle"><div><div class="row-t">Режим автора</div><div class="row-m">Добавление и правки разделов, уроков, книг</div></div><div class="sw'+(db.settings.admin?' on':'')+'"></div></div><div class="row card" data-action="publish"><div><div class="row-t">Опубликовать для всех 🚀</div><div class="row-m">Загрузить content.json на GitHub</div></div>'+ic('ul','ic-s')+'</div><div class="row card" data-action="appname-edit"><div><div class="row-t">Название приложения</div><div class="row-m">'+esc(appName())+'</div></div>'+ic('pen','ic-s')+'</div><div class="row card" data-action="channel-edit"><div><div class="row-t">📣 Наш канал</div><div class="row-m">'+(ch?esc(trunc(ch,32)):'Ссылка для учеников')+'</div></div>'+ic('pen','ic-s')+'</div><div class="row card" data-action="question-edit"><div><div class="row-t">❓ Задать вопрос</div><div class="row-m">'+(qu?esc(trunc(qu,32)):'Куда писать вопросы')+'</div></div>'+ic('pen','ic-s')+'</div><div class="row card" data-action="support-edit"><div><div class="row-t"> Ссылка поддержки</div><div class="row-m">'+(sup?esc(trunc(sup,32)):'Куда слать «не открывается»')+'</div></div>'+ic('pen','ic-s')+'</div><div class="row card" data-action="quotes-edit"><div><div class="row-t">Цитаты дня</div><div class="row-m">'+(db.quotes||[]).length+' цитат</div></div>'+ic('pen','ic-s')+'</div><div class="row card" data-action="gh-token"><div><div class="row-t">GitHub токен</div><div class="row-m">'+(getGhToken()?'Добавлен ✓':'Нужен для «Опубликовать»')+'</div></div>'+ic('pen','ic-s')+'</div><div class="row card" data-action="export"><div class="row-t">Экспорт контента</div>'+ic('dl','ic-s')+'</div><div class="row card" data-action="import"><div class="row-t">Импорт контента</div>'+ic('ul','ic-s')+'</div></div>';}
 function gData(){const nCnt=notesCount(),fCnt=(db.favL||[]).length+(db.favB||[]).length;return'<div class="grp"><div class="grp-t">Данные</div><div class="row card" data-action="backup-export"><div><div class="row-t">Резервная копия прогресса</div><div class="row-m">Для переноса на другой телефон</div></div>'+ic('dl','ic-s')+'</div><div class="row card" data-action="backup-import"><div><div class="row-t">Восстановить прогресс</div><div class="row-m">Вставить код резервной копии</div></div>'+ic('ul','ic-s')+'</div><div class="row card" data-action="clear-notes"><div class="row-t" style="color:#E23A28">Удалить заметки</div><span class="cnt">'+nCnt+'</span></div><div class="row card" data-action="clear-favs"><div class="row-t" style="color:#E23A28">Очистить избранное</div><span class="cnt">'+fCnt+'</span></div></div>';}
 function gMisc(){return'<div class="grp"><div class="grp-t">Прочее</div><div class="row card" data-action="reset-prog"><div class="row-t" style="color:#E23A28">Сбросить прогресс</div>'+ic('trash','ic-s')+'</div><div class="row card" data-action="reset-all"><div class="row-t" style="color:#E23A28">Сбросить всё</div>'+ic('x','ic-s')+'</div></div>';}
 function gConnect(){
@@ -671,35 +3558,7 @@ function playerTick(){const top=stackTop();if(top.s!=='player')return;const cur=
 function initWave(){const w=$('#wave');if(!w)return;waveBarsEl=Array.from(w.children);let drag=false;const frac=e=>{const r=w.getBoundingClientRect();return Math.min(1,Math.max(0,(e.clientX-r.left)/r.width));};const preview=f=>{w.style.setProperty('--prog',(f*100)+'%');const d=isFinite(AE.a.duration)?AE.a.duration:0;const c=$('#p-cur');if(c&&d)c.textContent=fmt(f*d);};w.addEventListener('pointerdown',e=>{drag=true;w.setPointerCapture(e.pointerId);const f=frac(e);preview(f);});w.addEventListener('pointermove',e=>drag&&preview(frac(e)));w.addEventListener('pointerup',e=>{if(!drag)return;drag=false;AE.seek(frac(e));playerTick();});w.addEventListener('pointercancel',()=>{drag=false;playerTick();});playerTick();}
 function jumpLesson(id){const f=findLesson(id);if(!f)return;AE.load(f.l,true);stackTop().p={id:id};rerender();}
 let ED=null;
-function openEditor(kind,id,sec,extra){
-  if(!canEdit())return;
-  let ex=null,parent=null,sub=null;
-  if(kind==='section')ex=id?findSection(id):null;
-  else if(kind==='sub'){
-    if(id){
-      const s=findSection(sec)||db.sections.find(x=>findSub(x,id,null));
-      const f=s?findSub(s,id,null):null;
-      if(f){ex=f.sub;parent=f.parentId;sec=s.id;}
-    }else parent=extra||null;
-  }
-  else if(kind==='lesson'){
-    const found=id?findLesson(id):null;
-    ex=found?found.l:null;
-    if(found){sec=found.s.id;if(found.sub)sub=found.sub.id;}
-  }
-  else ex=id?db.books.find(b=>b.id===id):null;
-  ED={
-    kind,
-    id,
-    sec,
-    sub,
-    parent,
-    color:(ex&&ex.color)||SWATCHES[db.sections.length%SWATCHES.length],
-    emoji:(ex&&ex.emoji)||'📁',
-    icon:(ex&&ex.icon)||null
-  };
-  go('editor',{kind,id,sec});
-}
+function openEditor(kind,id,sec,extra){if(!canEdit())return;let ex=null,parent=null,sub=null;if(kind==='section')ex=id?findSection(id):null;else if(kind==='sub'){if(id){const s=findSection(sec)||db.sections.find(x=>findSub(x,id,null));const f=s?findSub(s,id,null):null;if(f){ex=f.sub;parent=f.parentId;sec=s.id;}}else parent=extra||null;}else if(kind==='lesson')ex=ID?findLesson(id):null;else ex=id?db.books.find(b=>b.id===id):null;ED={kind,id,sec,sub,parent,color:(ex&&ex.color)||SWATCHES[db.sections.length%SWATCHES.length],emoji:(ex&&ex.emoji)||'📁',icon:(ex&&ex.icon)||null};go('editor',{kind,id,sec});}
 const fld=(l,inner)=>'<div class="fld"><label>'+l+'</label>'+inner+'</div>';
 function vEditor(){const k=ED.kind;let ex=null;if(k==='section')ex=ED.id?findSection(ED.id):null;else if(k==='sub'&&ED.id){const s=findSection(ED.sec)||db.sections.find(x=>findSub(x,ED.id,null));const f=s?findSub(s,ED.id,null):null;ex=f?f.sub:null;}else if(k==='lesson')ex=ED.id?(findLesson(ED.id)||{}).l:null;else ex=ED.id?db.books.find(b=>b.id===ED.id):null;const titles={section:ex?'Раздел':'Новый раздел',sub:ex?'Подраздел':'Новый подраздел',lesson:ex?'Урок':'Новый урок',book:ex?'Книга':'Новая книга'};let h='<header class="hdr"><button class="icbtn" data-action="back">'+ic('back')+'</button><h1 class="ttl" style="font-size:19px">'+titles[k]+'</h1><span style="width:42px"></span></header>';if(k==='section'){h+=fld('Название','<input name="title" maxlength="60" placeholder="Например: Основы" value="'+esc(ex?ex.title:'')+'">')+'<div class="fld"><label>Иконка</label><div style="display:flex;gap:10px;align-items:center"><div class="ep-prev" id="emoji-preview">'+((ED.icon&&I[ED.icon])?ic(ED.icon,'ic-l'):(ED.emoji||'📁'))+'</div><button class="btn gh" data-action="emoji-open">Эмодзи</button><button class="btn gh" data-action="icon-open">SVG</button></div></div>'+fld('Описание (необязательно)','<textarea name="desc" rows="2" maxlength="140" placeholder="Пара слов о разделе">'+esc(ex&&ex.desc||'')+'</textarea>')+'<div class="fld"><label>Цвет</label><div class="swatches">'+SWATCHES.map(c=>'<button class="swatch'+(ED.color===c?' on':'')+'" style="background:'+c+'" data-action="swatch" data-c="'+c+'"></button>').join('')+'</div></div><div class="hint">💡 Выберите эмодзи или SVG-иконку. Иконка окрасится в цвет раздела и будет везде (список, плеер). Если не выбрать — подберётся по названию.</div>';}else if(k==='sub'){h+=fld('Название','<input name="title" maxlength="60" placeholder="Например: Часть 1" value="'+esc(ex?ex.title:'')+'">')+fld('Описание (необязательно)','<textarea name="desc" rows="2" maxlength="140">'+esc(ex&&ex.desc||'')+'</textarea>')+'<div class="hint">💡 Подраздел открывается как отдельный экран. Внутри него можно создавать свои подразделы — столько уровней, сколько нужно.</div>';}else if(k==='lesson'){h+=fld('Название','<input name="title" maxlength="80" placeholder="Например: Урок 1. Введение" value="'+esc(ex?ex.title:'')+'">')+fld('Ссылка на аудио (mp3)','<input name="url" inputmode="url" placeholder="https://…/файл.mp3" value="'+esc(ex?ex.url:'')+'">')+fld('Описание (необязательно)','<textarea name="desc" rows="2" maxlength="140">'+esc(ex&&ex.desc||'')+'</textarea>')+'<div class="hint">💡 Нужна прямая https-ссылка на mp3. Длительность определится автоматически сразу после сохранения.</div>';}else{h+=fld('Название','<input name="title" maxlength="80" placeholder="Например: Хрестоматия" value="'+esc(ex?ex.title:'')+'">')+fld('Автор','<input name="author" maxlength="60" value="'+esc(ex&&ex.author||'')+'">')+fld('Раздел (необязательно)','<input name="cat" maxlength="40" placeholder="Например: Акыда" value="'+esc(ex&&ex.cat||'')+'">')+fld('Ссылка на PDF','<input name="url" inputmode="url" placeholder="https://…/файл.pdf" value="'+esc(ex?ex.url:'')+'">')+fld('Обложка — ссылка на картинку (необязательно)','<input name="cover" inputmode="url" placeholder="https://…/cover.jpg" value="'+esc(ex&&ex.cover||'')+'">')+'<div class="hint">💡 Прямая https-ссылка на .pdf. Книги с одинаковым «Разделом» группируются вместе. Лучше всего — файлы на GitHub Pages, Internet Archive или Dropbox.</div>';}h+='<div class="ed-btns">'+(ex?'<button class="btn dngr" data-action="del-editor">'+ic('trash','ic-s')+' Удалить</button>':'')+'<button class="btn pr" data-action="save-editor">'+ic('check','ic-s')+' Сохранить</button></div>';return h;}
 function saveEditor(){if(!canEdit())return toast('Нет доступа');if(!ED)return;const __audioId=AE.cur;const __audioTime=__audioId&&isFinite(AE.a.currentTime)?AE.a.currentTime:null;const __audioPlaying=__audioId&&!AE.a.paused;const q=n=>{const el=document.querySelector('#scr-editor [name="'+n+'"]');return el?el.value.trim():'';};const k=ED.kind;if(k==='section'){const title=q('title');if(!title)return toast('Введите название раздела');const data={title,emoji:ED.icon?'':(ED.emoji||'📁'),icon:ED.icon||null,desc:q('desc'),color:ED.color};if(ED.id)Object.assign(findSection(ED.id),data);else db.sections.push(Object.assign({id:uid(),lessons:[],subs:[]},data));}else if(k==='sub'){const title=q('title');if(!title)return toast('Введите название подраздела');const s=findSection(ED.sec);if(!s)return toast('Раздел не найден');const data={title,desc:q('desc')};if(ED.id){const f=findSub(s,ED.id,null);if(f)Object.assign(f.sub,data);}else{let container=s;if(ED.parent){const f=findSub(s,ED.parent,null);if(!f)return toast('Подраздел не найден');container=f.sub;}container.subs=container.subs||[];container.subs.push(Object.assign({id:uid(),lessons:[],subs:[]},data));}}else if(k==='lesson'){const title=q('title'),url=q('url');if(!title)return toast('Введите название урока');if(!/^https?:\/\//.test(url))return toast('Нужна прямая ссылка https на mp3');const data={title,url,desc:q('desc')};let lid=ED.id;if(lid){const f=findLesson(lid);if(f)Object.assign(f.l,data);}else{lid=uid();const s=findSection(ED.sec);if(!s)return toast('Раздел не найден');if(ED.sub){const f=findSub(s,ED.sub,null);if(!f)return toast('Подраздел не найден');f.sub.lessons=f.sub.lessons||[];f.sub.lessons.push(Object.assign({id:lid},data));}else{s.lessons=s.lessons||[];s.lessons.push(Object.assign({id:lid},data));}}probeDuration(url,d=>{if(d){const g=findLesson(lid);if(g){g.l.dur=Math.round(d);save();rerender();toast('Длительность: '+fmt(d));}}});}else{const title=q('title'),url=q('url');if(!title)return toast('Введите название книги');if(!/^https?:\/\//.test(url))return toast('Нужна прямая ссылка https на pdf');const data={title,author:q('author'),cat:q('cat'),url,cover:q('cover')};if(ED.id)Object.assign(db.books.find(b=>b.id===ED.id)||{},data);else db.books.push(Object.assign({id:uid()},data));}normalize();save();hap('success');toast('Сохранено');history.back();setTimeout(()=>{if(__audioId&&__audioTime!=null&&AE.cur===__audioId){try{AE.a.currentTime=__audioTime;}catch(e){}if(__audioPlaying&&!AE.a.paused){}else if(__audioPlaying)AE.a.play().catch(()=>{});playerTick();}},0);}
