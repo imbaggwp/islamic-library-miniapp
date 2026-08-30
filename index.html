@@ -1,19 +1,4 @@
-
-                        <!DOCTYPE html>
-                        <html lang="en">
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <style>
-                body {
-                  background-color: white; /* Ensure the iframe has a white background */
-                }
-
-                
-              </style>
-                        </head>
-                        <body>
-                            <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -70,6 +55,7 @@ body {
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
+    font-size: 14px;
 }
 .app { max-width: 500px; margin: 0 auto; background: var(--bg-primary); min-height: 100vh; position: relative; padding-bottom: 140px; }
 
@@ -640,6 +626,81 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; c
     flex-shrink: 0;
 }
 .quote-item-delete svg { width: 14px; height: 14px; }
+
+/* Сетка разделов как на фото 3 */
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.category-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    text-align: center;
+}
+.category-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.category-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 24px;
+}
+
+.category-name {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+}
+
+.category-count {
+    font-size: 12px;
+    color: var(--text-tertiary);
+}
+
+.category-menu-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--bg-tertiary);
+    border: none;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+}
+.editor-mode .category-menu-btn { display: flex; }
+.category-menu-btn svg { width: 16px; height: 16px; }
+
+/* Цвета для категорий */
+.cat-color-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.cat-color-2 { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.cat-color-3 { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+.cat-color-4 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+.cat-color-5 { background: linear-gradient(135deg, #ec4899, #db2777); }
+.cat-color-6 { background: linear-gradient(135deg, #10b981, #059669); }
+.cat-color-7 { background: linear-gradient(135deg, #f97316, #ea580c); }
+.cat-color-8 { background: linear-gradient(135deg, #14b8a6, #0d9488); }
 
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
@@ -1290,7 +1351,7 @@ function renderHome() {
                     </div>
                     <div class="quick-action-content">
                         <div class="quick-action-title truncate">${escapeHtml(continueItem.title)}</div>
-                        <div class="quick-action-sub">${continueItem.type === 'lesson' ? '⏱ ' + formatDuration(continueItem.duration) : ' стр. ' + continueItem.progress.position + ' / ' + continueItem.pages}</div>
+                        <div class="quick-action-sub">${continueItem.type === 'lesson' ? '⏱ ' + formatDuration(continueItem.duration) : '📄 стр. ' + continueItem.progress.position + ' / ' + continueItem.pages}</div>
                         <div class="progress-bar" style="margin-top: 6px;">
                             <div class="progress-fill" style="width: ${continueItem.progress.percent}%"></div>
                         </div>
@@ -1487,7 +1548,7 @@ function confirmDeleteCat(id) {
         DB.set('books', getBooks().filter(b => !ids.includes(b.categoryId)));
         state.currentCategory = null;
         renderTab();
-        showToast('🗑 Раздел удалён');
+        showToast(' Раздел удалён');
     });
 }
 
@@ -1581,23 +1642,31 @@ function renderContentList(container, type) {
             </div>
         `;
     } else {
+        // Сетка разделов как на фото 3
         if (tree.length > 0) {
-            html += `<div class="section"><div class="section-title">${icon('folder', 14)} Разделы</div>`;
-            tree.forEach(cat => {
-                const total = countItemsInTree(cat, type);
+            html += `<div class="section"><div class="section-title" style="font-size: 16px; text-transform: none; margin-bottom: 0;">Разделы <span class="badge">${tree.length}</span></div>`;
+            html += `<div class="categories-grid">`;
+            tree.forEach((cat, index) => {
+                const totalL = countItemsInTree(cat, 'lesson');
+                const totalB = countItemsInTree(cat, 'book');
+                const doneL = cat.lessons.filter(l => getProgress('lesson', l.id)?.completed).length;
+                const doneB = cat.books.filter(b => getProgress('book', b.id)?.completed).length;
+                const colorClass = `cat-color-${(index % 8) + 1}`;
+                
                 html += `
-                    <div class="card" onclick="openCategory(${cat.id})">
-                        <button class="card-menu-btn" onclick="event.stopPropagation(); showCategoryMenu(event, ${cat.id})">${icon('moreVertical', 16)}</button>
-                        <div class="card-title">
-                            <span style="font-size: 20px;">${cat.emoji || '📂'}</span>
-                            <span style="flex: 1; padding-right: 30px;" class="truncate">${escapeHtml(cat.title)}</span>
-                            <span class="badge">${total}</span>
+                    <div class="category-card" onclick="openCategory(${cat.id})">
+                        <button class="category-menu-btn" onclick="event.stopPropagation(); showCategoryMenu(event, ${cat.id})">${icon('moreVertical', 16)}</button>
+                        <div class="category-icon ${colorClass}">
+                            ${cat.emoji || '📂'}
                         </div>
-                        ${cat.description ? `<div class="card-desc">${escapeHtml(cat.description)}</div>` : ''}
+                        <div class="category-name">${escapeHtml(cat.title)}</div>
+                        <div class="category-count">
+                            ${type === 'lesson' ? totalL : totalB} ${type === 'lesson' ? 'уроков' : 'книг'} · ${type === 'lesson' ? doneL : doneB} пройдено
+                        </div>
                     </div>
                 `;
             });
-            html += `</div>`;
+            html += `</div></div>`;
         }
         
         if (filteredItems.length > 0) {
@@ -1650,29 +1719,31 @@ function renderCategoryView(container, type) {
     `;
     
     if (subcats.length > 0) {
-        html += `<div class="section"><div class="section-title">${icon('folder', 14)} Подразделы</div>`;
-        subcats.forEach(c => {
+        html += `<div class="section"><div class="section-title" style="font-size: 16px; text-transform: none; margin-bottom: 0;">Подразделы <span class="badge">${subcats.length}</span></div>`;
+        html += `<div class="categories-grid">`;
+        subcats.forEach((c, index) => {
             const tree = buildTree(c.id);
             const fullCat = { ...c, children: tree, lessons: getLessons().filter(l => l.categoryId === c.id), books: getBooks().filter(b => b.categoryId === c.id) };
             const totalL = countItemsInTree(fullCat, 'lesson');
             const totalB = countItemsInTree(fullCat, 'book');
+            const doneL = fullCat.lessons.filter(l => getProgress('lesson', l.id)?.completed).length;
+            const doneB = fullCat.books.filter(b => getProgress('book', b.id)?.completed).length;
+            const colorClass = `cat-color-${(index % 8) + 1}`;
+            
             html += `
-                <div class="card" onclick="openCategory(${c.id})">
-                    <button class="card-menu-btn" onclick="event.stopPropagation(); showCategoryMenu(event, ${c.id})">${icon('moreVertical', 16)}</button>
-                    <div class="card-title">
-                        <span style="font-size: 20px;">${c.emoji || ''}</span>
-                        <span style="flex: 1; padding-right: 30px;" class="truncate">${escapeHtml(c.title)}</span>
-                        ${icon('chevronRight', 16)}
+                <div class="category-card" onclick="openCategory(${c.id})">
+                    <button class="category-menu-btn" onclick="event.stopPropagation(); showCategoryMenu(event, ${c.id})">${icon('moreVertical', 16)}</button>
+                    <div class="category-icon ${colorClass}">
+                        ${c.emoji || '📂'}
                     </div>
-                    <div class="card-sub">
-                        ${totalL > 0 ? `${icon('headphones', 12)} ${totalL}` : ''}
-                        ${totalL > 0 && totalB > 0 ? ' • ' : ''}
-                        ${totalB > 0 ? `${icon('book', 12)} ${totalB}` : ''}
+                    <div class="category-name">${escapeHtml(c.title)}</div>
+                    <div class="category-count">
+                        ${type === 'lesson' ? totalL : totalB} ${type === 'lesson' ? 'уроков' : 'книг'} · ${type === 'lesson' ? doneL : doneB} пройдено
                     </div>
                 </div>
             `;
         });
-        html += `</div>`;
+        html += `</div></div>`;
     }
     
     if (lessons.length > 0) {
@@ -2076,12 +2147,12 @@ function addBookmark() {
     if (existing >= 0) {
         bookmarks.splice(existing, 1);
         DB.set(key, bookmarks);
-        showToast(' Закладка удалена');
+        showToast('🔖 Закладка удалена');
     } else {
         bookmarks.push({ page: state.pdfPage, date: new Date().toISOString() });
         bookmarks.sort((a, b) => a.page - b.page);
         DB.set(key, bookmarks);
-        showToast(' Закладка добавлена');
+        showToast('🔖 Закладка добавлена');
     }
     openBook(state.currentBook.id);
 }
@@ -2120,7 +2191,7 @@ function completeBook() {
     if (!state.currentBook) return;
     saveProgress('book', state.currentBook.id, 100, state.currentBook.pages, true);
     closePdf();
-    showToast('🎉 Книга прочитана!');
+    showToast(' Книга прочитана!');
 }
 
 function closePdf() {
@@ -2275,7 +2346,7 @@ function renderProfile() {
     const tgUserId = tg?.initDataUnsafe?.user?.id;
     const isAdmin = tgUserId && ADMIN_TELEGRAM_IDS.includes(tgUserId);
     
-    // Для локального тестирования (в браузере) показываем кнопку
+    // Показываем кнопку только админам или при тестировании в браузере
     const showActivateButton = !state.editorMode && (isAdmin || !tg);
     
     container.innerHTML = `
@@ -2347,7 +2418,7 @@ function renderProfile() {
         </div>
         
         <div style="text-align: center; color: var(--text-tertiary); font-size: 12px; margin-top: 20px; padding: 16px;">
-            <div>Уроки и Книги v4.5</div>
+            <div>Уроки и Книги v4.6</div>
             <div style="margin-top: 4px;">Сделано с ❤️</div>
         </div>
     `;
@@ -2491,7 +2562,7 @@ function deleteQuote(index) {
     quotes.splice(index, 1);
     DB.set('quotes', quotes);
     renderAdmin();
-    showToast(' Цитата удалена');
+    showToast('🗑 Цитата удалена');
 }
 
 function resetQuotes() {
@@ -2638,7 +2709,7 @@ function showBookForm(catId = null, editId = null) {
     }
     
     const catOptions = allCats.map(c => 
-        `<option value="${c.id}" ${(book?.categoryId || catId) === c.id ? 'selected' : ''}>${c.emoji || ''} ${escapeHtml(c.title)}</option>`
+        `<option value="${c.id}" ${(book?.categoryId || catId) === c.id ? 'selected' : ''}>${c.emoji || '📂'} ${escapeHtml(c.title)}</option>`
     ).join('');
     
     document.getElementById('modal-body').innerHTML = `
@@ -2727,18 +2798,3 @@ init();
 </script>
 </body>
 </html>
-
-
-              <script>
-                              // Проверяем, есть ли пользователь в списке админов
-const tgUserId = tg?.initDataUnsafe?.user?.id;
-const isAdmin = tgUserId && ADMIN_TELEGRAM_IDS.includes(tgUserId);
-
-// Показываем кнопку только админам (или при тестировании в браузере)
-const showActivateButton = !state.editorMode && (isAdmin || !tg);
-
-
-              </script>
-                        </body>
-                        </html>
-                    
