@@ -425,6 +425,26 @@ textarea.ex{width:100%;height:150px;background:var(--card2);border-radius:14px;b
 .note-body-edit code{background:var(--card2);padding:1px 6px;border-radius:6px;font-family:ui-monospace,monospace;font-size:.92em}
 .note-body-edit hr{border:0;border-top:1px solid var(--line);margin:1em 0}
 .note-meta{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--ink2);padding:0 4px}
+/* Styles for Note View Mode */
+.note-view-container { padding: 10px 0; }
+.note-view-title { font-family: var(--fd); font-size: 24px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; word-break: break-word; }
+.note-view-date { font-size: 12px; color: var(--ink2); margin-bottom: 20px; display: flex; align-items: center; gap: 6px; }
+.note-view-content { font-size: 16px; line-height: 1.7; color: var(--ink); word-break: break-word; }
+.note-view-content h1 { font-family: var(--fd); font-size: 22px; font-weight: 700; margin: 1.2em 0 0.5em; line-height: 1.25; }
+.note-view-content h2 { font-family: var(--fd); font-size: 18px; font-weight: 700; margin: 1em 0 0.4em; line-height: 1.3; }
+.note-view-content h3 { font-size: 16px; font-weight: 700; margin: 1em 0 0.4em; }
+.note-view-content p { margin: 0.6em 0; }
+.note-view-content ul, .note-view-content ol { padding-left: 1.4em; margin: 0.6em 0; }
+.note-view-content li { margin: 0.3em 0; }
+.note-view-content blockquote { border-left: 3px solid var(--acc); padding: 0.4em 0 0.4em 16px; margin: 0.8em 0; color: var(--ink2); font-style: italic; background: var(--card2); border-radius: 0 8px 8px 0; }
+.note-view-content b, .note-view-content strong { font-weight: 700; }
+.note-view-content i, .note-view-content em { font-style: italic; }
+.note-view-content u { text-decoration: underline; }
+.note-view-content s, .note-view-content strike { text-decoration: line-through; }
+.note-view-content a { color: var(--acc); text-decoration: underline; }
+.note-view-content code { background: var(--card2); padding: 2px 6px; border-radius: 6px; font-family: ui-monospace, monospace; font-size: 0.9em; }
+.note-view-content hr { border: 0; border-top: 1px solid var(--line); margin: 1.5em 0; }
+.note-view-actions { display: flex; gap: 10px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); }
 </style>
 </head>
 <body>
@@ -446,6 +466,7 @@ textarea.ex{width:100%;height:150px;background:var(--card2);border-radius:14px;b
 <section class="scr" id="scr-reader"></section>
 <section class="scr" id="scr-editor"></section>
 <section class="scr" id="scr-note-edit"></section>
+<section class="scr" id="scr-note-view"></section>
 </main>
 <div id="miniplayer" hidden></div>
 <nav id="tabbar" hidden></nav>
@@ -553,7 +574,7 @@ function lessonPathTitles(id){for(const s of db.sections){const r=walkChain(s,id
 function walkChain(node,id,acc){const hit=(node.lessons||[]).find(l=>l.id===id);if(hit)return acc.concat([hit.title]);for(const sb of(node.subs||[])){const r=walkChain(sb,id,acc.concat([sb.title]));if(r)return r;}return null;}
 function reportItem(type,id){let msg='';if(type==='lesson'){const f=findLesson(id);if(!f)return;const chain=lessonPathTitles(id)||[f.s.title,f.l.title];msg='Ассаляму Алейкум! Не открывается урок. Путь: '+chain.join(' → ')+'. ('+appName()+' v'+VER+')';}else{const b=db.books.find(x=>x.id===id);if(!b)return;const cat=(b.cat||'').trim();msg='Ассаляму Алейкум! Не открывается книга. Путь: Книги'+(cat?' → '+cat:'')+' → '+b.title+'. ('+appName()+' v'+VER+')';}sendReport(msg);}
 function sendSubscribe(on,time){if(!WORKER_URL||!TG_USER)return;fetch(WORKER_URL+'/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_USER.id,time:time,on:!!on,tzOffset:new Date().getTimezoneOffset()})}).catch(()=>{});}
-function sendAnnounce(){if(!WORKER_URL||!TG_USER)return;fetch(WORKER_URL+'/announce',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_USER.id,text:'🎉 Вышли новые уроки в «'+appName()+'»! Заходите заниматься ✨'})}).catch(()=>{});}
+function sendAnnounce(){if(!WORKER_URL||!TG_USER)return;fetch(WORKER_URL+'/announce',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_USER.id,text:'🎉 Вышли новые уроки в «'+appName()+'»! Заходите заниматься '})}).catch(()=>{});}
 const REMIND_TIMES=['06:00','07:00','08:00','09:00','12:00','15:00','18:00','19:00','20:00','21:00','22:00'];
 function remindModal(){const cur=db.settings.reminderTime||'19:00';let h='<div class="m-ttl">Время напоминания</div><div class="m-txt">По вашему местному времени.</div><div class="ep-grid" style="grid-template-columns:repeat(3,1fr)">';h+=REMIND_TIMES.map(t=>'<button data-action="remind-set" data-t="'+t+'" style="font-size:15px;font-weight:600;'+(t===cur?'outline:2px solid var(--acc);':'')+'">'+t+'</button>').join('');h+='</div>';modal(h);}
 function heatColor(lv){if(lv<=0)return'var(--card2)';return hexA('#F4511E',[0,0.25,0.5,0.78,1][lv]||1);}
@@ -661,7 +682,7 @@ AE.a.addEventListener('error',()=>{if(AE.cur)toast('Не удалось загр
 window.addEventListener('beforeunload',save);
 document.addEventListener('visibilitychange',()=>document.hidden&&save());
 setInterval(save,10000);
-function markDone(id,v){const pr=db.progress[id]||(db.progress[id]={});if(v&&!pr.done){pr.done=true;pr.doneTs=Date.now();pr.pos=pr.dur||pr.pos;hap('success');toast('Урок пройден ');save();}else if(!v){pr.done=false;save();}}
+function markDone(id,v){const pr=db.progress[id]||(db.progress[id]={});if(v&&!pr.done){pr.done=true;pr.doneTs=Date.now();pr.pos=pr.dur||pr.pos;hap('success');toast('Урок пройден 🎉');save();}else if(!v){pr.done=false;save();}}
 function onPlayState(){const playing=AE.cur&&!AE.a.paused;const pb=$('#p-playbtn');if(pb)pb.innerHTML=ic(playing?'pause':'play',playing?'':'pl');const art=$('.p-art');if(art)art.classList.toggle('playing',!!playing);document.querySelectorAll('.eq[data-live]').forEach(e=>e.classList.toggle('on',playing));syncMini();const top=stackTop().s;if(['section','folder','home','lessons','favs','books'].includes(top))rerender();}
 function msMeta(l){if(!('mediaSession'in navigator))return;try{const f=findLesson(l.id);navigator.mediaSession.metadata=new MediaMetadata({title:l.title,artist:(f&&f.s.title)||appName(),album:appName()});navigator.mediaSession.setActionHandler('play',()=>AE.a.play());navigator.mediaSession.setActionHandler('pause',()=>AE.a.pause());const st=db.settings.skipStep||15;navigator.mediaSession.setActionHandler('seekbackward',()=>AE.skip(-st));navigator.mediaSession.setActionHandler('seekforward',()=>AE.skip(st));}catch(e){}}
 const PDFJS_URLS = [
@@ -867,7 +888,7 @@ function vFolder(p){const s=findSection(p.id);const f=s?findSub(s,p.sub,null):nu
 function bookCard(b,i){const read=db.readB.includes(b.id);const pg=db.pages[b.id];return'<div class="bcard fade" style="animation-delay:'+(i*.05)+'s"><div class="bcover" data-action="open-pdf" data-id="'+b.id+'" style="background:'+coverGrad(b)+'">'+(b.cover?'<img src="'+esc(b.cover)+'" alt="">':'<div class="bc-t"'+(hasArabic(b.title)?' ar':'')+'>'+esc(b.title)+'</div><div class="bc-a">'+esc(b.author||'')+'</div>')+'<span class="bc-open">'+ic('book','ic-s')+'</span></div><div class="bmeta"><div><div class="bt">'+esc(trunc(b.title,36))+'</div><div class="ba">'+esc(b.author||'')+(pg?' · стр. '+pg:'')+'</div></div><div class="brow">'+(canEdit()?'<button class="edit-book-btn" data-action="edit-book" data-id="'+b.id+'" aria-label="Редактировать книгу" title="Редактировать">'+ic('pen','ic-s')+'</button>':'')+'<button class="chip'+(read?' on':'')+'" data-action="read-b" data-id="'+b.id+'">'+ic('check','ic-s')+' Прочитано</button><button class="heart'+(db.favB.includes(b.id)?' on':'')+'" style="width:30px;height:30px" data-action="fav-b" data-id="'+b.id+'">'+ic('heart','ic-s')+'</button></div></div></div>';}
 function vBooks(){
 const tab=db.settings.booksTab||'books';
-let h='<header class="hdr"><div><div class="kick">'+(tab==='notes'?db.notes.length+' '+plural(db.notes.length,'конспект','конспекта','конспектов'):db.books.length+' '+plural(db.books.length,'книга','книги','книг'))+'</div><h1 class="ttl">'+(tab==='notes'?'Конспекты':'Библиотека')+'</h1></div><div class="hdr-r">'+(canEdit()?'<button class="addbtn" data-action="'+(tab==='notes'?'add-note':'add-book')+'">'+ic('plus','ic-s')+' '+(tab==='notes'?'Конспект':'Книга')+'</button>':'')+'<button class="icbtn" data-action="search" aria-label="Поиск">'+ic('search')+'</button><button class="icbtn" data-action="profile" aria-label="Профиль">'+ic('user')+'</button></div></header>';
+let h='<header class="hdr"><div><div class="kick">'+(tab==='notes'?db.notes.length+' '+plural(db.notes.length,'конспект','конспекта','конспектов'):db.books.length+' '+plural(db.books.length,'книга','книги','книг'))+'</div><h1 class="ttl">'+(tab==='notes'?'Конспекты':'Библиотека')+'</h1></div><div class="hdr-r">'+(canEdit() && tab==='notes' ? '<button class="addbtn" data-action="add-note">'+ic('plus','ic-s')+' Конспект</button>' : '')+(canEdit() && tab==='books' ? '<button class="addbtn" data-action="add-book">'+ic('plus','ic-s')+' Книга</button>' : '')+'<button class="icbtn" data-action="search" aria-label="Поиск">'+ic('search')+'</button><button class="icbtn" data-action="profile" aria-label="Профиль">'+ic('user')+'</button></div></header>';
 h+='<div class="books-tabs">';
 h+='<button class="books-tab'+(tab==='books'?' on':'')+'" data-action="books-tab" data-v="books">'+icTab('bookopen')+'<span>Книги</span></button>';
 h+='<button class="books-tab'+(tab==='notes'?' on':'')+'" data-action="books-tab" data-v="notes">'+icTab('doc')+'<span>Конспекты</span></button>';
@@ -875,7 +896,7 @@ h+='</div>';
 if(tab==='notes'){
 const notes=(db.notes||[]).slice().sort((a,b)=>(b.updatedAt||b.ts||0)-(a.updatedAt||a.ts||0));
 if(!notes.length){
-h+=emptyBox('Конспектов пока нет','Создайте свой первый конспект — пишите мысли, выделяйте важное, структурируйте знания.',{a:'add-note',t:'+ Новый конспект'});
+h+=emptyBox('Конспектов пока нет','Создайте свой первый конспект — пишите мысли, выделяйте важное, структурируйте знания.', canEdit() ? {a:'add-note',t:'+ Новый конспект'} : null);
 }else{
 h+='<div class="note-list">';
 notes.forEach((n,i)=>{
@@ -891,6 +912,29 @@ return h;
 }
 if(!db.books.length)return h+emptyBox('Полка пустая',canEdit()?'Добавьте PDF-книги по прямым ссылкам.':'Книги скоро появятся.',canEdit()?{a:'add-book',t:'Добавить книгу'}:null);const cats=[];db.books.forEach(b=>{const c=(b.cat||'').trim();if(c&&!cats.includes(c))cats.push(c);});let i=0;cats.forEach(c=>{h+='<div class="sec-head" style="margin-top:14px"><h2 class="h2">'+esc(c)+'</h2></div><div class="bgrid">'+db.books.filter(b=>(b.cat||'').trim()===c).map(b=>bookCard(b,i++)).join('')+'</div>';});const nocat=db.books.filter(b=>!(b.cat||'').trim());if(nocat.length){h+=(cats.length?'<div class="sec-head" style="margin-top:14px"><h2 class="h2">Другое</h2></div>':'')+'<div class="bgrid">'+nocat.map(b=>bookCard(b,i++)).join('')+'</div>';}return h;}
 function vReader(p){const b=db.books.find(x=>x.id===p.id);if(!b)return'<div style="padding:40px;text-align:center">Книга не найдена</div>';return'<header class="hdr r-head" style="margin-bottom:10px"><button class="icbtn" data-action="back">'+ic('back')+'</button><div class="hdr-r"><button class="icbtn" id="r-bm" data-action="bm-toggle" aria-label="Закладка">'+ic('bookmark')+'</button><button class="icbtn" data-action="bm-list" aria-label="Список закладок">'+ic('list')+'</button><button class="icbtn" data-action="r-fs" aria-label="Во весь экран">'+ic('expand')+'</button><button class="icbtn" data-action="open-ext" data-id="'+b.id+'" aria-label="Открыть во внешнем просмотрщике">'+ic('ext')+'</button></div></header><div class="r-titleline"><div class="r-title">'+esc(b.title)+'</div></div><div class="reader" id="reader"><div class="r-load">Загрузка книги…</div></div><div class="r-bar"><button class="icbtn" data-action="r-zoom" data-z="-1" aria-label="Уменьшить">'+ic('minus')+'</button><button class="icbtn" data-action="r-prev" aria-label="Предыдущая страница">'+ic('back')+'</button><div class="r-page" id="r-page">…</div><button class="icbtn" data-action="r-next" aria-label="Следующая страница">'+ic('chev')+'</button><button class="icbtn" data-action="r-zoom" data-z="1" aria-label="Увеличить">'+ic('plus')+'</button></div>';}
+
+// --- NOTE VIEW MODE ---
+function vNoteView(p){
+    const id=p.id;
+    const note=findNote(id);
+    if(!note) return '<div style="padding:40px;text-align:center">Конспект не найден</div>';
+    
+    let h='<header class="hdr"><button class="icbtn" data-action="back">'+ic('back')+'</button><h1 class="ttl" style="font-size:19px">Конспект</h1><div class="hdr-r">';
+    if(canEdit()){
+        h+='<button class="icbtn" data-action="note-to-edit" data-id="'+esc(id)+'" title="Редактировать">'+ic('pen')+'</button>';
+        h+='<button class="icbtn" data-action="note-delete" data-id="'+esc(id)+'" style="color:#E23A28" title="Удалить">'+ic('trash')+'</button>';
+    }
+    h+='</div></header>';
+    
+    h+='<div class="note-view-container fade">';
+    h+='<div class="note-view-title">'+esc(note.title||'Без названия')+'</div>';
+    h+='<div class="note-view-date">'+ic('clock','ic-s')+' '+fmtDate(note.updatedAt||note.ts)+'</div>';
+    h+='<div class="note-view-content">'+(note.text||'<span style="opacity:0.5">Пустой конспект</span>')+'</div>';
+    h+='</div>';
+    
+    return h;
+}
+
 // Экран редактирования конспекта
 let noteEditorState=null;
 function vNoteEdit(p){
@@ -993,6 +1037,8 @@ n.updatedAt=now;
 save();
 hap('success');
 toast('Конспект сохранён ✏️');
+// После сохранения переходим на экран просмотра, а не остаемся в редакторе
+go('note-view', {id: noteEditorState.id});
 }
 function vSearch(){return'<header class="hdr"><button class="icbtn" data-action="back">'+ic('back')+'</button><h1 class="ttl" style="font-size:19px">Поиск</h1><span style="width:42px"></span></header><div class="search-bar"><input id="search-input" placeholder="Уроки, подразделы, книги, конспекты…" autocomplete="off"></div><div id="search-results"></div>';}
 function renderSearchResults(){const box=$('#search-results');if(!box)return;const q=searchQ.trim().toLowerCase();if(q.length<2){box.innerHTML='<div class="m-txt" style="text-align:center;padding:34px 10px">Введите минимум 2 символа для поиска</div>';return;}const r=searchAll(q);const cnt=r.sections.length+r.subs.length+r.lessons.length+r.books.length+r.notes.length;if(!cnt){box.innerHTML='<div class="empty" style="padding:34px"><div class="e-ic">🔍</div><div class="e-t">Ничего не найдено</div><div class="e-m">Попробуйте другое слово</div></div>';return;}let h='';const row=(act,attrs,iconHtml,t,m)=>'<div class="lrow card" '+act+' '+attrs+'><div class="lrow-n" style="background:var(--card2)">'+iconHtml+'</div><div class="lrow-t"><div class="t">'+esc(t)+'</div><div class="m">'+esc(m)+'</div></div><div class="sec-go">'+ic('chev')+'</div></div>';if(r.notes.length){h+='<div class="sr-group">Конспекты</div>';r.notes.forEach(n=>{h+=row('data-action="open-note"','data-id="'+esc(n.id)+'"',ic('doc','ic-s'),n.title||'Без названия',trunc(stripHtml(n.text||''),60)||'Пустой конспект');});}if(r.sections.length){h+='<div class="sr-group">Разделы</div>';r.sections.forEach(s=>{h+=row('data-action="open-section"','data-id="'+s.id+'"',secIconHTML(s,'ic-s'),s.title,'раздел · '+flatLessons(s).length+' уроков');});}if(r.subs.length){h+='<div class="sr-group">Подразделы</div>';r.subs.forEach(x=>{h+=row('data-action="open-sub"','data-id="'+x.sb.id+'" data-sec="'+x.s.id+'"',ic('folder','ic-s'),x.sb.title,x.s.title);});}if(r.lessons.length){h+='<div class="sr-group">Уроки</div>';r.lessons.forEach(x=>{h+=row('data-action="open-lesson"','data-id="'+x.l.id+'"',ic('play','ic-s'),x.l.title,x.s.title+(durOf(x.l)?' · '+fmt(durOf(x.l)):''));});}if(r.books.length){h+='<div class="sr-group">Книги</div>';r.books.forEach(b=>{h+=row('data-action="open-pdf"','data-id="'+b.id+'"',ic('doc','ic-s'),b.title,b.author||'PDF');});}box.innerHTML=h;}
@@ -1019,6 +1065,9 @@ h+='<div class="empty fade" style="padding:48px 24px">';
 h+='<div class="e-ic" style="font-size:44px;margin-bottom:12px">📝</div>';
 h+='<div class="e-t" style="font-family:var(--fd);font-weight:700;font-size:16px;margin-bottom:6px">Заметок пока нет</div>';
 h+='<div class="e-m" style="font-size:13px;color:var(--ink2);line-height:1.5;margin-bottom:18px">Откройте плеер и нажмите на карандашик — сохраняйте мысли и закладки на момент аудио.</div>';
+if(canEdit()){
+h+='<button class="btn pr" data-action="add-note">+ Новый конспект</button>';
+}
 h+='</div>';
 }else{
 h+='<div class="note-list">';
@@ -1132,7 +1181,7 @@ function tokenModal(){modal('<div class="m-ttl">GitHub токен</div><p class=
 function quotesModal(){modal('<div class="m-ttl">Цитаты дня</div><p class="m-txt">Одна цитата на строку. Источник можно указать через «—». Цитата показывается вверху вкладки «Уроки» как «мысль дня».</p><textarea class="ex" id="quotes-ta" style="height:220px;font-family:var(--fb);font-size:13px">'+esc((db.quotes||[]).join('\n'))+'</textarea><div class="m-btns"><button class="btn pr" data-action="quotes-save">Сохранить</button></div>');}
 function appNameModal(){modal('<div class="m-ttl">Название приложения</div><p class="m-txt">Отображается на экране приветствия и в профиле. После «Опубликовать для всех» новое имя увидят все ученики.</p><div class="fld"><label>Название</label><input id="an-input" maxlength="40" value="'+esc(appName())+'"></div><div class="m-btns"><button class="btn pr" data-action="appname-save">Сохранить</button></div>');}
 let mpId=null;
-function syncMini(){const mp=$('#miniplayer'),top=stackTop().s;const show=!!AE.cur&&top!=='player'&&top!=='onboard'&&top!=='note-edit'&&db.settings.onboarded;mp.hidden=!show;if(!show)return;const tabsVisible=TABS.some(t=>t[0]===top)&&stack.length===1;mp.classList.toggle('notabs',!tabsVisible);const f=findLesson(AE.cur);if(!f)return;if(mpId!==AE.cur){mpId=AE.cur;mp.innerHTML='<div class="mp-ico" style="background:'+hexA(f.s.color,.18)+'">'+(f.s.emoji||'')+'</div><div class="mp-t" data-action="open-player"><div class="t">'+esc(f.l.title)+'</div><div class="m">'+esc(f.s.title)+(f.sub?' · '+esc(f.sub.title):'')+'</div></div><button class="mp-x" data-action="mp-close" aria-label="Закрыть аудио">'+ic('x','ic-s')+'</button><button class="icbtn" id="mp-btn" data-action="mp-toggle">'+ic(AE.a.paused?'play':'pause')+'</button><div class="mp-prog"><i id="mp-prog"></i></div>';}const b=$('#mp-btn');if(b)b.innerHTML=ic(AE.a.paused?'play':'pause');}
+function syncMini(){const mp=$('#miniplayer'),top=stackTop().s;const show=!!AE.cur&&top!=='player'&&top!=='onboard'&&top!=='note-edit'&&top!=='note-view'&&db.settings.onboarded;mp.hidden=!show;if(!show)return;const tabsVisible=TABS.some(t=>t[0]===top)&&stack.length===1;mp.classList.toggle('notabs',!tabsVisible);const f=findLesson(AE.cur);if(!f)return;if(mpId!==AE.cur){mpId=AE.cur;mp.innerHTML='<div class="mp-ico" style="background:'+hexA(f.s.color,.18)+'">'+(f.s.emoji||'')+'</div><div class="mp-t" data-action="open-player"><div class="t">'+esc(f.l.title)+'</div><div class="m">'+esc(f.s.title)+(f.sub?' · '+esc(f.sub.title):'')+'</div></div><button class="mp-x" data-action="mp-close" aria-label="Закрыть аудио">'+ic('x','ic-s')+'</button><button class="icbtn" id="mp-btn" data-action="mp-toggle">'+ic(AE.a.paused?'play':'pause')+'</button><div class="mp-prog"><i id="mp-prog"></i></div>';}const b=$('#mp-btn');if(b)b.innerHTML=ic(AE.a.paused?'play':'pause');}
 function miniTick(){const el=$('#mp-prog');if(!el||!AE.cur)return;const pr=prOf(AE.cur);if(pr&&pr.dur)el.style.width=Math.min(100,pr.pos/pr.dur*100)+'%';}
 function buildTabbar(){$('#tabbar').innerHTML=TABS.map(t=>'<button class="tab" data-action="tab" data-tab="'+t[0]+'">'+ic(t[1])+'<span>'+t[2]+'</span></button>').join('');}
 let mbFn=null;
@@ -1144,8 +1193,11 @@ else if(st.s==='note-edit')setMB('СОХРАНИТЬ',saveCurrentNote);
 else clearMB();
 document.title=appName()+' — аудиоуроки и книги';
 syncMini();}
-const views={onboard:vOnboard,home:vHome,lessons:vLessons,section:vSection,folder:vFolder,books:vBooks,favs:vFavs,stats:vStats,profile:vProfile,psub:vPSub,search:vSearch,player:vPlayer,reader:vReader,editor:vEditor,'note-edit':vNoteEdit};
-function renderTop(dir){const st=stackTop();if(st.s==='player'&&!findLesson(st.p.id)){history.back();return;}const audioId=AE.cur;const audioTime=audioId&&isFinite(AE.a.currentTime)?AE.a.currentTime:null;const audioPlaying=audioId&&!AE.a.paused;if(curKey&&curKey.indexOf('reader|')===0){RD.pdf=null;RD.tok++;}if(curEl)scrollPos[curKey]=curEl.scrollTop;const el=document.getElementById('scr-'+st.s);document.querySelectorAll('.scr.on').forEach(x=>x.classList.remove('on','fwd','bwd','pop','noanim','fs'));el.innerHTML=views[st.s](st.p||{});el.classList.add('on',dir===0?'noanim':(st.s==='player'?'pop':dir<0?'bwd':'fwd'));curKey=st.s+'|'+((st.p&&st.p.id)||'')+'|'+((st.p&&st.p.sub)||'')+'|'+((st.p&&st.p.group)||'');curEl=el;el.scrollTop=scrollPos[curKey]||0;if(st.s==='player')initWave();if(st.s==='reader'){initReader(st.p.id);}if(st.s==='note-edit'){initNoteEditor();}if(st.s==='search'){const inp=$('#search-input');if(inp){inp.value=searchQ;inp.addEventListener('input',()=>{searchQ=inp.value;renderSearchResults();});renderSearchResults();setTimeout(()=>inp.focus(),80);}}if(st.s==='profile'){const ring=$('#ring');if(ring)requestAnimationFrame(()=>requestAnimationFrame(()=>ring.style.setProperty('--p',ring.dataset.p)));}chrome();if(audioId&&audioTime!=null&&AE.cur===audioId){try{AE.a.currentTime=audioTime;}catch(e){}if(audioPlaying&&!AE.a.paused){}else if(audioPlaying){AE.a.play().catch(()=>{});}}}
+const views={onboard:vOnboard,home:vHome,lessons:vLessons,section:vSection,folder:vFolder,books:vBooks,favs:vFavs,stats:vStats,profile:vProfile,psub:vPSub,search:vSearch,player:vPlayer,reader:vReader,editor:vEditor,'note-edit':vNoteEdit,'note-view':vNoteView};
+function renderTop(dir){const st=stackTop();if(st.s==='player'&&!findLesson(st.p.id)){history.back();return;}const audioId=AE.cur;const audioTime=audioId&&isFinite(AE.a.currentTime)?AE.a.currentTime:null;const audioPlaying=audioId&&!AE.a.paused;if(curKey&&curKey.indexOf('reader|')===0){RD.pdf=null;RD.tok++;}if(curEl)scrollPos[curKey]=curEl.scrollTop;const el=document.getElementById('scr-'+st.s);document.querySelectorAll('.scr.on').forEach(x=>x.classList.remove('on','fwd','bwd','pop','noanim','fs'));el.innerHTML=views[st.s](st.p||{});el.classList.add('on',dir===0?'noanim':(st.s==='player'?'pop':dir<0?'bwd':'fwd'));curKey=st.s+'|'+((st.p&&st.p.id)||'')+'|'+((st.p&&st.p.sub)||'')+'|'+((st.p&&st.p.group)||'');curEl=el;el.scrollTop=scrollPos[curKey]||0;if(st.s==='player')initWave();if(st.s==='reader'){initReader(st.p.id);}if(st.s==='note-edit'){initNoteEditor();}if(st.s==='note-view'){ // Scroll to top when viewing note
+    el.scrollTop = 0;
+}
+if(st.s==='search'){const inp=$('#search-input');if(inp){inp.value=searchQ;inp.addEventListener('input',()=>{searchQ=inp.value;renderSearchResults();});renderSearchResults();setTimeout(()=>inp.focus(),80);}}if(st.s==='profile'){const ring=$('#ring');if(ring)requestAnimationFrame(()=>requestAnimationFrame(()=>ring.style.setProperty('--p',ring.dataset.p)));}chrome();if(audioId&&audioTime!=null&&AE.cur===audioId){try{AE.a.currentTime=audioTime;}catch(e){}if(audioPlaying&&!AE.a.paused){}else if(audioPlaying){AE.a.play().catch(()=>{});}}}
 let toastT=null;
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2600);}
 function modal(inner){const m=$('#modal');m.hidden=false;m.innerHTML='<div class="m-back" data-action="m-close"></div><div class="m-card">'+inner+'</div>';requestAnimationFrame(()=>m.classList.add('on'));}
@@ -1170,7 +1222,8 @@ case 'open-sub':go('folder',{id:el.dataset.sec,sub:id});break;
 case 'open-lesson':{const f=findLesson(id);if(!f)break;if(AE.cur===id){if(AE.a.paused)AE.a.play().catch(()=>{});}else AE.load(f.l,true);if(stackTop().s!=='player'||stackTop().p.id!==id)go('player',{id});else rerender();break;}
 case 'open-player':if(AE.cur&&stackTop().s!=='player')go('player',{id:AE.cur});break;
 case 'open-pdf':go('reader',{id});break;
-case 'open-note':go('note-edit',{id});break;
+case 'open-note':go('note-view',{id});break; // Changed to note-view
+case 'note-to-edit':go('note-edit',{id});break; // New action to switch to edit mode
 case 'add-note':if(!canEdit()){toast('Добавлять заметки может только админ');break;}go('note-edit',{id:null});break;
 case 'note-save':saveCurrentNote();hap('success');break;
 case 'note-cancel':{
@@ -1216,7 +1269,7 @@ case 'icon-pick':ED.icon=el.dataset.k;ED.emoji=null;closeModal();updateSecPrevie
 case 'icon-clear':ED.icon=null;closeModal();updateSecPreview();hap();break;
 case 'emoji-pack':emojiPack=el.dataset.p;emojiPickerModal(emojiTarget);break;
 case 'emoji-pick':{const v=el.dataset.e;if(emojiTarget==='appicon'){db.settings.appIcon=v;db.settings.appLogo='';save();closeModal();hap('success');toast('Аватар обновлён');rerender();}else{ED.emoji=v;ED.icon=null;closeModal();updateSecPreview();hap();}break;}
-case 'emoji-add-my':{const ei=document.getElementById('emoji-input');const v=ei?ei.value.trim():'';if(!v){toast('Сначала вставьте эмодзи в поле');break;}db.settings.myEmojis=db.settings.myEmojis||[];if(!db.settings.myEmojis.includes(v)){db.settings.myEmojis.push(v);save();toast('Эмодзи добавлен в пак «Мои» ✨');}else toast('Этот эмодзи уже в паке «Мои»');emojiPack='my';emojiPickerModal(emojiTarget);break;}
+case 'emoji-add-my':{const ei=document.getElementById('emoji-input');const v=ei?ei.value.trim():'';if(!v){toast('Сначала вставьте эмодзи в поле');break;}db.settings.myEmojis=db.settings.myEmojis||[];if(!db.settings.myEmojis.includes(v)){db.settings.myEmojis.push(v);save();toast('Эмодзи добавлен в пак «Мои» ');}else toast('Этот эмодзи уже в паке «Мои»');emojiPack='my';emojiPickerModal(emojiTarget);break;}
 case 'appicon-save':{const inp=$('#logo-input');const v=inp?inp.value.trim():'';db.settings.appLogo=v;if(v)db.settings.appIcon='';save();closeModal();hap('success');toast('Аватар обновлён');rerender();break;}
 case 'appicon-reset':db.settings.appIcon='';db.settings.appLogo='';save();closeModal();hap();toast('Аватар сброшен');rerender();break;
 case 'r-prev':if(RD.pdf&&RD.page>1){RD.page--;hap();renderPage();}break;
