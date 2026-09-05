@@ -465,7 +465,7 @@ textarea.ex{width:100%;height:150px;background:var(--card2);border-radius:14px;b
 <div id="modal" hidden></div>
 <script>
 'use strict';
-const APP_NAME='Требуй знания!';const VER='1.52';
+const APP_NAME='Требуй знания!';const VER='1.54';
 const GITHUB_REPO='imbaggwp/tolibelm.github.io';
 const CONTENT_URL='';
 const WORKER_URL='https://tolibelmapp.asiya30092013.workers.dev';
@@ -515,7 +515,7 @@ db.settings=db.settings||{};if(db.settings.skipStep==null)db.settings.skipStep=1
 function normNode(x){x.lessons=x.lessons||[];x.subs=(x.subs||[]).map(n=>{n.id=n.id||uid();n.title=n.title||'Подраздел';n.desc=n.desc||'';return normNode(n);});return x;}
 function normalize(){db.sections=(db.sections||[]).map(normNode);}
 normalize();
-function save(){try{localStorage.setItem(LS,JSON.stringify(db));}catch(e){}}
+function save(){try{localStorage.setItem(LS,JSON.stringify(db));cloudSaveDebounced();}catch(e){}}
 const appName=()=>(db.settings.appName||APP_NAME);
 function appIcoInner(){if(db.settings.appLogo)return'<img src="'+esc(db.settings.appLogo)+'" alt="">';if(db.settings.appIcon)return'<span style="font-size:30px;line-height:1">'+esc(db.settings.appIcon)+'</span>';return ic('book');}
 const getGhToken=()=>{try{return localStorage.getItem('ilm_gh_token')||'';}catch(e){return'';}};
@@ -547,7 +547,85 @@ function lessonPathTitles(id){for(const s of db.sections){const r=walkChain(s,id
 function walkChain(node,id,acc){const hit=(node.lessons||[]).find(l=>l.id===id);if(hit)return acc.concat([hit.title]);for(const sb of(node.subs||[])){const r=walkChain(sb,id,acc.concat([sb.title]));if(r)return r;}return null;}
 function reportItem(type,id){let msg='';if(type==='lesson'){const f=findLesson(id);if(!f)return;const chain=lessonPathTitles(id)||[f.s.title,f.l.title];msg='Ассаляму Алейкум! Не открывается урок. Путь: '+chain.join(' → ')+'. ('+appName()+' v'+VER+')';}else{const b=db.books.find(x=>x.id===id);if(!b)return;const cat=(b.cat||'').trim();msg='Ассаляму Алейкум! Не открывается книга. Путь: Книги'+(cat?' → '+cat:'')+' → '+b.title+'. ('+appName()+' v'+VER+')';}sendReport(msg);}
 function sendSubscribe(on,time){if(!WORKER_URL||!TG_USER)return;fetch(WORKER_URL+'/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_USER.id,time:time,on:!!on,tzOffset:new Date().getTimezoneOffset()})}).catch(()=>{});}
-function sendAnnounce(){if(!WORKER_URL||!TG_USER)return;fetch(WORKER_URL+'/announce',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_USER.id,text:'🎉 Вышли новые уроки в «'+appName()+'»! Заходите заниматься '})}).catch(()=>{});}
+function sendAnnounce(){if(!WORKER_URL||!TG_USER)return;fetch(WORKER_URL+'/announce',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_USER.id,text:' Вышли новые уроки в «'+appName()+'»! Заходите заниматься '})}).catch(()=>{});}
+/* ===== ОБЛАЧНАЯ СИНХРОНИЗАЦИЯ ===== */
+let cloudSaveTimer=null;
+let cloudSyncing=false;
+let cloudLastSaved=null;
+function cloudSaveDebounced(){
+clearTimeout(cloudSaveTimer);
+cloudSaveTimer=setTimeout(()=>cloudSaveNow(),2000);
+}
+async function cloudSaveNow(){
+if(!TG_USER||!WORKER_URL||cloudSyncing)return;
+const currentHash=JSON.stringify({
+progress:db.progress,
+audioNotes:db.audioNotes,
+favL:db.favL,
+favB:db.favB,
+readB:db.readB,
+pages:db.pages,
+bookmarks:db.bookmarks,
+days:db.days,
+listenSec:db.listenSec,
+last:db.last,
+notes:db.notes||[],
+settings:db.settings
+});
+if(currentHash===cloudLastSaved)return;
+cloudLastSaved=currentHash;
+cloudSyncing=true;
+try{
+const res=await fetch(WORKER_URL+'/save-db',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({chat_id:TG_USER.id,db:{
+progress:db.progress,
+audioNotes:db.audioNotes,
+favL:db.favL,
+favB:db.favB,
+readB:db.readB,
+pages:db.pages,
+bookmarks:db.bookmarks,
+days:db.days,
+listenSec:db.listenSec,
+last:db.last,
+notes:db.notes||[],
+settings:db.settings,
+syncedAt:Date.now()
+}})
+});
+const j=await res.json().catch(()=>({}));
+if(j.ok){console.log('☁️ Сохранено в облако:',j.size,'байт');}
+else if(j.error==='too_large'){console.warn('️ База слишком большая для облака:',j.size);}
+}catch(e){console.error('Ошибка облачного сохранения:',e);}
+finally{cloudSyncing=false;}
+}
+async function cloudLoad(){
+if(!TG_USER||!WORKER_URL)return false;
+try{
+const res=await fetch(WORKER_URL+'/load-db?chat_id='+TG_USER.id);
+const j=await res.json().catch(()=>({}));
+if(j.ok&&j.db){
+if(j.db.progress)db.progress=j.db.progress;
+if(j.db.audioNotes)db.audioNotes=j.db.audioNotes;
+if(j.db.favL)db.favL=j.db.favL;
+if(j.db.favB)db.favB=j.db.favB;
+if(j.db.readB)db.readB=j.db.readB;
+if(j.db.pages)db.pages=j.db.pages;
+if(j.db.bookmarks)db.bookmarks=j.db.bookmarks;
+if(j.db.days)db.days=j.db.days;
+if(typeof j.db.listenSec==='number')db.listenSec=j.db.listenSec;
+if(j.db.last)db.last=j.db.last;
+if(j.db.notes)db.notes=j.db.notes;
+if(j.db.settings)Object.assign(db.settings,j.db.settings);
+save();
+console.log('☁️ Загружено из облака, syncedAt:',j.db.syncedAt);
+return true;
+}
+}catch(e){console.error('Ошибка загрузки из облака:',e);}
+return false;
+}
 const REMIND_TIMES=['06:00','07:00','08:00','09:00','12:00','15:00','18:00','19:00','20:00','21:00','22:00'];
 function remindModal(){const cur=db.settings.reminderTime||'19:00';let h='<div class="m-ttl">Время напоминания</div><div class="m-txt">По вашему местному времени.</div><div class="ep-grid" style="grid-template-columns:repeat(3,1fr)">';h+=REMIND_TIMES.map(t=>'<button data-action="remind-set" data-t="'+t+'" style="font-size:15px;font-weight:600;'+(t===cur?'outline:2px solid var(--acc);':'')+'">'+t+'</button>').join('');h+='</div>';modal(h);}
 function heatColor(lv){if(lv<=0)return'var(--card2)';return hexA('#F4511E',[0,0.25,0.5,0.78,1][lv]||1);}
@@ -967,8 +1045,6 @@ toast('Конспект сохранён ✏️');
 }
 function vSearch(){return'<header class="hdr"><button class="icbtn" data-action="back">'+ic('back')+'</button><h1 class="ttl" style="font-size:19px">Поиск</h1><span style="width:42px"></span></header><div class="search-bar"><input id="search-input" placeholder="Уроки, подразделы, книги, конспекты…" autocomplete="off"></div><div id="search-results"></div>';}
 function renderSearchResults(){const box=$('#search-results');if(!box)return;const q=searchQ.trim().toLowerCase();if(q.length<2){box.innerHTML='<div class="m-txt" style="text-align:center;padding:34px 10px">Введите минимум 2 символа для поиска</div>';return;}const r=searchAll(q);const cnt=r.sections.length+r.subs.length+r.lessons.length+r.books.length;if(!cnt){box.innerHTML='<div class="empty" style="padding:34px"><div class="e-ic">🔍</div><div class="e-t">Ничего не найдено</div><div class="e-m">Попробуйте другое слово</div></div>';return;}let h='';const row=(act,attrs,iconHtml,t,m)=>'<div class="lrow card" '+act+' '+attrs+'><div class="lrow-n" style="background:var(--card2)">'+iconHtml+'</div><div class="lrow-t"><div class="t">'+esc(t)+'</div><div class="m">'+esc(m)+'</div></div><div class="sec-go">'+ic('chev')+'</div></div>';if(r.sections.length){h+='<div class="sr-group">Разделы</div>';r.sections.forEach(s=>{h+=row('data-action="open-section"','data-id="'+s.id+'"',secIconHTML(s,'ic-s'),s.title,'раздел · '+flatLessons(s).length+' уроков');});}if(r.subs.length){h+='<div class="sr-group">Подразделы</div>';r.subs.forEach(x=>{h+=row('data-action="open-sub"','data-id="'+x.sb.id+'" data-sec="'+x.s.id+'"',ic('folder','ic-s'),x.sb.title,x.s.title);});}if(r.lessons.length){h+='<div class="sr-group">Уроки</div>';r.lessons.forEach(x=>{h+=row('data-action="open-lesson"','data-id="'+x.l.id+'"',ic('play','ic-s'),x.l.title,x.s.title+(durOf(x.l)?' · '+fmt(durOf(x.l)):''));});}if(r.books.length){h+='<div class="sr-group">Книги</div>';r.books.forEach(b=>{h+=row('data-action="open-pdf"','data-id="'+b.id+'"',ic('doc','ic-s'),b.title,b.author||'PDF');});}box.innerHTML=h;}
-
-/* ===== ИЗБРАННОЕ С ВКЛАДКОЙ «ЗАМЕТКИ» ===== */
 function vFavs(){
 let h='<header class="hdr"><div><div class="kick">ваша коллекция</div><h1 class="ttl">Избранное</h1></div><div class="hdr-r"><button class="icbtn" data-action="search" aria-label="Поиск">'+ic('search')+'</button><button class="icbtn" data-action="profile" aria-label="Профиль">'+ic('user')+'</button></div></header>';
 h+='<div class="seg" style="margin-bottom:18px"><button class="'+(favTab==='l'?'on':'')+'" data-action="fav-tab" data-v="l">Уроки</button><button class="'+(favTab==='b'?'on':'')+'" data-action="fav-tab" data-v="b">Книги</button><button class="'+(favTab==='n'?'on':'')+'" data-action="fav-tab" data-v="n">Заметки</button></div>';
@@ -990,7 +1066,7 @@ allNotes.push({id:n.id,lessonId:lessonId,lessonTitle:f.l.title,sectionTitle:f.s.
 });
 }
 allNotes.sort((a,b)=>b.ts-a.ts);
-if(!allNotes.length)return h+emptyBox('Заметок пока нет','Добавляйте заметки во время прослушивания уроков — кнопка ✏️ в плеере.');
+if(!allNotes.length)return h+emptyBox('Заметок пока нет','Добавляйте заметки во время прослушивания уроков — кнопка ️ в плеере.');
 allNotes.forEach((n,i)=>{
 h+='<div class="fav-note-card card fade" style="animation-delay:'+(i*.03)+'s" data-action="fav-note-open" data-lesson="'+esc(n.lessonId)+'" data-note="'+esc(n.id)+'">';
 h+='<div class="fav-note-head">';
@@ -1005,7 +1081,6 @@ h+='</div>';
 }
 return h;
 }
-
 function vStats(){const total=lessonCount(),done=doneCount(),pct=total?Math.round(done/total*100):0;let h='<header class="hdr"><div><div class="kick">'+dateLine()+'</div><h1 class="ttl">Прогресс</h1></div><div class="hdr-r"><button class="icbtn" data-action="search" aria-label="Поиск">'+ic('search')+'</button><button class="icbtn" data-action="profile" aria-label="Профиль">'+ic('user')+'</button></div></header><div class="st-big fade">'+pct+'<span>%</span></div><div class="st-lbl">курса пройдено</div><div class="st-grid"><div class="st-card card fade" style="animation-delay:.06s"><div class="st-v" style="color:var(--acc)">'+ic('play','ic-s')+fmtMin(db.listenSec||0)+'</div><div class="st-l">прослушано</div></div><div class="st-card card fade" style="animation-delay:.1s"><div class="st-v" style="color:var(--acc)">'+ic('flame','ic-s')+streak()+'</div><div class="st-l">дней подряд</div></div><div class="st-card card fade" style="animation-delay:.14s"><div class="st-v">'+done+'/'+total+'</div><div class="st-l">уроков пройдено</div></div><div class="st-card card fade" style="animation-delay:.18s"><div class="st-v">'+db.readB.length+'/'+db.books.length+'</div><div class="st-l">книг прочитано</div></div></div><div class="st-sec card fade" style="animation-delay:.2s"><div class="st-st"><span style="color:var(--ink)">Активность за 12 недель</span></div>'+heatHTML()+'</div>';
 h+='<div class="sections-accordion" id="sections-accordion">';
 h+='<div class="sections-header" onclick="toggleSectionsAccordion()">';
@@ -1090,6 +1165,7 @@ else if(kind==='lesson'){
 const found=id?findLesson(id):null;
 ex=found?found.l:null;
 if(found){sec=found.s.id;if(found.sub)sub=found.sub.id;}
+else{sub=extra||null;} // ← ИСПРАВЛЕНИЕ: используем extra для нового урока
 }
 else ex=id?db.books.find(b=>b.id===id):null;
 ED={kind,id,sec,sub,parent,color:(ex&&ex.color)||SWATCHES[db.sections.length%SWATCHES.length],emoji:(ex&&ex.emoji)||'📁',icon:(ex&&ex.icon)||null};
@@ -1129,8 +1205,6 @@ function exportModal(){exportJson=JSON.stringify({sections:db.sections,books:db.
 function importModal(){modal('<div class="m-ttl">Импорт контента</div><p class="m-txt">Вставьте JSON. Текущие разделы, книги и цитаты будут заменены, ваш прогресс сохранится.</p><textarea class="ex" id="imp-ta" placeholder="{ &quot;sections&quot;: [...], &quot;books&quot;: [...] }"></textarea><div class="m-btns"><button class="btn pr" data-action="apply-import">Применить</button></div>');}
 function applyImport(){if(!isAdminUser())return;try{const j=JSON.parse($('#imp-ta').value);if(!Array.isArray(j.sections))throw 0;db.sections=j.sections;db.books=Array.isArray(j.books)?j.books:[];if(Array.isArray(j.quotes))db.quotes=j.quotes;if(typeof j.appName==='string'&&j.appName)db.settings.appName=j.appName;if(typeof j.appIcon==='string')db.settings.appIcon=j.appIcon;if(typeof j.appLogo==='string')db.settings.appLogo=j.appLogo;if(typeof j.channel==='string')db.settings.channel=j.channel;if(typeof j.question==='string')db.settings.question=j.question;if(typeof j.support==='string')db.settings.support=j.support;normalize();save();closeModal();hap('success');toast('Контент обновлён');rerender();probeMissingDurations();}catch(e){toast('Неверный формат JSON');}}
 function copyText(t){if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>toast('Скопировано')).catch(()=>toast('Не удалось скопировать'));else toast('Выделите текст вручную');}
-
-/* ===== АУДИО-ЗАМЕТКИ: РЕДАКТОР + МОДАЛКА РЕДАКТИРОВАНИЯ ===== */
 function openAudioNoteEditor(){
 const lessonId=AE.cur;
 if(!lessonId){toast('Сначала запустите урок');return;}
@@ -1149,8 +1223,7 @@ h+='<div class="audio-note-modal-time">'+fmt(n.timecode)+'</div>';
 h+='<div class="audio-note-modal-text">'+esc(n.text)+'</div>';
 h+='<div class="audio-note-modal-actions">';
 h+='<button class="icbtn sm" data-action="audio-note-jump" data-id="'+esc(lessonId)+'" data-time="'+n.timecode+'" title="Перейти к моменту">'+ic('play','ic-s')+'</button>';
-h+='<button class="icbtn sm" data-action="audio-note-edit" data-id="'+esc(lessonId)+'" data-note="'+esc(nid)+'" title="Редактировать">'+ic('pen','ic-s')+'</button>';
-h+='<button class="icbtn sm" data-action="audio-note-delete" data-id="'+esc(lessonId)+'" data-note="'+esc(nid)+'" style="color:#E23A28" title="Удалить">'+ic('trash','ic-s')+'</button>';
+h+='<button class="icbtn sm" data-action="audio-note-delete" data-id="'+esc(lessonId)+'" data-time="'+n.timecode+'" style="color:#E23A28" title="Удалить">'+ic('trash','ic-s')+'</button>';
 h+='</div></div>';
 });
 h+='</div>';
@@ -1161,7 +1234,6 @@ h+='<div class="fld"><label>Таймкод</label><input id="new-note-time" type
 h+='<div class="fld"><label>Заметка</label><textarea id="new-note-text" rows="3" placeholder="Ваша мысль, цитата или закладка…"></textarea></div>';
 h+='<div class="m-btns"><button class="btn gh" data-action="m-close">Закрыть</button><button class="btn pr" data-action="save-audio-note" data-lesson="'+lessonId+'">'+ic('plus','ic-s')+' Добавить</button></div>';
 modal(h);
-save();
 }
 function saveAudioNote(lessonId){
 const timeStr=$('#new-note-time')?$('#new-note-time').value.trim():fmt(0);
@@ -1176,38 +1248,6 @@ hap('success');
 toast('Заметка добавлена 📝');
 openAudioNoteEditor();
 }
-function editAudioNoteModal(lessonId,noteId){
-const notes=db.audioNotes[lessonId]||[];
-const note=notes.find(n=>n.id===noteId);
-if(!note){toast('Заметка не найдена');return;}
-const lesson=findLesson(lessonId);
-let h='<div class="m-ttl">Редактировать заметку</div>';
-h+='<div class="m-txt">'+(lesson?esc(lesson.s.title)+' › '+esc(lesson.l.title):'')+'</div>';
-h+='<div class="fld"><label>Таймкод</label><input id="edit-note-time" type="text" value="'+fmt(note.timecode)+'" style="font-family:var(--fd);font-weight:700;color:var(--acc)"></div>';
-h+='<div class="fld"><label>Заметка</label><textarea id="edit-note-text" rows="4" placeholder="Текст заметки…">'+esc(note.text)+'</textarea></div>';
-h+='<div class="m-btns">';
-h+='<button class="btn gh" data-action="audio-note-jump" data-id="'+esc(lessonId)+'" data-time="'+note.timecode+'">'+ic('play','ic-s')+' К моменту</button>';
-h+='<button class="btn pr" data-action="audio-note-save-edit" data-lesson="'+esc(lessonId)+'" data-note="'+esc(noteId)+'">'+ic('check','ic-s')+' Сохранить</button>';
-h+='</div>';
-modal(h);
-}
-function saveAudioNoteEdit(lessonId,noteId){
-const notes=db.audioNotes[lessonId]||[];
-const note=notes.find(n=>n.id===noteId);
-if(!note){toast('Заметка не найдена');return;}
-const timeStr=$('#edit-note-time')?$('#edit-note-time').value.trim():fmt(0);
-const text=$('#edit-note-text')?$('#edit-note-text').value.trim():'';
-if(!text){toast('Введите текст заметки');return;}
-const timeParts=timeStr.split(':').map(x=>parseInt(x,10)||0);
-note.timecode=timeParts.length===2?timeParts[0]*60+timeParts[1]:timeParts[0]||0;
-note.text=text;
-note.updatedAt=Date.now();
-save();
-hap('success');
-toast('Заметка обновлена ✏️');
-openAudioNoteEditor();
-}
-
 document.addEventListener('click',async e=>{const el=e.target.closest('[data-action]');if(!el)return;const a=el.dataset.action,id=el.dataset.id;switch(a){
 case 'start':db.settings.onboarded=true;save();hap('medium');stack=[{s:'home',p:{}}];history.replaceState({d:1},'');renderTop(1);break;
 case 'tab':setTab(el.dataset.tab);hap();break;
@@ -1224,10 +1264,7 @@ case 'open-pdf':go('reader',{id});break;
 case 'open-audio-note-editor':openAudioNoteEditor();break;
 case 'save-audio-note':saveAudioNote(el.dataset.lesson);break;
 case 'audio-note-jump':{const lessonId=el.dataset.id;const time=parseFloat(el.dataset.time);if(!lessonId||isNaN(time))break;const lesson=findLesson(lessonId);if(!lesson){toast('Урок не найден');break;}if(AE.cur!==lessonId){AE.load(lesson.l,true);}setTimeout(()=>{if(AE.a.duration)AE.seek(time/AE.a.duration);playerTick();},300);closeModal();break;}
-case 'audio-note-edit':{editAudioNoteModal(el.dataset.id,el.dataset.note);break;}
-case 'audio-note-save-edit':{saveAudioNoteEdit(el.dataset.lesson,el.dataset.note);break;}
-case 'audio-note-delete':{const lessonId=el.dataset.id;const noteId=el.dataset.note;db.audioNotes[lessonId]=(db.audioNotes[lessonId]||[]).filter(n=>n.id!==noteId);save();hap();toast('Заметка удалена');openAudioNoteEditor();break;}
-case 'fav-note-open':{const lessonId=el.dataset.lesson;const noteId=el.dataset.note;editAudioNoteModal(lessonId,noteId);break;}
+case 'audio-note-delete':{const lessonId=el.dataset.id;const time=parseFloat(el.dataset.time);if(!lessonId||isNaN(time))break;db.audioNotes[lessonId]=(db.audioNotes[lessonId]||[]).filter(n=>n.timecode!==time);save();hap();toast('Заметка удалена');openAudioNoteEditor();break;}
 case 'open-ext':{const b=db.books.find(x=>x.id===id);if(!b)break;try{tg&&tg.openLink?tg.openLink(b.url):window.open(b.url,'_blank');}catch(err){window.open(b.url,'_blank');}break;}
 case 'open-link':openExternal(el.dataset.url);hap();break;
 case 'open-channel':{const url=(db.settings.channel||'').trim();if(!url){toast('Ссылка на канал не настроена');break;}openExternal(url);hap();break;}
@@ -1331,6 +1368,15 @@ history.replaceState({d:1},'');
 renderTop(0);
 maybeRemote();
 probeMissingDurations();
+// 🆕 Загружаем данные из облака при первом запуске
+if(TG_USER&&db.settings.onboarded){
+cloudLoad().then(loaded=>{
+if(loaded){
+rerender();
+toast('☁️ Прогресс синхронизирован');
+}
+});
+}
 </script>
 </body>
 </html>
