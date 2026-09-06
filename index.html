@@ -510,6 +510,37 @@ nav#tabbar::before{display:none;content:none}
 @media (min-width:700px){.scr{max-width:720px;margin:0 auto;padding-left:28px;padding-right:28px}.bgrid{grid-template-columns:repeat(3,1fr)}}
 @media (min-width:760px){.scr{max-width:860px;padding:calc(env(safe-area-inset-top) + 30px) 34px 40px}.bgrid{grid-template-columns:repeat(3,1fr)}}
 </style>
+
+<style id="v2-design">
+/* V2 — cohesive learning dashboard */
+:root{--v2-radius:22px;--v2-shadow:0 14px 40px rgba(0,0,0,.08)}
+.scr{padding-bottom:calc(108px + env(safe-area-inset-bottom))!important}
+#scr-home.scr{padding-bottom:calc(108px + env(safe-area-inset-bottom))!important}
+.v2-wrap{max-width:760px;margin:0 auto}
+.v2-hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:26px;padding:22px;background:linear-gradient(135deg,var(--card),var(--card2));box-shadow:var(--v2-shadow);margin:6px 0 18px}
+.v2-hero:after{content:"";position:absolute;width:170px;height:170px;border-radius:50%;right:-70px;top:-75px;background:var(--acc);opacity:.09;pointer-events:none}
+.v2-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink2);font-weight:800;margin-bottom:6px}
+.v2-hero h1{margin:0;font-size:27px;line-height:1.1;letter-spacing:-.04em}
+.v2-hero p{margin:8px 0 0;color:var(--ink2);font-size:13px;line-height:1.45;max-width:520px}
+.v2-progress{display:flex;align-items:center;gap:14px;margin-top:18px}
+.v2-progress-ring{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;flex:none;background:conic-gradient(var(--acc) calc(var(--p)*1%),var(--card3) 0);position:relative}
+.v2-progress-ring:after{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--card)}
+.v2-progress-ring b{position:relative;z-index:1;font-size:14px}
+.v2-progress-copy{min-width:0;flex:1}.v2-progress-copy strong{display:block;font-size:14px}.v2-progress-copy span{display:block;color:var(--ink2);font-size:11px;margin-top:4px}
+.v2-mini-stat{display:flex;gap:7px;align-items:center;font-weight:800;font-size:13px;color:var(--acc)}
+.v2-section-head{display:flex;justify-content:space-between;align-items:center;margin:20px 2px 10px}.v2-section-head h2{font-size:17px;margin:0;letter-spacing:-.02em}.v2-section-head button{border:0;background:none;color:var(--acc);font-weight:800;font-size:12px}
+.v2-continue{display:flex;align-items:center;gap:13px;width:100%;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:13px;box-shadow:0 8px 24px rgba(0,0,0,.05)}
+.v2-continue-icon{width:48px;height:48px;border-radius:15px;background:var(--acc);color:#fff;display:grid;place-items:center;flex:none}.v2-continue-copy{min-width:0;flex:1}.v2-continue-copy strong{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v2-continue-copy span{display:block;color:var(--ink2);font-size:11px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v2-bar{height:5px;border-radius:9px;background:var(--card3);overflow:hidden;margin-top:9px}.v2-bar i{display:block;height:100%;border-radius:inherit;background:var(--acc)}
+.v2-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.v2-action{border:1px solid var(--line);background:var(--card);border-radius:19px;padding:16px;text-align:left;min-height:102px;display:flex;flex-direction:column;justify-content:space-between;gap:10px}.v2-action .v2-ai{width:34px;height:34px;border-radius:12px;background:color-mix(in srgb,var(--game-c,var(--acc)) 14%,transparent);color:var(--game-c,var(--acc));display:grid;place-items:center}.v2-action b{font-size:13px}.v2-action small{display:block;color:var(--ink2);font-size:10px;margin-top:2px}
+.v2-week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.v2-day{border:1px solid var(--line);background:var(--card);border-radius:15px;padding:9px 4px;text-align:center}.v2-day b{display:block;font-size:9px;color:var(--ink2)}.v2-day i{display:grid;place-items:center;width:26px;height:26px;border-radius:9px;margin:7px auto 0;background:var(--card2);font-style:normal}.v2-day.on i{background:var(--acc);color:#fff}.v2-day.today{border-color:var(--acc)}
+.v2-recent{display:grid;gap:8px}.v2-recent-item{display:flex;align-items:center;gap:11px;padding:12px;border:1px solid var(--line);background:var(--card);border-radius:17px;text-align:left}.v2-recent-ico{width:40px;height:40px;border-radius:12px;background:var(--card2);display:grid;place-items:center;color:var(--acc);flex:none}.v2-recent-copy{min-width:0;flex:1}.v2-recent-copy strong{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v2-recent-copy span{display:block;font-size:10px;color:var(--ink2);margin-top:3px}.v2-chevron{color:var(--ink3)}
+.v2-book-tools{display:flex;gap:8px;overflow:auto;padding:2px 1px 6px;margin-bottom:6px;scrollbar-width:none}.v2-book-tools::-webkit-scrollbar{display:none}.v2-chip{white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--ink2);border-radius:999px;padding:8px 12px;font-size:11px;font-weight:800}.v2-chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.v2-book-list{display:grid;gap:10px}.v2-book-row{display:flex;gap:12px;align-items:center;border:1px solid var(--line);background:var(--card);border-radius:19px;padding:10px}.v2-book-cover{width:54px;height:72px;border-radius:12px;overflow:hidden;flex:none;display:grid;place-items:center;color:#fff;font-weight:800}.v2-book-cover img{width:100%;height:100%;object-fit:cover}.v2-book-info{min-width:0;flex:1}.v2-book-info strong{display:block;font-size:13px;line-height:1.25}.v2-book-info small{display:block;color:var(--ink2);font-size:10px;margin-top:4px}.v2-book-meta{display:flex;gap:7px;align-items:center;margin-top:8px;font-size:9px;color:var(--ink2)}.v2-book-progress{height:4px;border-radius:9px;background:var(--card3);overflow:hidden;margin-top:7px}.v2-book-progress i{display:block;height:100%;background:var(--acc)}.v2-book-go{width:34px;height:34px;border:0;border-radius:11px;background:var(--card2);color:var(--acc);display:grid;place-items:center;flex:none}
+.v2-stats-hero{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;border:1px solid var(--line);background:var(--card);border-radius:24px;padding:18px;margin-bottom:12px}.v2-stats-pct{font-size:48px;font-weight:900;letter-spacing:-.06em;line-height:.9}.v2-stats-pct span{font-size:22px;color:var(--ink2)}.v2-stats-copy{color:var(--ink2);font-size:11px;line-height:1.5;margin-top:8px}.v2-stats-ring{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--acc) calc(var(--p)*1%),var(--card3) 0);position:relative}.v2-stats-ring:after{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--card)}.v2-stats-ring b{position:relative;z-index:1;font-size:12px}.v2-stat-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.v2-stat-card{padding:14px;border:1px solid var(--line);background:var(--card);border-radius:18px}.v2-stat-card b{display:block;font-size:19px}.v2-stat-card span{display:block;color:var(--ink2);font-size:10px;margin-top:4px}.v2-bars{display:flex;align-items:end;gap:6px;height:112px;padding:10px 4px 0}.v2-bar-col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:6px}.v2-bar-col i{width:100%;max-width:28px;min-height:4px;border-radius:7px 7px 3px 3px;background:var(--acc)}.v2-bar-col span{font-size:8px;color:var(--ink2)}.v2-insight{margin-top:10px;border-radius:17px;background:var(--card2);padding:12px;font-size:11px;color:var(--ink2);line-height:1.5}.v2-insight b{color:var(--ink)}
+.v2-profile-top{display:flex;align-items:center;gap:14px;padding:16px;border:1px solid var(--line);background:var(--card);border-radius:22px;margin-bottom:12px}.v2-profile-copy{min-width:0}.v2-profile-copy strong{display:block;font-size:17px}.v2-profile-copy span{display:block;color:var(--ink2);font-size:10px;margin-top:4px}.v2-profile-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:16px}.v2-profile-action{border:1px solid var(--line);background:var(--card);border-radius:17px;padding:13px;text-align:left}.v2-profile-action b{display:block;font-size:12px}.v2-profile-action span{display:block;color:var(--ink2);font-size:10px;margin-top:4px}
+@media(max-width:420px){.v2-hero{padding:18px}.v2-hero h1{font-size:24px}.v2-stats-hero{grid-template-columns:1fr}.v2-stats-ring{position:absolute;right:28px;margin-top:-10px;width:70px;height:70px}.v2-stats-pct{font-size:43px}}
+@media(min-width:800px){.v2-wrap{max-width:820px}.v2-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.v2-stat-cards{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
 </head>
 <body>
 <div class="ambient" aria-hidden="true"></div>
@@ -1422,6 +1453,100 @@ toast('☁️ Прогресс синхронизирован');
 }
 });
 }
+
+/* V2 feature layer: continue, recents, richer library/progress/profile/search */
+(function(){
+  db.settings=db.settings||{};
+  db.recent=Array.isArray(db.recent)?db.recent:[];
+  db.bookMeta=db.bookMeta&&typeof db.bookMeta==='object'?db.bookMeta:{};
+  function persist(){try{save();}catch(e){try{localStorage.setItem(LS,JSON.stringify(db));}catch(_){} }}
+  function addRecent(type,id){
+    if(!id)return;
+    db.recent=(db.recent||[]).filter(x=>!(x.type===type&&x.id===id));
+    db.recent.unshift({type,id,ts:Date.now()});
+    db.recent=db.recent.slice(0,8); persist();
+  }
+  function recentItems(){return (db.recent||[]).map(x=>{if(x.type==='lesson'){const f=findLesson(x.id);return f?{...x,title:f.l.title,sub:f.s.title,action:'open-lesson'}:null;}const b=db.books.find(b=>b.id===x.id);return b?{...x,title:b.title,sub:b.author||'PDF',action:'open-pdf'}:null;}).filter(Boolean);}
+  function bookPct(b){
+    const pg=Number(db.pages[b.id]||0); const total=Number((db.bookMeta[b.id]||{}).total||b.pages||0);
+    if(db.readB.includes(b.id))return 100;
+    if(pg&&total)return Math.min(99,Math.round(pg/total*100));
+    return pg?1:0;
+  }
+  function weekData(){const a=[];for(let i=6;i>=0;i--){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);const k=dayKey(d);a.push({d,k,sec:Number(db.days[k]||0)});}return a;}
+  function dayName(d){return ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][d.getDay()];}
+  function recentHtml(limit){const arr=recentItems().slice(0,limit||4);if(!arr.length)return '';let h='<div class="v2-section-head"><h2>Недавно открытое</h2><button data-action="search">Найти ещё</button></div><div class="v2-recent">';arr.forEach(x=>{h+='<button class="v2-recent-item" data-action="'+x.action+'" data-id="'+esc(x.id)+'"><span class="v2-recent-ico">'+ic(x.type==='lesson'?'play':'book','ic-s')+'</span><span class="v2-recent-copy"><strong>'+esc(x.title)+'</strong><span>'+esc(x.sub)+'</span></span><span class="v2-chevron">'+ic('chev','ic-s')+'</span></button>';});return h+'</div>';}
+  function v2Home(){
+    const total=lessonCount(),done=doneCount(),pct=total?Math.round(done/total*100):0,cont=continueLesson(),st=streak();
+    let h='<div class="v2-wrap">';
+    h+='<header class="game-head"><div><span>Твой учебный путь</span><strong>'+esc(appName())+'</strong></div><div class="game-head-actions"><button data-action="search" aria-label="Поиск">'+ic('search')+'</button><button data-action="profile" aria-label="Профиль">'+ic('user')+'</button></div></header>';
+    h+='<section class="v2-hero"><div class="v2-kicker">Сегодня</div><h1>'+esc(pct?'Продолжай в том же духе':'Начни свой путь')+'</h1><p>'+esc(pct?('Ты прошёл '+done+' из '+total+' уроков. Ещё один урок — и прогресс станет выше.'):('Выбери первый урок и сделай небольшой шаг сегодня.'))+'</p><div class="v2-progress"><div class="v2-progress-ring" style="--p:'+pct+'"><b>'+pct+'%</b></div><div class="v2-progress-copy"><strong>'+done+' из '+total+' уроков</strong><span>Общий прогресс обучения</span><div class="v2-bar"><i style="width:'+pct+'%"></i></div></div><div class="v2-mini-stat">'+ic('flame','ic-s')+' '+st+'</div></div></section>';
+    if(cont){const pr=prOf(cont.l.id)||{},dur=pr.dur||durOf(cont.l)||0,pos=pr.pos||0,fp=dur?Math.round(Math.min(1,pos/dur)*100):0;h+='<div class="v2-section-head"><h2>Продолжить обучение</h2></div><button class="v2-continue" data-action="home-continue"><span class="v2-continue-icon">'+ic('play')+'</span><span class="v2-continue-copy"><strong>'+esc(cont.l.title)+'</strong><span>'+esc(cont.s.title)+' · '+fmt(pos)+(dur?' / '+fmt(dur):'')+'</span><div class="v2-bar"><i style="width:'+fp+'%"></i></div></span><span class="v2-chevron">'+ic('chev','ic-s')+'</span></button>';}else{h+='<div class="v2-section-head"><h2>Начать обучение</h2></div><button class="v2-continue" data-action="tab" data-tab="lessons"><span class="v2-continue-icon">'+ic('cap')+'</span><span class="v2-continue-copy"><strong>Открыть список уроков</strong><span>Выбери направление и начни с первого материала</span><div class="v2-bar"><i style="width:0%"></i></div></span><span class="v2-chevron">'+ic('chev','ic-s')+'</span></button>';}
+    h+='<div class="v2-section-head"><h2>Быстрый доступ</h2></div><div class="v2-grid">'+[['lessons','cap','Уроки','Все разделы','#1CB0F6'],['books','book','Книги','Библиотека','#A560E8'],['stats','chart','Прогресс','Статистика','#FF9600'],['favs','heart','Сохранённое','Избранное','#FF4B6E']].map(x=>'<button class="v2-action" data-action="tab" data-tab="'+x[0]+'" style="--game-c:'+x[4]+'"><span class="v2-ai">'+ic(x[1])+'</span><span><b>'+x[2]+'</b><small>'+x[3]+'</small></span></button>').join('')+'</div>';
+    const wd=weekData();h+='<div class="v2-section-head"><h2>Активность</h2><button data-action="tab" data-tab="stats">Подробнее</button></div><div class="v2-week">'+wd.map((x,i)=>'<div class="v2-day '+(x.sec>0?'on ':'')+(i===6?'today':'')+'"><b>'+dayName(x.d)+'</b><i>'+(x.sec>0?ic('check','ic-s'):'')+'</i></div>').join('')+'</div>';
+    h+=recentHtml(4);
+    h+='<div class="v2-section-head"><h2>Книга для чтения</h2><button data-action="tab" data-tab="books">Вся библиотека</button></div>';
+    const b=db.books[0];if(b){const pp=bookPct(b);h+='<button class="v2-book-row" data-action="open-pdf" data-id="'+esc(b.id)+'"><span class="v2-book-cover" style="background:'+coverGrad(b)+'">'+(b.cover?'<img src="'+esc(b.cover)+'" alt="">':ic('book'))+'</span><span class="v2-book-info"><strong>'+esc(b.title)+'</strong><small>'+esc(b.author||'PDF')+'</small>'+(pp?'<div class="v2-book-progress"><i style="width:'+pp+'%"></i></div><div class="v2-book-meta"><span>'+pp+'% прочитано</span></div>':'<div class="v2-book-meta"><span>Открыть и читать</span></div>')+'</span><span class="v2-book-go">'+ic('chev','ic-s')+'</span></button>';} 
+    h+='</div>';return h;
+  }
+  function v2Books(){
+    const cats=[];db.books.forEach(b=>{const c=(b.cat||'').trim();if(c&&!cats.includes(c))cats.push(c);});
+    let h='<div class="v2-wrap"><header class="hdr"><div><div class="kick">'+db.books.length+' '+plural(db.books.length,'книга','книги','книг')+'</div><h1 class="ttl">Библиотека</h1></div><div class="hdr-r">'+(canEdit()?'<button class="addbtn" data-action="add-book">'+ic('plus','ic-s')+' Книга</button>':'')+'<button class="icbtn" data-action="search" aria-label="Поиск">'+ic('search')+'</button><button class="icbtn" data-action="profile" aria-label="Профиль">'+ic('user')+'</button></div></header>';
+    h+='<div class="v2-book-tools"><button class="v2-chip '+(booksTab==='books'?'on':'')+'" data-action="v2-books-sort" data-v="all">Все</button><button class="v2-chip '+(booksTab==='recent'?'on':'')+'" data-action="v2-books-sort" data-v="recent">Недавно открытые</button><button class="v2-chip '+(booksTab==='fav'?'on':'')+'" data-action="v2-books-sort" data-v="fav">Избранные</button></div>';
+    let arr=db.books.slice();if(booksTab==='recent')arr=recentItems().filter(x=>x.type==='book').map(x=>db.books.find(b=>b.id===x.id)).filter(Boolean);if(booksTab==='fav')arr=arr.filter(b=>db.favB.includes(b.id));
+    if(!arr.length)return h+emptyBox('Здесь пока пусто',booksTab==='fav'?'Добавляйте книги в избранное сердечком.':'Открывайте книги — они появятся здесь.');
+    const cats2=[];arr.forEach(b=>{const c=(b.cat||'').trim()||'Другое';if(!cats2.includes(c))cats2.push(c);});
+    cats2.forEach(c=>{h+='<div class="v2-section-head"><h2>'+esc(c)+'</h2><span class="cnt">'+arr.filter(b=>(b.cat||'').trim()=== (c==='Другое'?'':c)).length+'</span></div><div class="v2-book-list">';arr.filter(b=>(b.cat||'').trim()=== (c==='Другое'?'':c)).forEach(b=>{const pp=bookPct(b),pg=Number(db.pages[b.id]||0);h+='<button class="v2-book-row" data-action="open-pdf" data-id="'+esc(b.id)+'"><span class="v2-book-cover" style="background:'+coverGrad(b)+'">'+(b.cover?'<img src="'+esc(b.cover)+'" alt="">':ic('book'))+'</span><span class="v2-book-info"><strong>'+esc(b.title)+'</strong><small>'+esc(b.author||'PDF')+'</small><div class="v2-book-meta"><span>'+ (db.readB.includes(b.id)?'✓ Прочитано':pg?'Стр. '+pg:'Не открывалась')+'</span><span>·</span><span>'+ (db.favB.includes(b.id)?'В избранном':'')+'</span></div>'+(pp?'<div class="v2-book-progress"><i style="width:'+pp+'%"></i></div>':'')+'</span><span class="v2-book-go">'+ic('chev','ic-s')+'</span></button>';});h+='</div>';});
+    h+='</div>';return h;
+  }
+  function v2Stats(){
+    const total=lessonCount(),done=doneCount(),pct=total?Math.round(done/total*100):0,wd=weekData(),weekMin=Math.round(wd.reduce((a,x)=>a+x.sec,0)/60),active=wd.filter(x=>x.sec>0).length;
+    let h='<div class="v2-wrap"><header class="hdr"><div><div class="kick">'+dateLine()+'</div><h1 class="ttl">Прогресс</h1></div><div class="hdr-r"><button class="icbtn" data-action="search">'+ic('search')+'</button><button class="icbtn" data-action="profile">'+ic('user')+'</button></div></header>';
+    h+='<section class="v2-stats-hero"><div><div class="v2-stats-pct">'+pct+'<span>%</span></div><div class="v2-stats-copy">'+done+' из '+total+' уроков пройдено · '+db.readB.length+' из '+db.books.length+' книг отмечено как прочитанные.</div></div><div class="v2-stats-ring" style="--p:'+pct+'"><b>'+pct+'%</b></div></section>';
+    h+='<div class="v2-stat-cards"><div class="v2-stat-card"><b>'+fmtMin(db.listenSec||0)+'</b><span>прослушано</span></div><div class="v2-stat-card"><b>'+streak()+'</b><span>дней подряд</span></div><div class="v2-stat-card"><b>'+active+'</b><span>активных дней за 7 дней</span></div><div class="v2-stat-card"><b>'+weekMin+' мин</b><span>учёбы за 7 дней</span></div></div>';
+    h+='<div class="v2-section-head"><h2>Последние 7 дней</h2></div><div class="v2-stat-card"><div class="v2-bars">'+wd.map(x=>{const max=Math.max(1,...wd.map(y=>y.sec));const hp=Math.max(4,Math.round(x.sec/max*88));return'<div class="v2-bar-col"><i style="height:'+hp+'px" title="'+Math.round(x.sec/60)+' мин"></i><span>'+dayName(x.d)+'</span></div>';}).join('')+'</div><div class="v2-insight">'+(active?'Ты занимался '+active+' '+plural(active,'день','дня','дней')+' за последнюю неделю.':'За последнюю неделю занятий ещё не было.')+' '+(pct>=75?'<b>Отличный темп.</b>':'<b>Главное — регулярность.</b>')+'</div></div>';
+    h+='<div class="v2-section-head"><h2>По разделам</h2></div>';
+    db.sections.forEach(s=>{const fl=flatLessons(s),dn=fl.filter(l=>prOf(l.id)&&prOf(l.id).done).length,pc=fl.length?Math.round(dn/fl.length*100):0;h+='<button class="sec-card card" data-action="open-section" data-id="'+esc(s.id)+'"><div class="sec-ico" style="background:'+hexA(s.color,.15)+';color:'+s.color+'">'+secIconHTML(s,'ic-l')+'</div><div class="sec-info"><div class="sec-t">'+esc(s.title)+'</div><div class="sec-m">'+dn+' из '+fl.length+' уроков</div><div class="bar"><i style="width:'+pc+'%;background:'+s.color+'"></i></div></div><div class="sec-go" style="color:'+s.color+'">'+ic('chev')+'</div></button>';});
+    h+='</div>';return h;
+  }
+  function v2Profile(){
+    const total=lessonCount(),done=doneCount(),pct=total?Math.round(done/total*100):0,adm=isAdminUser();
+    let h='<div class="v2-wrap"><header class="hdr"><button class="icbtn" data-action="back">'+ic('back')+'</button><h1 class="ttl" style="font-size:19px">Профиль</h1><span style="width:42px"></span></header>';
+    h+='<div class="v2-profile-top"><div class="prof-ico">'+appIcoInner()+'</div><div class="v2-profile-copy"><strong>'+esc(appName())+'</strong><span>Telegram Mini App · v'+VER+(adm?' · администратор':'')+'</span></div><div class="v2-stats-ring" style="--p:'+pct+';width:58px;height:58px"><b>'+pct+'%</b></div></div>';
+    h+='<div class="v2-profile-actions"><button class="v2-profile-action" data-action="tab" data-tab="stats"><b>'+done+'/'+total+' уроков</b><span>Открыть прогресс</span></button><button class="v2-profile-action" data-action="tab" data-tab="favs"><b>'+db.favL.length+' сохранённых</b><span>Моя коллекция</span></button></div>';
+    h+='<div class="grp"><div class="grp-t">Настройки</div>'+prow('appearance','pen','Оформление','Тема: авто / светлая / тёмная')+prow('listen','play','Прослушивание','Скорость, перемотка, автопереход')+prow('remind','bell','Напоминания','«Пора заняться» в Telegram')+(adm?prow('content','ul','Контент','Публикации, ссылки, цитаты, токен'):'')+prow('data','dl','Данные','Резервные копии и очистка')+prow('misc','trash','Прочее','Сброс прогресса и настроек')+'</div>'+gConnect()+'<div class="foot">'+esc(appName())+' v'+VER+'</div></div>';return h;
+  }
+  function v2Search(){return '<div class="v2-wrap"><header class="hdr"><button class="icbtn" data-action="back">'+ic('back')+'</button><h1 class="ttl" style="font-size:19px">Поиск</h1><span style="width:42px"></span></header><div class="search-bar"><input id="search-input" placeholder="Уроки, книги, разделы, конспекты…" autocomplete="off"></div><div class="v2-search-hint">Поиск работает сразу по нескольким типам материалов.</div><div id="search-results"></div></div>';}
+  function v2RenderSearchResults(){const box=$('#search-results');if(!box)return;const q=searchQ.trim().toLowerCase();if(q.length<2){box.innerHTML='<div class="m-txt" style="text-align:center;padding:34px 10px">Введите минимум 2 символа</div>';return;}const all=db.notes||[];const notes=all.filter(n=>(n.title+' '+stripHtml(n.text||'')).toLowerCase().includes(q));const r=searchAll(q);let h='';const row=(act,attrs,iconHtml,t,m)=>'<button class="lrow card" '+act+' '+attrs+'><div class="lrow-n" style="background:var(--card2)">'+iconHtml+'</div><div class="lrow-t"><div class="t">'+esc(t)+'</div><div class="m">'+esc(m)+'</div></div><div class="sec-go">'+ic('chev')+'</div></button>';
+    if(r.sections.length){h+='<div class="sr-group">Разделы</div>';r.sections.forEach(s=>h+=row('data-action="open-section"','data-id="'+s.id+'"',secIconHTML(s,'ic-s'),s.title,'раздел · '+flatLessons(s).length+' уроков'));}
+    if(r.subs.length){h+='<div class="sr-group">Подразделы</div>';r.subs.forEach(x=>h+=row('data-action="open-sub"','data-id="'+x.sb.id+'" data-sec="'+x.s.id+'"',ic('folder','ic-s'),x.sb.title,x.s.title));}
+    if(r.lessons.length){h+='<div class="sr-group">Уроки</div>';r.lessons.forEach(x=>h+=row('data-action="open-lesson"','data-id="'+x.l.id+'"',ic('play','ic-s'),x.l.title,x.s.title+(durOf(x.l)?' · '+fmt(durOf(x.l)):'')));}
+    if(r.books.length){h+='<div class="sr-group">Книги</div>';r.books.forEach(b=>h+=row('data-action="open-pdf"','data-id="'+b.id+'"',ic('doc','ic-s'),b.title,b.author||'PDF'));}
+    if(notes.length){h+='<div class="sr-group">Конспекты</div>';notes.slice(0,8).forEach(n=>h+=row('data-action="note-open"','data-id="'+n.id+'"',ic('pen','ic-s'),n.title,'личный конспект · '+fmtDate(n.ts)));}
+    if(!h)h='<div class="empty" style="padding:34px"><div class="e-ic">🔍</div><div class="e-t">Ничего не найдено</div><div class="e-m">Попробуйте другое слово</div></div>';box.innerHTML=h;}
+  views.home=v2Home;views.books=v2Books;views.stats=v2Stats;views.profile=v2Profile;views.search=v2Search;
+  /* keep the original reader/player and lesson screens, but add recents */
+  document.addEventListener('click',function(e){
+    const el=e.target.closest('[data-action]');if(!el)return;const a=el.dataset.action,id=el.dataset.id;
+    if(a==='open-lesson'&&id)addRecent('lesson',id);
+    if(a==='open-pdf'&&id)addRecent('book',id);
+    if(a==='v2-books-sort'){e.preventDefault();booksTab=el.dataset.v==='recent'?'recent':el.dataset.v==='fav'?'fav':'books';db.settings.booksTab=booksTab;persist();rerender();return;}
+    if(a==='note-open'&&id){const n=findNote(id);if(n){go('note-edit',{id:id});}}
+  },true);
+  /* Search renderer override, preserving the existing live input setup. */
+  renderSearchResults=v2RenderSearchResults;
+  /* Capture PDF totals when available for future book progress. */
+  const oldInitReader=initReader;
+  initReader=async function(id){await oldInitReader(id);if(id&&RD.total){db.bookMeta[id]=db.bookMeta[id]||{};db.bookMeta[id].total=RD.total;persist();rerender();}};
+  /* Store richer book progress whenever the reader changes page. */
+  const oldRenderPage=renderPage;
+  renderPage=function(){const r=oldRenderPage.apply(this,arguments);if(RD.id&&RD.page){db.pages[RD.id]=RD.page;db.bookMeta[RD.id]=db.bookMeta[RD.id]||{};if(RD.total)db.bookMeta[RD.id].total=RD.total;persist();}return r;};
+  /* Add a small style hint under search. */
+  const style=document.createElement('style');style.textContent='.v2-search-hint{font-size:10px;color:var(--ink2);margin:-4px 2px 14px}.v2-wrap .hdr{max-width:none}';document.head.appendChild(style);
+  /* Make cloud/backup include V2 data when the app serializes its DB. */
+  const oldExportModal=exportModal;exportModal=function(){exportJson=JSON.stringify({sections:db.sections,books:db.books,quotes:db.quotes||[],v2:{recent:db.recent||[],bookMeta:db.bookMeta||{}}},null,1);modal('<div class="m-ttl">Экспорт контента</div><p class="m-txt">Разделы, книги, цитаты и дополнительные данные библиотеки.</p><textarea class="ex" readonly>'+esc(exportJson)+'</textarea><div class="m-btns"><button class="btn gh" data-action="dl-json">'+ic('dl','ic-s')+' Файл</button><button class="btn pr" data-action="copy-json">Скопировать</button></div>');};
+})();
+
 </script>
 </body>
 </html>
