@@ -81,6 +81,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
       <h1>Выбери свой клуб</h1>
       <p>Начни карьеру с реальной командой сезона 2026/27. У каждого клуба свой бюджет, рейтинг и уровень сложности.</p>
     </div>
+    <div class="section" style="margin-top:4px"><h2>⚽ Настоящие клубы</h2></div>
     <div id="clubChoices"></div>
     <button class="new-career" type="button" onclick="openCustomClub()">⚡ Создать свой клуб</button>
   </section>
@@ -122,7 +123,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
       </div>
 
       <div class="custom-actions">
-        <button type="button" class="custom-cancel" onclick="closeCustomClub()">Отмена</button>
+        <button type="button" class="custom-cancel" onclick="closeCustomClub()">← Настоящие клубы</button>
         <button type="button" class="custom-create" onclick="createCustomClub()">Создать клуб</button>
       </div>
     </div>
@@ -423,10 +424,17 @@ document.addEventListener('keydown',function(e){
 });
 
 function changeClub(){
-  if(confirm('Сменить клуб? Текущий прогресс этой карьеры останется в сохранении только до выбора нового клуба.')){
+  if(confirm('Сменить клуб? Текущий прогресс этой карьеры будет заменён новой карьерой.')){
     localStorage.removeItem('fm_state');
     localStorage.removeItem('fm_career_started');
-    location.reload();
+    careerStarted=false;
+    state=JSON.parse(JSON.stringify(initialState));
+    closeCustomClub();
+    document.querySelectorAll('main.page').forEach(x=>x.classList.add('hidden'));
+    document.getElementById('appContent').classList.add('hidden');
+    document.getElementById('clubSelect').classList.remove('hidden');
+    renderClubChoices();
+    window.scrollTo({top:0,behavior:'smooth'});
   }
 }
 function initCareer(){
@@ -689,6 +697,7 @@ function showToast(text){
  let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';Object.assign(t.style,{position:'fixed',left:'50%',bottom:'92px',transform:'translateX(-50%)',background:'#f4f6f8',color:'#111',padding:'11px 15px',borderRadius:'13px',fontWeight:'700',fontSize:'12px',zIndex:60,boxShadow:'0 8px 30px #0008'});document.body.appendChild(t)}
  t.textContent=text;t.style.opacity='1';clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.style.opacity='0',2200)
 }
+renderClubChoices();
 updateHome();renderPlayers();renderMarket();renderLeague();renderFixtures();
 </script>
 </body>
