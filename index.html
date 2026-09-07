@@ -2620,6 +2620,43 @@ svg {
 
 </style>
 
+
+<style>
+/* =========================================================
+   HIERARCHICAL CONTENT / INLINE ADMIN
+========================================================= */
+.hierarchy-toolbar{display:flex;gap:8px;margin:0 0 14px;}
+.hierarchy-add{flex:1;min-height:44px;border-radius:14px;background:#e0c2a4;color:#211c18;font-size:12px;font-weight:700;}
+.hierarchy-add.secondary{background:rgba(255,255,255,.07);color:#fff;}
+.hierarchy-card{width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:14px;color:#fff;margin-bottom:9px;}
+.hierarchy-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:rgba(224,194,164,.12);font-size:20px;flex:none;}
+.hierarchy-info{min-width:0;flex:1;}
+.hierarchy-info strong{display:block;font-size:14px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hierarchy-info span{display:block;color:rgba(255,255,255,.42);font-size:10px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hierarchy-arrow{color:rgba(255,255,255,.35);font-size:20px;}
+.inline-admin{display:flex;gap:6px;margin-left:auto;flex:none;}
+.inline-admin button{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.07);color:#e0c2a4;}
+.inline-admin .delete{color:#d99690;}
+.hierarchy-breadcrumb{display:flex;align-items:center;gap:6px;overflow:auto;white-space:nowrap;color:rgba(255,255,255,.4);font-size:10px;margin:0 0 12px;}
+.hierarchy-breadcrumb button{background:transparent;color:rgba(255,255,255,.55);padding:2px 0;}
+.inline-section-head{display:flex;align-items:center;justify-content:space-between;margin:17px 0 10px;}
+.inline-section-head h2{margin:0;color:#fff;font-size:16px;}
+.inline-section-head span{font-size:10px;color:rgba(255,255,255,.35);}
+.inline-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.66);display:none;align-items:flex-end;padding:12px;}
+.inline-modal.active{display:flex;}
+.inline-modal-card{width:100%;max-width:560px;margin:auto;background:#201f1d;border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:18px;max-height:90vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.35);}
+.inline-modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.inline-modal-head h3{margin:0;color:#fff;font-size:18px;}
+.inline-modal-close{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.07);color:#fff;font-size:18px;}
+.inline-field{margin-bottom:11px;}
+.inline-field label{display:block;color:rgba(255,255,255,.45);font-size:10px;margin-bottom:6px;}
+.inline-field input,.inline-field textarea{width:100%;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.055);color:#fff;border-radius:13px;padding:12px;outline:none;font-size:12px;}
+.inline-field textarea{min-height:80px;resize:vertical;}
+.inline-save{width:100%;height:46px;border-radius:14px;background:#e0c2a4;color:#211c18;font-weight:700;font-size:12px;margin-top:4px;}
+.inline-danger{width:100%;height:42px;border-radius:13px;background:rgba(168,91,85,.12);color:#d99690;font-size:11px;margin-top:8px;}
+.admin-hint{padding:12px 14px;border-radius:14px;background:rgba(224,194,164,.08);color:rgba(255,255,255,.5);font-size:10px;line-height:1.5;margin-bottom:12px;}
+</style>
+
 </head>
 
 
@@ -7241,6 +7278,443 @@ function showToast(message) {
     );
 }
 
+
+/* =========================================================
+   HIERARCHICAL CONTENT SYSTEM
+   Sections can contain sections and direct lessons.
+========================================================= */
+
+let sections = [];
+let currentSectionId = null;
+let inlineEditing = null;
+
+function normalizeSections(data) {
+    if (Array.isArray(data.sections)) {
+        return data.sections.map((item, index) => ({
+            id: String(item.id ?? `section-${index + 1}`),
+            parent_id: item.parent_id ?? item.parentId ?? null,
+            title: item.title || item.name || "Без названия",
+            description: item.description || "",
+            cover_url: item.cover_url || item.cover || "",
+            type: item.type || "section",
+            published: item.published !== false,
+            order: Number(item.order ?? index)
+        }));
+    }
+
+    const result = [];
+    const categoryMap = new Map();
+    const courseMap = new Map();
+
+    (data.categories || []).forEach((cat, i) => {
+        const id = `section-category-${cat.id}`;
+        categoryMap.set(String(cat.id), id);
+        result.push({
+            id,
+            parent_id: null,
+            title: cat.title || cat.name || `Раздел ${i + 1}`,
+            description: cat.description || "",
+            cover_url: cat.cover_url || cat.cover || "",
+            type: "section",
+            published: cat.published !== false,
+            order: i
+        });
+    });
+
+    (data.courses || []).forEach((course, i) => {
+        const id = `section-course-${course.id}`;
+        courseMap.set(String(course.id), id);
+        result.push({
+            id,
+            parent_id: categoryMap.get(String(course.category_id ?? course.categoryId)) || null,
+            title: course.title || `Курс ${i + 1}`,
+            description: course.description || "",
+            cover_url: course.cover_url || course.cover || "",
+            author: course.author || "",
+            type: "course",
+            published: course.published !== false,
+            order: i
+        });
+    });
+
+    return result;
+}
+
+function syncLegacyFromSections() {
+    categories = sections
+        .filter(s => s.parent_id === null)
+        .map((s, i) => ({
+            id: s.id,
+            title: s.title,
+            name: s.title,
+            description: s.description,
+            slug: slugify(s.title),
+            published: s.published,
+            order: i
+        }));
+
+    courses = sections
+        .filter(s => s.type === "course")
+        .map(s => ({
+            id: s.id,
+            category_id: s.parent_id,
+            title: s.title,
+            description: s.description,
+            cover_url: s.cover_url,
+            author: s.author || "",
+            published: s.published,
+            order: s.order
+        }));
+
+    lessons.forEach(lesson => {
+        if (lesson.section_id) return;
+        const course = courses.find(c => String(c.id) === String(lesson.course_id ?? lesson.courseId));
+        if (course) lesson.section_id = course.id;
+    });
+}
+
+async function loadContent() {
+    try {
+        const response = await fetch("content.json?v=" + Date.now(), { cache: "no-store" });
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        const data = await response.json();
+
+        sections = normalizeSections(data);
+        lessons = Array.isArray(data.lessons) ? data.lessons : [];
+        books = Array.isArray(data.books) ? data.books : [];
+
+        syncLegacyFromSections();
+        content = { sections, lessons, books };
+        renderEverything();
+    } catch (error) {
+        console.error("content.json:", error);
+        sections = [];
+        lessons = [];
+        books = [];
+        categories = [];
+        courses = [];
+        renderEverything();
+        showToast("Не удалось загрузить content.json");
+    }
+}
+
+function exportContent() {
+    syncLegacyFromSections();
+    const data = {
+        version: 2,
+        sections,
+        lessons,
+        books
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "content.json";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    showToast("content.json готов");
+}
+
+function importContent() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json,application/json";
+    input.onchange = async event => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        try {
+            const data = JSON.parse(await file.text());
+            if (!data || !Array.isArray(data.lessons) || !Array.isArray(data.books) ||
+                (!Array.isArray(data.sections) && !Array.isArray(data.categories))) {
+                throw new Error("Неверная структура");
+            }
+            sections = normalizeSections(data);
+            lessons = data.lessons;
+            books = data.books;
+            syncLegacyFromSections();
+            content = { version: 2, sections, lessons, books };
+            renderEverything();
+            if (isAdmin) renderAdminList();
+            showToast("Контент импортирован");
+        } catch (e) {
+            console.error(e);
+            showToast("Ошибка импорта JSON");
+        }
+    };
+    input.click();
+}
+
+function sectionChildren(parentId) {
+    return visibleItems(sections)
+        .filter(s => String(s.parent_id ?? "") === String(parentId ?? ""))
+        .sort((a,b) => Number(a.order || 0) - Number(b.order || 0));
+}
+
+function sectionLessons(sectionId) {
+    return visibleItems(lessons)
+        .filter(l => String(l.section_id ?? l.sectionId ?? "") === String(sectionId))
+        .sort((a,b) => Number(a.lesson_number ?? a.number ?? 0) - Number(b.lesson_number ?? b.number ?? 0));
+}
+
+function getSection(id) {
+    return sections.find(s => String(s.id) === String(id));
+}
+
+function sectionPath(id) {
+    const path = [];
+    let current = getSection(id);
+    let guard = 0;
+    while (current && guard++ < 50) {
+        path.unshift(current);
+        current = getSection(current.parent_id);
+    }
+    return path;
+}
+
+function renderCourseCards(search = "") {
+    const container = document.getElementById("courseList");
+    if (!container) return;
+    const query = String(search || "").trim().toLowerCase();
+    let list = sectionChildren(null);
+    if (query) {
+        list = visibleItems(sections).filter(s =>
+            [s.title, s.description, s.author].filter(Boolean).join(" ").toLowerCase().includes(query)
+        );
+    }
+    container.innerHTML = list.length ? list.map(sectionCardHtml).join("") : `
+        <div class="empty"><p>${query ? "Ничего не найдено" : "Пока нет разделов"}</p></div>`;
+    const filters = document.getElementById("categoryFilters");
+    if (filters) filters.style.display = "none";
+    const lessonsContainer = document.getElementById("lessonList");
+    if (lessonsContainer) lessonsContainer.innerHTML = "";
+}
+
+function sectionCardHtml(section) {
+    const children = sectionChildren(section.id).length;
+    const direct = sectionLessons(section.id).length;
+    return `
+        <div class="hierarchy-card" onclick="openCourse('${escapeAttribute(section.id)}')">
+            <div class="hierarchy-icon">${section.type === "course" ? "🎧" : "📁"}</div>
+            <div class="hierarchy-info">
+                <strong>${escapeHtml(section.title)}</strong>
+                <span>${children ? children + " подраздел" + (children === 1 ? "" : "ов") : ""}${children && direct ? " · " : ""}${direct ? direct + " урок" + (direct === 1 ? "" : "ов") : (!children ? "Пусто" : "")}</span>
+            </div>
+            ${isAdmin ? `<div class="inline-admin" onclick="event.stopPropagation()">
+                <button onclick="openInlineAdmin('section','${escapeAttribute(section.id)}')">✎</button>
+                <button class="delete" onclick="deleteSection('${escapeAttribute(section.id)}')">×</button>
+            </div>` : ""}
+            <div class="hierarchy-arrow">›</div>
+        </div>`;
+}
+
+function renderLessons() {
+    renderCourseCards(document.getElementById("lessonSearch")?.value || "");
+}
+
+function openCourse(id) {
+    currentSectionId = id;
+    const section = getSection(id);
+    if (!section) return;
+    document.getElementById("coursePageTitle").textContent = section.title;
+    document.getElementById("coursePageSubtitle").textContent = "Раздел обучения";
+    renderSectionPage(section);
+    goTo("course");
+}
+
+function renderSectionPage(section) {
+    const hero = document.getElementById("courseHero");
+    const list = document.getElementById("courseLessonList");
+    if (!hero || !list) return;
+
+    const path = sectionPath(section.id);
+    const children = sectionChildren(section.id);
+    const directLessons = sectionLessons(section.id);
+    const completed = directLessons.filter(l => isLessonCompleted(l.id)).length;
+    const percent = directLessons.length ? Math.round(completed / directLessons.length * 100) : 0;
+
+    hero.innerHTML = `
+        <div class="hierarchy-breadcrumb">
+            <button onclick="goTo('audio')">Аудиоуроки</button>
+            ${path.map((p,i) => `<span>›</span><button onclick="openCourse('${escapeAttribute(p.id)}')">${escapeHtml(p.title)}</button>`).join("")}
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px">
+            <div class="hierarchy-icon">${section.type === "course" ? "🎧" : "📁"}</div>
+            <div style="flex:1;min-width:0">
+                <div style="color:#fff;font-size:19px;font-weight:700">${escapeHtml(section.title)}</div>
+                <div style="color:rgba(255,255,255,.43);font-size:11px;margin-top:5px;line-height:1.5">${escapeHtml(section.description || "")}</div>
+            </div>
+        </div>
+        <div style="margin-top:15px">
+            <div style="display:flex;justify-content:space-between;color:rgba(255,255,255,.42);font-size:9px;margin-bottom:6px"><span>Прогресс</span><span>${percent}%</span></div>
+            <div class="course-progress-track"><div style="width:${percent}%"></div></div>
+        </div>
+    `;
+
+    list.innerHTML = `
+        ${isAdmin ? `<div class="hierarchy-toolbar">
+            <button class="hierarchy-add" onclick="openInlineAdmin('section',null,'${escapeAttribute(section.id)}')">＋ Подраздел</button>
+            <button class="hierarchy-add secondary" onclick="openInlineAdmin('lesson',null,'${escapeAttribute(section.id)}')">＋ Урок</button>
+        </div>` : ""}
+        ${children.length ? `<div class="inline-section-head"><h2>Подразделы</h2><span>${children.length}</span></div>${children.map(sectionCardHtml).join("")}` : ""}
+        ${directLessons.length ? `<div class="inline-section-head"><h2>Уроки</h2><span>${directLessons.length}</span></div>${directLessons.map(inlineLessonHtml).join("")}` : ""}
+        ${!children.length && !directLessons.length ? `<div class="empty"><p>Здесь пока ничего нет</p>${isAdmin ? `<p style="font-size:10px">Добавь подраздел или первый урок.</p>` : ""}</div>` : ""}
+    `;
+}
+
+function inlineLessonHtml(lesson) {
+    const completed = isLessonCompleted(lesson.id);
+    return `
+        <div class="hierarchy-card" onclick="openPlayer('${escapeAttribute(lesson.id)}')">
+            <div class="hierarchy-icon">${completed ? "✓" : "▶"}</div>
+            <div class="hierarchy-info">
+                <strong>${escapeHtml(lesson.lesson_number ?? lesson.number ?? "")}. ${escapeHtml(lesson.title)}</strong>
+                <span>${escapeHtml(lesson.duration || "Аудиоурок")}${lesson.description ? " · " + escapeHtml(lesson.description) : ""}</span>
+            </div>
+            ${isAdmin ? `<div class="inline-admin" onclick="event.stopPropagation()">
+                <button onclick="openInlineAdmin('lesson','${escapeAttribute(lesson.id)}','${escapeAttribute(lesson.section_id || currentSectionId)}')">✎</button>
+                <button class="delete" onclick="deleteLesson('${escapeAttribute(lesson.id)}')">×</button>
+            </div>` : ""}
+            <div class="hierarchy-arrow">›</div>
+        </div>`;
+}
+
+function openInlineAdmin(type, id = null, parentId = null) {
+    if (!isAdmin) return;
+    inlineEditing = { type, id, parentId };
+    const modal = document.getElementById("inlineAdminModal");
+    const title = document.getElementById("inlineModalTitle");
+    const body = document.getElementById("inlineModalBody");
+    const existing = id ? (type === "section" ? getSection(id) : lessons.find(l => String(l.id) === String(id))) : null;
+    const parent = parentId ? getSection(parentId) : (existing ? getSection(existing.parent_id) : null);
+
+    if (type === "section") {
+        title.textContent = existing ? "Изменить раздел" : (parent ? "Добавить подраздел" : "Добавить раздел");
+        body.innerHTML = `
+            <div class="admin-hint">${parent ? "Новый раздел будет добавлен внутрь: <b>" + escapeHtml(parent.title) + "</b>" : "Создай верхний раздел. Внутри него можно создавать сколько угодно подразделов."}</div>
+            <div class="inline-field"><label>Название</label><input id="inlineTitle" value="${escapeAttribute(existing?.title || "")}" placeholder="Например: Таухид"></div>
+            <div class="inline-field"><label>Описание</label><textarea id="inlineDescription" placeholder="Краткое описание">${escapeHtml(existing?.description || "")}</textarea></div>
+            <button class="inline-save" onclick="saveInlineSection()">${existing ? "Сохранить изменения" : "Создать раздел"}</button>`;
+    } else {
+        title.textContent = existing ? "Изменить урок" : "Добавить урок";
+        body.innerHTML = `
+            <div class="admin-hint">Урок будет находиться в разделе: <b>${escapeHtml(parent?.title || "Без раздела")}</b></div>
+            <div class="inline-field"><label>Номер урока</label><input id="inlineNumber" type="number" min="1" value="${escapeAttribute(existing?.lesson_number ?? existing?.number ?? "")}" placeholder="1"></div>
+            <div class="inline-field"><label>Название</label><input id="inlineTitle" value="${escapeAttribute(existing?.title || "")}" placeholder="Название урока"></div>
+            <div class="inline-field"><label>Описание</label><textarea id="inlineDescription" placeholder="Краткое описание">${escapeHtml(existing?.description || "")}</textarea></div>
+            <div class="inline-field"><label>MP3 / аудио ссылка</label><input id="inlineAudio" value="${escapeAttribute(existing?.audio_url || existing?.audio || "")}" placeholder="https://...mp3"></div>
+            <div class="inline-field"><label>Длительность</label><input id="inlineDuration" value="${escapeAttribute(existing?.duration || "")}" placeholder="32:15"></div>
+            <button class="inline-save" onclick="saveInlineLesson()">${existing ? "Сохранить изменения" : "Добавить урок"}</button>`;
+    }
+    modal.classList.add("active");
+}
+
+function closeInlineAdmin() {
+    document.getElementById("inlineAdminModal")?.classList.remove("active");
+    inlineEditing = null;
+}
+
+function saveInlineSection() {
+    if (!isAdmin) return;
+    const title = value("inlineTitle");
+    const description = value("inlineDescription");
+    if (!title) return showToast("Введите название");
+    if (inlineEditing?.id) {
+        const item = getSection(inlineEditing.id);
+        if (item) { item.title = title; item.description = description; }
+        showToast("Раздел изменён");
+    } else {
+        const parentId = inlineEditing?.parentId ?? null;
+        sections.push({
+            id: nextId(sections, "section"), parent_id: parentId, title, description,
+            cover_url: "", type: "section", published: true,
+            order: sectionChildren(parentId).length
+        });
+        showToast(parentId ? "Подраздел добавлен" : "Раздел добавлен");
+    }
+    syncLegacyFromSections();
+    closeInlineAdmin();
+    renderEverything();
+    if (currentSectionId) { const sec = getSection(currentSectionId); if (sec) renderSectionPage(sec); }
+}
+
+function saveInlineLesson() {
+    if (!isAdmin) return;
+    const sectionId = inlineEditing?.parentId || inlineEditing?.sectionId;
+    const number = Number(document.getElementById("inlineNumber")?.value || 0);
+    const title = value("inlineTitle");
+    const description = value("inlineDescription");
+    const audioUrl = value("inlineAudio");
+    const duration = value("inlineDuration");
+    if (!sectionId || !number || !title) return showToast("Заполни номер и название урока");
+
+    if (inlineEditing?.id) {
+        const item = lessons.find(l => String(l.id) === String(inlineEditing.id));
+        if (item) { item.section_id = sectionId; item.lesson_number = number; item.title = title; item.description = description; item.audio_url = audioUrl; item.duration = duration; }
+        showToast("Урок изменён");
+    } else {
+        lessons.push({ id: nextId(lessons, "lesson"), section_id: sectionId, lesson_number: number, title, description, audio_url: audioUrl, duration, published: true });
+        showToast("Урок добавлен");
+    }
+    closeInlineAdmin();
+    renderEverything();
+    const sec = getSection(sectionId); if (sec) { currentSectionId = sectionId; renderSectionPage(sec); }
+}
+
+function deleteLesson(id) {
+    if (!isAdmin) return;
+    const item = lessons.find(l => String(l.id) === String(id));
+    if (!item || !confirm(`Удалить «${item.title}»?`)) return;
+    lessons = lessons.filter(l => String(l.id) !== String(id));
+    showToast("Урок удалён");
+    renderEverything();
+    const sec = getSection(currentSectionId); if (sec) renderSectionPage(sec);
+}
+
+function deleteSection(id) {
+    if (!isAdmin) return;
+    const item = getSection(id);
+    if (!item) return;
+    const ids = new Set([String(id)]);
+    let changed = true;
+    while (changed) {
+        changed = false;
+        sections.forEach(s => { if (s.parent_id != null && ids.has(String(s.parent_id)) && !ids.has(String(s.id))) { ids.add(String(s.id)); changed = true; } });
+    }
+    if (!confirm(`Удалить «${item.title}» и всё внутри?`)) return;
+    sections = sections.filter(s => !ids.has(String(s.id)));
+    lessons = lessons.filter(l => !ids.has(String(l.section_id ?? l.sectionId)));
+    if (ids.has(String(currentSectionId))) currentSectionId = null;
+    syncLegacyFromSections();
+    showToast("Раздел удалён");
+    renderEverything();
+    goTo("audio");
+}
+
+function renderEverything() {
+    renderLessons();
+    renderBooks();
+    updateHome();
+    updateProgress();
+    updateProfile();
+    renderFavorites();
+    if (isAdmin) { updateAdminStats(); renderAdminList(); }
+}
+
+function updateAdminStats() {
+    const el = document.getElementById("adminStats");
+    if (!el) return;
+    el.innerHTML = `<div class="admin-hint"><b>${sections.length}</b> разделов · <b>${lessons.length}</b> уроков · <b>${books.length}</b> книг<br>Теперь разделы и подразделы можно создавать прямо внутри Аудиоуроков.</div>`;
+}
+
+/* Direct admin entry point from the profile remains available. */
+function openAdmin() {
+    if (!isAdmin) return;
+    goTo("admin");
+}
+
 /* =========================================================
    INITIALIZE
 ========================================================= */
@@ -7270,6 +7744,17 @@ document.addEventListener(
     initialize
 );
 </script>
+
+
+<div id="inlineAdminModal" class="inline-modal" onclick="if(event.target===this) closeInlineAdmin()">
+  <div class="inline-modal-card">
+    <div class="inline-modal-head">
+      <h3 id="inlineModalTitle">Добавить</h3>
+      <button class="inline-modal-close" onclick="closeInlineAdmin()">×</button>
+    </div>
+    <div id="inlineModalBody"></div>
+  </div>
+</div>
 
 </body>
 </html>
