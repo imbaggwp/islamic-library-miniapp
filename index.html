@@ -1244,7 +1244,7 @@ function renderLiveTacticalPanel(){
     <div class="live-tactics-switches">${TACTICAL_SWITCHES.map(x=>`<button class="${x[0]===state.tacticalSwitch?'active':''}" onclick="setLiveTacticalSwitch('${x[0]}')">${x[1]}</button>`).join('')}</div>
     <div class="live-tactics-bars">${bars.map(b=>`<div class="tactic-stat"><div><span>${b[0]}</span><b>${b[1]}</b></div><div class="tactic-track"><i style="width:${b[1]}%"></i></div></div>`).join('')}</div>
     ${impact.warnings.length?`<div class="tactic-warnings">${impact.warnings.map(w=>`<div>⚠ ${w}</div>`).join('')}</div>`:''}
-  </div>${renderZoneAnalysis()}`;
+  </div>${renderZoneAnalysis()}${renderOpponentAIPanel()}${renderOpponentLivePanel()}${renderOpponentPlayerAIPanel()}`;
 }
 function renderIndividualInstruction(pid){
   ensureLiveTacticsState();
@@ -6853,6 +6853,28 @@ if(document.readyState==='loading'){
 .zone-chips{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.zone-chips span{display:flex;justify-content:space-between;gap:5px;padding:7px 8px;border-radius:9px;background:rgba(255,255,255,.035);font-size:10px}.zone-chips i{font-style:normal;font-weight:800;opacity:.8}
 .zone-messages,.zone-ok{margin-top:8px;font-size:11px;line-height:1.45}.zone-messages{color:#ffc978}.zone-ok{color:#8fd7a3}
 
+
+.tactical-event-panel{margin-top:10px;padding:11px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025)}
+.tactical-event-panel b{font-size:12px}.event-tendency-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:8px}
+.event-tendency{padding:7px;border-radius:9px;background:rgba(255,255,255,.035);font-size:10px}.event-tendency strong{display:block;font-size:12px;margin-top:2px}
+@media(max-width:700px){.event-tendency-grid{grid-template-columns:repeat(2,1fr)}}
+
+
+.opponent-ai-panel{margin-top:10px;padding:11px 12px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.025)}
+.opponent-ai-head{display:flex;justify-content:space-between;gap:8px;font-size:12px}.opponent-ai-head span{font-weight:800;opacity:.85}
+.opponent-ai-text{margin-top:6px;font-size:10px;line-height:1.4;opacity:.65}
+.opponent-ai-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}.opponent-ai-grid div{display:flex;justify-content:space-between;padding:6px 7px;background:rgba(255,255,255,.035);border-radius:8px;font-size:9px}.opponent-ai-grid b{font-size:11px}
+
+
+.opponent-live-panel{margin-top:9px;padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:11px;background:rgba(255,255,255,.02)}
+.opponent-live-head{display:flex;justify-content:space-between;font-size:11px}.opponent-live-head span{opacity:.65}
+.opponent-live-message{margin-top:6px;font-size:10px;line-height:1.4;opacity:.78}.opponent-live-meta{margin-top:7px;font-size:9px;opacity:.5}
+
+
+.opponent-player-ai-panel{margin-top:9px;padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:11px;background:rgba(255,255,255,.018)}
+.opponent-player-ai-head{display:flex;justify-content:space-between;font-size:11px}.opponent-player-ai-head span{opacity:.6}
+.opponent-player-ai-text,.opponent-threat{margin-top:6px;font-size:10px;line-height:1.4;opacity:.72}
+
 </style>
 <script id="finance2-script">
 /* FINANCE 2.0 COMPLETE SYSTEM */
@@ -7168,7 +7190,486 @@ function refreshZoneAnalysisUI(){
     } else if(old){
       old.outerHTML=renderZoneAnalysis();
     }
-  },0);
+      mountTacticalEventPanel();
+},0);
+}
+
+
+/* === TACTICAL MATCH EVENTS 4.0 ===
+   Тактические зоны теперь влияют на типы и вероятность событий матча.
+*/
+function liveEventContext(){
+  ensureLiveTacticsState();
+  const z=calculateTacticalZoneEffects();
+  const m=getZoneEngineModifier();
+  const style=state.tacticalSwitch||'balance';
+  const attackLine=(state.startingXI||[]).filter(id=>{const p=pitchCoordForPlayer(id);return p&&p.x>62}).length;
+  const defensiveLine=(state.startingXI||[]).filter(id=>{const p=pitchCoordForPlayer(id);return p&&p.x<38}).length;
+  return {z,m,style,attackLine,defensiveLine};
+}
+function tacticalEventProfile(){
+  const c=liveEventContext(), z=c.z;
+  let flank=0.08, central=0.08, counter=0.08, buildup=0.12, pressure=0.10;
+  if(z.left>=2) flank+=0.10;
+  if(z.right>=2) flank+=0.10;
+  if(z.center>=5) central+=0.10;
+  if(z.centralAdvantage>=1) central+=0.06;
+  if(z.transitionRisk>=12) counter+=0.12;
+  if(z.attack>=4 && z.defense<=3) counter+=0.06;
+  if(c.style==='allout') { flank+=.04; central+=.04; pressure+=.08; counter+=.10; }
+  if(c.style==='defend') { counter-=.02; buildup-=.02; pressure+=.02; }
+  if(c.style==='attack') { flank+=.04; central+=.03; pressure+=.04; }
+  return {
+    flank:Math.max(.01,Math.min(.45,flank)),
+    central:Math.max(.01,Math.min(.45,central)),
+    counter:Math.max(.01,Math.min(.45,counter)),
+    buildup:Math.max(.01,Math.min(.45,buildup)),
+    pressure:Math.max(.01,Math.min(.45,pressure))
+  };
+}
+function tacticalEventChance(type){
+  const p=tacticalEventProfile();
+  return p[type]||.05;
+}
+function tacticalPickAttackChannel(){
+  const p=tacticalEventProfile();
+  const r=Math.random();
+  const right=calculateTacticalZoneEffects().right;
+  const left=calculateTacticalZoneEffects().left;
+  if(left>=2 && right<2) return 'left';
+  if(right>=2 && left<2) return 'right';
+  if(r<p.flank/Math.max(.01,p.flank+p.central)) return Math.random()<.5?'left':'right';
+  return 'center';
+}
+function createTacticalMatchEvent(homeTeam=true){
+  ensureOpponentAI();
+  const ai=analyzeOpponentAgainstUs();
+
+  const c=liveEventContext(), p=tacticalEventProfile();
+  const r=Math.random();
+  const channel=tacticalPickAttackChannel();
+  if(r<p.counter){
+    return {type:'counter',team:homeTeam?'home':'away',
+      text:(homeTeam?'⚡ Контратака хозяев':'⚡ Контратака соперника')+
+      (c.z.transitionRisk>=12?' — высокая линия оставила пространство':'')};
+  }
+  if(r<p.counter+p.pressure){
+    return {type:'press',team:homeTeam?'home':'away',
+      text:(homeTeam?'🔥 Жёсткий прессинг':'🔥 Прессинг соперника')+
+      (c.z.center>=5?' — центр перекрыт':'')};
+  }
+  if(r<p.counter+p.pressure+p.flank){
+    return {type:'flank',team:homeTeam?'home':'away',
+      channel,text:(homeTeam?'↗ Атака через ':'↙ Соперник атакует через ')+(channel==='left'?'левый фланг':channel==='right'?'правый фланг':'центр')};
+  }
+  return {type:'buildup',team:homeTeam?'home':'away',
+    text:(homeTeam?'🎯 Комбинационная атака':'🎯 Соперник развивает атаку')+
+      (c.z.centralAdvantage>=1?' — численное преимущество в центре':'')};
+}
+
+const _baseCreateTacticalMatchEvent=createTacticalMatchEvent;
+createTacticalMatchEvent=function(homeTeam=true){
+  ensureOpponentLiveState();
+  opponentLiveEventInjection();
+
+  const ev=_baseCreateTacticalMatchEvent(homeTeam);
+  return applyOpponentAIToEvent(ev,homeTeam);
+};
+function applyTacticalEventToMatchEngine(event,match){
+  if(!match) return match;
+  const c=liveEventContext();
+  const own=event.team==='home';
+  const mod=own?c.m:{attack:-c.m.attack,defense:-c.m.defense,control:-c.m.control,press:-c.m.press};
+  if(event.type==='counter'){
+    match.xg=(Number(match.xg)||0)+Math.max(0.02,0.10+(mod.attack||0)*.5);
+    match.shots=(Number(match.shots)||0)+1;
+  } else if(event.type==='flank'){
+    match.xg=(Number(match.xg)||0)+Math.max(0.015,0.055+(mod.attack||0)*.35);
+    match.shots=(Number(match.shots)||0)+1;
+  } else if(event.type==='press'){
+    match.possession=(Number(match.possession)||50)+((mod.press||0)*12);
+    match.shots=(Number(match.shots)||0)+(.5+(mod.press||0));
+  } else {
+    match.possession=(Number(match.possession)||50)+((mod.control||0)*10);
+  }
+  return match;
+}
+function tacticalGoalQuality(){
+  const c=liveEventContext();
+  const p=tacticalEventProfile();
+  let q=.12;
+  q+=c.m.attack*.35;
+  q+=c.m.control*.12;
+  q+=p.flank*.08;
+  q+=p.central*.06;
+  q-=c.m.defense<0?Math.abs(c.m.defense)*.12:0;
+  return Math.max(.03,Math.min(.48,q));
+}
+function tacticalMatchNarrative(){
+  const c=liveEventContext(), p=tacticalEventProfile();
+  const notes=[];
+  if(c.z.left>=2) notes.push('левый фланг перегружен');
+  if(c.z.right>=2) notes.push('правый фланг перегружен');
+  if(c.z.centralAdvantage>=1) notes.push('центр под контролем');
+  if(c.z.transitionRisk>=12) notes.push('за спиной много пространства');
+  if(notes.length===0) notes.push('структура команды сбалансирована');
+  return notes;
+}
+
+
+function renderTacticalEventPanel(){
+  const p=tacticalEventProfile(), c=liveEventContext();
+  const vals=[['Фланги',p.flank],['Центр',p.central],['Контратаки',p.counter],['Прессинг',p.pressure]];
+  return `<div class="tactical-event-panel"><b>Влияние тактики на события</b>
+    <div class="event-tendency-grid">${vals.map(v=>`<div class="event-tendency">${v[0]}<strong>${Math.round(v[1]*100)}%</strong></div>`).join('')}</div>
+    <div style="margin-top:8px;opacity:.65;font-size:10px">${tacticalMatchNarrative().join(' · ')}</div>
+  </div>`;
+}
+function mountTacticalEventPanel(){
+  const panel=document.querySelector('.live-tactics-panel');
+  if(!panel) return;
+  let x=panel.querySelector('.tactical-event-panel');
+  if(!x){ panel.insertAdjacentHTML('beforeend',renderTacticalEventPanel()); }
+  else x.outerHTML=renderTacticalEventPanel();
+}
+
+
+/* === OPPONENT TACTICAL AI 5.0 === */
+const OPPONENT_TACTICS=[
+  ['lowblock','Низкий блок'],['balanced','Баланс'],['press','Высокий прессинг'],
+  ['wide','Атака через фланги'],['central','Атака через центр'],['counter','Контратаки']
+];
+function ensureOpponentAI(){
+  state.opponentAI=state.opponentAI||{
+    tactic:'balanced',adaptation:0,history:[],lastReason:''
+  };
+}
+function analyzeOpponentAgainstUs(){
+  ensureOpponentAI();
+  const z=calculateTacticalZoneEffects();
+  const live=liveEventContext();
+  const reasons=[];
+  let scores={lowblock:0,balanced:1,press:0,wide:0,central:0,counter:0};
+  if(z.attack>=4){scores.lowblock+=3;scores.counter+=2;reasons.push('твоя атакующая линия высоко');}
+  if(z.left>=2){scores.wide+=2;scores.counter+=1;reasons.push('перегруз слева');}
+  if(z.right>=2){scores.wide+=2;scores.counter+=1;reasons.push('перегруз справа');}
+  if(z.center>=5){scores.wide+=3;scores.counter+=2;reasons.push('центр хорошо закрыт');}
+  if(z.weak.length>=5){scores.press+=2;reasons.push('есть свободные зоны');}
+  if(live.style==='allout'){scores.counter+=4;scores.lowblock+=2;reasons.push('режим «Все в атаку»');}
+  if(live.style==='defend'){scores.press+=2;scores.central+=1;}
+  if(live.style==='attack'){scores.counter+=2;scores.lowblock+=1;}
+  let best=Object.keys(scores).sort((a,b)=>scores[b]-scores[a])[0];
+  const labels=Object.fromEntries(OPPONENT_TACTICS.map(x=>[x[0],x[1]]));
+  state.opponentAI.tactic=best;
+  state.opponentAI.adaptation=Math.min(100,(state.opponentAI.adaptation||0)+12);
+  state.opponentAI.lastReason=reasons.length?reasons.join(', '):'соперник сохраняет базовый план';
+  state.opponentAI.history=(state.opponentAI.history||[]).slice(-4);
+  state.opponentAI.history.push({minute:state.liveMatch?.minute||0,tactic:best,reason:state.opponentAI.lastReason});
+  return {tactic:best,label:labels[best],scores,reasons};
+}
+function getOpponentAIModifier(){
+  ensureOpponentAI();
+  const t=state.opponentAI.tactic;
+  const m={attack:0,defense:0,control:0,press:0,counter:0,wide:0,central:0};
+  if(t==='lowblock'){m.defense=.09;m.attack=-.06;m.counter=.04;}
+  if(t==='press'){m.press=.10;m.control=.04;m.defense=-.025;}
+  if(t==='wide'){m.attack=.06;m.wide=.12;m.control=-.025;}
+  if(t==='central'){m.attack=.05;m.central=.12;m.control=.06;}
+  if(t==='counter'){m.counter=.14;m.attack=.035;m.defense=.02;}
+  if(t==='balanced'){m.control=.025;}
+  return m;
+}
+function applyOpponentAIToEvent(event,homeTeam=true){
+  const m=getOpponentAIModifier();
+  if(!event) return event;
+  if(event.team!==(homeTeam?'home':'away')){
+    if(event.type==='counter' && m.counter>.1) event.text+=' — соперник поймал команду на высокой линии';
+    if(event.type==='flank' && m.wide>.1) event.text+=' — соперник целенаправленно перегружает фланг';
+    if(event.type==='press' && m.press>.08) event.text+=' — соперник душит выход из обороны';
+  }
+  return event;
+}
+function opponentAITurn(){
+  const result=analyzeOpponentAgainstUs();
+  saveState();
+  return result;
+}
+function opponentAIEventPressure(){
+  const m=getOpponentAIModifier();
+  return {
+    counter:Math.max(0,m.counter),
+    press:Math.max(0,m.press),
+    wide:Math.max(0,m.wide),
+    central:Math.max(0,m.central),
+    attack:Math.max(0,m.attack),
+    defense:Math.max(0,m.defense)
+  };
+}
+function renderOpponentAIPanel(){
+  ensureOpponentAI();
+  const labels=Object.fromEntries(OPPONENT_TACTICS.map(x=>[x[0],x[1]]));
+  const a=analyzeOpponentAgainstUs();
+  return `<div class="opponent-ai-panel">
+    <div class="opponent-ai-head"><b>ИИ соперника</b><span>${a.label}</span></div>
+    <div class="opponent-ai-text">${a.reasons.length?'Соперник адаптируется: '+a.reasons.join(' · '):'Соперник пока не видит критической проблемы.'}</div>
+    <div class="opponent-ai-grid">
+      ${Object.entries(a.scores).map(([k,v])=>`<div><span>${labels[k]}</span><b>${v}</b></div>`).join('')}
+    </div>
+  </div>`;
+}
+
+
+/* === OPPONENT LIVE REACTION 6.0 === */
+const OPPONENT_REACTION_INTERVAL=10;
+function ensureOpponentLiveState(){
+  ensureOpponentAI();
+  state.opponentAI.live=state.opponentAI.live||{
+    lastMinute:-99,changes:0,shape:'base',subs:[],message:'Соперник ждёт развития матча.'
+  };
+}
+function getOpponentPlayersLive(){
+  const lm=state.liveMatch||{};
+  return lm.opponentXI||lm.awayXI||state.opponentXI||[];
+}
+function chooseOpponentShapeLive(){
+  const c=liveEventContext(), z=c.z;
+  if(z.left>=2 || z.right>=2) return '4-2-3-1 wide';
+  if(z.center>=5) return '3-4-3';
+  if(c.style==='allout' || z.transitionRisk>=12) return '5-4-1';
+  if(c.style==='defend') return '4-4-2';
+  if(z.weak.length>=5) return '4-3-3';
+  return '4-2-3-1';
+}
+function opponentReactionReason(shape){
+  const c=liveEventContext(),z=c.z;
+  if(z.left>=2) return 'усиливает левый фланг против твоего перегруза';
+  if(z.right>=2) return 'усиливает правый фланг против твоего перегруза';
+  if(z.center>=5) return 'добавляет игрока для борьбы за центр';
+  if(c.style==='allout') return 'садится глубже и готовит контратаки';
+  if(z.transitionRisk>=12) return 'использует пространство за высокой линией';
+  if(z.weak.length>=5) return 'идёт в свободные зоны между линиями';
+  return 'сохраняет базовую структуру';
+}
+function opponentCanSubLive(){
+  const lm=state.liveMatch||{};
+  const used=Number(lm.opponentSubsUsed||0);
+  return used<5;
+}
+function makeOpponentSubstitutionLive(){
+  if(!opponentCanSubLive()) return null;
+  const lm=state.liveMatch||{};
+  lm.opponentSubsUsed=Number(lm.opponentSubsUsed||0)+1;
+  const names=['атакующий игрок','центральный полузащитник','защитник','фланговый игрок','нападающий'];
+  const name=names[Math.floor(Math.random()*names.length)];
+  const sub={minute:Number(lm.minute||0),text:'🔄 Соперник делает замену: '+name};
+  ensureOpponentLiveState();
+  state.opponentAI.live.subs.push(sub);
+  return sub;
+}
+function applyOpponentLiveReaction(force=false){
+  ensureOpponentLiveState();
+  const minute=Number(state.liveMatch?.minute||0);
+  if(!force && minute-state.opponentAI.live.lastMinute<OPPONENT_REACTION_INTERVAL) return null;
+  if(minute<15 && !force) return null;
+  state.opponentAI.live.lastMinute=minute;
+  const before=state.opponentAI.tactic;
+  const result=analyzeOpponentAgainstUs();
+  const shape=chooseOpponentShapeLive();
+  const reason=opponentReactionReason(shape);
+  let changed=before!==result.tactic || state.opponentAI.live.shape!==shape;
+  state.opponentAI.live.shape=shape;
+  state.opponentAI.live.changes+=changed?1:0;
+  state.opponentAI.live.message='Соперник '+reason+'.';
+  let sub=null;
+  if(changed && minute>=55 && Math.random()<.42) sub=makeOpponentSubstitutionLive();
+  if(!changed && minute>=65 && Math.random()<.12) sub=makeOpponentSubstitutionLive();
+  if(sub) state.opponentAI.live.message+=' '+sub.text;
+  saveState();
+  return {changed,sub,shape,tactic:result.tactic,reason};
+}
+function opponentLiveEventInjection(){
+  const r=applyOpponentLiveReaction(false);
+  if(!r) return null;
+  if(r.changed){
+    return {type:'opponent_adaptation',team:'away',
+      text:'🧠 Соперник перестроился: '+r.shape+' — '+r.reason+'.'};
+  }
+  return r.sub;
+}
+function getOpponentLiveModifier(){
+  ensureOpponentLiveState();
+  const m=getOpponentAIModifier();
+  const shape=state.opponentAI.live.shape;
+  if(shape==='5-4-1'){m.defense+=.07;m.attack-=.05;}
+  if(shape==='3-4-3'){m.attack+=.06;m.defense-=.025;m.press+=.035;}
+  if(shape==='4-3-3'){m.attack+=.04;m.press+=.03;}
+  if(shape==='4-2-3-1 wide'){m.wide+=.08;m.control+=.025;}
+  return m;
+}
+function opponentLiveNarrative(){
+  ensureOpponentLiveState();
+  return state.opponentAI.live.message;
+}
+function renderOpponentLivePanel(){
+  ensureOpponentLiveState();
+  const l=state.opponentAI.live;
+  return `<div class="opponent-live-panel">
+    <div class="opponent-live-head"><b>Живая реакция соперника</b><span>${l.shape}</span></div>
+    <div class="opponent-live-message">${l.message}</div>
+    <div class="opponent-live-meta">Перестроений: <b>${l.changes}</b> · Замен: <b>${l.subs.length}</b></div>
+  </div>`;
+}
+ensureOpponentLiveState();
+
+
+let opponentLivePulseTimer=null;
+function startOpponentLivePulse(){
+  clearInterval(opponentLivePulseTimer);
+  opponentLivePulseTimer=setInterval(()=>{
+    try{
+      if(state.liveMatch && !state.liveMatch.finished){
+        const ev=opponentLiveEventInjection();
+        if(ev && Array.isArray(state.liveMatch.events)){
+          state.liveMatch.events.push(ev);
+          if(typeof renderMatch==='function') renderMatch();
+        }
+      }
+    }catch(e){}
+  },4000);
+}
+startOpponentLivePulse();
+
+
+/* === OPPONENT PLAYER AI 7.0 === */
+function ensureOpponentPlayerAI(){
+  ensureOpponentLiveState();
+  state.opponentAI.playerAI=state.opponentAI.playerAI||{
+    markedPlayer:null,markedZone:null,lastAction:'Соперник пока не назначил персональную опеку.'
+  };
+}
+function getBestUserThreat(){
+  const ids=(state.startingXI||[]).filter(Boolean);
+  const scored=ids.map(id=>{
+    const p=getPlayerByIdLive(id), pos=pitchCoordForPlayer(id);
+    if(!p||!pos) return null;
+    const ins=state.individualInstructions?.[id]||'hold';
+    let score=50;
+    if(pos.x>55)score+=15;
+    if(pos.y>30&&pos.y<70)score+=12;
+    if(ins==='free')score+=10;
+    if(ins==='attack')score+=8;
+    if(ins==='press')score+=3;
+    return {id,p,pos,score};
+  }).filter(Boolean).sort((a,b)=>b.score-a.score);
+  return scored[0]||null;
+}
+function getOpponentXIIds(){
+  const lm=state.liveMatch||{};
+  return lm.opponentXI||lm.awayXI||state.opponentXI||[];
+}
+function ensureOpponentPositions(){
+  ensureOpponentPlayerAI();
+  const ids=getOpponentXIIds().filter(Boolean);
+  state.opponentAI.playerAI.positions=state.opponentAI.playerAI.positions||{};
+  ids.forEach((id,i)=>{
+    if(!state.opponentAI.playerAI.positions[id]){
+      const base=[
+        [12,50],[24,20],[24,40],[24,60],[24,80],
+        [43,30],[43,50],[43,70],
+        [67,25],[67,50],[67,75]
+      ][i%11];
+      state.opponentAI.playerAI.positions[id]={x:base[0],y:base[1]};
+    }
+  });
+}
+function chooseOpponentMarker(){
+  ensureOpponentPositions();
+  const threat=getBestUserThreat();
+  if(!threat) return null;
+  const ids=getOpponentXIIds().filter(Boolean);
+  let best=null,bestScore=-1e9;
+  ids.forEach(id=>{
+    const pos=state.opponentAI.playerAI.positions[id]; if(!pos)return;
+    const roleScore=100-Math.abs(+pos.x-(+threat.pos.x-8))*2-Math.abs(+pos.y-(+threat.pos.y))*1.2;
+    if(roleScore>bestScore){bestScore=roleScore;best={id,pos};}
+  });
+  return {threat,defender:best};
+}
+function adaptOpponentPlayerPositions(){
+  ensureOpponentPositions();
+  const c=liveEventContext(), z=c.z, ai=state.opponentAI.playerAI;
+  const ids=getOpponentXIIds().filter(Boolean);
+  const changes=[];
+  const threat=getBestUserThreat();
+  if(threat){
+    const mark=chooseOpponentMarker();
+    if(mark){
+      const old={...mark.defender.pos};
+      mark.defender.pos.x=Math.max(8,Math.min(92,threat.pos.x-7));
+      mark.defender.pos.y=Math.max(7,Math.min(93,threat.pos.y));
+      ai.markedPlayer=threat.id;
+      ai.markedZone=threat.pos.x>62?'атака':threat.pos.x<38?'оборона':'полузащита';
+      if(Math.abs(old.x-mark.defender.pos.x)>4||Math.abs(old.y-mark.defender.pos.y)>5)
+        changes.push('персональная опека ключевого игрока');
+    }
+  }
+  ids.forEach(id=>{
+    const p=ai.positions[id];
+    if(!p)return;
+    if(z.left>=2 && p.y<38){p.y=Math.min(92,p.y+7);changes.push('соперник сместил защитника к левому флангу');}
+    if(z.right>=2 && p.y>62){p.y=Math.max(8,p.y-7);changes.push('соперник сместил защитника к правому флангу');}
+    if(z.center>=5 && p.y>=35&&p.y<=65){p.y += p.y<50?-6:6;changes.push('соперник раздвинул центр');}
+    if(c.style==='allout' && p.x<38){p.x=Math.max(10,p.x-5);}
+  });
+  ai.lastAction=changes.length?changes[changes.length-1]:'Соперник сохраняет позиции.';
+  return changes;
+}
+function opponentPlayerAIAttackingBonus(){
+  ensureOpponentPositions();
+  const c=liveEventContext(),ai=state.opponentAI.playerAI;
+  let b=0;
+  if(ai.markedPlayer){
+    const p=pitchCoordForPlayer(ai.markedPlayer);
+    if(p && p.x>55) b+=.025;
+  }
+  if(c.z.left>=2||c.z.right>=2)b+=.018;
+  if(c.z.center>=5)b+=.015;
+  return b;
+}
+function opponentPlayerAIDefenseBonus(){
+  ensureOpponentPlayerAI();
+  const ai=state.opponentAI.playerAI;
+  return ai.markedPlayer?.toString()?0.02:0;
+}
+function opponentPlayerAIEvent(){
+  const changes=adaptOpponentPlayerPositions();
+  saveState();
+  if(changes.length) return {
+    type:'opponent_player_ai',team:'away',
+    text:'🧠 ИИ соперника: '+changes[0]+'.'
+  };
+  return null;
+}
+function renderOpponentPlayerAIPanel(){
+  ensureOpponentPlayerAI();
+  const ai=state.opponentAI.playerAI;
+  const threat=getBestUserThreat();
+  const marked=threat&&ai.markedPlayer===threat.id;
+  return `<div class="opponent-player-ai-panel">
+    <div class="opponent-player-ai-head"><b>Персональная адаптация</b><span>${marked?'Опека назначена':'Анализ игроков'}</span></div>
+    <div class="opponent-player-ai-text">${ai.lastAction}</div>
+    ${threat?`<div class="opponent-threat">Главная угроза: <b>${getPlayerDisplayNameLive(threat.p)}</b></div>`:''}
+  </div>`;
+}
+function getPlayerDisplayNameLive(p){
+  if(!p)return 'Игрок';
+  return p.name||p.fullName||p[1]||'Игрок';
+}
+ensureOpponentPlayerAI();
+
+
+function getOpponentPlayerAIEventModifier(){
+  return {attack:opponentPlayerAIAttackingBonus(),defense:opponentPlayerAIDefenseBonus()};
 }
 
 </body>
