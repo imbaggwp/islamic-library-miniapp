@@ -394,6 +394,9 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .board-history>div{display:grid;grid-template-columns:55px 60px 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--line,#2b2f36);font-size:12px}
 .board-history b{font-size:13px}.board-history em{font-style:normal;opacity:.6}
 button.danger{border-color:rgba(255,90,90,.35)!important;color:#ff9b9b!important}
+
+.tactical-field,.tactical-field *{user-select:none;-webkit-user-select:none}
+.tactical-field .pitch-player{touch-action:none!important;-webkit-user-drag:none!important}
 </style>
 </style>
 <style>
@@ -1253,31 +1256,66 @@ function initPitchDrag(){
   const pitch=document.getElementById('pitch');
   if(!pitch)return;
   pitch.querySelectorAll('.pitch-player').forEach(el=>{
-    let dragging=false, moved=false;
+    if(el.dataset.dragReady==='1')return;
+    el.dataset.dragReady='1';
+    let dragging=false,moved=false,startX=0,startY=0;
+
+    const point=e=>({x:e.clientX,y:e.clientY});
     const move=e=>{
       if(!dragging)return;
-      const r=pitch.getBoundingClientRect();
-      const pt=e.touches?e.touches[0]:e;
-      const x=Math.max(3,Math.min(97,(pt.clientX-r.left)/r.width*100));
-      const y=Math.max(5,Math.min(95,(pt.clientY-r.top)/r.height*100));
-      el.style.left=x+'%';el.style.top=y+'%';moved=true;
+      e.preventDefault();
+      const r=pitch.getBoundingClientRect(),pt=point(e);
+      const x=Math.max(3,Math.min(97,(pt.x-r.left)/r.width*100));
+      const y=Math.max(5,Math.min(95,(pt.y-r.top)/r.height*100));
+      el.style.left=x+'%';
+      el.style.top=y+'%';
+      moved=true;
     };
-    const end=()=>{
+    const end=e=>{
       if(!dragging)return;
-      dragging=false;el.classList.remove('dragging');
+      if(e)e.preventDefault();
+      dragging=false;
+      el.classList.remove('dragging');
+      try{if(el.hasPointerCapture?.(e.pointerId))el.releasePointerCapture(e.pointerId)}catch(_){}
       const key=el.dataset.pitchKey;
-      state.pitchPositions[key]={x:parseFloat(el.style.left),y:parseFloat(el.style.top)};
-      save();
-      setTimeout(()=>{moved=false},0);
+      if(key){
+        state.pitchPositions=state.pitchPositions||{};
+        state.pitchPositions[key]={
+          x:parseFloat(el.style.left)||50,
+          y:parseFloat(el.style.top)||50
+        };
+        save();
+      }
+      setTimeout(()=>{moved=false},80);
     };
-    el.addEventListener('pointerdown',e=>{dragging=true;moved=false;el.classList.add('dragging');el.setPointerCapture?.(e.pointerId);});
-    el.addEventListener('pointermove',move);
-    el.addEventListener('pointerup',end);
-    el.addEventListener('pointercancel',end);
-    el.addEventListener('click',e=>{if(moved){e.preventDefault();e.stopPropagation();}});
+
+    el.addEventListener('pointerdown',e=>{
+      if(e.button!==undefined&&e.button!==0)return;
+      e.preventDefault();
+      const pt=point(e);startX=pt.x;startY=pt.y;
+      dragging=true;moved=false;
+      el.classList.add('dragging');
+      try{el.setPointerCapture(e.pointerId)}catch(_){}
+    },{passive:false});
+
+    el.addEventListener('pointermove',e=>{
+      if(!dragging)return;
+      const pt=point(e);
+      if(Math.abs(pt.x-startX)>3||Math.abs(pt.y-startY)>3)move(e);
+    },{passive:false});
+
+    el.addEventListener('pointerup',end,{passive:false});
+    el.addEventListener('pointercancel',end,{passive:false});
+    el.addEventListener('dragstart',e=>e.preventDefault());
+
+    el.addEventListener('click',e=>{
+      if(moved){
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    },true);
   });
-}
-function resetPitchPositions(){
+}function resetPitchPositions(){
   ensureTacticalState();state.pitchPositions={};save();renderPitch();showToast('Позиции сброшены');
 }
 function renderTactics(){
