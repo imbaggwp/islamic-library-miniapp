@@ -42,12 +42,12 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .select-hero{background:linear-gradient(135deg,#171e29,#10151d);border:1px solid var(--line);border-radius:24px;padding:22px;margin-bottom:16px}
 .select-hero h1{font-size:28px;margin:0 0 8px}.select-hero p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
 .league-title{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin:20px 2px 9px}
-.club-list{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.select-filters{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}.filter-field label{display:block;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;margin:0 0 6px 2px}.club-select-input{height:48px;padding:0 13px}.selected-club-preview{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:17px;padding:12px;margin-bottom:12px}.preview-icon{width:45px;height:45px;border-radius:13px;background:var(--card2);display:grid;place-items:center;font-size:22px}.preview-info{flex:1;min-width:0}.preview-info b{display:block;font-size:14px}.preview-info span{display:block;color:var(--muted);font-size:10px;margin-top:3px}.preview-btn{width:auto;padding:10px 13px;font-size:11px;white-space:nowrap}.club-list{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .club-choice{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:13px;text-align:left;display:flex;align-items:center;gap:10px;transition:.15s}
 .club-choice:active{transform:scale(.98)}.club-choice .cicon{width:42px;height:42px;border-radius:13px;background:var(--card2);display:grid;place-items:center;font-size:21px}
 .club-choice b{font-size:13px}.club-choice small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
 .new-career{width:100%;margin-top:14px;background:var(--accent);color:#15110a;padding:14px;border-radius:14px;font-weight:800}
-@media(max-width:420px){.club-list{grid-template-columns:1fr}}
+@media(max-width:560px){.select-filters{grid-template-columns:1fr}.selected-club-preview{flex-wrap:wrap}.preview-btn{width:100%}}@media(max-width:420px){.club-list{grid-template-columns:1fr}}
 
 .pitch-wrap{background:linear-gradient(180deg,#174b2a,#123d24);border:1px solid #2b6a40;border-radius:22px;padding:10px;box-shadow:inset 0 0 35px #06160c;margin-bottom:12px}
 .pitch{height:430px;border:2px solid rgba(255,255,255,.28);border-radius:16px;position:relative;overflow:hidden;background:repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 55px,transparent 55px 110px)}
@@ -79,9 +79,9 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
     </div>
     <div class="select-hero">
       <h1>Выбери свой клуб</h1>
-      <p>Начни карьеру с реальной командой сезона 2026/27. У каждого клуба свой бюджет, рейтинг и уровень сложности.</p>
+      <p>Начни карьеру с реальной командой сезона 2026/27. Выбирай лигу и клуб из выпадающих списков. В пяти топ-лигах сейчас 98 клубов: 20 + 20 + 20 + 20 + 18.</p>
     </div>
-    <div class="section" style="margin-top:4px"><h2>⚽ Настоящие клубы</h2></div>
+    <div class="section" style="margin-top:4px"><h2>⚽ Настоящий клуб</h2><span class="link">2026/27</span></div>
     <div id="clubChoices"></div>
     <button class="new-career" type="button" onclick="openCustomClub()">⚡ Создать свой клуб</button>
   </section>
@@ -312,9 +312,9 @@ const clubs={
 const clubLeagues={
 'Premier League':['AFC Bournemouth','Arsenal','Aston Villa','Brentford','Brighton & Hove Albion','Chelsea','Coventry City','Crystal Palace','Everton','Fulham','Hull City','Ipswich Town','Leeds United','Liverpool','Manchester City','Manchester United','Newcastle United','Nottingham Forest','Sunderland','Tottenham'],
 'La Liga':['Athletic Club','Atlético de Madrid','CA Osasuna','Celta','Deportivo Alavés','Elche CF','FC Barcelona','Getafe CF','Levante UD','Málaga CF','Racing Santander','Rayo Vallecano','RC Deportivo','RCD Espanyol','Real Betis','Real Madrid','Real Sociedad','Sevilla FC','Valencia CF','Villarreal'],
-'Bundesliga':['FC Augsburg','1. FC Union Berlin','SV Werder Bremen','Borussia Dortmund','SV Elversberg','Eintracht Frankfurt','Sport-Club Freiburg','Hamburger SV','TSG Hoffenheim','1. FC Köln','RB Leipzig','Bayer 04 Leverkusen','1. FSV Mainz 05','Borussia Mönchengladbach','FC Bayern München','SC Paderborn 07','FC Schalke 04','VfB Stuttgart','VfL Wolfsburg','FC St. Pauli'],
-'Serie A':['Atalanta','Bologna','Cagliari','Como','Cremonese','Fiorentina','Genoa','Inter','Juventus','Lazio','Lecce','Milan','Napoli','Parma','Pisa','Roma','Sassuolo','Torino','Udinese','Verona'],
-'Ligue 1':['Angers','Auxerre','Brest','Le Havre','Lens','Lille','Lorient','Lyon','Marseille','Metz','Monaco','Montpellier','Nantes','Nice','Paris Saint-Germain','Rennes','Saint-Étienne','Strasbourg','Toulouse','Reims']
+'Bundesliga':['FC Augsburg','1. FC Union Berlin','SV Werder Bremen','Borussia Dortmund','SV Elversberg','Eintracht Frankfurt','Sport-Club Freiburg','Hamburger SV','TSG Hoffenheim','1. FC Köln','RB Leipzig','Bayer 04 Leverkusen','1. FSV Mainz 05','Borussia Mönchengladbach','FC Bayern München','FC Schalke 04','VfB Stuttgart','VfL Wolfsburg'],
+'Serie A':['Atalanta','Bologna','Cagliari','Como','Fiorentina','Frosinone','Genoa','Inter','Juventus','Lazio','Lecce','Milan','Monza','Napoli','Parma','Roma','Sassuolo','Torino','Udinese','Venezia'],
+'Ligue 1':['Angers SCO','AJ Auxerre','Stade Brestois 29','Havre AC','Le Mans FC','RC Lens','FC Lorient','LOSC Lille','Olympique Lyonnais','Olympique de Marseille','AS Monaco','OGC Nice','Paris FC','Paris Saint-Germain','Stade Rennais F.C.','RC Strasbourg Alsace','Toulouse FC','ESTAC Troyes']
 };
 const extraClubs=[
  ['AFC Bournemouth','🏴','Premier League',76,18,'🔴','Средне'],['Aston Villa','🏴','Premier League',80,34,'🟣','Средне'],['Brentford','🏴','Premier League',75,17,'🔴⚪','Средне'],['Brighton & Hove Albion','🏴','Premier League',77,24,'🔵⚪','Средне'],['Coventry City','🏴','Premier League',70,10,'🔵','Легко'],['Crystal Palace','🏴','Premier League',75,18,'🔴🔵','Средне'],['Everton','🏴','Premier League',74,20,'🔵','Средне'],['Fulham','🏴','Premier League',75,18,'⚪⚫','Средне'],['Hull City','🏴','Premier League',69,9,'🟠⚫','Легко'],['Ipswich Town','🏴','Premier League',70,11,'🔵','Легко'],['Leeds United','🏴','Premier League',74,16,'⚪','Средне'],['Nottingham Forest','🏴','Premier League',78,22,'🔴','Средне'],['Sunderland','🏴','Premier League',71,12,'🔴⚪','Легко'],['Tottenham','🏴','Premier League',82,40,'⚪','Сложно'],
@@ -349,21 +349,114 @@ clubs['Bayern München'].icon='🔴⚪';
 
 
 
+
+// Aliases for official 2026/27 league naming.
+const clubAliases={
+  'Angers SCO':'Angers',
+  'AJ Auxerre':'Auxerre',
+  'Stade Brestois 29':'Brest',
+  'Havre AC':'Le Havre',
+  'RC Lens':'Lens',
+  'FC Lorient':'Lorient',
+  'LOSC Lille':'Lille',
+  'Olympique Lyonnais':'Lyon',
+  'Olympique de Marseille':'Marseille',
+  'AS Monaco':'Monaco',
+  'OGC Nice':'Nice',
+  'Stade Rennais F.C.':'Rennes',
+  'RC Strasbourg Alsace':'Strasbourg',
+  'Toulouse FC':'Toulouse',
+  'ESTAC Troyes':'Troyes',
+  'FC Augsburg':'Augsburg',
+  'SV Werder Bremen':'Werder Bremen',
+  'Sport-Club Freiburg':'Freiburg',
+  'TSG Hoffenheim':'Hoffenheim',
+  'Bayer 04 Leverkusen':'Bayer Leverkusen',
+  '1. FSV Mainz 05':'Mainz',
+  'Borussia Mönchengladbach':'Borussia Mönchengladbach',
+  'FC Bayern München':'Bayern München',
+  'FC Schalke 04':'Schalke 04',
+  'VfB Stuttgart':'Stuttgart',
+  'VfL Wolfsburg':'Wolfsburg',
+  '1. FC Union Berlin':'Union Berlin',
+  '1. FC Köln':'Köln',
+  'SV Elversberg':'Elversberg',
+  'Hamburger SV':'Hamburger SV',
+  'Udinese':'Udinese',
+  'Venezia':'Venezia',
+  'Paris Saint-Germain':'Paris Saint-Germain'
+};
+
 function renderClubChoices(){
- const groups={};
- Object.entries(clubs).forEach(([name,c])=>(groups[c.league]??=[]).push([name,c]));
- document.getElementById('clubChoices').innerHTML=Object.entries(groups).map(([league,arr])=>`
-  <div class="league-title">${league}</div><div class="club-list">${arr.map(([name,c])=>`
-   <button class="club-choice" onclick="chooseClub('${name.replace(/'/g,"\\'")}')">
-    <div class="cicon">${c.icon}</div><div><b>${c.country} ${name}</b><small>⭐ ${c.rating} · 💰 €${c.money}M · ${c.difficulty}</small></div>
-   </button>`).join('')}</div>`).join('');
+ const host=document.getElementById('clubChoices');
+ const leagues=Object.keys(clubLeagues);
+ host.innerHTML=`
+  <div class="select-filters">
+    <div class="filter-field">
+      <label for="leagueSelect">Лига</label>
+      <select id="leagueSelect" class="input club-select-input" onchange="updateClubDropdown()">
+        ${leagues.map(l=>`<option value="${l}">${l} · ${clubLeagues[l].length} клубов</option>`).join('')}
+      </select>
+    </div>
+    <div class="filter-field">
+      <label for="clubSelectDropdown">Клуб</label>
+      <select id="clubSelectDropdown" class="input club-select-input" onchange="previewClubFromDropdown()"></select>
+    </div>
+  </div>
+  <div id="selectedClubPreview" class="selected-club-preview"></div>`;
+ updateClubDropdown();
 }
+function updateClubDropdown(){
+ const league=document.getElementById('leagueSelect')?.value;
+ const select=document.getElementById('clubSelectDropdown');
+ if(!league||!select)return;
+ const names=clubLeagues[league]||[];
+ select.innerHTML=names.map(name=>`<option value="${name}">${name}</option>`).join('');
+ previewClubFromDropdown();
+}
+function previewClubFromDropdown(){
+ const select=document.getElementById('clubSelectDropdown');
+ const preview=document.getElementById('selectedClubPreview');
+ if(!select||!preview)return;
+ const name=select.value;
+ const resolvedName=clubAliases[name]||name;
+ const c=clubs[resolvedName]||clubs[name]||{country:'🌍',rating:70,money:15,icon:'⚽',difficulty:'Средне'};
+ preview.innerHTML=`
+  <div class="preview-icon">${c.icon}</div>
+  <div class="preview-info"><b>${c.country} ${name}</b><span>⭐ ${c.rating} · 💰 €${c.money}M · ${c.difficulty} · 👥 ${c.players.length||'—'} игроков</span></div>
+  <button type="button" class="primary preview-btn" onclick="chooseClubFromDropdown()">Начать карьеру</button>`;
+}
+function chooseClubFromDropdown(){
+ const name=document.getElementById('clubSelectDropdown')?.value;
+ if(name)chooseClub(name);
+}
+
+
+function generateClubSquad(c,name){
+  const base=Math.max(62,Math.min(82,Number(c.rating||70)));
+  const pool=[
+    ['Вратарь 1','GK'],['Вратарь 2','GK'],
+    ['Защитник 1','CB'],['Защитник 2','CB'],['Защитник 3','CB'],['Защитник 4','LB'],
+    ['Защитник 5','RB'],['Полузащитник 1','CM'],['Полузащитник 2','CM'],
+    ['Полузащитник 3','CDM'],['Полузащитник 4','AM'],['Полузащитник 5','LW'],
+    ['Полузащитник 6','RW'],['Нападающий 1','ST'],['Нападающий 2','ST'],
+    ['Нападающий 3','ST'],['Молодой игрок 1','CM'],['Молодой игрок 2','RW']
+  ];
+  return pool.map((p,i)=>{
+    const boost=i<11?2:0;
+    const overall=Math.max(60,Math.min(86,Math.round(base+boost-(i%5))));
+    const pot=Math.max(overall,Math.min(92,overall+(i%4===0?7:3)));
+    return [name+' · '+p[0],p[1],overall,'🌍',p[1]==='GK'?'🧤':(p[1]==='ST'?'⚽':'🛡️'),pot];
+  });
+}
+
 function chooseClub(name){
- const c=clubs[name];
- if(!c)return;
+ const resolvedName=clubAliases[name]||name;
+ const c=clubs[resolvedName]||clubs[name];
+ if(!c){showToast('Для этого клуба пока нет карточки базы');return;}
  state=JSON.parse(JSON.stringify(initialState));
  state.club=name;state.country=c.country;state.league=c.league;state.rating=c.rating;state.money=c.money;
- state.players=c.players.length?JSON.parse(JSON.stringify(c.players)):JSON.parse(JSON.stringify(initialState.players));
+ state.players=c.players.length?JSON.parse(JSON.stringify(c.players)):generateClubSquad(c,name);
  state.bench=JSON.parse(JSON.stringify(initialState.bench));
  state.opponents=(clubLeagues[c.league]||['Rival FC','City FC','United FC','Dynamo FC','Athletic FC','Sporting FC']).filter(x=>x!==name).slice(0,8);
  state.opponents=[...state.opponents,...state.opponents,...state.opponents].slice(0,18);
