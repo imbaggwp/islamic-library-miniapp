@@ -17,7 +17,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .top{padding:22px 18px 12px;display:flex;justify-content:space-between;align-items:center}
 .brand{font-size:20px;font-weight:800;letter-spacing:-.4px}.brand span{color:var(--accent)}
 .iconbtn{width:42px;height:42px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
-.page{padding:0 16px}.hidden{display:none!important}
+.page{padding:0 16px}.hidden{display:none!important}#appContent.hidden{display:none!important}
 .hero{background:linear-gradient(135deg,#171e29,#10151d);border:1px solid var(--line);border-radius:24px;padding:20px;margin:6px 0 14px;position:relative;overflow:hidden}
 .hero:after{content:"⚽";position:absolute;right:-12px;bottom:-28px;font-size:120px;opacity:.06}
 .clubrow{display:flex;align-items:center;gap:14px}.crest{width:58px;height:58px;border-radius:18px;background:#202936;display:grid;place-items:center;font-size:29px;border:1px solid #303a49}
@@ -37,10 +37,34 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .event{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:8px}.event b{font-size:13px}.event p{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.45}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:40;display:flex;align-items:flex-end}.sheet{width:min(760px,100%);margin:auto;background:#11161e;border:1px solid var(--line);border-radius:24px 24px 0 0;padding:20px 16px 30px;max-height:88vh;overflow:auto}.sheet h2{margin:0 0 8px}.sheet p{color:var(--muted);font-size:13px;line-height:1.5}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.secondary{background:var(--card2);border:1px solid var(--line);padding:13px;border-radius:13px;font-weight:700}
 @media(min-width:700px){.tabs{bottom:14px;border:1px solid var(--line);border-radius:20px;width:720px}.page{padding:0 22px}}
+
+.club-select{min-height:calc(100vh - 70px);padding:10px 16px 30px}
+.select-hero{background:linear-gradient(135deg,#171e29,#10151d);border:1px solid var(--line);border-radius:24px;padding:22px;margin-bottom:16px}
+.select-hero h1{font-size:28px;margin:0 0 8px}.select-hero p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.league-title{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin:20px 2px 9px}
+.club-list{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.club-choice{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:13px;text-align:left;display:flex;align-items:center;gap:10px;transition:.15s}
+.club-choice:active{transform:scale(.98)}.club-choice .cicon{width:42px;height:42px;border-radius:13px;background:var(--card2);display:grid;place-items:center;font-size:21px}
+.club-choice b{font-size:13px}.club-choice small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.new-career{width:100%;margin-top:14px;background:var(--accent);color:#15110a;padding:14px;border-radius:14px;font-weight:800}
+@media(max-width:420px){.club-list{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="app">
+  <section id="clubSelect" class="club-select">
+    <div class="top" style="padding-left:2px;padding-right:2px">
+      <div class="brand">⚽ <span>Football</span> Manager</div>
+      <div style="font-size:11px;color:var(--muted)">Карьера</div>
+    </div>
+    <div class="select-hero">
+      <h1>Выбери свой клуб</h1>
+      <p>Начни карьеру с реальной командой сезона 2026/27. У каждого клуба свой бюджет, рейтинг и уровень сложности.</p>
+    </div>
+    <div id="clubChoices"></div>
+    <button class="new-career" onclick="chooseClub('Rizvan FC')">⚡ Создать свой клуб</button>
+  </section>
+  <div id="appContent">
   <div class="top">
     <div class="brand">⚽ <span>Football</span> Manager</div>
     <button class="iconbtn" onclick="showToast('Уведомления пока пусты')">🔔</button>
@@ -133,7 +157,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
       <button class="tile" onclick="upgrade('training')"><div class="ico">🏋️</div><b>База</b><span>Скорость развития</span></button>
       <button class="tile" onclick="upgrade('medical')"><div class="ico">🏥</div><b>Медцентр</b><span>Восстановление</span></button>
     </div>
-    <div class="section"><h2>Финансы</h2></div><button class="secondary" style="width:100%;margin-bottom:12px" onclick="if(confirm('Сбросить весь прогресс?')){localStorage.removeItem('fm_state');location.reload()}">♻️ Сбросить сохранение</button>
+    <div class="section"><h2>Финансы</h2></div><button class="secondary" style="width:100%;margin-bottom:12px" onclick="if(confirm('Сбросить карьеру и выбрать новый клуб?')){localStorage.removeItem('fm_state');location.reload()}">♻️ Сбросить сохранение</button>
     <div class="event"><b>Доход за неделю</b><p>🎟 Билеты +€180K · 🤝 Спонсор +€120K · 🏆 Призовые +€40K</p></div>
     <div class="event"><b>Расходы за неделю</b><p>👥 Зарплаты −€210K · 🏟 Содержание −€35K</p></div>
   </main>
@@ -145,6 +169,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
     <button class="tab" data-page="league" onclick="navigate('league')"><i>🏆</i>Лига</button>
     <button class="tab" data-page="club" onclick="navigate('club')"><i>⚙️</i>Клуб</button>
   </nav>
+  </div>
 </div>
 
 <div id="modal" class="modal hidden" onclick="if(event.target===this)closeModal()">
@@ -152,8 +177,116 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 </div>
 
 <script>
+
+const clubs={
+ 'Real Madrid':{country:'🇪🇸',league:'La Liga',rating:88,money:42.0,icon:'👑',difficulty:'Сложно',players:[
+  ['Courtois','GK',90,'🇧🇪','🧤',94],['Rüdiger','CB',86,'🇩🇪','🛡️',91],['Huijsen','CB',82,'🇪🇸','🧱',88],
+  ['Bellingham','CM',90,'🏴','🧠',95],['Valverde','CM',88,'🇺🇾','⚙️',94],['Tchouaméni','CDM',86,'🇫🇷','🛡️',92],
+  ['Vinícius Jr.','LW',91,'🇧🇷','⚡',96],['Mbappé','ST',92,'🇫🇷','⚽',97],['Rodrygo','RW',86,'🇧🇷','🎯',91]
+ ]},
+ 'Barcelona':{country:'🇪🇸',league:'La Liga',rating:87,money:28.0,icon:'🔵🔴',difficulty:'Сложно',players:[
+  ['Joan García','GK',82,'🇪🇸','🧤',90],['Koundé','CB',87,'🇫🇷','🛡️',92],['Cubarsí','CB',84,'🇪🇸','🧱',94],
+  ['Pedri','CM',91,'🇪🇸','🧠',96],['Rodri','CDM',91,'🇪🇸','⚙️',94],['De Jong','CM',86,'🇳🇱','🎯',89],
+  ['Lamine Yamal','RW',91,'🇪🇸','⚡',97],['Raphinha','LW',88,'🇧🇷','🔥',92],['Gabriel Jesus','ST',83,'🇧🇷','⚽',87]
+ ]},
+ 'Manchester City':{country:'🏴',league:'Premier League',rating:89,money:65.0,icon:'🔵',difficulty:'Сложно',players:[
+  ['Donnarumma','GK',89,'🇮🇹','🧤',93],['Rúben Dias','CB',88,'🇵🇹','🛡️',91],['Gvardiol','CB',86,'🇭🇷','🧱',92],
+  ['Bernardo Silva','CM',88,'🇵🇹','🧠',94],['Reijnders','CM',84,'🇳🇱','⚙️',91],['Foden','RW',87,'🏴','🎯',90],
+  ['Doku','LW',84,'🇧🇪','⚡',94],['Haaland','ST',92,'🇳🇴','⚽',96],['Cherki','AM',83,'🇫🇷','✨',91]
+ ]},
+ 'Liverpool':{country:'🏴',league:'Premier League',rating:86,money:55.0,icon:'🔴',difficulty:'Сложно',players:[
+  ['Alisson','GK',88,'🇧🇷','🧤',91],['Van Dijk','CB',88,'🇳🇱','🛡️',89],['Konaté','CB',85,'🇫🇷','🧱',91],
+  ['Mac Allister','CM',86,'🇦🇷','🧠',92],['Szoboszlai','CM',84,'🇭🇺','⚙️',90],['Salah','RW',90,'🇪🇬','⚡',93],
+  ['Barcola','LW',84,'🇫🇷','🔥',94],['Isak','ST',88,'🇸🇪','⚽',92],['Wirtz','AM',89,'🇩🇪','✨',95]
+ ]},
+ 'Arsenal':{country:'🏴',league:'Premier League',rating:87,money:52.0,icon:'🔴',difficulty:'Сложно',players:[
+  ['Raya','GK',86,'🇪🇸','🧤',91],['Saliba','CB',88,'🇫🇷','🛡️',94],['Gabriel','CB',86,'🇧🇷','🧱',91],
+  ['Ødegaard','CM',89,'🇳🇴','🧠',95],['Rice','CDM',88,'🏴','⚙️',94],['Saka','RW',89,'🏴','⚡',95],
+  ['Martinelli','LW',84,'🇧🇷','🔥',91],['Gyökeres','ST',87,'🇸🇪','⚽',92],['Trossard','LW',82,'🇧🇪','🎯',87]
+ ]},
+ 'Bayern München':{country:'🇩🇪',league:'Bundesliga',rating:88,money:48.0,icon:'🔴⚪',difficulty:'Сложно',players:[
+  ['Neuer','GK',86,'🇩🇪','🧤',85],['Upamecano','CB',85,'🇫🇷','🛡️',89],['Tah','CB',84,'🇩🇪','🧱',91],
+  ['Kimmich','CM',88,'🇩🇪','🧠',91],['Musiala','AM',90,'🇩🇪','✨',97],['Olise','RW',88,'🇫🇷','⚡',95],
+  ['Luis Díaz','LW',87,'🇨🇴','🔥',91],['Kane','ST',91,'🏴','⚽',88],['Gnabry','RW',82,'🇩🇪','🎯',85]
+ ]},
+ 'PSG':{country:'🇫🇷',league:'Ligue 1',rating:89,money:70.0,icon:'🔵🔴',difficulty:'Сложно',players:[
+  ['Donnarumma','GK',89,'🇮🇹','🧤',93],['Hakimi','RB',88,'🇲🇦','⚡',95],['Marquinhos','CB',87,'🇧🇷','🛡️',90],
+  ['Vitinha','CM',89,'🇵🇹','🧠',96],['João Neves','CM',85,'🇵🇹','⚙️',94],['Kvaratskhelia','LW',89,'🇬🇪','🔥',94],
+  ['Dembélé','RW',91,'🇫🇷','⚡',96],['Désiré Doué','AM',84,'🇫🇷','✨',96],['Gonçalo Ramos','ST',82,'🇵🇹','⚽',88]
+ ]},
+ 'Inter':{country:'🇮🇹',league:'Serie A',rating:86,money:32.0,icon:'⚫🔵',difficulty:'Средне',players:[
+  ['Sommer','GK',84,'🇨🇭','🧤',84],['Bastoni','CB',88,'🇮🇹','🛡️',92],['Acerbi','CB',81,'🇮🇹','🧱',78],
+  ['Barella','CM',88,'🇮🇹','⚙️',93],['Çalhanoğlu','CM',87,'🇹🇷','🎯',91],['Dimarco','LWB',86,'🇮🇹','⚡',92],
+  ['Dumfries','RWB',85,'🇳🇱','🏃',90],['Lautaro','ST',90,'🇦🇷','⚽',93],['Thuram','ST',87,'🇫🇷','🔥',94]
+ ]},
+ 'Juventus':{country:'🇮🇹',league:'Serie A',rating:82,money:27.0,icon:'⚪⚫',difficulty:'Средне',players:[
+  ['Di Gregorio','GK',83,'🇮🇹','🧤',89],['Bremer','CB',86,'🇧🇷','🛡️',90],['Kalulu','CB',81,'🇫🇷','🧱',87],
+  ['Locatelli','CM',82,'🇮🇹','🧠',86],['Thuram','CM',83,'🇫🇷','💪',92],['Conceição','RW',82,'🇵🇹','⚡',94],
+  ['Yıldız','LW',84,'🇹🇷','✨',96],['Vlahović','ST',85,'🇷🇸','⚽',90],['Milik','ST',77,'🇵🇱','🎯',75]
+ ]},
+ 'Borussia Dortmund':{country:'🇩🇪',league:'Bundesliga',rating:82,money:25.0,icon:'🟡⚫',difficulty:'Средне',players:[
+  ['Kobel','GK',85,'🇨🇭','🧤',91],['Schlotterbeck','CB',84,'🇩🇪','🛡️',90],['Anton','CB',78,'🇩🇪','🧱',83],
+  ['Brandt','AM',83,'🇩🇪','🧠',87],['Sabitzer','CM',80,'🇦🇹','⚙️',82],['Adeyemi','LW',83,'🇩🇪','⚡',94],
+  ['Gittens','RW',80,'🏴','🔥',93],['Guirassy','ST',84,'🇬🇳','⚽',88],['Beier','ST',79,'🇩🇪','🎯',89]
+ ]}
+};
+const clubLeagues={
+'Premier League':['Arsenal','Chelsea','Liverpool','Manchester City','Manchester United','Newcastle United','Tottenham','Aston Villa'],
+'La Liga':['Real Madrid','Barcelona','Atlético Madrid','Villarreal','Athletic Club','Real Betis','Sevilla','Real Sociedad'],
+'Bundesliga':['Bayern München','Bayer Leverkusen','Borussia Dortmund','RB Leipzig','VfB Stuttgart','Eintracht Frankfurt','Mainz 05','Freiburg'],
+'Serie A':['Inter','Juventus','Milan','Napoli','Roma','Atalanta','Lazio','Fiorentina'],
+'Ligue 1':['PSG','Marseille','Monaco','Lyon','Lille','Nice','Lens','Rennes']
+};
+const extraClubs=[
+ ['Manchester United','🏴','Premier League',79,35,'🔴','Сложно'],['Chelsea','🏴','Premier League',81,45,'🔵','Средне'],
+ ['Newcastle United','🏴','Premier League',80,32,'⚫⚪','Средне'],['Atlético Madrid','🇪🇸','La Liga',84,30,'🔴⚪','Средне'],
+ ['Milan','🇮🇹','Serie A',82,30,'🔴⚫','Средне'],['Napoli','🇮🇹','Serie A',82,28,'🔵','Средне'],
+ ['Bayer Leverkusen','🇩🇪','Bundesliga',84,38,'🔴⚫','Средне'],['RB Leipzig','🇩🇪','Bundesliga',80,35,'🔴⚪','Средне'],
+ ['Marseille','🇫🇷','Ligue 1',78,25,'🔵⚪','Средне'],['Monaco','🇫🇷','Ligue 1',80,30,'🔴⚪','Средне']
+];
+extraClubs.forEach(c=>clubs[c[0]]={country:c[1],league:c[2],rating:c[3],money:c[4],icon:c[5],difficulty:c[6],players:[]});
+
+function renderClubChoices(){
+ const groups={};
+ Object.entries(clubs).forEach(([name,c])=>(groups[c.league]??=[]).push([name,c]));
+ document.getElementById('clubChoices').innerHTML=Object.entries(groups).map(([league,arr])=>`
+  <div class="league-title">${league}</div><div class="club-list">${arr.map(([name,c])=>`
+   <button class="club-choice" onclick="chooseClub('${name.replace(/'/g,"\\'")}')">
+    <div class="cicon">${c.icon}</div><div><b>${c.country} ${name}</b><small>⭐ ${c.rating} · 💰 €${c.money}M · ${c.difficulty}</small></div>
+   </button>`).join('')}</div>`).join('');
+}
+function chooseClub(name){
+ if(name==='Rizvan FC'){startCustomClub();return}
+ const c=clubs[name];
+ state=JSON.parse(JSON.stringify(initialState));
+ state.club=name;state.country=c.country;state.league=c.league;state.rating=c.rating;state.money=c.money;state.players=c.players.length?c.players:initialState.players;
+ state.opponents=(clubLeagues[c.league]||['Rival FC','City FC','United FC','Dynamo FC','Athletic FC','Sporting FC']).filter(x=>x!==name).slice(0,8);
+ state.opponents=[...state.opponents,...state.opponents,...state.opponents].slice(0,18);
+ state.results=new Array(18).fill(null);state.round=1;state.played=0;state.wins=0;state.draws=0;state.losses=0;
+ state.table=(clubLeagues[c.league]||[]).map((x,i)=>[x,0,0]);
+ if(!state.table.some(x=>x[0]===name))state.table.push([name,0,0]);
+ localStorage.setItem('fm_state',JSON.stringify(state));
+ document.getElementById('clubSelect').classList.add('hidden');document.getElementById('appContent').classList.remove('hidden');
+ initCareer();updateHome();renderPlayers();renderMarket();renderLeague();renderFixtures();navigate('home');
+ showToast('Карьера началась: '+name);
+}
+function startCustomClub(){
+ state=JSON.parse(JSON.stringify(initialState));state.club='Rizvan FC';state.country='🇷🇺';state.league='Премьер-лига';state.round=1;state.results=new Array(18).fill(null);
+ localStorage.setItem('fm_state',JSON.stringify(state));
+ document.getElementById('clubSelect').classList.add('hidden');document.getElementById('appContent').classList.remove('hidden');
+ updateHome();renderPlayers();renderMarket();renderLeague();renderFixtures();navigate('home');
+ showToast('Создан Rizvan FC');
+}
+function initCareer(){
+ if(state && state.club){
+   document.getElementById('clubSelect').classList.add('hidden');document.getElementById('appContent').classList.remove('hidden');
+   if(state.club!=='Rizvan FC')document.getElementById('clubTitle').textContent=state.club;
+ } else {
+   document.getElementById('appContent').classList.add('hidden');renderClubChoices();
+ }
+}
 const initialState={
- money:4.2,rating:64,place:8,wins:3,draws:2,losses:6,played:11,season:1,round:12,
+ club:'Rizvan FC',country:'🇷🇺',league:'Премьер-лига',money:4.2,rating:64,place:8,wins:3,draws:2,losses:6,played:11,season:1,round:12,
  tactic:'counter',
  players:[
   ['Алиев','ST',69,'🇷🇺','⚽',88],['Магомедов','LW',72,'🇷🇺','⚡',92],['Иванов','RW',66,'🇷🇺','🎯',84],
@@ -266,6 +399,7 @@ function upgrade(type){
  state.money-=c;save();updateHome();showToast('Улучшение построено · −€'+c+'M');
 }
 function updateHome(){
+ document.getElementById('clubTitle').textContent=state.club||'Rizvan FC';
  document.getElementById('clubRating').textContent=state.rating;
  document.getElementById('money').textContent='€'+state.money.toFixed(1)+'M';
  document.getElementById('place').textContent=state.place;
