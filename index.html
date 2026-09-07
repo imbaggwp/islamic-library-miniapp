@@ -2455,57 +2455,155 @@ const state = {
    LEAGUES
 ========================================================= */
 
-const LEAGUES = [
+const TOP_LEAGUE_IDS = [
+    39, 140, 135, 78, 61,
+    88, 94, 203, 235, 307
+];
 
+const EUROPEAN_TOURNAMENT_IDS = [
+    2, 3, 848
+];
+
+const NATIONAL_TEAM_TOURNAMENT_IDS = [
+    1, 4, 5, 10
+];
+
+const ALLOWED_LEAGUE_IDS = [
+    ...TOP_LEAGUE_IDS,
+    ...EUROPEAN_TOURNAMENT_IDS,
+    ...NATIONAL_TEAM_TOURNAMENT_IDS
+];
+
+const LEAGUES = [
     {
         id: 2,
-        name: "Champions League",
+        name: "Лига чемпионов",
         short: "UCL",
         country: "Europe",
         logo: "https://media.api-sports.io/football/leagues/2.png"
     },
-
+    {
+        id: 3,
+        name: "Лига Европы",
+        short: "UEL",
+        country: "Europe",
+        logo: "https://media.api-sports.io/football/leagues/3.png"
+    },
+    {
+        id: 848,
+        name: "Лига конференций",
+        short: "UECL",
+        country: "Europe",
+        logo: "https://media.api-sports.io/football/leagues/848.png"
+    },
     {
         id: 39,
-        name: "Premier League",
+        name: "Премьер-лига",
         short: "Premier League",
         country: "England",
         logo: "https://media.api-sports.io/football/leagues/39.png"
     },
-
     {
         id: 140,
-        name: "La Liga",
+        name: "Ла Лига",
         short: "La Liga",
         country: "Spain",
         logo: "https://media.api-sports.io/football/leagues/140.png"
     },
-
     {
         id: 135,
-        name: "Serie A",
+        name: "Серия A",
         short: "Serie A",
         country: "Italy",
         logo: "https://media.api-sports.io/football/leagues/135.png"
     },
-
     {
         id: 78,
-        name: "Bundesliga",
+        name: "Бундеслига",
         short: "Bundesliga",
         country: "Germany",
         logo: "https://media.api-sports.io/football/leagues/78.png"
     },
-
     {
         id: 61,
-        name: "Ligue 1",
+        name: "Лига 1",
         short: "Ligue 1",
         country: "France",
         logo: "https://media.api-sports.io/football/leagues/61.png"
+    },
+    {
+        id: 88,
+        name: "Эредивизи",
+        short: "Eredivisie",
+        country: "Netherlands",
+        logo: "https://media.api-sports.io/football/leagues/88.png"
+    },
+    {
+        id: 94,
+        name: "Примейра-лига",
+        short: "Primeira Liga",
+        country: "Portugal",
+        logo: "https://media.api-sports.io/football/leagues/94.png"
+    },
+    {
+        id: 203,
+        name: "Суперлига",
+        short: "Super Lig",
+        country: "Turkey",
+        logo: "https://media.api-sports.io/football/leagues/203.png"
+    },
+    {
+        id: 235,
+        name: "Российская Премьер-лига",
+        short: "РПЛ",
+        country: "Russia",
+        logo: "https://media.api-sports.io/football/leagues/235.png"
+    },
+    {
+        id: 307,
+        name: "Saudi Pro League",
+        short: "SPL",
+        country: "Saudi-Arabia",
+        logo: "https://media.api-sports.io/football/leagues/307.png"
+    },
+    {
+        id: 1,
+        name: "Чемпионат мира",
+        short: "World Cup",
+        country: "World",
+        logo: "https://media.api-sports.io/football/leagues/1.png"
+    },
+    {
+        id: 4,
+        name: "Чемпионат Европы",
+        short: "Euro",
+        country: "Europe",
+        logo: "https://media.api-sports.io/football/leagues/4.png"
+    },
+    {
+        id: 5,
+        name: "Лига наций УЕФА",
+        short: "Nations League",
+        country: "Europe",
+        logo: "https://media.api-sports.io/football/leagues/5.png"
+    },
+    {
+        id: 10,
+        name: "Товарищеские матчи",
+        short: "Friendlies",
+        country: "World",
+        logo: "https://media.api-sports.io/football/leagues/10.png"
     }
-
 ];
+
+function isAllowedMatch(match) {
+    const leagueId = Number(match?.league?.id);
+    return ALLOWED_LEAGUE_IDS.includes(leagueId);
+}
+
+function filterAllowedMatches(matches) {
+    return (matches || []).filter(isAllowedMatch);
+}
 
 
 /* =========================================================
@@ -2859,13 +2957,13 @@ async function loadHome() {
 
 
         renderHomeLive(
-            liveData.response || []
+            filterAllowedMatches(liveData.response || [])
         );
 
 
         renderMatchList(
             matchesEl,
-            matchesData.response || []
+            filterAllowedMatches(matchesData.response || [])
         );
 
 
@@ -3212,7 +3310,7 @@ async function loadMatchesPage() {
 
         renderMatchList(
             el,
-            data.response || []
+            filterAllowedMatches(data.response || [])
         );
 
 
@@ -3617,7 +3715,7 @@ async function loadLivePage() {
 
 
         const matches =
-            data.response || [];
+            filterAllowedMatches(data.response || []);
 
 
         if (!matches.length) {
