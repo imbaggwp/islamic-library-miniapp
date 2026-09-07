@@ -2622,6 +2622,9 @@ svg {
 .hierarchy-card{cursor:pointer;transition:transform .15s,opacity .15s,border-color .15s;}
 .hierarchy-card.dragging{opacity:.45;transform:scale(.985);border-color:#e0c2a4;}
 .drag-handle{width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.45);display:grid;place-items:center;flex:none;font-size:15px;cursor:grab;}
+.hierarchy-card[draggable="true"]{user-select:none;}
+.hierarchy-card[draggable="true"]:active .drag-handle{cursor:grabbing;}
+
 .inline-admin .add{color:#e0c2a4;}
 </style>
 
@@ -7540,21 +7543,64 @@ function dragSectionEnd(event) {
 function dropSection(event, parentId) {
     if (!isAdmin) return;
     event.preventDefault();
-    const targetId = String(event.currentTarget.dataset.sectionId || "");
+    event.stopPropagation();
+
+    const targetEl = event.currentTarget;
+    const targetId = String(targetEl.dataset.sectionId || "");
     const draggedId = String(draggedSectionId || event.dataTransfer.getData("text/plain") || "");
     if (!draggedId || draggedId === targetId) return;
+
     const dragged = getSection(draggedId);
     const target = getSection(targetId);
     if (!dragged || !target) return;
-    if (String(target.parent_id ?? "") !== String(dragged.parent_id ?? "")) return showToast("Перемещение между разными уровнями пока недоступно");
-    if (isSectionDescendant(target.id, dragged.id)) return showToast("Нельзя переместить раздел внутрь самого себя");
+
+    // Drop zones:
+    // top 30%    -> place before the target
+    // middle 40% -> move inside the target
+    // bottom 30% -> place after the target
+    const rect = targetEl.getBoundingClientRect();
+    const y = event.clientY - rect.top;
+    const ratio = rect.height ? y / rect.height : 0.5;
+
+    if (ratio >= 0.30 && ratio <= 0.70) {
+        // Move the section into the target as a child.
+        if (isSectionDescendant(target.id, dragged.id)) {
+            return showToast("Нельзя переместить раздел внутрь самого себя");
+        }
+
+        const oldParentId = dragged.parent_id ?? null;
+        const oldSiblings = sectionChildren(oldParentId).filter(x => String(x.id) !== draggedId);
+        oldSiblings.forEach((item, i) => item.order = i);
+
+        dragged.parent_id = target.id;
+        dragged.order = sectionChildren(target.id).filter(x => String(x.id) !== draggedId).length;
+
+        syncLegacyFromSections();
+        renderEverything();
+        const sec = currentSectionId ? getSection(currentSectionId) : null;
+        if (sec) renderSectionPage(sec);
+        showToast(`«${dragged.title}» перемещён внутрь «${target.title}»`);
+        return;
+    }
+
+    // Reorder within the same parent when dropped above/below a sibling.
+    if (String(target.parent_id ?? "") !== String(dragged.parent_id ?? "")) {
+        return showToast("Чтобы переместить внутрь раздела, отпусти в центральной части карточки");
+    }
+
     const siblings = sectionChildren(dragged.parent_id);
     const from = siblings.findIndex(x => String(x.id) === draggedId);
-    const to = siblings.findIndex(x => String(x.id) === targetId);
-    if (from < 0 || to < 0) return;
+    const targetIndex = siblings.findIndex(x => String(x.id) === targetId);
+    if (from < 0 || targetIndex < 0) return;
+
     const reordered = siblings.filter(x => String(x.id) !== draggedId);
-    reordered.splice(to, 0, dragged);
+    let insertAt = targetIndex;
+    if (from < targetIndex) insertAt -= 1;
+    if (ratio > 0.70) insertAt += 1;
+    insertAt = Math.max(0, Math.min(insertAt, reordered.length));
+    reordered.splice(insertAt, 0, dragged);
     reordered.forEach((item, i) => item.order = i);
+
     syncLegacyFromSections();
     renderEverything();
     const sec = currentSectionId ? getSection(currentSectionId) : null;
