@@ -2618,6 +2618,11 @@ svg {
 
 }
 
+
+.hierarchy-card{cursor:pointer;transition:transform .15s,opacity .15s,border-color .15s;}
+.hierarchy-card.dragging{opacity:.45;transform:scale(.985);border-color:#e0c2a4;}
+.drag-handle{width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.45);display:grid;place-items:center;flex:none;font-size:15px;cursor:grab;}
+.inline-admin .add{color:#e0c2a4;}
 </style>
 
 
@@ -7456,12 +7461,10 @@ function sectionChildren(parentId) {
 function sectionLessons(sectionId) {
     return visibleItems(lessons)
         .filter(l => String(l.section_id ?? l.sectionId ?? "") === String(sectionId))
-        .sort((a,b) => Number(a.lesson_number ?? a.number ?? 0) - Number(b.lesson_number ?? b.number ?? 0));
+        .sort((a,b) => Number(a.order ?? a.lesson_number ?? a.number ?? 0) - Number(b.order ?? b.lesson_number ?? b.number ?? 0));
 }
 
-function getSection(id) {
-    return sections.find(s => String(s.id) === String(id));
-}
+function getSection(id) { return sections.find(s => String(s.id) === String(id)); }
 
 function sectionPath(id) {
     const path = [];
@@ -7484,8 +7487,7 @@ function renderCourseCards(search = "") {
             [s.title, s.description, s.author].filter(Boolean).join(" ").toLowerCase().includes(query)
         );
     }
-    container.innerHTML = list.length ? list.map(sectionCardHtml).join("") : `
-        <div class="empty"><p>${query ? "Ничего не найдено" : "Пока нет разделов"}</p></div>`;
+    container.innerHTML = list.length ? list.map(sectionCardHtml).join("") : `<div class="empty"><p>${query ? "Ничего не найдено" : "Пока нет разделов"}</p></div>`;
     const filters = document.getElementById("categoryFilters");
     if (filters) filters.style.display = "none";
     const lessonsContainer = document.getElementById("lessonList");
@@ -7496,18 +7498,104 @@ function sectionCardHtml(section) {
     const children = sectionChildren(section.id).length;
     const direct = sectionLessons(section.id).length;
     return `
-        <div class="hierarchy-card" onclick="openCourse('${escapeAttribute(section.id)}')">
+        <div class="hierarchy-card" draggable="${isAdmin}" data-section-id="${escapeAttribute(section.id)}"
+             ondragstart="dragSectionStart(event,'${escapeAttribute(section.id)}')"
+             ondragover="dragSectionOver(event)"
+             ondrop="dropSection(event,'${escapeAttribute(section.parent_id ?? '')}')"
+             ondragend="dragSectionEnd(event)"
+             onclick="openCourse('${escapeAttribute(section.id)}')">
+            ${isAdmin ? `<div class="drag-handle" onclick="event.stopPropagation()" title="Перетащить">⠿</div>` : ""}
             <div class="hierarchy-icon">${section.type === "course" ? "🎧" : "📁"}</div>
             <div class="hierarchy-info">
                 <strong>${escapeHtml(section.title)}</strong>
                 <span>${children ? children + " подраздел" + (children === 1 ? "" : "ов") : ""}${children && direct ? " · " : ""}${direct ? direct + " урок" + (direct === 1 ? "" : "ов") : (!children ? "Пусто" : "")}</span>
             </div>
             ${isAdmin ? `<div class="inline-admin" onclick="event.stopPropagation()">
-                <button onclick="openInlineAdmin('section','${escapeAttribute(section.id)}')">✎</button>
-                <button class="delete" onclick="deleteSection('${escapeAttribute(section.id)}')">×</button>
+                <button class="add" title="Добавить внутрь" onclick="openInlineAdmin('section',null,'${escapeAttribute(section.id)}')">＋</button>
+                <button title="Редактировать" onclick="openInlineAdmin('section','${escapeAttribute(section.id)}')">✎</button>
+                <button class="delete" title="Удалить" onclick="deleteSection('${escapeAttribute(section.id)}')">×</button>
             </div>` : ""}
             <div class="hierarchy-arrow">›</div>
         </div>`;
+}
+
+let draggedSectionId = null;
+let draggedLessonId = null;
+function dragSectionStart(event, id) {
+    if (!isAdmin) return;
+    draggedSectionId = String(id);
+    event.currentTarget.classList.add("dragging");
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", String(id));
+}
+function dragSectionOver(event) {
+    if (!isAdmin || !draggedSectionId) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+}
+function dragSectionEnd(event) {
+    event.currentTarget.classList.remove("dragging");
+    draggedSectionId = null;
+}
+function dropSection(event, parentId) {
+    if (!isAdmin) return;
+    event.preventDefault();
+    const targetId = String(event.currentTarget.dataset.sectionId || "");
+    const draggedId = String(draggedSectionId || event.dataTransfer.getData("text/plain") || "");
+    if (!draggedId || draggedId === targetId) return;
+    const dragged = getSection(draggedId);
+    const target = getSection(targetId);
+    if (!dragged || !target) return;
+    if (String(target.parent_id ?? "") !== String(dragged.parent_id ?? "")) return showToast("Перемещение между разными уровнями пока недоступно");
+    if (isSectionDescendant(target.id, dragged.id)) return showToast("Нельзя переместить раздел внутрь самого себя");
+    const siblings = sectionChildren(dragged.parent_id);
+    const from = siblings.findIndex(x => String(x.id) === draggedId);
+    const to = siblings.findIndex(x => String(x.id) === targetId);
+    if (from < 0 || to < 0) return;
+    const reordered = siblings.filter(x => String(x.id) !== draggedId);
+    reordered.splice(to, 0, dragged);
+    reordered.forEach((item, i) => item.order = i);
+    syncLegacyFromSections();
+    renderEverything();
+    const sec = currentSectionId ? getSection(currentSectionId) : null;
+    if (sec) renderSectionPage(sec);
+    showToast("Порядок сохранён");
+}
+function isSectionDescendant(candidateId, ancestorId) {
+    let current = getSection(candidateId), guard = 0;
+    while (current && guard++ < 100) {
+        if (String(current.parent_id) === String(ancestorId)) return true;
+        current = getSection(current.parent_id);
+    }
+    return false;
+}
+
+function dragLessonStart(event, id) {
+    if (!isAdmin) return;
+    draggedLessonId = String(id);
+    event.currentTarget.classList.add("dragging");
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", String(id));
+}
+function dragLessonOver(event) { if (isAdmin && draggedLessonId) { event.preventDefault(); event.dataTransfer.dropEffect = "move"; } }
+function dragLessonEnd(event) { event.currentTarget.classList.remove("dragging"); draggedLessonId = null; }
+function dropLesson(event, sectionId) {
+    if (!isAdmin) return;
+    event.preventDefault();
+    const targetId = String(event.currentTarget.dataset.lessonId || "");
+    const draggedId = String(draggedLessonId || event.dataTransfer.getData("text/plain") || "");
+    if (!draggedId || draggedId === targetId) return;
+    const siblings = sectionLessons(sectionId);
+    const from = siblings.findIndex(x => String(x.id) === draggedId);
+    const to = siblings.findIndex(x => String(x.id) === targetId);
+    if (from < 0 || to < 0) return;
+    const dragged = siblings[from];
+    const reordered = siblings.filter(x => String(x.id) !== draggedId);
+    reordered.splice(to, 0, dragged);
+    reordered.forEach((item, i) => item.order = i);
+    renderEverything();
+    const sec = getSection(sectionId); if (sec) renderSectionPage(sec);
+    showToast("Порядок уроков сохранён");
 }
 
 function renderLessons() {
@@ -7566,15 +7654,22 @@ function renderSectionPage(section) {
 
 function inlineLessonHtml(lesson) {
     const completed = isLessonCompleted(lesson.id);
+    const sectionId = lesson.section_id || lesson.sectionId || currentSectionId;
     return `
-        <div class="hierarchy-card" onclick="openPlayer('${escapeAttribute(lesson.id)}')">
+        <div class="hierarchy-card" draggable="${isAdmin}" data-lesson-id="${escapeAttribute(lesson.id)}"
+             ondragstart="dragLessonStart(event,'${escapeAttribute(lesson.id)}')"
+             ondragover="dragLessonOver(event)"
+             ondrop="dropLesson(event,'${escapeAttribute(sectionId)}')"
+             ondragend="dragLessonEnd(event)"
+             onclick="openPlayer('${escapeAttribute(lesson.id)}')">
+            ${isAdmin ? `<div class="drag-handle" onclick="event.stopPropagation()" title="Перетащить">⠿</div>` : ""}
             <div class="hierarchy-icon">${completed ? "✓" : "▶"}</div>
             <div class="hierarchy-info">
                 <strong>${escapeHtml(lesson.lesson_number ?? lesson.number ?? "")}. ${escapeHtml(lesson.title)}</strong>
                 <span>${escapeHtml(lesson.duration || "Аудиоурок")}${lesson.description ? " · " + escapeHtml(lesson.description) : ""}</span>
             </div>
             ${isAdmin ? `<div class="inline-admin" onclick="event.stopPropagation()">
-                <button onclick="openInlineAdmin('lesson','${escapeAttribute(lesson.id)}','${escapeAttribute(lesson.section_id || currentSectionId)}')">✎</button>
+                <button onclick="openInlineAdmin('lesson','${escapeAttribute(lesson.id)}','${escapeAttribute(sectionId)}')">✎</button>
                 <button class="delete" onclick="deleteLesson('${escapeAttribute(lesson.id)}')">×</button>
             </div>` : ""}
             <div class="hierarchy-arrow">›</div>
@@ -7655,7 +7750,7 @@ function saveInlineLesson() {
         if (item) { item.section_id = sectionId; item.lesson_number = number; item.title = title; item.description = description; item.audio_url = audioUrl; item.duration = duration; }
         showToast("Урок изменён");
     } else {
-        lessons.push({ id: nextId(lessons, "lesson"), section_id: sectionId, lesson_number: number, title, description, audio_url: audioUrl, duration, published: true });
+        lessons.push({ id: nextId(lessons, "lesson"), section_id: sectionId, lesson_number: number, title, description, audio_url: audioUrl, duration, published: true, order: sectionLessons(sectionId).length });
         showToast("Урок добавлен");
     }
     closeInlineAdmin();
