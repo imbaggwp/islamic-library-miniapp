@@ -59,6 +59,14 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .pitch-player b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}.pitch-player small{color:#ddd}
 .scheme{display:flex;gap:7px;overflow:auto;padding-bottom:2px}.scheme button{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:11px}.scheme button.active{border-color:var(--accent);color:var(--accent);background:rgba(245,158,11,.08)}
 .player-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;margin-bottom:9px}.player-card-head{display:flex;align-items:center;gap:12px}.big-avatar{width:52px;height:52px;border-radius:16px;background:var(--card2);display:grid;place-items:center;font-size:25px}.pc-info{flex:1}.pc-info h3{margin:0;font-size:16px}.pc-info span{color:var(--muted);font-size:11px}.attr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:13px}.attr{background:var(--card2);border-radius:10px;padding:8px;text-align:center}.attr b{display:block;font-size:14px}.attr span{font-size:9px;color:var(--muted)}
+
+.match-score{background:linear-gradient(135deg,#171e29,#10151d);border:1px solid var(--line);border-radius:23px;padding:18px;margin-bottom:12px}
+.livebar{display:flex;justify-content:space-between;color:var(--muted);font-size:11px}.live{color:var(--red);font-weight:800}
+.scoreline{display:flex;justify-content:center;align-items:center;gap:25px;margin:18px 0}.scoreteam{text-align:center;width:110px}.scoreteam .mini{width:52px;height:52px;margin:auto auto 7px;border-radius:16px;background:var(--card2);display:grid;place-items:center;font-size:25px}.score{font-size:34px;font-weight:900;letter-spacing:2px}
+.match-events{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px}.match-event{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px}.match-event:last-child{border:0}.minute{color:var(--muted);width:30px}.match-stats{display:grid;gap:9px}.mstat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px}.mstatrow{display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px}.mbar{height:5px;background:#252d39;border-radius:10px;overflow:hidden;display:flex}.mbar i{display:block;height:100%;background:var(--accent)}
+.match-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.match-controls button{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 5px;font-size:11px}.match-controls button.active{border-color:var(--accent);color:var(--accent)}
+.substitution{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.full-width{grid-column:1/-1}
 </style>
 </head>
 <body>
@@ -84,8 +92,8 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
   <main id="home" class="page">
     <div class="hero">
       <div class="clubrow">
-        <div class="crest">⚡</div>
-        <div><div class="clubname" id="clubTitle">Rizvan FC</div><div class="sub">Россия · Премьер-лига · Сезон 1</div></div>
+        <div class="crest" id="clubCrest">⚡</div>
+        <div><div class="clubname" id="clubTitle">Rizvan FC</div><div class="sub" id="clubSub">Россия · Премьер-лига · Сезон 1</div></div>
       </div>
       <div class="stats">
         <div class="stat"><b id="clubRating">64</b><span>Рейтинг</span></div>
@@ -160,6 +168,11 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
   <main id="league" class="page hidden">
     <div class="header"><button class="back" onclick="navigate('home')">←</button><h1>Чемпионат</h1></div>
     <div class="table" id="leagueTable"></div>
+  </main>
+
+  <main id="gameMatch" class="page hidden">
+    <div class="header"><button class="back" onclick="navigate('home')">←</button><h1>Матч</h1></div>
+    <div id="matchContainer"></div>
   </main>
 
   <main id="calendar" class="page hidden">
@@ -418,43 +431,126 @@ function renderFixtures(){
    return `<div class="event" style="display:flex;align-items:center;gap:12px"><div style="font-size:11px;color:var(--muted);width:42px">ТУР ${n}</div><div style="flex:1"><b>${n%2?'Rizvan FC — '+op:op+' — Rizvan FC'}</b><p>${r?'Матч завершён':'Премьер-лига'}</p></div><div style="text-align:right;display:flex;flex-direction:column;gap:4px">${status}</div></div>`;
  }).join('');
 }
+let matchSession=null;
 function openMatch(){
- showModal(`<h2>⚔️ Тур ${state.round}: ${state.round%2?'Rizvan FC — '+state.opponents[state.round-1]:state.opponents[state.round-1]+' — Rizvan FC'}</h2>
- <p>Соперник: <b>${state.opponents[state.round-1]}</b>. Твой рейтинг ${state.rating}. Схема: <b>${state.scheme||'4-3-3'}</b>.</p>
+ if(state.round>18){return showModal(`<h2>🏆 Сезон завершён</h2><p>Поздравляем! Все 18 туров сыграны.</p><button class="primary" onclick="closeModal()">Закрыть</button>`)}
+ const op=state.opponents[state.round-1];
+ showModal(`<h2>⚔️ Тур ${state.round}</h2><p><b>${state.club}</b> против <b>${op}</b><br>Схема: <b>${state.scheme||'4-3-3'}</b></p>
+ <div class="section"><h2>Выбери стиль</h2></div>
  <div class="grid2">
-  <button class="tile" onclick="playMatch('counter')"><div class="ico">⚡</div><b>Контратака</b><span>Хорошо против сильных</span></button>
-  <button class="tile" onclick="playMatch('press')"><div class="ico">🔥</div><b>Прессинг</b><span>Рискованно, но мощно</span></button>
-  <button class="tile" onclick="playMatch('possession')"><div class="ico">🎯</div><b>Владение</b><span>Стабильный стиль</span></button>
-  <button class="tile" onclick="playMatch('defense')"><div class="ico">🛡️</div><b>Оборона</b><span>Шанс на ничью</span></button>
+  <button class="tile" onclick="startMatch('counter')"><div class="ico">⚡</div><b>Контратака</b><span>+эффект против сильных</span></button>
+  <button class="tile" onclick="startMatch('press')"><div class="ico">🔥</div><b>Прессинг</b><span>больше моментов, больше риска</span></button>
+  <button class="tile" onclick="startMatch('possession')"><div class="ico">🎯</div><b>Владение</b><span>контроль и стабильность</span></button>
+  <button class="tile" onclick="startMatch('defense')"><div class="ico">🛡️</div><b>Оборона</b><span>меньше риска</span></button>
  </div>`);
 }
-function playMatch(style){
- state.tactic=style;
- const opponentRating=62+((state.round*7)%13);
- const bonus={counter:4,press:3,possession:2,defense:-1}[style];
- const fatigue=state.players.reduce((s,p)=>s+p[5],0)/state.players.length;
- const strength=state.rating+bonus+(fatigue-80)*.12;
- const chance=Math.max(.18,Math.min(.82,.5+(strength-opponentRating)*.035));
- const roll=Math.random();
- let win=roll<chance*.62, draw=!win&&roll<chance*.62+(1-chance)*.58;
- let home=state.round%2===1;
- let gf,ga;
- if(win){gf=2+Math.floor(Math.random()*2);ga=Math.floor(Math.random()*2)}
- else if(draw){gf=1;ga=1}
- else {gf=Math.floor(Math.random()*2);ga=2+Math.floor(Math.random()*2)}
- const score=home?`${gf}:${ga}`:`${ga}:${gf}`;
- const result={score,win,draw};
- state.results[state.round-1]=result;state.played++;state.round=Math.min(18,state.round+1);
- if(win){state.wins++;state.money+=.25;state.rating=Math.min(90,state.rating+1)}
+function startMatch(style){
+ closeModal();
+ matchSession={minute:1,homeGoals:0,awayGoals:0,style,events:[],finished:false,subs:0,homePoss:50,shotsH:0,shotsA:0,onTargetH:0,onTargetA:0};
+ navigate('gameMatch');renderMatch();
+ let timer=setInterval(()=>{
+   if(!matchSession||matchSession.finished){clearInterval(timer);return}
+   advanceMatch();
+ },650);
+ matchSession.timer=timer;
+}
+function advanceMatch(){
+ if(!matchSession)return;
+ const step=4+Math.floor(Math.random()*7);
+ matchSession.minute=Math.min(90,matchSession.minute+step);
+ const opRating=60+((state.round*7)%13);
+ const teamStrength=state.rating+(matchSession.style==='counter'?3:matchSession.style==='press'?4:matchSession.style==='possession'?2:-1);
+ const fatigue=state.players.reduce((a,p)=>a+p[5],0)/state.players.length;
+ const attackChance=Math.max(.05,Math.min(.32,.12+(teamStrength-opRating)*.012+(fatigue-75)*.001));
+ const eventRoll=Math.random();
+ matchSession.homePoss=Math.max(35,Math.min(65,50+(matchSession.style==='possession'?9:matchSession.style==='press'?3:matchSession.style==='counter'?-4:-7)+(Math.random()*8-4)));
+ if(eventRoll<attackChance){
+   matchSession.shotsH++;
+   if(Math.random()<.48+(state.rating-opRating)*.008){matchSession.onTargetH++}
+   if(Math.random()<.18+(state.rating-opRating)*.012){
+     matchSession.homeGoals++;
+     const scorer=state.players[Math.floor(Math.random()*Math.min(5,state.players.length))];
+     matchSession.events.unshift({m:matchSession.minute,icon:'⚽',text:`<b>ГООООЛ!</b> ${scorer[0]} забивает!`});
+   } else {
+     matchSession.events.unshift({m:matchSession.minute,icon:'🎯',text:`${state.club} создаёт опасный момент`});
+   }
+ } else if(eventRoll<.34){
+   matchSession.shotsA++;
+   if(Math.random()<.38)matchSession.onTargetA++;
+   if(Math.random()<.12){matchSession.awayGoals++;matchSession.events.unshift({m:matchSession.minute,icon:'⚽',text:`<b>Гол соперника.</b> ${state.opponents[state.round-1]} выходит вперёд`})}
+   else matchSession.events.unshift({m:matchSession.minute,icon:'🧤',text:`Вратарь ${state.club} спасает команду`});
+ } else if(eventRoll<.39){
+   matchSession.events.unshift({m:matchSession.minute,icon:'🟨',text:'Жёлтая карточка'});
+ } else if(eventRoll<.415){
+   matchSession.events.unshift({m:matchSession.minute,icon:'🔄',text:'Тренер готовит замену'});
+ }
+ if(matchSession.minute>=90)finishMatch();
+ else renderMatch();
+}
+function renderMatch(){
+ const op=state.opponents[state.round-1], m=matchSession;
+ if(!m)return;
+ document.getElementById('matchContainer').innerHTML=`
+  <div class="match-score">
+   <div class="livebar"><span>${state.league||'Чемпионат'} · Тур ${state.round}</span><span class="live">● LIVE · ${m.minute}'</span></div>
+   <div class="scoreline">
+    <div class="scoreteam"><div class="mini">${state.club==='Real Madrid'?'👑':state.club==='Barcelona'?'🔵🔴':'⚡'}</div><b>${state.club}</b></div>
+    <div class="score">${m.homeGoals} : ${m.awayGoals}</div>
+    <div class="scoreteam"><div class="mini">⚽</div><b>${op}</b></div>
+   </div>
+   <div class="match-controls">
+    <button class="${m.style==='counter'?'active':''}" onclick="changeStyle('counter')">⚡ Атака</button>
+    <button class="${m.style==='possession'?'active':''}" onclick="changeStyle('possession')">🎯 Контроль</button>
+    <button class="${m.style==='defense'?'active':''}" onclick="changeStyle('defense')">🛡️ Оборона</button>
+   </div>
+   <div class="substitution">
+    <button class="secondary full-width" onclick="makeSub()">🔄 Сделать замену (${m.subs}/5)</button>
+   </div>
+  </div>
+  <div class="section"><h2>События</h2></div>
+  <div class="match-events">${m.events.slice(0,8).map(e=>`<div class="match-event"><span class="minute">${e.m}'</span><span>${e.icon} ${e.text}</span></div>`).join('')||'<div style="color:var(--muted);font-size:12px">Матч только начался...</div>'}</div>
+  <div class="section"><h2>Статистика</h2></div>
+  <div class="match-stats">
+   ${statRow('Владение',Math.round(m.homePoss),100-Math.round(m.homePoss))}
+   ${statRow('Удары',m.shotsH,m.shotsA)}
+   ${statRow('В створ',m.onTargetH,m.onTargetA)}
+  </div>`;
+}
+function statRow(name,a,b){
+ const total=Math.max(1,a+b),pct=Math.round(a/total*100);
+ return `<div class="mstat"><div class="mstatrow"><span>${a}</span><b>${name}</b><span>${b}</span></div><div class="mbar"><i style="width:${pct}%"></i><i style="width:${100-pct}%;background:#4b5563"></i></div></div>`;
+}
+function changeStyle(style){
+ if(!matchSession)return;
+ matchSession.style=style;renderMatch();
+}
+function makeSub(){
+ if(!matchSession||matchSession.subs>=5)return showToast('Все 5 замен уже использованы');
+ if(state.players.length<12)return showToast('Недостаточно игроков на скамейке');
+ const starter=state.players[matchSession.subs%Math.min(11,state.players.length)];
+ const bench=state.players.splice(11,1)[0];
+ state.players[matchSession.subs%Math.min(11,state.players.length)]=bench;
+ matchSession.subs++;
+ matchSession.events.unshift({m:matchSession.minute,icon:'🔄',text:`Замена: ${bench[0]} выходит вместо ${starter[0]}`});
+ save();renderMatch();showToast('Замена выполнена');
+}
+function finishMatch(){
+ if(!matchSession||matchSession.finished)return;
+ matchSession.finished=true;clearInterval(matchSession.timer);
+ const gf=matchSession.homeGoals,ga=matchSession.awayGoals,op=state.opponents[state.round-1];
+ const win=gf>ga,draw=gf===ga;
+ state.results[state.round-1]={score:`${gf}:${ga}`,win,draw};
+ state.played++;state.round=Math.min(19,state.round+1);
+ if(win){state.wins++;state.money+=.25;state.rating=Math.min(95,state.rating+1);state.place=Math.max(1,state.place-1)}
  else if(draw){state.draws++;state.money+=.08}
- else {state.losses++;state.money=Math.max(0,state.money-.05);state.rating=Math.max(45,state.rating-1)}
- state.players.forEach(p=>p[5]=Math.max(55,p[5]-Math.floor(Math.random()*7+3)));
- const row=state.table.find(x=>x[0]==='Rizvan FC');row[1]++;row[2]+=win?3:draw?1:0;
- if(win)state.place=Math.max(1,state.place-1); else if(!draw)state.place=Math.min(10,state.place+1);
+ else {state.losses++;state.money=Math.max(0,state.money-.05);state.rating=Math.max(45,state.rating-1);state.place=Math.min(10,state.place+1)}
+ const row=state.table.find(x=>x[0]===state.club)||state.table.find(x=>x[0]==='Rizvan FC');
+ if(row){row[1]++;row[2]+=win?3:draw?1:0}
+ state.players.forEach(p=>p[5]=Math.max(50,p[5]-Math.floor(Math.random()*6+3)));
  save();updateHome();renderLeague();renderFixtures();
  const title=win?'🏆 ПОБЕДА!':draw?'🤝 НИЧЬЯ':'😔 ПОРАЖЕНИЕ';
- const text=win?`Отличная работа. Клуб получает <b>€250K</b> призовых.`:draw?'Команды разделили очки.':'Сегодня соперник оказался сильнее. Впереди следующий тур.';
- showModal(`<h2>${title}</h2><p style="font-size:22px;text-align:center"><b>${score}</b></p><p>${text}</p><button class="primary" onclick="closeModal();navigate('home')">Продолжить</button>`);
+ const msg=win?`Отличный матч. Призовые: <b>€250K</b>.`:draw?'Команды забрали по одному очку.':'Сегодня соперник оказался сильнее. Впереди следующий тур.';
+ showModal(`<h2>${title}</h2><p style="font-size:30px;text-align:center"><b>${gf} : ${ga}</b></p><p>${state.club} — ${op}<br><br>${msg}</p><button class="primary" onclick="closeModal();navigate('home')">Завершить</button>`);
 }
 function buy(i){
  const p=state.market[i];
@@ -471,7 +567,7 @@ function upgrade(type){
  state.money-=c;save();updateHome();showToast('Улучшение построено · −€'+c+'M');
 }
 function updateHome(){
- document.getElementById('clubTitle').textContent=state.club||'Rizvan FC';
+ document.getElementById('clubTitle').textContent=state.club||'Rizvan FC';document.getElementById('clubCrest').textContent=state.club==='Real Madrid'?'👑':state.club==='Barcelona'?'🔵🔴':state.club==='PSG'?'🔵🔴':state.club==='Bayern München'?'🔴⚪':state.club==='Inter'?'⚫🔵':'⚽';document.getElementById('clubSub').textContent=(state.country||'🇷🇺')+' · '+(state.league||'Премьер-лига')+' · Сезон '+state.season;
  document.getElementById('clubRating').textContent=state.rating;
  document.getElementById('money').textContent='€'+state.money.toFixed(1)+'M';
  document.getElementById('place').textContent=state.place;
