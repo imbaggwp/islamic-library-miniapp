@@ -48,6 +48,17 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .club-choice b{font-size:13px}.club-choice small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
 .new-career{width:100%;margin-top:14px;background:var(--accent);color:#15110a;padding:14px;border-radius:14px;font-weight:800}
 @media(max-width:420px){.club-list{grid-template-columns:1fr}}
+
+.pitch-wrap{background:linear-gradient(180deg,#174b2a,#123d24);border:1px solid #2b6a40;border-radius:22px;padding:10px;box-shadow:inset 0 0 35px #06160c;margin-bottom:12px}
+.pitch{height:430px;border:2px solid rgba(255,255,255,.28);border-radius:16px;position:relative;overflow:hidden;background:repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 55px,transparent 55px 110px)}
+.pitch:before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:rgba(255,255,255,.25);transform:translateX(-50%)}
+.pitch:after{content:"";position:absolute;left:50%;top:50%;width:78px;height:78px;border:2px solid rgba(255,255,255,.25);border-radius:50%;transform:translate(-50%,-50%)}
+.goal{position:absolute;left:50%;width:100px;height:35px;border:2px solid rgba(255,255,255,.25);transform:translateX(-50%)}.goal.top{top:-2px;border-top:0}.goal.bottom{bottom:-2px;border-bottom:0}
+.pitch-player{position:absolute;transform:translate(-50%,-50%);text-align:center;width:76px;background:rgba(9,18,13,.78);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:5px 3px;backdrop-filter:blur(5px);font-size:9px;z-index:2}
+.pitch-player .shirt{width:28px;height:28px;margin:auto;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#111;font-size:15px;font-weight:900;border:2px solid rgba(255,255,255,.7)}
+.pitch-player b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}.pitch-player small{color:#ddd}
+.scheme{display:flex;gap:7px;overflow:auto;padding-bottom:2px}.scheme button{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:11px}.scheme button.active{border-color:var(--accent);color:var(--accent);background:rgba(245,158,11,.08)}
+.player-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;margin-bottom:9px}.player-card-head{display:flex;align-items:center;gap:12px}.big-avatar{width:52px;height:52px;border-radius:16px;background:var(--card2);display:grid;place-items:center;font-size:25px}.pc-info{flex:1}.pc-info h3{margin:0;font-size:16px}.pc-info span{color:var(--muted);font-size:11px}.attr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:13px}.attr{background:var(--card2);border-radius:10px;padding:8px;text-align:center}.attr b{display:block;font-size:14px}.attr span{font-size:9px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -111,8 +122,17 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 
   <main id="squad" class="page hidden">
     <div class="header"><button class="back" onclick="navigate('home')">←</button><h1>Состав</h1></div>
-    <div class="notice">Совет: выпускай игроков с высокой формой. Усталость влияет на вероятность ошибок во время матча.</div>
-    <div class="section"><h2>Основной состав</h2><span class="link">4-3-3</span></div>
+    <div class="scheme" id="schemes">
+      <button onclick="setScheme('4-3-3')">4-3-3</button>
+      <button onclick="setScheme('4-4-2')">4-4-2</button>
+      <button onclick="setScheme('4-2-3-1')">4-2-3-1</button>
+    </div>
+    <div class="section"><h2>Стартовый состав</h2><span class="link" id="schemeLabel">4-3-3</span></div>
+    <div class="pitch-wrap"><div class="pitch" id="pitch">
+      <div class="goal top"></div><div class="goal bottom"></div>
+    </div></div>
+    <div class="notice">Нажми на игрока на поле или в списке ниже, чтобы посмотреть характеристики. Состав сохраняется автоматически.</div>
+    <div class="section"><h2>Игроки</h2><span class="link" id="squadCount"></span></div>
     <div class="players" id="players"></div>
   </main>
 
@@ -322,6 +342,7 @@ const initialState={
 let savedState=JSON.parse(localStorage.getItem('fm_state')||'null');
 let state=savedState||initialState;
 let careerStarted=localStorage.getItem('fm_career_started')==='1';
+state.scheme=state.scheme||'4-3-3';
 function save(){localStorage.setItem('fm_state',JSON.stringify(state))}
 function navigate(id){
  document.querySelectorAll('main.page').forEach(x=>x.classList.add('hidden'));
@@ -333,11 +354,48 @@ function navigate(id){
  if(id==='league')renderLeague();
  if(id==='calendar')renderFixtures();
 }
+const schemes={
+ '4-3-3':[
+  ['GK',50,91],['LB',22,72],['CB',39,79],['CB',61,79],['RB',78,72],
+  ['CM',35,58],['CDM',50,52],['CM',65,58],['LW',24,29],['ST',50,18],['RW',76,29]
+ ],
+ '4-4-2':[
+  ['GK',50,91],['LB',22,72],['CB',39,79],['CB',61,79],['RB',78,72],
+  ['LM',22,52],['CM',42,57],['CM',58,57],['RM',78,52],['ST',42,24],['ST',58,24]
+ ],
+ '4-2-3-1':[
+  ['GK',50,91],['LB',22,72],['CB',39,79],['CB',61,79],['RB',78,72],
+  ['CDM',40,58],['CDM',60,58],['LW',24,38],['CAM',50,34],['RW',76,38],['ST',50,19]
+ ]
+};
+function setScheme(name){
+ state.scheme=name;save();renderPitch();
+ document.querySelectorAll('#schemes button').forEach(b=>b.classList.toggle('active',b.textContent===name));
+}
+function renderPitch(){
+ const scheme=state.scheme||'4-3-3',slots=schemes[scheme], arr=state.players.slice(0,11);
+ document.getElementById('schemeLabel').textContent=scheme;
+ document.getElementById('pitch').innerHTML='<div class="goal top"></div><div class="goal bottom"></div>'+
+ slots.map((slot,i)=>{
+   const p=arr[i]||['Игрок','',0,'','⚽',0];
+   return `<button class="pitch-player" style="left:${slot[1]}%;top:${slot[2]}%" onclick="playerDetails(${i})"><div class="shirt">${p[4]}</div><b>${p[0]}</b><small>${p[2]} · ${slot[0]}</small></button>`;
+ }).join('');
+ document.querySelectorAll('#schemes button').forEach(b=>b.classList.toggle('active',b.textContent===scheme));
+}
 function renderPlayers(){
- const starters=state.players.map((p,i)=>`
- <div class="player"><div class="avatar">${p[4]}</div><div class="pinfo"><b>${p[3]} ${p[0]}</b><span>${p[1]} · Форма ${p[5]}%</span><div class="progress"><i style="width:${p[5]}%"></i></div></div><div class="rating">${p[2]}<span class="pos">${p[1]}</span></div></div>`).join('');
- const bench=state.bench.map(p=>`<div class="player"><div class="avatar">${p[4]}</div><div class="pinfo"><b>${p[3]} ${p[0]}</b><span>Запасной · Форма ${p[5]}%</span></div><div class="rating">${p[2]}</div></div>`).join('');
- document.getElementById('players').innerHTML=starters+'<div class="section"><h2>Запасные</h2></div>'+bench;
+ renderPitch();
+ document.getElementById('squadCount').textContent=state.players.length+' игроков';
+ document.getElementById('players').innerHTML=state.players.map((p,i)=>`
+ <button class="player" style="text-align:left" onclick="playerDetails(${i})">
+  <div class="avatar">${p[4]}</div><div class="pinfo"><b>${p[3]} ${p[0]}</b><span>${p[1]} · Форма ${p[5]}% · ${i<11?'Старт':'Запасной'}</span><div class="progress"><i style="width:${p[5]}%"></i></div></div>
+  <div class="rating">${p[2]}<span class="pos">${p[1]}</span></div>
+ </button>`).join('');
+}
+function playerDetails(i){
+ const p=state.players[i];
+ showModal(`<div class="player-card"><div class="player-card-head"><div class="big-avatar">${p[4]}</div><div class="pc-info"><h3>${p[3]} ${p[0]}</h3><span>${p[1]} · ${i<11?'Основной состав':'Запасной'}</span></div><div class="rating">${p[2]}</div></div>
+ <div class="attr-grid"><div class="attr"><b>${p[5]}%</b><span>Форма</span></div><div class="attr"><b>${Math.min(99,p[2]+6)}</b><span>Потенциал</span></div><div class="attr"><b>${18+(i*2)%14}</b><span>Возраст</span></div></div></div>
+ <button class="secondary" style="width:100%" onclick="closeModal()">Закрыть</button>`);
 }
 function renderMarket(){
  document.getElementById('budgetText').textContent='€'+state.money.toFixed(1)+'M';
@@ -362,7 +420,7 @@ function renderFixtures(){
 }
 function openMatch(){
  showModal(`<h2>⚔️ Тур ${state.round}: ${state.round%2?'Rizvan FC — '+state.opponents[state.round-1]:state.opponents[state.round-1]+' — Rizvan FC'}</h2>
- <p>Соперник: <b>${state.opponents[state.round-1]}</b>. Твой рейтинг ${state.rating}. Выбери тактику перед стартом.</p>
+ <p>Соперник: <b>${state.opponents[state.round-1]}</b>. Твой рейтинг ${state.rating}. Схема: <b>${state.scheme||'4-3-3'}</b>.</p>
  <div class="grid2">
   <button class="tile" onclick="playMatch('counter')"><div class="ico">⚡</div><b>Контратака</b><span>Хорошо против сильных</span></button>
   <button class="tile" onclick="playMatch('press')"><div class="ico">🔥</div><b>Прессинг</b><span>Рискованно, но мощно</span></button>
