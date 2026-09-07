@@ -77,6 +77,201 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 
 .player-meta{display:block;margin-top:3px;font-size:10px;color:#8993a3;font-weight:500}
 
+
+.transfer-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.transfer-toolbar .input{flex:1;min-width:180px}
+.transfer-list{display:grid;gap:8px}
+.transfer-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px;border:1px solid rgba(255,255,255,.07);border-radius:14px;background:rgba(255,255,255,.035)}
+.transfer-main b{display:block}.transfer-main span{display:block;font-size:11px;color:#8e97a5;margin-top:3px}
+.transfer-actions{display:flex;gap:6px;align-items:center}
+.transfer-actions button{white-space:nowrap}
+.transfer-badge{font-size:10px;padding:4px 7px;border-radius:999px;background:rgba(255,255,255,.07);color:#aeb7c4}
+.transfer-budget{display:flex;justify-content:space-between;gap:8px;margin:8px 0 12px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.04);font-size:12px}
+.transfer-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.65);z-index:1000}
+.transfer-modal.show{display:flex}
+.transfer-box{width:min(460px,100%);background:#17191d;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.transfer-box h3{margin:0 0 12px}.transfer-box .input{width:100%;margin:5px 0 10px}
+.transfer-box .transfer-summary{padding:12px;border-radius:12px;background:rgba(255,255,255,.04);font-size:12px;line-height:1.55}
+.transfer-box .transfer-actions{margin-top:12px}
+@media(max-width:560px){.transfer-row{grid-template-columns:1fr}.transfer-actions{justify-content:flex-start}}
+
+
+.squad-actions{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}
+.player-action-btn{font-size:11px;padding:7px 9px}
+.transfer-history{margin-top:14px}
+.history-row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:11px}
+.history-row span:last-child{color:#9ca5b2;text-align:right}
+.loan-badge{display:inline-block;margin-left:5px;padding:2px 5px;border-radius:6px;background:rgba(100,170,255,.12);color:#8fc2ff}
+
+
+.contract-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.contract-card{padding:12px;border:1px solid rgba(255,255,255,.07);border-radius:14px;background:rgba(255,255,255,.035)}
+.contract-card b{display:block}.contract-card span{display:block;font-size:11px;color:#929baa;margin-top:3px}
+.contract-card .contract-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.morale-bar{height:6px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:6px}
+.morale-fill{height:100%;background:currentColor}
+@media(max-width:560px){.contract-grid{grid-template-columns:1fr}}
+
+
+.training-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.training-card{padding:13px;border:1px solid rgba(255,255,255,.07);border-radius:15px;background:rgba(255,255,255,.035)}
+.training-card b{display:block}.training-card span{display:block;color:#929baa;font-size:11px;margin-top:4px}
+.training-card button{margin-top:9px}
+.form-line{display:flex;justify-content:space-between;font-size:10px;color:#9199a6;margin-top:8px}
+.form-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:4px}
+.form-fill{height:100%;background:currentColor}
+.stat-pills{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.stat-pill{padding:4px 7px;border-radius:8px;background:rgba(255,255,255,.06);font-size:10px}
+@media(max-width:560px){.training-grid{grid-template-columns:1fr}}
+
+
+.match-center{display:grid;grid-template-columns:1fr;gap:10px}
+.match-card{padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.035)}
+.match-head{display:flex;justify-content:space-between;gap:8px;color:#8e97a5;font-size:11px}
+.match-teams{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin:14px 0;text-align:center}
+.match-team b{display:block;font-size:14px}.match-score{font-size:24px;font-weight:800}
+.match-events{font-size:11px;color:#a3abb7;border-top:1px solid rgba(255,255,255,.06);padding-top:9px}
+.match-event{padding:3px 0}
+.match-actions{display:flex;gap:7px;flex-wrap:wrap}
+.result-win{color:#6fe29a}.result-draw{color:#ffd166}.result-loss{color:#ff7c7c}
+
+
+.live-match{padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:rgba(255,255,255,.035)}
+.live-score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;text-align:center;gap:10px;margin:12px 0 16px}
+.live-team b{display:block;font-size:14px}.live-team small{color:#8e97a5}
+.live-score-num{font-size:30px;font-weight:900}
+.minute{font-size:11px;color:#9da6b4;text-align:center;margin-bottom:8px}
+.event-feed{max-height:230px;overflow:auto;padding:9px 0;border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06)}
+.event-item{display:flex;gap:8px;padding:6px 2px;font-size:12px}
+.event-icon{width:22px;text-align:center}.match-controls{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.tactic-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
+.tactic-btn.active{outline:2px solid rgba(255,255,255,.2)}
+.sub-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px}
+@media(max-width:560px){.tactic-grid{grid-template-columns:1fr 1fr}}
+
+
+.formation-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.formation-card{padding:11px 12px;border:1px solid rgba(255,255,255,.07);border-radius:14px;background:rgba(255,255,255,.035);cursor:pointer}
+.formation-card:hover{background:rgba(255,255,255,.06)}
+.formation-card.active{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.08)}
+.formation-card b{display:block;font-size:13px}.formation-card span{display:block;font-size:10px;color:#8e97a5;margin-top:3px}
+.xi-list{display:grid;gap:7px;margin-top:10px}
+.xi-row{display:grid;grid-template-columns:32px 1fr auto auto;align-items:center;gap:7px;padding:8px 10px;border-radius:11px;background:rgba(255,255,255,.035);font-size:11px}
+.xi-pos{font-size:10px;color:#9da6b4}.xi-select{min-width:0}
+.xi-select select{width:100%;height:34px;padding:0 8px;font-size:11px}
+.role-controls{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+
+
+.tactical-pitch{position:relative;width:100%;max-width:620px;aspect-ratio:1.55;margin:14px auto;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.12);background:linear-gradient(90deg,rgba(255,255,255,.025) 50%,rgba(255,255,255,.045) 50%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.03)}
+.tactical-pitch:before{content:"";position:absolute;inset:7%;border:2px solid rgba(255,255,255,.35);border-radius:2px}
+.pitch-half{position:absolute;left:7%;right:7%;top:50%;height:0;border-top:2px solid rgba(255,255,255,.3)}
+.pitch-circle{position:absolute;width:24%;aspect-ratio:1;border:2px solid rgba(255,255,255,.3);border-radius:50%;left:38%;top:38%}
+.pitch-dot{position:absolute;width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.45);left:49.5%;top:49.5%}
+.pitch-box-top,.pitch-box-bottom{position:absolute;left:25%;width:50%;height:18%;border:2px solid rgba(255,255,255,.3)}
+.pitch-box-top{top:7%;border-top:0}.pitch-box-bottom{bottom:7%;border-bottom:0}
+.pitch-player{position:absolute;transform:translate(-50%,-50%);width:78px;text-align:center;cursor:pointer;z-index:3}
+.pitch-player .shirt{width:36px;height:36px;border-radius:50%;margin:auto;display:flex;align-items:center;justify-content:center;background:#d9dce1;color:#17191d;font-weight:900;border:2px solid rgba(0,0,0,.25);box-shadow:0 4px 10px rgba(0,0,0,.25)}
+.pitch-player.active .shirt{outline:3px solid rgba(255,255,255,.65)}
+.pitch-player b{display:block;font-size:9px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pitch-player small{display:block;color:#aab2bf;font-size:8px}
+.pitch-help{text-align:center;color:#8993a2;font-size:10px;margin-top:-5px}
+
+
+.pitch-player.dragging{cursor:grabbing;z-index:20;transform:translate(-50%,-50%) scale(1.08)}
+.pitch-player{touch-action:none}
+.pitch-player .shirt{cursor:grab}
+.pitch-player .shirt:active{cursor:grabbing}
+.pitch-reset{display:flex;gap:7px;justify-content:center;margin-top:8px}
+
+
+.tactical-role-panel{margin:10px 0;padding:10px;border:1px solid var(--border,#333);border-radius:12px;background:rgba(255,255,255,.03)}
+.tactical-role-panel label{display:block;font-size:12px;opacity:.7;margin-bottom:6px}
+.tactical-role-panel select{width:100%;padding:10px;border-radius:9px;background:#15171b;color:inherit;border:1px solid #343840}
+.tactical-role-panel small{display:block;margin-top:6px;opacity:.65}
+.pitch-player em{display:block;font-size:9px;font-style:normal;opacity:.72;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis}
+
+
+.tactical-profile{margin:8px auto 0;padding:9px 12px;border:1px solid var(--border,#333);border-radius:10px;text-align:center;font-size:12px;opacity:.82}
+
+
+.match-engine-card{margin:12px 0}
+.match-score{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;text-align:center;padding:14px 8px}
+.match-score strong{font-size:28px}
+.match-metrics{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.match-metrics span{padding:7px 10px;border-radius:9px;background:rgba(255,255,255,.04);font-size:12px}
+.match-events{max-height:190px;overflow:auto;border-top:1px solid var(--border,#333);padding-top:8px}
+.match-events div{padding:5px 0;font-size:12px}
+
+
+.live-clock{text-align:center;font-size:25px;font-weight:800;margin:4px 0 8px}
+.live-clock span{font-size:11px;opacity:.6;margin-left:6px;font-weight:500}
+.live-controls{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:8px 0}
+.live-controls button{font-size:11px;padding:8px 10px}
+
+
+.league-meta{font-size:12px;opacity:.65;margin:4px 0 8px}
+.league-table-wrap{overflow-x:auto}
+.league-table{width:100%;border-collapse:collapse;font-size:11px;min-width:620px}
+.league-table th,.league-table td{padding:7px 5px;border-bottom:1px solid rgba(255,255,255,.06);text-align:center}
+.league-table th:nth-child(2),.league-table td:nth-child(2){text-align:left}
+.league-table tr.my-team{background:rgba(255,255,255,.07)}
+.form-dot{display:inline-flex;width:17px;height:17px;border-radius:50%;align-items:center;justify-content:center;margin:1px;font-size:9px}
+.form-dot.w{background:rgba(70,190,110,.25)}.form-dot.d{background:rgba(230,180,60,.22)}.form-dot.l{background:rgba(220,70,70,.22)}
+.league-calendar-title{font-weight:700;margin:15px 0 8px}
+.calendar-round{border-top:1px solid rgba(255,255,255,.06);padding:8px 0}
+.fixture{display:grid;grid-template-columns:1fr 55px 1fr;gap:7px;padding:6px 4px;font-size:11px;align-items:center}
+.fixture span:last-child{text-align:right}.fixture strong{text-align:center}.my-fixture{font-weight:700}
+
+
+.career-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px 0}
+.career-strip>div{padding:10px 7px;border:1px solid rgba(255,255,255,.07);border-radius:11px;text-align:center;background:rgba(255,255,255,.03)}
+.career-strip small{display:block;opacity:.55;font-size:10px}.career-strip b{display:block;margin-top:3px;font-size:15px}
+.next-match-note{text-align:center;margin:8px 0;font-size:12px;opacity:.8}
+
+
+.transfer-market-card{margin:12px 0}.market-toolbar{display:grid;grid-template-columns:1fr 120px;gap:7px;margin:10px 0}
+.market-toolbar input,.market-toolbar select{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:inherit}
+.window-status{padding:9px 11px;border-radius:10px;background:rgba(255,255,255,.04);font-size:11px;margin-bottom:8px}
+.market-list{display:flex;flex-direction:column;gap:6px}.market-row{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:9px;border:1px solid rgba(255,255,255,.06);border-radius:11px}
+.market-row small{display:block;opacity:.58;margin-top:3px}.market-actions button{font-size:10px;padding:7px 9px}
+.market-history{margin-top:10px;border-top:1px solid rgba(255,255,255,.06);padding-top:7px;font-size:11px;opacity:.75}
+
+
+.squad-row{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.squad-main small{display:block;opacity:.58;margin-top:3px;font-size:10px}
+.squad-bars{display:flex;flex-wrap:wrap;gap:5px;margin:7px 0}
+.squad-bars span{padding:5px 7px;border-radius:8px;background:rgba(255,255,255,.04);font-size:10px}
+.squad-row-actions{display:flex;gap:6px;flex-wrap:wrap}.squad-row-actions button{font-size:10px;padding:6px 8px}
+.complaint{display:block;color:#e9b85d;margin-top:6px}
+
+
+.euro-card{border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:11px;margin:9px 0;background:rgba(255,255,255,.025)}
+.euro-head{display:flex;justify-content:space-between;gap:8px;align-items:center}.euro-head h3{margin:0}.euro-head small{opacity:.55}
+.euro-next{display:grid;grid-template-columns:1fr 35px 1fr;gap:6px;align-items:center;text-align:center;margin:10px 0;padding:9px;border-radius:10px;background:rgba(255,255,255,.04);font-size:11px}
+.euro-next button{grid-column:1/-1}.euro-actions{display:flex;justify-content:flex-end;margin-bottom:7px}
+.euro-row{display:grid;grid-template-columns:24px 1fr 30px 50px 30px;gap:5px;padding:5px 3px;font-size:10px;border-top:1px solid rgba(255,255,255,.045);align-items:center}
+.euro-row span:nth-child(3),.euro-row span:nth-child(4),.euro-row strong{text-align:center}.euro-row.mine{background:rgba(255,255,255,.07);border-radius:6px}
+.euro-note{font-size:10px;opacity:.55;line-height:1.45;margin-top:10px}
+
+
+.unified-fixture{display:grid;grid-template-columns:80px 1fr 38px 55px;gap:7px;align-items:center;padding:9px 3px;border-top:1px solid rgba(255,255,255,.06);font-size:11px}.unified-fixture small{display:block;opacity:.5;font-size:9px}.unified-fixture strong{text-align:center}.unified-fixture.upcoming{background:rgba(255,255,255,.025)}.injury-alert{margin-top:8px;padding:8px;border-radius:9px;background:rgba(220,70,70,.12);font-size:11px}
+
+
+.season-date{font-size:11px;opacity:.7;margin:8px 0}.timeline-item{display:grid;grid-template-columns:58px 12px 1fr auto;gap:8px;align-items:center;padding:9px 2px;border-top:1px solid rgba(255,255,255,.06)}
+.timeline-date{text-align:center}.timeline-date small{display:block;opacity:.45;font-size:8px}.timeline-dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.45}.timeline-item.next{background:rgba(255,255,255,.035);border-radius:9px}.timeline-info small{display:block;opacity:.5;font-size:9px;margin-top:2px}.timeline-item button{font-size:10px;padding:7px 8px}
+
+
+.cup-status{font-size:11px;opacity:.7;margin:6px 0}.cup-next{display:grid;grid-template-columns:1fr 35px 1fr;gap:7px;align-items:center;text-align:center;padding:10px;border-radius:10px;background:rgba(255,255,255,.04);font-size:11px;margin-bottom:8px}.cup-next button{grid-column:1/-1}.cup-bracket{max-height:180px;overflow:auto;margin-bottom:8px}.cup-bracket>div{display:grid;grid-template-columns:24px 1fr 40px 1fr;gap:4px;padding:5px 2px;border-top:1px solid rgba(255,255,255,.05);font-size:10px}.cup-bracket b{text-align:center}
+
+
+.euro-tournament-center{margin-top:10px}.euro-tabs{display:flex;gap:6px;margin-bottom:10px}.euro-tabs button{flex:1;border:0;border-radius:9px;padding:8px;background:rgba(255,255,255,.05);color:inherit;font-weight:700}.euro-tabs button.active{background:rgba(255,255,255,.12)}.euro-headline{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.euro-headline span{font-size:10px;opacity:.65}.draw-box,.euro-table-wrap{background:rgba(255,255,255,.035);border-radius:10px;padding:9px;margin-top:8px}.draw-title{font-size:11px;font-weight:800;margin-bottom:7px}.draw-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.draw-pair{padding:7px;border-radius:8px;background:rgba(255,255,255,.04);display:flex;justify-content:space-between;gap:5px;font-size:10px}.draw-pair small{opacity:.55}.euro-table-wrap{overflow:hidden}.euro-mini-table{width:100%;border-collapse:collapse;font-size:9px}.euro-mini-table th,.euro-mini-table td{padding:5px 3px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)}.euro-mini-table th:nth-child(2),.euro-mini-table td:nth-child(2){text-align:left}.euro-mini-table tr.me{background:rgba(255,255,255,.08);font-weight:700}.qualification-zones{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:8px}.qualification-zones>div{padding:7px;border-radius:8px;background:rgba(255,255,255,.035);display:flex;flex-direction:column;gap:2px}.qualification-zones span{font-size:8px;opacity:.6}.my-euro-path{margin-top:9px;padding:9px;border-radius:10px;background:rgba(255,255,255,.035)}.path-line{display:flex;align-items:center;gap:5px;overflow:auto;margin-top:7px;font-size:9px;white-space:nowrap}.path-line span{opacity:.4}.path-line span.on{opacity:1;font-weight:800}.path-line i{opacity:.4;font-style:normal}
+
+
+.knockout-section{margin-top:10px}.knockout-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}.knockout-grid{display:grid;grid-template-columns:1fr;gap:7px}.knockout-tie{padding:9px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.05)}.tie-title{font-size:9px;opacity:.55;margin-bottom:5px}.tie-team{font-size:11px;font-weight:700;padding:4px 0}.tie-team.winner{font-weight:900}.tie-leg{display:grid;grid-template-columns:1fr 55px 28px;align-items:center;gap:4px;font-size:9px;opacity:.75;padding:3px 0}.tie-leg b{text-align:center}.tie-leg button{border:0;border-radius:6px;padding:4px;background:rgba(255,255,255,.1);color:inherit}.tie-winner{margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.06);font-size:9px;font-weight:800}
+
+
+.season-full-calendar-card{margin-top:10px}.calendar-day{display:grid;grid-template-columns:72px 1fr;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}.calendar-day.next-day{background:rgba(255,255,255,.035);border-radius:9px;padding-left:7px;padding-right:7px}.calendar-date{display:flex;flex-direction:column;gap:2px}.calendar-date b{font-size:11px}.calendar-date span{font-size:8px;opacity:.45}.calendar-events{display:flex;flex-direction:column;gap:4px}.calendar-event{display:flex;justify-content:space-between;align-items:center;padding:6px 7px;border-radius:7px;background:rgba(255,255,255,.035);font-size:9px}.calendar-event.played{opacity:.45}.calendar-event small{font-size:8px;opacity:.55}
+
 </style>
 </head>
 <body>
@@ -196,14 +391,23 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
     </div></div>
     <div class="notice">Нажми на игрока на поле или в списке ниже, чтобы посмотреть характеристики. Состав сохраняется автоматически.</div>
     <div class="section"><h2>Игроки</h2><span class="link" id="squadCount"></span></div>
-    <div class="players" id="players"></div>
+    <div class="players" id="players"><div class="card squad-management-card">
+  <div class="section-head"><div><h3>👥 Управление составом</h3><p>Форма, мораль, физическая готовность и игровое время.</p></div></div>
+  <div id="squadManagementBox"></div>
+</div>
+</div>
   </main>
 
   <main id="transfers" class="page hidden">
     <div class="header"><button class="back" onclick="navigate('home')">←</button><h1>Трансферы</h1></div>
     <div class="notice">У тебя ограниченный бюджет. Следи за зарплатной ведомостью и потенциалом молодых игроков.</div>
     <div class="section"><h2>Рынок</h2><span class="link" id="budgetText">€4.2M</span></div>
-    <div class="players" id="market"></div>
+    <div class="players" id="market"><div class="card transfer-market-card">
+  <div class="section-head"><div><h3>💰 Трансферный рынок</h3><p>Скаутинг, переговоры и трансферное окно.</p></div>
+  <button class="primary" onclick="progressTransferWindow()">⏭️ Следующий день</button></div>
+  <div id="transferMarketBox"></div>
+</div>
+</div>
   </main>
 
   <main id="training" class="page hidden">
@@ -554,6 +758,7 @@ function chooseClub(name){
  if(document.getElementById('customClubModal')) closeCustomClub();
  document.getElementById('clubSelect').classList.add('hidden');document.getElementById('appContent').classList.remove('hidden');
  initCareer();updateHome();renderPlayers();renderMarket();renderLeague();renderFixtures();navigate('home');
+renderTraining();
  showToast('Карьера началась: '+name);
 }
 function openCustomClub(){
@@ -626,6 +831,1788 @@ document.addEventListener('keydown',function(e){
  if(e.key==='Escape' && document.getElementById('customClubModal')?.classList.contains('show')) closeCustomClub();
 });
 
+
+let transferTarget=null;
+
+
+
+
+
+let liveMatch=null;
+function bestXI(){
+  return (state.players||[]).slice().sort((a,b)=>b[2]-a[2]).slice(0,11);
+}
+function benchPlayers(){
+  const xi=new Set(bestXI().map(p=>p[0]));
+  return (state.players||[]).filter(p=>!xi.has(p[0]));
+}
+
+const FORMATIONS=[{"name":"4-3-3","code":"4-3-3","positions":["GK","LB","CB","CB","RB","CM","CM","CM","LW","ST","RW"]},{"name":"4-3-3 атакующая","code":"4-3-3-A","positions":["GK","LB","CB","CB","RB","CM","CM","AM","LW","ST","RW"]},{"name":"4-3-3 ложная девятка","code":"4-3-3-F9","positions":["GK","LB","CB","CB","RB","CM","CDM","AM","LW","CF","RW"]},{"name":"4-4-2","code":"4-4-2","positions":["GK","LB","CB","CB","RB","LM","CM","CM","RM","ST","ST"]},{"name":"4-4-2 ромб","code":"4-4-2-D","positions":["GK","LB","CB","CB","RB","CDM","CM","CM","AM","ST","ST"]},{"name":"4-2-3-1","code":"4-2-3-1","positions":["GK","LB","CB","CB","RB","CDM","CDM","LW","AM","RW","ST"]},{"name":"4-2-3-1 широкая","code":"4-2-3-1-W","positions":["GK","LB","CB","CB","RB","CDM","CDM","LW","AM","RW","ST"]},{"name":"4-1-4-1","code":"4-1-4-1","positions":["GK","LB","CB","CB","RB","CDM","LM","CM","CM","RM","ST"]},{"name":"4-5-1","code":"4-5-1","positions":["GK","LB","CB","CB","RB","LM","CM","CDM","CM","RM","ST"]},{"name":"4-1-2-1-2","code":"4-1-2-1-2","positions":["GK","LB","CB","CB","RB","CDM","CM","CM","AM","ST","ST"]},{"name":"3-4-3","code":"3-4-3","positions":["GK","CB","CB","CB","LM","CM","CM","RM","LW","ST","RW"]},{"name":"3-4-2-1","code":"3-4-2-1","positions":["GK","CB","CB","CB","LM","CM","CM","RM","AM","AM","ST"]},{"name":"3-5-2","code":"3-5-2","positions":["GK","CB","CB","CB","LM","CM","CM","CM","RM","ST","ST"]},{"name":"3-4-1-2","code":"3-4-1-2","positions":["GK","CB","CB","CB","LM","CM","CM","RM","AM","ST","ST"]},{"name":"5-3-2","code":"5-3-2","positions":["GK","LWB","CB","CB","CB","RWB","CM","CM","CM","ST","ST"]},{"name":"5-4-1","code":"5-4-1","positions":["GK","LWB","CB","CB","CB","RWB","LM","CM","CM","RM","ST"]},{"name":"5-2-2-1","code":"5-2-2-1","positions":["GK","LWB","CB","CB","CB","RWB","CDM","CDM","AM","AM","ST"]},{"name":"4-2-4","code":"4-2-4","positions":["GK","LB","CB","CB","RB","CM","CM","LW","ST","ST","RW"]},{"name":"4-6-0","code":"4-6-0","positions":["GK","LB","CB","CB","RB","LM","CM","CDM","CM","RM","AM"]},{"name":"2-3-5","code":"2-3-5","positions":["GK","CB","CB","DM","CM","CM","LW","AM","ST","ST","RW"]}];
+function ensureTacticalState(){
+  state.formation=state.formation||'4-3-3';
+  state.startingXI=Array.isArray(state.startingXI)?state.startingXI:[];
+  state.captain=state.captain||'';
+  state.penaltyTaker=state.penaltyTaker||'';
+  state.freeKickTaker=state.freeKickTaker||'';
+  state.cornerTaker=state.cornerTaker||'';
+}
+function currentFormation(){
+  ensureTacticalState();
+  return FORMATIONS.find(f=>f.code===state.formation)||FORMATIONS[0];
+}
+function autoXI(){
+  const ps=(state.players||[]).slice().sort((a,b)=>b[2]-a[2]);
+  return ps.slice(0,11).map(p=>p[0]);
+}
+function chooseFormation(code){
+  ensureTacticalState();
+  state.formation=code;
+  state.startingXI=autoXI();
+  saveState(); renderTactics(); renderLiveMatch();
+initPitchDrag();
+  showToast('Расстановка: '+currentFormation().name);
+}
+function setXI(index,name){
+  ensureTacticalState();
+  if(!state.startingXI[index])state.startingXI[index]=name;
+  else state.startingXI[index]=name;
+  state.startingXI=[...new Set(state.startingXI)].slice(0,11);
+  saveState(); renderTactics();
+}
+function setTacticalRole(key,name){
+  ensureTacticalState(); state[key]=name; saveState(); renderTactics();
+  showToast('Назначен: '+name);
+}
+function renderTactics(){
+  const page=document.getElementById('squad')||document.getElementById('team');
+  if(!page)return;
+  ensureTacticalState();
+  const f=currentFormation();
+  const players=state.players||[];
+  const xi=state.startingXI.length===11?state.startingXI:autoXI();
+  state.startingXI=xi;
+  const opts=players.map(p=>`<option value="${p[0]}">${p[0]} · ${p[1]} · ⭐${p[2]}</option>`).join('');
+  page.innerHTML=`
+  <div class="section-title"><div class="card match-engine-card">
+  <div class="section-head"><div><h3>Матч</h3><p>Результат рассчитывается по составу, формации и ролям.</p></div>
+  <button class="primary" onclick="startLiveMatch()">▶ Начать матч</button></div>
+  <div id="lastMatchBox"><div class="empty-state">Матч ещё не сыгран.</div></div>
+</div>
+<h2>Тактика и состав</h2><span>${f.name}</span></div>
+  <div class="match-card">
+    <b>Расстановка · ${FORMATIONS.length} вариантов</b>
+    <div class="formation-grid">${FORMATIONS.map(x=>`<div class="formation-card ${x.code===f.code?'active':''}" onclick="chooseFormation('${x.code}')"><b>${x.name}</b><span>${x.positions.slice(1).join(' · ')}</span></div>`).join('')}</div>
+  </div>
+  <div class="match-card">
+    <b>Стартовые 11</b>
+    <div class="xi-list">
+      ${f.positions.map((pos,i)=>`<div class="xi-row"><span class="xi-pos">${pos}</span><div class="xi-select"><select onchange="setXI(${i},this.value)">${players.map(p=>`<option value="${p[0]}" ${p[0]===xi[i]?'selected':''}>${p[0]} · ⭐${p[2]}</option>`).join('')}</select></div><span>№${i+1}</span></div>`).join('')}
+    </div>
+  </div>
+  <div class="match-card">
+    <b>Исполнители</b>
+    <div class="role-controls">
+      <select class="input" onchange="setTacticalRole('captain',this.value)"><option value="">Капитан</option>${players.map(p=>`<option ${p[0]===state.captain?'selected':''}>${p[0]}</option>`).join('')}</select>
+      <select class="input" onchange="setTacticalRole('penaltyTaker',this.value)"><option value="">Пенальти</option>${players.map(p=>`<option ${p[0]===state.penaltyTaker?'selected':''}>${p[0]}</option>`).join('')}</select>
+      <select class="input" onchange="setTacticalRole('freeKickTaker',this.value)"><option value="">Штрафные</option>${players.map(p=>`<option ${p[0]===state.freeKickTaker?'selected':''}>${p[0]}</option>`).join('')}</select>
+      <select class="input" onchange="setTacticalRole('cornerTaker',this.value)"><option value="">Угловые</option>${players.map(p=>`<option ${p[0]===state.cornerTaker?'selected':''}>${p[0]}</option>`).join('')}</select>
+    </div>
+  </div>`;
+}
+
+function startInteractiveMatch(competition='league',euroName=null){
+  ensureSeasonState();ensurePlayerManagement();ensureLeagueSeason();
+  let fixture=null, opponent='', home=true;
+  if(competition==='europe'&&euroName){
+    const e=state.europe?.[euroName], round=e?.matchday+1;
+    fixture=e?.fixtures.find(f=>!f.played&&f.round===round&&(f.home===state.club||f.away===state.club));
+    if(!fixture){showToast('Еврокубковый матч не найден');return}
+    opponent=fixture.home===state.club?fixture.away:fixture.home; home=fixture.home===state.club;
+  }else{
+    fixture=nextFixture();
+    if(!fixture){showToast('Следующий матч не найден');return}
+    opponent=fixture.home===state.club?fixture.away:fixture.home; home=fixture.home===state.club;
+  }
+  const names=prepareXIForMatch(), xi=names.map(findMyPlayer).filter(Boolean);
+  if(xi.length<11){showToast('Нужно 11 доступных игроков в стартовом составе');return}
+  liveMatch={competition,euroName,fixture,opponent,home,minute:0,gf:0,ga:0,events:[],finished:false,tactic:'balanced',
+    xi:xi.map(p=>p[0]),bench:(state.players||[]).filter(p=>!names.includes(p[0])).map(p=>p[0]),usedSubs:0,maxSubs:5,
+    injured:[],yellow:{},paused:false,elapsedTimer:null};
+  renderLiveMatch(); liveMatch.elapsedTimer=setInterval(liveTick,900);
+}
+function setLiveTactic(t){if(liveMatch){liveMatch.tactic=t;renderLiveMatch()}}
+function addLiveEvent(icon,text){if(liveMatch)liveMatch.events.unshift({minute:liveMatch.minute,icon,text})}
+function playerCanEnter(name){const d=playerMgmt(name);return d.injuredUntil<=0&&d.fitness>=30&&!liveMatch.xi.includes(name)}
+function makeManualSub(){
+  if(!liveMatch||liveMatch.finished)return;
+  if(liveMatch.usedSubs>=5)return showToast('Лимит замен исчерпан');
+  const available=liveMatch.bench.filter(playerCanEnter); if(!available.length)return showToast('Нет доступных игроков на скамейке');
+  const out=prompt(`Кого заменить?\n${liveMatch.xi.map((n,i)=>`${i+1}. ${n}`).join('\n')}`); if(!out)return;
+  const outName=liveMatch.xi.find(n=>n.toLowerCase()===out.trim().toLowerCase())||liveMatch.xi[Number(out)-1]; if(!outName)return showToast('Игрок не найден');
+  const choice=prompt(`Кого выпустить вместо ${outName}?\n${available.map((n,i)=>`${i+1}. ${n}`).join('\n')}`); if(!choice)return;
+  const inName=available[Number(choice)-1]||available.find(n=>n.toLowerCase()===choice.trim().toLowerCase()); if(!inName)return showToast('Игрок не найден');
+  const idx=liveMatch.xi.indexOf(outName); liveMatch.xi[idx]=inName;
+  liveMatch.bench=liveMatch.bench.filter(n=>n!==inName);liveMatch.bench.push(outName);liveMatch.usedSubs++;
+  playerMgmt(inName).subApps++;addLiveEvent('🔄',`${inName} выходит вместо ${outName}.`);saveState();renderLiveMatch();
+}
+function forceInjurySub(name){
+  const d=playerMgmt(name);d.injuredUntil=Math.max(d.injuredUntil,3+Math.floor(Math.random()*10));d.fitness=Math.max(5,d.fitness-25);
+  liveMatch.injured.push(name);addLiveEvent('🚑',`${name} получил травму — нужна замена.`);
+  if(liveMatch.usedSubs<5){
+    const available=liveMatch.bench.filter(playerCanEnter);
+    if(available.length){const inName=available[0],idx=liveMatch.xi.indexOf(name);liveMatch.xi[idx]=inName;liveMatch.bench=liveMatch.bench.filter(n=>n!==inName);liveMatch.bench.push(name);liveMatch.usedSubs++;playerMgmt(inName).subApps++;addLiveEvent('🔄',`${inName} автоматически выходит вместо ${name}.`);}
+  }
+}
+function toggleLivePause(){if(liveMatch){liveMatch.paused=!liveMatch.paused;renderLiveMatch()}}
+function liveTick(){
+  if(!liveMatch||liveMatch.finished||liveMatch.paused)return;
+  liveMatch.minute++;
+  const xi=liveMatch.xi.map(findMyPlayer).filter(Boolean);
+  const strength=xi.length?xi.reduce((a,p)=>a+(Number(p[2])||0)*(.72+playerMgmt(p[0]).fitness/400),0)/xi.length:teamStrength();
+  const opp=opponentStrength(liveMatch.opponent), t=calculateTacticalImpact();
+  const style={attacking:1.16,balanced:1,defensive:.84}[liveMatch.tactic];
+  const homePower=liveMatch.home?1.03:.97;
+  const chance=Math.max(.008,Math.min(.16,(strength/100)*.10*style*homePower+(t.attack-70)*.001));
+  const oppChance=Math.max(.006,Math.min(.14,(opp/100)*.085*(liveMatch.tactic==='attacking'?1.10:liveMatch.tactic==='defensive'?.80:1)));
+  const r=Math.random();
+  if(r<chance){const scorer=liveMatch.xi[Math.floor(Math.random()*liveMatch.xi.length)];liveMatch.gf++;playerMgmt(scorer).goals++;addLiveEvent('⚽',`${scorer} забивает!`)}
+  else if(r<chance+oppChance){liveMatch.ga++;addLiveEvent('⚽',`${liveMatch.opponent} забивает.`)}
+  else if(r<chance+oppChance+.025)addLiveEvent('🎯',`${state.club} создаёт опасный момент.`);
+  if(Math.random()<.025){const p=liveMatch.xi[Math.floor(Math.random()*liveMatch.xi.length)];liveMatch.yellow[p]=(liveMatch.yellow[p]||0)+1;addLiveEvent('🟨',`${p} получает жёлтую карточку.`)}
+  if(Math.random()<.0065){const c=liveMatch.xi.filter(n=>!liveMatch.injured.includes(n));if(c.length)forceInjurySub(c[Math.floor(Math.random()*c.length)])}
+  liveMatch.xi.forEach(n=>playerMgmt(n).fitness=Math.max(15,playerMgmt(n).fitness-.12));
+  renderLiveMatch(); if(liveMatch.minute>=90)setTimeout(finishInteractiveMatch,150);
+}
+function renderLiveMatch(){
+  const page=document.getElementById('calendar')||document.getElementById('matches');if(!page)return;
+  if(!liveMatch){renderMatchCenter();return} const m=liveMatch, a=m.home?state.club:m.opponent,b=m.home?m.opponent:state.club;
+  page.innerHTML=`<div class="section-title"><h2>${m.competition==='europe'?'🌍 '+m.euroName:m.competition==='cup'?'🏆 Кубок':'⚽ Матч'}</h2><span>${m.finished?'ФИНАЛ':m.minute+"'"}</span></div>
+  <div class="live-match"><div class="live-score"><div class="live-team"><b>${a}</b><small>${m.home?'🏠 Дома':'✈️ Гости'}</small></div><div class="live-score-num">${m.gf} : ${m.ga}</div><div class="live-team"><b>${b}</b></div></div>
+  <div class="minute">${m.finished?'МАТЧ ЗАВЕРШЁН':`Идёт матч · ${m.paused?'ПАУЗА':''}`}</div>
+  <div class="tactic-grid"><button class="secondary tactic-btn ${m.tactic==='defensive'?'active':''}" onclick="setLiveTactic('defensive')">🛡️ Оборона</button><button class="secondary tactic-btn ${m.tactic==='balanced'?'active':''}" onclick="setLiveTactic('balanced')">⚖️ Баланс</button><button class="secondary tactic-btn ${m.tactic==='attacking'?'active':''}" onclick="setLiveTactic('attacking')">🔥 Атака</button></div>
+  <div class="match-controls">${!m.finished?`<button class="primary" onclick="toggleLivePause()">${m.paused?'▶️ Продолжить':'Ⅱ Пауза'}</button><button class="secondary" onclick="makeManualSub()">🔄 Замена (${m.usedSubs}/5)</button>`:''}</div>
+  ${m.injured.length?`<div class="injury-alert">🚑 ${m.injured.map(n=>`${n} — ${playerMgmt(n).injuredUntil} дн.`).join(' · ')}</div>`:''}
+  <div class="event-feed">${m.events.map(e=>`<div class="event-item"><span class="event-icon">${e.icon}</span><span><b>${e.minute}'</b> ${e.text}</span></div>`).join('')||'<div class="empty">Матч только начался.</div>'}</div></div>`;
+}
+function finishInteractiveMatch(){
+  if(!liveMatch||liveMatch.finished)return;liveMatch.finished=true;if(liveMatch.elapsedTimer)clearInterval(liveMatch.elapsedTimer);
+  ensurePlayerManagement();liveMatch.xi.forEach(n=>{const d=playerMgmt(n);d.minutes+=90;d.fitness=Math.max(10,d.fitness-18);d.sharpness=Math.min(100,d.sharpness+7)});
+  const gf=liveMatch.home?liveMatch.gf:liveMatch.ga,ga=liveMatch.home?liveMatch.ga:liveMatch.gf;
+  if(liveMatch.competition==='cup'){
+    const cup=ensureDomesticCup(),f=liveMatch.fixture;
+    if(cup&&f&&!f.played){
+      f.played=true;f.gf=f.home===state.club?liveMatch.gf:liveMatch.ga;f.ga=f.home===state.club?liveMatch.ga:liveMatch.gf;
+      const winner=f.gf>f.ga?f.home:f.away;
+      const survivors=cup.bracket.filter(x=>x.played).map(x=>x.gf>x.ga?x.home:x.away);
+      if(winner===state.club){
+        cup.teams=[...new Set(survivors.concat(state.club))];
+        const phases=domesticCupPhases(),idx=phases.indexOf(cup.phase);
+        if(idx>=0&&idx<phases.length-1)buildDomesticCupRound(cup,phases[idx+1]);
+        else{cup.phase='Завершён';cup.winner=state.club;state.money=(state.money||0)+8;showToast('🏆 Кубок страны выигран!');}
+      }else{cup.phase='Вылет';}
+      markCalendarPlayed('cup','Кубок',cup.round||1);
+    }
+  }else if(liveMatch.competition==='europe'){
+    const e=state.europe[liveMatch.euroName],f=liveMatch.fixture;
+    if(e&&f&&!f.played){f.played=true;f.gf=f.home===state.club?liveMatch.gf:liveMatch.ga;f.ga=f.home===state.club?liveMatch.ga:liveMatch.gf;applyEuroResult(e,f.gf,f.ga,f.home,f.away);e.matchday=Math.max(e.matchday,f.round);advanceEuropeanPhase(liveMatch.euroName)}
+    state.lastEuropeanMatch={name:liveMatch.euroName,home:f?.home,away:f?.away,gf,ga};
+  }else{
+    const f=liveMatch.fixture||nextFixture(); if(f&&!f.played){f.played=true;f.gf=f.home===state.club?liveMatch.gf:liveMatch.ga;f.ga=f.home===state.club?liveMatch.ga:liveMatch.gf;applyLeagueResult(state.leagueSeason,f.gf,f.ga,f.home,f.away);state.leagueSeason.matchday=Math.max(state.leagueSeason.matchday,f.round+1)}
+    state.stats=state.stats||{wins:0,draws:0,losses:0,gf:0,ga:0};state.stats.gf+=gf;state.stats.ga+=ga;if(gf>ga)state.stats.wins++;else if(gf===ga)state.stats.draws++;else state.stats.losses++;state.playedMatches=(state.playedMatches||0)+1;state.matchday=state.leagueSeason.matchday;
+  }
+  state.daysToMatch=2;state.careerDay=(state.careerDay||1)+1;state.lastActivity=liveMatch.competition==='europe'?liveMatch.euroName:'Матч';
+  saveState();renderLiveMatch();renderMatchCenter();renderLeagueSeason();renderEuropean();renderSquadManagement();renderUnifiedCalendar();showToast(`Финальный свисток: ${liveMatch.gf}:${liveMatch.ga}`);
+}
+
+
+
+function ensureDomesticCup(){
+  ensureSeasonState();
+  state.domesticCup=state.domesticCup&&state.domesticCup.league===state.league?state.domesticCup:{
+    league:state.league,phase:'1/32 финала',round:0,teams:[],bracket:[],played:[],winner:null
+  };
+  const cup=state.domesticCup;
+  if(!cup.teams.length){
+    cup.teams=(clubLeagues[state.league]||[]).slice();
+    // The top-flight clubs are the playable pool; extra rounds are added only when needed.
+    buildDomesticCupRound(cup,'1/32 финала');
+  }
+  return cup;
+}
+function buildDomesticCupRound(cup,phase){
+  const teams=(cup.teams||[]).filter(Boolean);
+  let shuffled=teams.slice().sort(()=>Math.random()-.5);
+  const games=[];
+  for(let i=0;i<shuffled.length;i+=2){
+    if(shuffled[i+1])games.push({home:shuffled[i],away:shuffled[i+1],played:false,gf:null,ga:null});
+  }
+  cup.phase=phase;cup.bracket=games;
+}
+function domesticCupPhases(){
+  const n=(clubLeagues[state.league]||[]).length;
+  return n>=20?['1/32 финала','1/16 финала','1/8 финала','1/4 финала','1/2 финала','Финал']:
+    ['1/16 финала','1/8 финала','1/4 финала','1/2 финала','Финал'];
+}
+function playDomesticCupMatch(){
+  const cup=ensureDomesticCup();
+  const f=cup.bracket.find(x=>!x.played&&(x.home===state.club||x.away===state.club));
+  if(!f){showToast('Матч Кубка сейчас не найден');return}
+  startInteractiveMatch('cup',null);
+}
+function simulateDomesticCupRound(){
+  const cup=ensureDomesticCup();
+  const games=cup.bracket.filter(x=>!x.played);
+  if(!games.length){showToast('Раунд уже завершён');return}
+  const winners=[];
+  games.forEach(f=>{
+    if(f.home===state.club||f.away===state.club)return;
+    let [a,b]=simulateEuropeanMatch(f.home,f.away);
+    if(a===b)a=Math.random()<.5?a+1:a,b=a===b?b+1:b;
+    f.played=true;f.gf=a;f.ga=b;winners.push(a>b?f.home:f.away);
+  });
+  const mine=cup.bracket.find(x=>!x.played&&(x.home===state.club||x.away===state.club));
+  if(mine){showToast(`Кубок: твой матч ${mine.home} — ${mine.away}`);return}
+  advanceDomesticCup(winners);
+}
+function advanceDomesticCup(winners){
+  const cup=ensureDomesticCup();
+  const all=winners.slice();
+  const mine=cup.bracket.find(x=>x.home===state.club||x.away===state.club);
+  if(mine&&mine.played){
+    const winner=mine.gf>mine.ga?mine.home:mine.away;
+    if(winner===state.club)all.push(winner);
+  }
+  const phases=domesticCupPhases();
+  const nextIndex=phases.indexOf(cup.phase)+1;
+  if(nextIndex<0||nextIndex>=phases.length){
+    cup.winner=all[0]||null;cup.phase='Завершён';
+  }else{
+    buildDomesticCupRound(cup,phases[nextIndex]);
+    cup.bracket=cup.bracket.filter(x=>all.includes(x.home)||all.includes(x.away));
+    // If fewer teams than the round requires, pair the remaining teams directly.
+    if(cup.bracket.length===0&&all.length){
+      const gs=[];
+      for(let i=0;i<all.length;i+=2)if(all[i+1])gs.push({home:all[i],away:all[i+1],played:false,gf:null,ga:null});
+      cup.bracket=gs;
+    }
+  }
+  saveState();renderDomesticCup();addDomesticCupToSeasonCalendar();
+}
+function addDomesticCupToSeasonCalendar(){
+  ensureDomesticCup();ensureSeasonCalendar();
+  const cup=state.domesticCup;
+  const phaseOrder=domesticCupPhases().indexOf(cup.phase);
+  if(phaseOrder<0)return;
+  const d=new Date(`${state.season||2026}-09-20T12:00:00`);
+  d.setDate(d.getDate()+phaseOrder*35);
+  const item={date:d.toISOString().slice(0,10),type:'cup',competition:'Кубок',round:phaseOrder+1,phase:cup.phase};
+  const exists=state.seasonCalendar.some(x=>x.type==='cup'&&x.round===item.round);
+  if(!exists)state.seasonCalendar.push(item);
+  state.seasonCalendar.sort((a,b)=>a.date.localeCompare(b.date));
+}
+function renderDomesticCup(){
+  const box=document.getElementById('domesticCupBox');if(!box)return;
+  const cup=ensureDomesticCup();
+  const mine=cup.bracket.find(x=>x.home===state.club||x.away===state.club);
+  box.innerHTML=`
+    <div class="cup-status">Стадия: <b>${cup.phase}</b></div>
+    ${mine?`<div class="cup-next"><span>${mine.home}</span><strong>VS</strong><span>${mine.away}</span>
+      <button class="primary" onclick="playDomesticCupMatch()">▶ Играть</button></div>`:'<div class="empty-state">Твоя команда в этом раунде уже сыграла или вылетела.</div>'}
+    <div class="cup-bracket">${cup.bracket.map((f,i)=>`<div><span>${i+1}</span>${f.home} <b>${f.played?f.gf+':'+f.ga:'—'}</b> ${f.away}</div>`).join('')}</div>
+    <button class="secondary" onclick="simulateDomesticCupRound()">⏩ Симулировать остальные матчи</button>`;
+}
+function drawEuropeanLeague(name){
+  const e=state.europe[name],teams=Object.keys(e.table||{});
+  if(!teams.length)return;
+  const cfg=EUROPEAN_CONFIG[name];
+  const target=Math.min(cfg.matches,teams.length-1);
+  e.fixtures=[];e.draw=[];
+  // Each team receives opponents from different ranking bands. This is a game-friendly
+  // approximation of the UEFA draw restrictions while keeping it fully offline.
+  const sorted=teams.slice().sort((a,b)=>euroClubRating(b)-euroClubRating(a));
+  const bands=[];
+  for(let i=0;i<4;i++)bands.push(sorted.slice(i*9,(i+1)*9));
+  teams.forEach(team=>{
+    const band=Math.floor(sorted.indexOf(team)/9);
+    const candidates=teams.filter(x=>x!==team&&Math.floor(sorted.indexOf(x)/9)!==band);
+    const shuffled=candidates.sort(()=>Math.random()-.5);
+    const selected=[];
+    for(const opp of shuffled){
+      if(selected.length>=target)break;
+      if(!selected.includes(opp))selected.push(opp);
+    }
+    selected.forEach((opp,j)=>{
+      const home=(j%2===0);
+      e.fixtures.push({id:`${name}-${team}-${opp}`,round:j+1,home:home?team:opp,away:home?opp:team,played:false,gf:null,ga:null});
+      e.draw.push({team,opponent:opp,home});
+    });
+  });
+}
+function europeanStageDates(name){
+  const dates={
+    'Лига чемпионов':{
+      league:['2026-09-08','2026-10-13','2026-10-20','2026-11-03','2026-11-24','2026-12-08','2027-01-19','2027-01-27'],
+      playoff:['2027-02-16','2027-02-23'],r16:['2027-03-09','2027-03-16'],
+      qf:['2027-04-06','2027-04-13'],sf:['2027-04-27','2027-05-04'],final:['2027-06-05']
+    },
+    'Лига Европы':{
+      league:['2026-09-16','2026-10-15','2026-10-22','2026-11-05','2026-11-26','2026-12-10','2027-01-21','2027-01-28'],
+      playoff:['2027-02-18','2027-02-25'],r16:['2027-03-11','2027-03-18'],
+      qf:['2027-04-08','2027-04-15'],sf:['2027-04-29','2027-05-06'],final:['2027-05-26']
+    },
+    'Лига конференций':{
+      league:['2026-10-01','2026-10-22','2026-11-05','2026-11-26','2026-12-10','2026-12-17'],
+      playoff:['2027-02-18','2027-02-25'],r16:['2027-03-11','2027-03-18'],
+      qf:['2027-04-08','2027-04-15'],sf:['2027-04-29','2027-05-06'],final:['2027-06-02']
+    }
+  };
+  return dates[name]||dates['Лига чемпионов'];
+}
+
+function ensureSeasonCalendar(){
+  ensureSeasonState();
+  ensureLeagueSeason();
+  state.seasonCalendar=Array.isArray(state.seasonCalendar)?state.seasonCalendar:[];
+  if(state.seasonCalendar.length)return state.seasonCalendar;
+  const start=new Date(`${state.season||2026}-08-01T12:00:00`);
+  const fixtures=[];
+  const lf=state.leagueSeason.fixtures||[];
+  lf.filter(f=>f.home===state.club||f.away===state.club).forEach(f=>{
+    const d=new Date(start);d.setDate(d.getDate()+(f.round-1)*7);
+    fixtures.push({date:d.toISOString().slice(0,10),type:'league',competition:state.league,round:f.round,fixtureId:f.id});
+  });
+  state.seasonCalendar=fixtures.sort((a,b)=>a.date.localeCompare(b.date));
+  state.currentDate=state.currentDate||`${state.season||2026}-08-01`;
+  return state.seasonCalendar;
+}
+
+function rebuildEuropeanCalendar(){
+  ensureSeasonCalendar();
+  state.seasonCalendar=state.seasonCalendar.filter(x=>x.type!=='europe');
+  Object.keys(EUROPEAN_CONFIG).forEach(name=>{
+    const e=state.europe?.[name]; if(!e)return;
+    const dates=europeanStageDates(name);
+    (dates.league||[]).forEach((date,i)=>{
+      state.seasonCalendar.push({date,type:'europe',competition:name,round:i+1,phase:'Лиговая фаза',played:false});
+    });
+    ['playoff','r16','qf','sf','final'].forEach(stage=>{
+      (dates[stage]||[]).forEach((date,i)=>{
+        state.seasonCalendar.push({date,type:'europe',competition:name,round:i+1,phase:stage,played:false});
+      });
+    });
+  });
+  state.seasonCalendar.sort((a,b)=>a.date.localeCompare(b.date));
+}
+function calendarEventTitle(x){
+  if(x.type==='europe')return `🌍 ${x.competition} · ${x.phase==='Лиговая фаза'?'Тур '+x.round:euroStageLabel(x.phase)}`;
+  if(x.type==='cup')return `🏆 Кубок · ${x.phase||'Раунд'}`;
+  return x.competition==='Лига'?'⚽ Чемпионат':(x.competition||'Матч');
+}
+
+function addEuropeanCalendarToSeason(){
+  ensureSeasonCalendar();ensureEuropeanCompetitions();
+  try{
+    const cup=ensureDomesticCup(),f=cup.bracket.find(x=>x.home===state.club||x.away===state.club);
+    if(f)items.push({sort:300+cup.round*10,comp:'Кубок',round:cup.round||1,home:f.home,away:f.away,played:f.played,gf:f.gf,ga:f.ga,type:'cup'});
+  }catch(e){}
+  Object.keys(EUROPEAN_CONFIG).forEach(name=>{
+    const e=state.europe[name];if(!e?.qualified)return;
+    (e.fixtures||[]).filter(f=>f.home===state.club||f.away===state.club).forEach(f=>{
+      const d=new Date(`${state.season||2026}-09-01T12:00:00`);
+      d.setDate(d.getDate()+(f.round-1)*21);
+      const item={date:d.toISOString().slice(0,10),type:'europe',competition:name,round:f.round,fixtureId:f.id,euroName:name};
+      if(!state.seasonCalendar.some(x=>x.type===item.type&&x.competition===item.competition&&x.round===item.round))
+        state.seasonCalendar.push(item);
+    });
+  });
+  state.seasonCalendar.sort((a,b)=>a.date.localeCompare(b.date));
+  saveState();
+}
+function nextCalendarEvent(){
+  ensureSeasonCalendar();addEuropeanCalendarToSeason();
+  return state.seasonCalendar.find(x=>!x.played&&x.date>=state.currentDate)||null;
+}
+function markCalendarPlayed(type,competition,round){
+  ensureSeasonCalendar();
+  state.seasonCalendar.forEach(x=>{
+    if(x.type===type&&x.competition===competition&&x.round===round)x.played=true;
+  });
+}
+function advanceToNextEvent(){
+  ensureSeasonState();ensureSeasonCalendar();addEuropeanCalendarToSeason();
+  const next=state.seasonCalendar.find(x=>!x.played&&x.date>=state.currentDate);
+  if(!next){showToast('Сезон завершён');return}
+  const current=new Date(state.currentDate+'T12:00:00');
+  const target=new Date(next.date+'T12:00:00');
+  const days=Math.max(1,Math.round((target-current)/86400000));
+  for(let i=0;i<days;i++)manageSquadDay();
+  state.currentDate=next.date;
+  state.daysToMatch=0;
+  state.careerDay=(state.careerDay||1)+days;
+  state.lastActivity=`Подготовка: ${next.competition}`;
+  saveState();renderMatchCenter();renderUnifiedCalendar();renderSquadManagement();
+  showToast(`Сегодня ${next.date}: ${next.competition}`);
+}
+function seasonCalendarLabel(item){
+  return `${item.type==='europe'?EUROPEAN_CONFIG[item.competition]?.short:item.competition} · тур ${item.round}`;
+}
+
+function ensureLeagueSeason(){
+  ensureSeasonState();
+  const league=state.league||'Premier League';
+  const teams=(clubLeagues[league]||[]).slice();
+  state.leagueSeason=state.leagueSeason&&state.leagueSeason.league===league?state.leagueSeason:{
+    league,season:state.season||2026,matchday:1,played:{},table:{},fixtures:[]
+  };
+  const ls=state.leagueSeason;
+  teams.forEach(name=>{
+    if(!ls.table[name])ls.table[name]={name,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0,form:[]};
+  });
+  Object.keys(ls.table).forEach(name=>{if(!teams.includes(name))delete ls.table[name]});
+  if(!ls.fixtures.length)generateLeagueFixtures(teams,ls);
+  return ls;
+}
+function teamRatingForLeague(name){
+  const resolved=clubAliases[name]||name;
+  const c=clubs[resolved]||clubs[name];
+  return Number(c?.rating||70);
+}
+function generateLeagueFixtures(teams,ls){
+  const arr=teams.slice();
+  if(arr.length<2)return;
+  if(arr.length%2)arr.push('__BYE__');
+  const n=arr.length, rounds=[];
+  let rotation=arr.slice();
+  for(let r=0;r<n-1;r++){
+    const games=[];
+    for(let i=0;i<n/2;i++){
+      const a=rotation[i],b=rotation[n-1-i];
+      if(a!=='__BYE__'&&b!=='__BYE__'){
+        games.push({home:r%2===0?a:b,away:r%2===0?b:a,played:false,gf:null,ga:null});
+      }
+    }
+    rounds.push(games);
+    rotation=[rotation[0],rotation[n-1],...rotation.slice(1,n-1)];
+  }
+  const second=rounds.map(g=>g.map(x=>({home:x.away,away:x.home,played:false,gf:null,ga:null})));
+  ls.fixtures=[...rounds.flat(),...second.flat()].map((x,i)=>({...x,id:i+1,round:Math.floor(i/(n/2))+1}));
+}
+function simulateLeagueMatch(home,away){
+  const h=teamRatingForLeague(home)+2.2, a=teamRatingForLeague(away);
+  const xh=Math.max(.25,.75+(h-a)*.045), xa=Math.max(.2,.72+(a-h)*.04);
+  const poisson=lambda=>{
+    const L=Math.exp(-lambda);let k=0,pr=L,r=Math.random();
+    while(r>pr&&k<7){k++;pr*=lambda/k}
+    return k;
+  };
+  return [poisson(xh),poisson(xa)];
+}
+function applyLeagueResult(ls,gf,ga,home,away){
+  const h=ls.table[home],a=ls.table[away];
+  if(!h||!a)return;
+  h.p++;a.p++;h.gf+=gf;h.ga+=ga;a.gf+=ga;a.ga+=gf;
+  if(gf>ga){h.w++;h.pts+=3;a.l++;h.form.push('W');a.form.push('L')}
+  else if(gf<ga){a.w++;a.pts+=3;h.l++;h.form.push('L');a.form.push('W')}
+  else{h.d++;a.d++;h.pts++;a.pts++;h.form.push('D');a.form.push('D')}
+  h.form=h.form.slice(-5);a.form=a.form.slice(-5);
+}
+function playNextLeagueRound(){
+  const ls=ensureLeagueSeason();
+  const round=ls.matchday||1;
+  const games=ls.fixtures.filter(f=>f.round===round&&!f.played);
+  if(!games.length){
+    if(round>(ls.fixtures.reduce((m,f)=>Math.max(m,f.round),0)))return false;
+    ls.matchday++;
+    return playNextLeagueRound();
+  }
+  games.forEach(g=>{
+    const [gf,ga]=simulateLeagueMatch(g.home,g.away);
+    g.played=true;g.gf=gf;g.ga=ga;
+    applyLeagueResult(ls,gf,ga,g.home,g.away);
+  });
+  ls.matchday++;
+  saveState();
+  renderLeagueTable();
+  return true;
+}
+function leagueSortedTable(){
+  const ls=ensureLeagueSeason();
+  return Object.values(ls.table).sort((a,b)=>{
+    const gdA=a.gf-a.ga,gdB=b.gf-b.ga;
+    return b.pts-a.pts||gdB-gdA||b.gf-a.gf||teamRatingForLeague(b.name)-teamRatingForLeague(a.name);
+  });
+}
+function renderLeagueTable(){
+  const box=document.getElementById('leagueTableBox');
+  if(!box)return;
+  const rows=leagueSortedTable();
+  const maxRound=Math.max(0,...(ensureLeagueSeason().fixtures||[]).map(f=>f.round));
+  box.innerHTML=`<div class="league-meta">Тур ${Math.min(ensureLeagueSeason().matchday,maxRound+1)-1} из ${maxRound} · ${ensureLeagueSeason().league}</div>
+  <div class="league-table-wrap"><table class="league-table"><thead><tr><th>#</th><th>Команда</th><th>И</th><th>В</th><th>Н</th><th>П</th><th>М</th><th>РМ</th><th>О</th><th>Форма</th></tr></thead>
+  <tbody>${rows.map((r,i)=>`<tr class="${r.name==state.club?'my-team':''}"><td>${i+1}</td><td><b>${r.name}</b></td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf}:${r.ga}</td><td>${r.gf-r.ga}</td><td><b>${r.pts}</b></td><td>${r.form.map(x=>`<span class="form-dot ${x.toLowerCase()}">${x}</span>`).join('')}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
+
+
+function renderSeasonCalendarFull(){
+  const box=document.getElementById('seasonCalendarFull');if(!box)return;
+  ensureSeasonCalendar();
+  rebuildEuropeanCalendar();
+  const now=state.careerDate||`${state.season||2026}-08-01`;
+  const items=state.seasonCalendar.slice().sort((a,b)=>a.date.localeCompare(b.date));
+  const groups={};
+  items.forEach(x=>(groups[x.date]||(groups[x.date]=[])).push(x));
+  const dates=Object.keys(groups).sort();
+  box.innerHTML=dates.map(date=>{
+    const isNext=dates.find(d=>d>=now)===date;
+    return `<div class="calendar-day ${isNext?'next-day':''}">
+      <div class="calendar-date"><b>${new Date(date+'T12:00:00').toLocaleDateString('ru-RU',{day:'2-digit',month:'short'})}</b><span>${date}</span></div>
+      <div class="calendar-events">${groups[date].map(x=>`<div class="calendar-event ${x.played?'played':''}">
+        <span>${calendarEventTitle(x)}</span><small>${x.played?'✓ сыгран':'запланирован'}</small>
+      </div>`).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderSeasonTimeline(){
+  const box=document.getElementById('seasonTimelineBox');if(!box)return;
+  ensureSeasonCalendar();addEuropeanCalendarToSeason();
+  const now=state.currentDate||`${state.season||2026}-08-01`;
+  const items=state.seasonCalendar.filter(x=>x.date>=now).slice(0,18);
+  box.innerHTML=items.map(x=>{
+    const next=x===items[0];
+    return `<div class="timeline-item ${next?'next':''}">
+      <div class="timeline-date"><b>${x.date.slice(5)}</b><small>${x.date}</small></div>
+      <div class="timeline-dot"></div>
+      <div class="timeline-info"><b>${seasonCalendarLabel(x)}</b><small>${x.type==='league'?'Чемпионат':'Еврокубок'}</small></div>
+      ${next?`<button class="primary" onclick="${x.type==='europe'?`startInteractiveMatch('europe',${JSON.stringify(x.euroName)})`:'startInteractiveMatch()'}">▶ Играть</button>`:''}
+    </div>`;
+  }).join('')||'<div class="empty-state">Больше матчей в календаре нет.</div>';
+}
+
+function renderUnifiedCalendar(){
+ const box=document.getElementById('unifiedCalendarBox');if(!box)return;ensureLeagueSeason();ensureEuropeanCompetitions();
+ const items=[];state.leagueSeason.fixtures.filter(f=>f.home===state.club||f.away===state.club).forEach(f=>items.push({sort:f.round*10,comp:state.league,round:f.round,home:f.home,away:f.away,played:f.played,gf:f.gf,ga:f.ga,type:'league'}));
+ Object.keys(EUROPEAN_CONFIG).forEach(name=>{const e=state.europe[name];if(!e.qualified)return;(e.fixtures||[]).filter(f=>f.home===state.club||f.away===state.club).forEach(f=>items.push({sort:1000+f.round*10,comp:EUROPEAN_CONFIG[name].short,round:f.round,home:f.home,away:f.away,played:f.played,gf:f.gf,ga:f.ga,type:'europe',euro:name}))});
+ items.sort((a,b)=>a.sort-b.sort);
+ box.innerHTML=items.map(x=>`<div class="unified-fixture ${x.played?'':'upcoming'}"><span><b>${x.comp}</b><small>Тур ${x.round}</small></span><span>${x.home} — ${x.away}</span><strong>${x.played?x.gf+':'+x.ga:'—'}</strong>${!x.played?`<button class="primary" onclick="${x.type==='europe'?`startInteractiveMatch('europe',${JSON.stringify(x.euro)})`:'startInteractiveMatch()'}">Играть</button>`:''}</div>`).join('')||'<div class="empty-state">Календарь пуст.</div>';
+}
+
+function renderLeagueCalendar(){
+  const box=document.getElementById('leagueCalendarBox');
+  if(!box)return;
+  const ls=ensureLeagueSeason(), maxRound=Math.max(...ls.fixtures.map(f=>f.round));
+  const rounds=[];
+  for(let r=1;r<=maxRound;r++){
+    const games=ls.fixtures.filter(f=>f.round===r);
+    if(games.some(g=>g.home===state.club||g.away===state.club)||r>=Math.max(1,ls.matchday-2)&&r<=ls.matchday+2){
+      rounds.push({r,games});
+    }
+  }
+  box.innerHTML=rounds.map(({r,games})=>`<div class="calendar-round"><b>Тур ${r}</b>${games.map(g=>{
+    const me=g.home===state.club||g.away===state.club;
+    return `<div class="fixture ${me?'my-fixture':''}"><span>${g.home}</span><strong>${g.played?g.gf+' : '+g.ga:'—'}</strong><span>${g.away}</span></div>`;
+  }).join('')}</div>`).join('')||'<div class="empty-state">Календарь появится после выбора клуба.</div>';
+}
+function renderLeagueSeason(){
+  ensureLeagueSeason();renderLeagueTable();renderLeagueCalendar();
+}
+
+function ensureSeasonState(){
+  state.season=Number(state.season||2026);
+  state.matchday=Number(state.matchday||1);
+  state.careerDay=Number(state.careerDay||1);
+  state.daysToMatch=Number.isFinite(Number(state.daysToMatch))?Number(state.daysToMatch):1;
+  state.lastActivity=state.lastActivity||'Начало карьеры';
+  state.playedMatches=Array.isArray(state.playedMatches)?state.playedMatches:[];
+  state.stats=state.stats&&typeof state.stats==='object'?state.stats:{};
+  state.stats.wins=Number(state.stats.wins||0);
+  state.stats.draws=Number(state.stats.draws||0);
+  state.stats.losses=Number(state.stats.losses||0);
+  state.stats.gf=Number(state.stats.gf||0);
+  state.stats.ga=Number(state.stats.ga||0);
+}
+function opponentPool(){
+  const league=state.league;
+  return (clubLeagues[league]||[]).filter(n=>n!==state.club);
+}
+function nextOpponent(){
+  ensureSeasonState();
+  try{
+    const ls=ensureLeagueSeason();
+    const fixture=ls.fixtures.find(f=>!f.played&&f.round===ls.matchday&&(f.home===state.club||f.away===state.club));
+    if(fixture)return fixture.home===state.club?fixture.away:fixture.home;
+  }catch(e){}
+  const pool=opponentPool();
+  if(!pool.length)return 'Соперник';
+  return pool[(state.matchday-1)%pool.length];
+}
+function nextFixture(){
+  try{
+    const ls=ensureLeagueSeason();
+    return ls.fixtures.find(f=>!f.played&&(f.home===state.club||f.away===state.club))||null;
+  }catch(e){return null}
+}
+function teamStrength(){
+  const ps=state.players||[];
+  if(!ps.length)return Number(state.rating||70);
+  const top=ps.slice().sort((a,b)=>b[2]-a[2]).slice(0,11);
+  return Math.round(top.reduce((a,p)=>a+Number(p[2]||60),0)/top.length);
+}
+function opponentStrength(name){
+  const c=clubs[name];
+  return Number(c?.rating||70);
+}
+function simulateScore(home,away){
+  const a=teamStrength(), b=opponentStrength(away);
+  const advantage=home?3:0;
+  const base=Math.max(0.2,(a-b+advantage)/18);
+  const goals=Math.max(0,Math.min(6,Math.floor(Math.random()*2.2+base*.75)));
+  const opp=Math.max(0,Math.min(6,Math.floor(Math.random()*2.1+Math.max(0,(b-a-advantage)/18))));
+  return [goals,opp];
+}
+function applyMatchResult(opponent,home,gf,ga){
+  ensureSeasonState();
+  state.stats.gf+=gf; state.stats.ga+=ga;
+  if(gf>ga)state.stats.wins++; else if(gf===ga)state.stats.draws++; else state.stats.losses++;
+  state.points=Number(state.points||0)+(gf>ga?3:gf===ga?1:0);
+  state.playedMatches.push({
+    season:state.season,matchday:state.matchday,club:state.club,opponent,home,gf,ga,date:`${state.season}/${String(state.matchday).padStart(2,'0')}`
+  });
+  state.matchday++;
+  state.daysToMatch=2;
+  state.careerDay++;
+  state.lastActivity='Матч';
+  try{
+    const ls=ensureLeagueSeason();
+    const playedRound=Math.max(1,ls.matchday);
+    const fixture=ls.fixtures.find(f=>!f.played&&f.round===playedRound&&(f.home===state.club||f.away===state.club));
+    if(fixture){
+      fixture.played=true;
+      fixture.gf=fixture.home===state.club?gf:ga;
+      fixture.ga=fixture.home===state.club?ga:gf;
+      applyLeagueResult(ls,fixture.gf,fixture.ga,fixture.home,fixture.away);
+      ls.matchday=Math.max(ls.matchday,fixture.round+1);
+    }
+  }catch(e){}
+  (state.players||[]).forEach(p=>{
+    const d=devData(p);
+    d.form=Math.max(35,Math.min(100,d.form+(gf>ga?5:gf===ga?0:-5)));
+    d.fitness=Math.max(35,d.fitness-6);
+  });
+  saveState();renderPlayers();renderTraining();updateHome();
+}
+function playNextMatch(){
+  ensureSeasonState();
+  const opponent=nextOpponent();
+  const home=Math.random()>.48;
+  const [gf,ga]=simulateScore(home,opponent);
+  applyMatchResult(opponent,home,gf,ga);
+  renderMatchCenter();
+  showToast(`${home?'Дома':'В гостях'}: ${state.club} ${gf}:${ga} ${opponent}`);
+}
+
+function advanceCareerDay(){
+  ensureSeasonState();
+  if(liveMatch&&!liveMatch.finished){showToast('Сначала завершите матч');return}
+  if(state.daysToMatch>0)state.daysToMatch--;
+  state.careerDay++;
+  manageSquadDay();
+  state.lastActivity='Новый день';
+  (state.players||[]).forEach(p=>{
+    const d=devData(p);
+    d.fitness=Math.min(100,d.fitness+4);
+    d.form=Math.max(35,Math.min(100,d.form+1));
+  });
+  saveState();renderMatchCenter();renderPlayers();renderTraining();
+  showToast(`День ${state.careerDay}: команда восстановилась`);
+}
+function doCareerTraining(type){
+  ensureSeasonState();
+  if(state.daysToMatch<=0){showToast('Матч уже сегодня — лучше не перегружать команду');return}
+  if(type==='team')teamTraining('general');else recoverSquad();
+  state.daysToMatch=Math.max(0,state.daysToMatch-1);
+  state.careerDay++;
+  state.lastActivity=type==='team'?'Командная тренировка':'Восстановление';
+  saveState();renderMatchCenter();
+}
+
+
+function ensurePlayerManagement(){
+  state.playerManagement=state.playerManagement&&typeof state.playerManagement==='object'?state.playerManagement:{};
+  (state.players||[]).forEach(p=>{
+    if(!state.playerManagement[p[0]])state.playerManagement[p[0]]={
+      morale:78,fitness:92,sharpness:70,minutes:0,starts:0,subApps:0,
+      goals:0,assists:0,injuredUntil:0,complaint:0
+    };
+  });
+  return state.playerManagement;
+}
+function playerMgmt(name){
+  ensurePlayerManagement();
+  return state.playerManagement[name]||(state.playerManagement[name]={morale:78,fitness:92,sharpness:70,minutes:0,starts:0,subApps:0,goals:0,assists:0,injuredUntil:0,complaint:0});
+}
+function playerStatusLabel(name){
+  const d=playerMgmt(name);
+  if(d.injuredUntil>0)return `🩹 травма (${d.injuredUntil} дн.)`;
+  if(d.fitness<45)return '😴 сильная усталость';
+  if(d.fitness<65)return '⚠️ устал';
+  if(d.morale<45)return '😠 недоволен';
+  if(d.morale<60)return '😐 мораль снижена';
+  return '✅ готов';
+}
+function playerAvailability(name){
+  const d=playerMgmt(name);
+  return d.injuredUntil<=0&&d.fitness>=35;
+}
+function manageSquadDay(){
+  ensurePlayerManagement();
+  (state.players||[]).forEach(p=>{
+    const d=playerMgmt(p[0]);
+    d.fitness=Math.min(100,d.fitness+5);
+    d.sharpness=Math.max(35,d.sharpness-1);
+    if(d.morale<70)d.morale=Math.min(70,d.morale+1);
+    if(d.injuredUntil>0)d.injuredUntil--;
+    if(d.complaint>0)d.complaint--;
+  });
+}
+function setPlayerMorale(name,delta){
+  const d=playerMgmt(name);
+  d.morale=Math.max(0,Math.min(100,d.morale+delta));
+}
+function playerComplaint(name){
+  const p=findMyPlayer(name),d=playerMgmt(name);
+  if(!p)return '';
+  const role=(state.contracts?.[name]?.role)||'Ротация';
+  if(role==='Ключевой игрок'&&d.starts<3&&d.morale<70)return `${name} хочет больше игрового времени`;
+  if(d.morale<40)return `${name} недоволен своей ситуацией`;
+  if(d.fitness<40)return `${name} нуждается в восстановлении`;
+  return '';
+}
+function renderSquadManagement(){
+  const box=document.getElementById('squadManagementBox');
+  if(!box)return;
+  ensurePlayerManagement();
+  const rows=(state.players||[]).map((p,i)=>{
+    const d=playerMgmt(p[0]);
+    const contract=state.contracts?.[p[0]]||{};
+    return `<div class="squad-row">
+      <div class="squad-main"><b>${p[0]}</b><small>${p[1]} · ⭐${p[2]} · ${playerStatusLabel(p[0])}</small></div>
+      <div class="squad-bars">
+        <span>💪 ${d.fitness}</span><span>🧠 ${d.morale}</span><span>🎯 ${d.sharpness}</span>
+        <span>⏱️ ${d.minutes}'</span><span>⚽ ${d.goals}</span><span>🅰️ ${d.assists}</span>
+      </div>
+      <div class="squad-row-actions">
+        <button class="secondary" onclick="boostPlayerMorale(${JSON.stringify(p[0])})">💬 Поддержать</button>
+        <button class="secondary" onclick="setPlayerRoleModal(${JSON.stringify(p[0])})">🎯 Роль</button>
+      </div>
+      ${playerComplaint(p[0])?`<small class="complaint">⚠️ ${playerComplaint(p[0])}</small>`:''}
+    </div>`;
+  }).join('');
+  box.innerHTML=rows||'<div class="empty-state">В составе пока нет игроков.</div>';
+}
+function boostPlayerMorale(name){
+  setPlayerMorale(name,8);
+  saveState();renderSquadManagement();
+  showToast(`${name}: мораль повышена`);
+}
+function setPlayerRoleModal(name){
+  const p=findMyPlayer(name);if(!p)return;
+  const group=roleGroupForPosition(p[1]);
+  const roles=(TACTICAL_ROLES[group]||[]).map(x=>x[0]);
+  const current=getPlayerRole(name)||roles[0];
+  const role=prompt(`Роль для ${name}:\n${roles.join(', ')}`,current);
+  if(!role||!roles.includes(role))return;
+  setPlayerRole(name,role);
+  renderSquadManagement();
+}
+function prepareXIForMatch(){
+  ensurePlayerManagement();
+  let xi=(state.startingXI||[]).filter(n=>playerAvailability(n));
+  if(xi.length<11){
+    const candidates=(state.players||[]).filter(p=>playerAvailability(p[0])&&!xi.includes(p[0]));
+    xi=xi.concat(candidates.slice(0,11-xi.length).map(p=>p[0]));
+  }
+  state.startingXI=xi.slice(0,11);
+  return state.startingXI;
+}
+
+
+const EUROPEAN_CONFIG={
+  'Лига чемпионов':{short:'ЛЧ',matches:8,top8:8,playoffFrom:9,playoffTo:24,final:'Мюнхен',finalDate:'2027-06-05'},
+  'Лига Европы':{short:'ЛЕ',matches:8,top8:8,playoffFrom:9,playoffTo:24,final:'Франкфурт',finalDate:'2027-05-26'},
+  'Лига конференций':{short:'ЛК',matches:6,top8:8,playoffFrom:9,playoffTo:24,final:'Стамбул',finalDate:'2027-06-02'}
+};
+function euroAllClubs(){
+  const arr=[];
+  Object.values(clubLeagues||{}).forEach(list=>list.forEach(name=>{
+    if(!arr.includes(name))arr.push(name);
+  }));
+  return arr;
+}
+function euroClubRating(name){return teamRatingForLeague(name);}
+function ensureEuropeanCompetitions(){
+  state.europe=state.europe&&typeof state.europe==='object'?state.europe:{};
+  ['Лига чемпионов','Лига Европы','Лига конференций'].forEach(c=>{
+    if(!state.europe[c])state.europe[c]={
+      name:c,status:'inactive',qualified:false,phase:'Не участвует',matchday:0,
+      table:{},fixtures:[],knockouts:[],result:null
+    };
+  });
+  return state.europe;
+}
+function resetEuropeanSeason(){
+  state.europe={};
+  ensureEuropeanCompetitions();
+}
+function europeanQualification(){
+  ensureLeagueSeason();
+  const all=euroAllClubs();
+  const byLeague={};
+  Object.keys(clubLeagues).forEach(l=>{
+    byLeague[l]=leagueSortedTableFor(l);
+  });
+  // Game access list for the five loaded top leagues:
+  // top 4 -> Champions League; 5th -> Europa League; 6th -> Conference League.
+  const qualifiers={cl:[],el:[],ec:[]};
+  Object.values(byLeague).forEach(rows=>{
+    if(rows[0])qualifiers.cl.push(rows[0].name);
+    if(rows[1])qualifiers.cl.push(rows[1].name);
+    if(rows[2])qualifiers.cl.push(rows[2].name);
+    if(rows[3])qualifiers.cl.push(rows[3].name);
+    if(rows[4])qualifiers.el.push(rows[4].name);
+    if(rows[5])qualifiers.ec.push(rows[5].name);
+  });
+  // Fill to 36 with strongest remaining clubs, keeping competitions separate.
+  const ranked=all.slice().sort((a,b)=>euroClubRating(b)-euroClubRating(a));
+  while(qualifiers.cl.length<36){
+    const x=ranked.find(n=>!qualifiers.cl.includes(n));
+    if(!x)break;qualifiers.cl.push(x);
+  }
+  while(qualifiers.el.length<36){
+    const x=ranked.find(n=>!qualifiers.el.includes(n)&&!qualifiers.cl.slice(0,20).includes(n));
+    if(!x)break;qualifiers.el.push(x);
+  }
+  while(qualifiers.ec.length<36){
+    const x=ranked.find(n=>!qualifiers.ec.includes(n)&&!qualifiers.cl.slice(0,20).includes(n)&&!qualifiers.el.slice(0,20).includes(n));
+    if(!x)break;qualifiers.ec.push(x);
+  }
+  // Always guarantee the user's club is in the appropriate competition by table finish.
+  const mine=state.club;
+  const myRow=(leagueSortedTable()||[]).findIndex(x=>x.name===mine);
+  if(myRow>=0){
+    const target=myRow<4?'Лига чемпионов':myRow===4?'Лига Европы':myRow===5?'Лига конференций':null;
+    if(target){
+      const e=state.europe[target];e.qualified=true;e.status='active';e.phase='Лига';
+      if(!e.table[mine])e.table[mine]=newEuroTeam(mine);
+    }
+  }
+  return qualifiers;
+}
+function leagueSortedTableFor(league){
+  const ls=state.leagueSeason;
+  if(ls&&ls.league===league)return leagueSortedTable();
+  const list=clubLeagues[league]||[];
+  return list.map(name=>({name,pts:0,gf:0,ga:0,w:0,d:0,l:0,p:0})).sort((a,b)=>euroClubRating(b.name)-euroClubRating(a.name));
+}
+function newEuroTeam(name){
+  return {name,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0,form:[]};
+}
+function seedEuropeanCompetition(name,clubList){
+  const e=state.europe[name],cfg=EUROPEAN_CONFIG[name];
+  const teams=clubList.slice(0,36);
+  e.status='active';e.qualified=teams.includes(state.club);e.phase='Лига';e.matchday=0;
+  e.table={};e.fixtures=[];
+  teams.forEach(n=>e.table[n]=newEuroTeam(n));
+  // Each club gets cfg.matches opponents, with home/away split. We generate deterministic pairings.
+  const target=Math.min(cfg.matches,teams.length-1);
+  teams.forEach((team,i)=>{
+    for(let k=1;k<=target;k++){
+      const opp=teams[(i+k)%teams.length];
+      if(!opp||opp===team)continue;
+      const home=((i+k)%2===0);
+      e.fixtures.push({id:`${name}-${i}-${k}`,round:k,home:home?team:opp,away:home?opp:team,played:false,gf:null,ga:null});
+    }
+  });
+  // Remove duplicate fixtures and cap each team to target games.
+  const seen=new Set(),out=[];
+  e.fixtures.forEach(f=>{
+    const key=[f.home,f.away].sort().join('|')+'|'+f.round;
+    if(!seen.has(key)){seen.add(key);out.push(f)}
+  });
+  e.fixtures=out.filter(f=>f.round<=cfg.matches);
+}
+function simulateEuropeanMatch(home,away){
+  const h=euroClubRating(home)+2.0,a=euroClubRating(away);
+  const xh=Math.max(.18,.72+(h-a)*.04),xa=Math.max(.15,.68+(a-h)*.035);
+  const poisson=lambda=>{
+    const L=Math.exp(-lambda);let k=0,pr=L,r=Math.random();
+    while(r>pr&&k<7){k++;pr*=lambda/k} return k;
+  };
+  return [poisson(xh),poisson(xa)];
+}
+function applyEuroResult(e,gf,ga,home,away){
+  const h=e.table[home],a=e.table[away];if(!h||!a)return;
+  h.p++;a.p++;h.gf+=gf;h.ga+=ga;a.gf+=ga;a.ga+=gf;
+  if(gf>ga){h.w++;h.pts+=3;a.l++;h.form.push('W');a.form.push('L')}
+  else if(gf<ga){a.w++;a.pts+=3;h.l++;h.form.push('L');a.form.push('W')}
+  else{h.d++;a.d++;h.pts++;a.pts++;h.form.push('D');a.form.push('D')}
+  h.form=h.form.slice(-5);a.form=a.form.slice(-5);
+}
+function euroSorted(name){
+  const e=state.europe[name];
+  return Object.values(e.table).sort((a,b)=>(b.pts-a.pts)||((b.gf-b.ga)-(a.gf-a.ga))||(b.gf-a.gf)||euroClubRating(b.name)-euroClubRating(a.name));
+}
+function playEuropeanMatch(name,fixture){
+  const e=state.europe[name];
+  const [gf,ga]=simulateEuropeanMatch(fixture.home,fixture.away);
+  fixture.played=true;fixture.gf=gf;fixture.ga=ga;
+  applyEuroResult(e,gf,ga,fixture.home,fixture.away);
+}
+function simulateEuropeanRound(name){
+  const e=state.europe[name],cfg=EUROPEAN_CONFIG[name];
+  if(!e||!e.qualified){showToast('Этот турнир тебе пока недоступен');return}
+  const round=e.matchday+1;
+  const games=e.fixtures.filter(f=>f.round===round&&!f.played);
+  games.forEach(f=>{
+    if(f.home===state.club||f.away===state.club)return;
+    playEuropeanMatch(name,f);
+  });
+  const mine=e.fixtures.find(f=>!f.played&&f.round===round&&(f.home===state.club||f.away===state.club));
+  if(mine){
+    showToast(`Твой матч ${name}: ${mine.home} — ${mine.away}`);
+    return;
+  }
+  e.matchday=round;
+  if(round>=cfg.matches)prepareEuropeanKnockout(name);
+  saveState();renderEuropean();
+}
+function playMyEuropeanMatch(name){startInteractiveMatch('europe',name)}
+function prepareEuropeanKnockout(name){
+  const e=state.europe[name],rows=euroSorted(name),cfg=EUROPEAN_CONFIG[name];
+  const top8=rows.slice(0,8),play=rows.slice(8,24);
+  e.phase=top8.some(x=>x.name===state.club)?'1/8 финала':play.some(x=>x.name===state.club)?'Стыковые матчи':'Завершено';
+  e.knockouts=[];
+  // Playoff pairings: 9-16 vs 17-24.
+  for(let i=0;i<8;i++){
+    const a=play[i],b=play[15-i];
+    if(a&&b)e.knockouts.push({stage:'Плей-офф',home:a.name,away:b.name,leg:1,played:false,gf:null,ga:null});
+  }
+  // Direct top-8 round of 16 placeholder; actual opponents depend on playoff winners.
+  e.knockoutTop8=top8.map(x=>x.name);
+}
+
+function makeEuroTies(teams,stage){
+  const out=[];for(let i=0;i<teams.length;i+=2)if(teams[i+1])out.push({stage,a:teams[i],b:teams[i+1],played:false,ga:null,gb:null});return out;
+}
+function advanceEuropeanPhase(name){
+  const e=state.europe[name],cfg=EUROPEAN_CONFIG[name];if(!e||!e.qualified)return;
+  if(e.phase==='Лига'&&e.matchday>=cfg.matches){
+    const idx=euroSorted(name).findIndex(x=>x.name===state.club);
+    if(idx<8)e.phase='1/8 финала';else if(idx<24)e.phase='Стыки';else{e.phase='Вылет';e.status='eliminated';return}
+    const rows=euroSorted(name).slice(0,24).map(x=>x.name);
+    if(e.phase==='Стыки')e.bracket=makeEuroTies(rows.slice(8,24),'Стыки');
+    else e.bracket=makeEuroTies(rows.slice(0,8).concat(rows.slice(8,24).filter((_,i)=>i%2===0)),'1/8 финала');
+  }
+}
+function playEuropeanStage(name){
+  const e=state.europe[name];if(!e||!e.qualified)return showToast('Турнир недоступен');
+  if(e.phase==='Стыки'||e.phase==='1/8 финала'||e.phase==='1/4 финала'||e.phase==='1/2 финала'||e.phase==='Финал'){
+    const winners=[];
+    (e.bracket||[]).forEach(t=>{if(t.done){winners.push(t.winner);return}const r1=simulateEuropeanMatch(t.a,t.b),r2=simulateEuropeanMatch(t.b,t.a);const aa=r1[0]+r2[1],bb=r1[1]+r2[0];t.ga=aa;t.gb=bb;t.winner=aa===bb?(Math.random()<.5?t.a:t.b):(aa>bb?t.a:t.b);t.done=true;winners.push(t.winner)});
+    const my=winners.includes(state.club);
+    if(!my){e.phase='Вылет';e.status='eliminated';saveState();renderEuropean();return}
+    if(e.phase==='Стыки')e.phase='1/8 финала';
+    else if(e.phase==='1/8 финала')e.phase='1/4 финала';
+    else if(e.phase==='1/4 финала')e.phase='1/2 финала';
+    else if(e.phase==='1/2 финала')e.phase='Финал';
+    else {e.phase='Завершено';e.status='finished';e.result=state.club;const prize={'Лига чемпионов':140,'Лига Европы':40,'Лига конференций':15}[name]||10;state.money=(state.money||0)+prize;state.europeanPrize=(state.europeanPrize||0)+prize;state.clubCoefficient=(state.clubCoefficient||0)+({'Лига чемпионов':6,'Лига Европы':4,'Лига конференций':3}[name]||2);showToast(`🏆 ${name} выигран! +€${prize}M`);saveState();renderEuropean();return}
+    const pool=winners.filter(x=>x!==state.club);const teams=[state.club,...pool];e.bracket=makeEuroTies(teams,e.phase);saveState();renderEuropean();
+  }
+}
+
+function playEuropeanKnockoutRound(name){
+  const e=state.europe[name];
+  if(!e||e.phase==='Завершено'){showToast('Нет доступной стадии');return}
+  if(e.phase==='Стыковые матчи'||e.phase==='1/8 финала'){
+    const rows=euroSorted(name).slice(0,24);
+    // Resolve a simplified two-leg bracket, keeping user involvement explicit.
+    const pairings=[];
+    for(let i=0;i<8;i++){
+      const a=rows[8+i],b=rows[23-i];
+      if(a&&b)pairings.push([a.name,b.name]);
+    }
+    const winners=pairings.map(([a,b])=>{
+      const r1=simulateEuropeanMatch(a,b),r2=simulateEuropeanMatch(b,a);
+      const totalA=r1[0]+r2[1],totalB=r1[1]+r2[0];
+      return totalA>=totalB?a:b;
+    });
+    const top=euroSorted(name).slice(0,8).map(x=>x.name);
+    const r16=[...top,...winners].slice(0,16);
+    const next=[];
+    for(let i=0;i<8;i++){
+      if(r16[i*2]&&r16[i*2+1])next.push({stage:'1/8 финала',home:r16[i*2],away:r16[i*2+1],played:false});
+    }
+    e.knockouts=next;
+    e.phase='1/8 финала';
+    if(!next.some(x=>x.home===state.club||x.away===state.club)){
+      e.phase='Завершено';
+    }
+  }else if(e.phase==='1/8 финала'){
+    // This branch is intentionally retained for later rounds.
+  }
+  saveState();renderEuropean();
+}
+function qualifyEuropeanForSeason(){
+  ensureEuropeanCompetitions();
+  const q=europeanQualification();
+  seedEuropeanCompetition('Лига чемпионов',q.cl);
+  seedEuropeanCompetition('Лига Европы',q.el);
+  seedEuropeanCompetition('Лига конференций',q.ec);
+  ['Лига чемпионов','Лига Европы','Лига конференций'].forEach(n=>drawEuropeanLeague(n));
+  addEuropeanCalendarToSeason();
+  saveState();renderEuropean();
+  renderEuroTournamentCenter();renderSeasonTimeline();
+  renderSeasonCalendarFull();
+}
+
+
+function europeanStageReward(name,stage){
+  const rewards={
+    'Лига чемпионов':{league:2,playoff:5,r16:11,qf:12,sf:15,final:25,winner:30},
+    'Лига Европы':{league:0.9,playoff:2.5,r16:5,qf:6,sf:7,final:15,winner:20},
+    'Лига конференций':{league:0.4,playoff:1,r16:2,qf:3,sf:4,final:8,winner:12}
+  };
+  return rewards[name]?.[stage]||0;
+}
+function addEuropeanPrize(name,stage){
+  const amount=europeanStageReward(name,stage);
+  if(amount){state.money=(state.money||0)+amount;state.clubCoefficient=(state.clubCoefficient||0)+({league:.25,playoff:.5,r16:1,qf:1.5,sf:2,final:3,winner:4}[stage]||0);return amount}
+  return 0;
+}
+function ensureEuropeanKnockout(name){
+  const e=state.europe[name];if(!e)return;
+  if(!e.knockout)e.knockout={stage:'playoff',ties:[],winner:null};
+  return e.knockout;
+}
+
+
+function ensureEuroKnockoutEngine(){
+  if(!state.europe)return;
+  Object.keys(EUROPEAN_CONFIG).forEach(name=>{
+    const e=state.europe[name];
+    if(!e)return;
+    if(!e.knockout)e.knockout={stage:'playoff',ties:[],winner:null,history:[]};
+    if(!e.knockout.history)e.knockout.history=[];
+  });
+}
+function euroStageOrder(name){
+  const cfg=EUROPEAN_CONFIG[name];
+  return cfg&&cfg.matches===6?['playoff','r16','qf','sf','final']:['playoff','r16','qf','sf','final'];
+}
+function euroStageLabel(stage){
+  return {playoff:'Плей-офф',r16:'1/8 финала',qf:'1/4 финала',sf:'1/2 финала',final:'Финал'}[stage]||stage;
+}
+function euroTieWinner(t){
+  const a=(t.leg1?.gf||0)+(t.leg2?.gf||0);
+  const b=(t.leg1?.ga||0)+(t.leg2?.ga||0);
+  if(a!==b)return a>b?t.home:t.away;
+  return t.penaltyWinner||null;
+}
+function createEuroTies(name,stage,teams){
+  const e=state.europe[name];if(!e)return [];
+  const list=(teams||[]).slice().sort(()=>Math.random()-.5);
+  const ties=[];
+  for(let i=0;i<list.length;i+=2){
+    if(!list[i+1])break;
+    ties.push({id:`${name}-${stage}-${Date.now()}-${i}`,stage,home:list[i],away:list[i+1],
+      leg1:{home:list[i],away:list[i+1],played:false,gf:null,ga:null},
+      leg2:{home:list[i+1],away:list[i],played:false,gf:null,ga:null},
+      penaltyWinner:null,winner:null});
+  }
+  e.knockout.ties=ties;
+  e.knockout.stage=stage;
+  return ties;
+}
+function ensureEuroKnockoutRound(name){
+  ensureEuroKnockoutEngine();
+  const e=state.europe[name];if(!e)return null;
+  const k=e.knockout;
+  if(k.ties&&k.ties.length)return k.ties;
+  const sorted=Object.keys(e.table||{}).sort((a,b)=>{
+    const A=e.table[a]||{},B=e.table[b]||{};
+    return (B.pts||0)-(A.pts||0);
+  });
+  let teams=[];
+  if(k.stage==='playoff')teams=sorted.slice(8,24);
+  else if(k.stage==='r16')teams=sorted.slice(0,8);
+  else teams=(k.history?.[k.history.length-1]?.winners||[]).slice();
+  if(teams.length<2)return [];
+  return createEuroTies(name,k.stage,teams);
+}
+function simulateEuroLeg(name,tie,leg){
+  if(leg.played)return;
+  const home=leg.home,away=leg.away;
+  let [gf,ga]=simulateEuropeanMatch(home,away);
+  leg.gf=gf;leg.ga=ga;leg.played=true;
+  const e=state.europe[name];
+  const isMine=home===state.club||away===state.club;
+  if(!isMine){
+    // keep simulated result only
+  }
+  return {gf,ga};
+}
+function playEuroKnockoutMatch(name,tieId,legNo){
+  const e=state.europe[name],k=e?.knockout;
+  const tie=k?.ties?.find(t=>t.id===tieId);
+  if(!tie)return;
+  const leg=legNo===1?tie.leg1:tie.leg2;
+  if(leg.played){showToast('Этот матч уже сыгран');return}
+  if(leg.home===state.club||leg.away===state.club){
+    startInteractiveMatch('euro',name,{knockout:true,tieId,legNo});
+  }else{
+    simulateEuroLeg(name,tie,leg);
+    resolveEuroTie(name,tie);
+    saveState();renderEuroTournamentCenter();
+  }
+}
+function resolveEuroTie(name,tie){
+  if(!tie.leg1.played||!tie.leg2.played)return null;
+  let a=(tie.leg1.gf||0)+(tie.leg2.ga||0);
+  let b=(tie.leg1.ga||0)+(tie.leg2.gf||0);
+  if(a>b)tie.winner=tie.home;
+  else if(b>a)tie.winner=tie.away;
+  else{
+    tie.penaltyWinner=Math.random()<.5?tie.home:tie.away;
+    tie.winner=tie.penaltyWinner;
+  }
+  return tie.winner;
+}
+function advanceEuroKnockout(name){
+  const e=state.europe[name],k=e?.knockout;if(!k)return;
+  k.ties.forEach(t=>resolveEuroTie(name,t));
+  const winners=k.ties.map(t=>t.winner).filter(Boolean);
+  if(winners.length<=1){
+    k.winner=winners[0]||null;
+    if(k.winner===state.club){
+      const amount=addEuropeanPrize(name,k.stage==='final'?'winner':'final');
+      showToast(`🏆 ${name}: победа! +${amount||0} млн`);
+    }
+    return;
+  }
+  const order=euroStageOrder(name),idx=order.indexOf(k.stage);
+  const next=order[idx+1];
+  k.history.push({stage:k.stage,winners:winners.slice()});
+  k.ties=[];
+  k.stage=next;
+  createEuroTies(name,next,winners);
+  if(next==='final'&&winners.length>2){
+    // Reduce to two finalists in the unlikely case of an incomplete bracket.
+    k.ties=createEuroTies(name,next,winners.slice(0,2));
+  }
+  saveState();renderEuroTournamentCenter();
+}
+function simulateAllEuroKnockout(name){
+  const e=state.europe[name],k=e?.knockout;if(!k)return;
+  ensureEuroKnockoutRound(name);
+  k.ties.forEach(t=>{
+    if(!t.leg1.played)simulateEuroLeg(name,t,t.leg1);
+    if(!t.leg2.played)simulateEuroLeg(name,t,t.leg2);
+    resolveEuroTie(name,t);
+  });
+  advanceEuroKnockout(name);
+}
+function renderEuroKnockout(name){
+  const e=state.europe?.[name],k=e?.knockout;
+  if(!k)return '<div class="empty-state">Плей-офф ещё не сформирован.</div>';
+  ensureEuroKnockoutRound(name);
+  let html=`<div class="knockout-head"><b>${euroStageLabel(k.stage)}</b><button class="secondary" onclick="simulateAllEuroKnockout('${name.replace(/'/g,"\\'")}')">⏩ Симулировать раунд</button></div>`;
+  html+='<div class="knockout-grid">';
+  k.ties.forEach((t,i)=>{
+    const mine=t.home===state.club||t.away===state.club;
+    html+=`<div class="knockout-tie">
+      <div class="tie-title">Пара ${i+1}</div>
+      <div class="tie-team ${t.winner===t.home?'winner':''}">${t.home}</div>
+      <div class="tie-leg"><span>1-й матч</span><b>${t.leg1.played?t.leg1.gf+' : '+t.leg1.ga:'—'}</b>${!t.leg1.played&&mine?`<button onclick="playEuroKnockoutMatch('${name.replace(/'/g,"\\'")}','${t.id}',1)">▶</button>`:''}</div>
+      <div class="tie-team ${t.winner===t.away?'winner':''}">${t.away}</div>
+      <div class="tie-leg"><span>2-й матч</span><b>${t.leg2.played?t.leg2.gf+' : '+t.leg2.ga:'—'}</b>${!t.leg2.played&&mine?`<button onclick="playEuroKnockoutMatch('${name.replace(/'/g,"\\'")}','${t.id}',2)">▶</button>`:''}</div>
+      ${t.winner?`<div class="tie-winner">✓ ${t.winner}</div>`:''}
+    </div>`;
+  });
+  html+='</div>';
+  return html;
+}
+
+function renderEuroTournamentCenter(){
+  const box=document.getElementById('euroTournamentCenter');
+  if(!box||!state.europe)return;
+  const names=Object.keys(EUROPEAN_CONFIG);
+  let html='<div class="euro-tabs">';
+  names.forEach((n,i)=>html+=`<button class="${i===0?'active':''}" onclick="showEuroTournament('${n.replace(/'/g,"\\'")}')">${EUROPEAN_CONFIG[n].short}</button>`);
+  html+='</div><div id="euroTournamentBody"></div>';
+  box.innerHTML=html;
+  showEuroTournament(names[0]);
+}
+function showEuroTournament(name){
+  const body=document.getElementById('euroTournamentBody');if(!body)return;
+  const e=state.europe[name];
+  if(!e){body.innerHTML='<div class="empty-state">Турнир ещё не сформирован.</div>';return}
+  const teams=Object.keys(e.table||{}).sort((a,b)=>(e.table[b]?.pts||0)-(e.table[a]?.pts||0));
+  const meIndex=teams.indexOf(state.club);
+  const phase=(e.phase||'Лиговая фаза');
+  let html=`<div class="euro-headline"><b>${name}</b><span>${phase}</span></div>`;
+  if(e.draw?.length){
+    html+=`<div class="draw-box"><div class="draw-title">🎲 Жеребьёвка</div><div class="draw-grid">`;
+    const mine=e.draw.filter(x=>x.team===state.club).slice(0,8);
+    (mine.length?mine:e.draw.slice(0,8)).forEach(x=>{
+      html+=`<div class="draw-pair"><span>${x.team===state.club?x.opponent:x.team}</span><small>${x.home?'Дома':'В гостях'}</small></div>`;
+    });
+    html+='</div></div>';
+  }
+  if(teams.length){
+    html+=`<div class="euro-table-wrap"><div class="draw-title">📊 Лиговая таблица</div><table class="euro-mini-table"><thead><tr><th>#</th><th>Клуб</th><th>О</th><th>В</th><th>Н</th><th>П</th><th>О</th></tr></thead><tbody>`;
+    teams.slice(0,36).forEach((t,i)=>{
+      const r=e.table[t]||{};
+      const cls=t===state.club?' me':'';
+      html+=`<tr class="${cls}"><td>${i+1}</td><td>${t}</td><td>${r.played||0}</td><td>${r.wins||0}</td><td>${r.draws||0}</td><td>${r.losses||0}</td><td><b>${r.pts||0}</b></td></tr>`;
+    });
+    html+='</tbody></table></div>';
+    const top8=teams.slice(0,8), playoff=teams.slice(8,24);
+    html+=`<div class="qualification-zones">
+      <div><b>🥇 1–8</b><span>Прямой выход в 1/8</span></div>
+      <div><b>🟡 9–24</b><span>Плей-офф</span></div>
+      <div><b>🔴 25–36</b><span>Вылет</span></div>
+    </div>`;
+    if(meIndex>=0){
+      html+=`<div class="my-euro-path"><strong>Твой путь</strong><div class="path-line">
+        <span class="${meIndex<8?'on':''}">Лига</span><i>→</i><span class="${meIndex<24?'on':''}">Плей-офф</span><i>→</i><span>1/8</span><i>→</i><span>1/4</span><i>→</i><span>1/2</span><i>→</i><span>Финал</span>
+      </div></div>`;
+    }
+  }
+  body.innerHTML=html;
+}
+
+function renderEuropean(){
+  const box=document.getElementById('europeanBox');if(!box)return;
+  ensureEuropeanCompetitions();
+  const cards=Object.keys(EUROPEAN_CONFIG).map(name=>{
+    const e=state.europe[name],cfg=EUROPEAN_CONFIG[name];
+    const rows=euroSorted(name).slice(0,36);
+    const mine=e.qualified;
+    const fixture=e.fixtures.find(f=>!f.played&&f.round===e.matchday+1&&(f.home===state.club||f.away===state.club));
+    return `<div class="euro-card">
+      <div class="euro-head"><div><h3>${name}</h3><small>${e.phase} · ${e.matchday}/${cfg.matches} туров</small></div><b>${mine?'Участвуете':'—'}</b></div>
+      ${mine&&fixture?`<div class="euro-next"><span>${fixture.home}</span><strong>VS</strong><span>${fixture.away}</span><button class="primary" onclick="playMyEuropeanMatch(${JSON.stringify(name)})">▶ Играть</button></div>`:''}
+      <div class="euro-actions">${mine?`<button class="secondary" onclick="simulateEuropeanRound(${JSON.stringify(name)})">⏩ Симулировать тур</button>`:''}</div>
+      <div class="euro-table">${rows.map((r,i)=>`<div class="euro-row ${r.name===state.club?'mine':''}"><span>${i+1}</span><b>${r.name}</b><span>${r.p}</span><span>${r.gf}:${r.ga}</span><strong>${r.pts}</strong></div>`).join('')}</div>
+    </div>`;
+  }).join('');
+  box.innerHTML=cards+`<div class="euro-note">Формат основан на действующей модели UEFA: 36 клубов в единой лиге; места 1–8 напрямую в 1/8, 9–24 — в стыки, 25–36 выбывают. В ЛЧ и ЛЕ по 8 матчей лиговой фазы, в ЛК — 6.</div>`;
+}
+
+function ensureTransferWindow(){
+  state.transferWindow=state.transferWindow||{
+    open:true,daysLeft:21,scouted:{},offers:[],incoming:[],outgoing:[]
+  };
+  return state.transferWindow;
+}
+function marketPlayerPool(){
+  const pool=[];
+  Object.keys(clubs||{}).forEach(cn=>{
+    const c=clubs[cn];
+    (c.players||[]).forEach(p=>{
+      if(!findMyPlayer(p[0]))pool.push({name:p[0],pos:p[1],ov:Number(p[2])||70,nat:p[3]||'',club:cn});
+    });
+  });
+  return pool;
+}
+function marketPlayerValue(p){
+  const age=(getPlayerMeta(p)?.age||24);
+  const ageFactor=age<21?1.18:age>30?.78:1;
+  return Math.max(0.8,Math.round((0.9+(p.ov-65)*0.42)*ageFactor*10)/10);
+}
+function scoutMarketPlayer(name){
+  const w=ensureTransferWindow();
+  const p=marketPlayerPool().find(x=>x.name===name);
+  if(!p)return;
+  w.scouted[name]=true;
+  saveState();renderTransferMarket();
+  showToast(`Скаутинг завершён: ${name}`);
+}
+function makeMarketOffer(name){
+  const w=ensureTransferWindow();
+  const p=marketPlayerPool().find(x=>x.name===name);
+  if(!p)return;
+  const value=marketPlayerValue(p);
+  const wage=Math.max(8,Math.round((p.ov-60)*2.2));
+  const fee=Number(prompt(`Предложение за ${p.name}\nОриентировочная стоимость: €${value}M\nВведите сумму трансфера (€M):`,value.toFixed(1)));
+  if(!Number.isFinite(fee)||fee<=0)return;
+  if(fee>Number(state.money||0)){showToast('Недостаточно средств на трансфер');return}
+  const chance=Math.max(.12,Math.min(.95,.35+(fee/value-.8)*.42+(Number(state.rating||70)-p.ov)*.008));
+  const accepted=Math.random()<chance;
+  if(!accepted){
+    showToast(`${p.club} отклонил предложение`);
+    w.outgoing.push({player:p.name,club:p.club,fee,status:'Отклонено'});
+    saveState();renderTransferMarket();return;
+  }
+  const requestedWage=Number(prompt(`Зарплата для ${p.name} (€тыс./нед.):`,wage));
+  if(!Number.isFinite(requestedWage)||requestedWage<0)return;
+  const maxWage=Math.max(10,Number(state.wageBudget||500));
+  if(requestedWage>maxWage){showToast('Зарплатный фонд не позволяет оформить контракт');return}
+  if(!Array.isArray(state.players))state.players=[];
+  state.money=Math.max(0,Number(state.money||0)-fee);
+  state.wageBudget=Math.max(0,maxWage-requestedWage);
+  state.players.push([p.name,p.pos,p.ov,p.nat,'👤',Math.min(99,p.ov+6)]);
+  state.contracts=state.contracts||{};
+  state.contracts[p.name]={wage:requestedWage,expiry:(state.season||2026)+4,role:'Ротация'};
+  w.outgoing.push({player:p.name,club:p.club,fee,status:'Подписан'});
+  saveState();renderTransferMarket();renderPlayers();
+  showToast(`${p.name} подписал контракт!`);
+}
+function progressTransferWindow(){
+  const w=ensureTransferWindow();
+  if(w.daysLeft<=0){w.open=false;showToast('Трансферное окно закрыто');return}
+  w.daysLeft--;
+  // Other clubs occasionally buy a market player, shrinking availability.
+  if(Math.random()<.18){
+    const pool=marketPlayerPool();
+    if(pool.length){
+      const p=pool[Math.floor(Math.random()*pool.length)];
+      w.incoming.push({player:p.name,club:p.club,status:'Другой клуб проявил интерес'});
+    }
+  }
+  saveState();renderTransferMarket();
+}
+function renderTransferMarket(){
+  const box=document.getElementById('transferMarketBox');
+  if(!box)return;
+  const w=ensureTransferWindow();
+  const q=(document.getElementById('marketSearch')?.value||'').trim().toLowerCase();
+  const pos=(document.getElementById('marketPos')?.value||'').trim();
+  let pool=marketPlayerPool().filter(p=>(!q||p.name.toLowerCase().includes(q)||p.club.toLowerCase().includes(q))&&(!pos||p.pos===pos));
+  pool.sort((a,b)=>b.ov-a.ov);
+  pool=pool.slice(0,80);
+  box.innerHTML=`
+    <div class="market-toolbar">
+      <input id="marketSearch" placeholder="Поиск игрока или клуба" value="${q}" oninput="renderTransferMarket()">
+      <select id="marketPos" onchange="renderTransferMarket()"><option value="">Все позиции</option><option value="GK">GK</option><option value="DEF">DEF</option><option value="MID">MID</option><option value="ST">ST</option><option value="LW">LW</option><option value="RW">RW</option></select>
+    </div>
+    <div class="window-status">Трансферное окно: <b>${w.open?'ОТКРЫТО':'ЗАКРЫТО'}</b> · осталось <b>${w.daysLeft}</b> дн. · бюджет <b>€${Number(state.money||0).toFixed(1)}M</b></div>
+    <div class="market-list">${pool.map(p=>{
+      const sc=!!w.scouted[p.name],value=marketPlayerValue(p);
+      return `<div class="market-row"><div><b>${p.name}</b><small>${p.club} · ${p.pos} · ⭐${p.ov}${sc?` · 💶 €${value}M · ${getPlayerMeta(p)?.age||24} лет`:''}</small></div>
+      <div class="market-actions">${sc?`<button class="secondary" onclick="makeMarketOffer(${JSON.stringify(p.name)})">Предложить</button>`:`<button class="secondary" onclick="scoutMarketPlayer(${JSON.stringify(p.name)})">🔎 Скаут</button>`}</div></div>`;
+    }).join('')||'<div class="empty-state">Игроки не найдены.</div>'}</div>
+    <div class="market-history">${w.outgoing.slice(-8).reverse().map(x=>`<div>${x.player} · ${x.club} · €${x.fee}M · <b>${x.status}</b></div>`).join('')}</div>`;
+  const sel=document.getElementById('marketPos');if(sel)sel.value=pos;
+}
+
+function openCareerMarket(){
+  navigate('market');
+  showToast('Трансферный рынок открыт');
+
+  renderTransferMarket();}
+function resetCareerSeason(){
+  if(!confirm('Начать сезон заново? Текущий прогресс чемпионата будет сброшен.'))return;
+  const league=state.league, club=state.club;
+  state.leagueSeason=null;
+  state.seasonCalendar=[];
+  state.matchday=1;state.careerDay=1;state.daysToMatch=1;
+  state.playedMatches=[];state.points=0;
+  state.stats={wins:0,draws:0,losses:0,gf:0,ga:0};
+  ensureLeagueSeason();
+  saveState();renderMatchCenter();renderLeagueSeason();
+  showToast('Новый сезон начат');
+}
+
+function renderMatchCenter(){
+  const page=document.getElementById('calendar')||document.getElementById('matches');
+  if(!page)return;
+  ensureSeasonState();ensureLeagueSeason();
+  const fixture=nextFixture();
+  const opponent=fixture?(fixture.home===state.club?fixture.away:fixture.home):'Сезон завершён';
+  const home=fixture?fixture.home===state.club:true;
+  const history=state.playedMatches.slice().reverse().slice(0,12);
+  const ls=state.leagueSeason;
+  const row=ls.table[state.club]||{pts:0,p:0,w:0,d:0,l:0,gf:0,ga:0};
+  page.innerHTML=`
+    <div class="section-title"><h2>Карьера</h2><span>День ${state.careerDay}</span></div>
+    <div class="career-strip">
+      <div><small>Сезон</small><b>${state.season}/${String(state.season+1).slice(-2)}</b></div>
+      <div><small>Тур</small><b>${fixture?ls.matchday:'—'}</b></div>
+      <div><small>Очки</small><b>${row.pts}</b></div>
+      <div><small>Место</small><b>${leagueSortedTable().findIndex(x=>x.name===state.club)+1}</b></div>
+    </div>
+    <div class="match-card next-match-card">
+      <div class="match-head"><span>Следующий матч</span><span>${fixture?(home?'🏠 Дома':'✈️ В гостях'):'🏁'}</span></div>
+      ${fixture?`<div class="match-teams">
+        <div class="match-team"><b>${home?state.club:opponent}</b><small>${home?'Ваша команда':'Соперник'}</small></div>
+        <div class="match-score">VS</div>
+        <div class="match-team"><b>${home?opponent:state.club}</b><small>${home?'Соперник':'Ваша команда'}</small></div>
+      </div>
+      <div class="next-match-note">${state.daysToMatch>0?`До матча: <b>${state.daysToMatch} дн.</b>`:'Матч сегодня'}</div>
+      <div class="match-actions">
+        ${state.daysToMatch>0?`<button class="secondary" onclick="advanceCareerDay()">☀️ Следующий день</button>`:''}
+        ${state.daysToMatch>0?`<button class="secondary" onclick="doCareerTraining('team')">🏋️ Тренировка</button>`:`<button class="primary" onclick="startInteractiveMatch()">▶️ Начать матч</button>`}
+        <button class="secondary" onclick="doCareerTraining('recovery')">🛌 Восстановление</button>
+      </div>`:
+      `<div class="empty-state">Все матчи чемпионата сыграны.</div>
+       <div class="match-actions"><button class="primary" onclick="resetCareerSeason()">🔄 Новый сезон</button></div>`}
+    </div>
+    <div class="match-card">
+      <div class="section-title"><h3>Быстрые действия</h3></div>
+      <div class="match-actions">
+        <button class="secondary" onclick="navigate('market')">💰 Трансферы</button>
+        <button class="secondary" onclick="navigate('players')">👥 Состав</button>
+        <button class="secondary" onclick="navigate('tactics')">🧠 Тактика</button>
+        <button class="secondary" onclick="navigate('training')">🏋️ Тренировки</button>
+      </div>
+    </div>
+    <div class="match-card">
+      <div class="section-title"><h3>Сезонная статистика</h3></div>
+      <div class="stat-pills">
+        <span class="stat-pill">🏆 ${state.stats.wins} побед</span>
+        <span class="stat-pill">🤝 ${state.stats.draws} ничьих</span>
+        <span class="stat-pill">❌ ${state.stats.losses} поражений</span>
+        <span class="stat-pill">⚽ ${state.stats.gf}:${state.stats.ga}</span>
+        <span class="stat-pill">⭐ ${row.pts} очков</span>
+      </div>
+    </div>
+    <div class="match-card"><div class="section-title"><h3>Последние матчи</h3></div>
+      ${history.map(m=>`<div class="history-row"><span>${m.home?m.club:m.opponent} — ${m.home?m.opponent:m.club}</span><span>${m.gf}:${m.ga} · тур ${m.matchday}</span></div>`).join('')||'<div class="empty">Матчей пока нет.</div>'}
+    </div>`;
+}
+
+function ensureDevelopmentState(){
+  state.playerDev=state.playerDev&&typeof state.playerDev==='object'?state.playerDev:{};
+}
+function devData(p){
+  ensureDevelopmentState();
+  const n=p[0];
+  if(!state.playerDev[n]){
+    state.playerDev[n]={form:75,fitness:82,training:0,lastType:'—'};
+  }
+  return state.playerDev[n];
+}
+function trainingCost(type){
+  return type==='attack'?0.18:type==='defense'?0.16:type==='passing'?0.14:type==='fitness'?0.10:0.12;
+}
+function trainPlayer(name,type){
+  const p=findMyPlayer(name); if(!p)return;
+  const d=devData(p), m=getPlayerMeta(p);
+  if(Number(state.money||0)<trainingCost(type)){showToast('Недостаточно денег на тренировку');return}
+  const labels={attack:'Атака',defense:'Защита',passing:'Пасы',fitness:'Физика',general:'Общая'};
+  state.money=Number(state.money||0)-trainingCost(type);
+  d.training++;
+  d.lastType=labels[type]||'Общая';
+  d.fitness=Math.min(100,d.fitness+(type==='fitness'?7:3));
+  d.form=Math.min(100,d.form+(type==='general'?6:4));
+  // Development is limited by potential.
+  const potential=Number(p[5]||p[2]);
+  const chance=(potential-p[2])>0 ? .55 : .16;
+  if(Math.random()<chance && p[2]<potential){
+    p[2]=Math.min(potential,p[2]+1);
+    addManagerNotice(`${name}: рейтинг вырос до ${p[2]} после тренировки.`);
+  }
+  saveState(); renderPlayers(); updateHome(); showToast(`${name}: тренировка «${d.lastType}» завершена`);
+}
+function teamTraining(type){
+  const players=state.players||[];
+  if(!players.length){showToast('В составе пока нет игроков');return}
+  const cost=players.length*trainingCost(type)*.35;
+  if(Number(state.money||0)<cost){showToast('Недостаточно денег на командную тренировку');return}
+  state.money=Number(state.money||0)-cost;
+  players.forEach(p=>{
+    const d=devData(p);
+    d.training++; d.lastType=type==='fitness'?'Физика':type==='passing'?'Пасы':type==='attack'?'Атака':'Командная';
+    d.fitness=Math.min(100,d.fitness+3); d.form=Math.min(100,d.form+2);
+    if(Math.random()<.08 && p[2]<p[5])p[2]++;
+  });
+  saveState();renderPlayers();updateHome();showToast('Командная тренировка завершена');
+}
+function recoverSquad(){
+  const cost=Math.max(.2,(state.players||[]).length*.015);
+  if(Number(state.money||0)<cost){showToast('Недостаточно денег');return}
+  state.money-=cost;
+  (state.players||[]).forEach(p=>{const d=devData(p);d.fitness=Math.min(100,d.fitness+10);d.form=Math.min(100,d.form+4)});
+  saveState();renderPlayers();updateHome();showToast('Команда восстановлена');
+}
+function renderTraining(){
+  const page=document.getElementById('training'); if(!page)return;
+  ensureDevelopmentState();
+  const players=state.players||[];
+  page.innerHTML=`
+    <div class="section-title"><h2>Тренировки</h2><span>${players.length} игроков</span></div>
+    <div class="squad-actions">
+      <button class="primary" onclick="teamTraining('general')">🏋️ Командная</button>
+      <button class="secondary" onclick="teamTraining('fitness')">⚡ Физика</button>
+      <button class="secondary" onclick="recoverSquad()">❤️ Восстановить</button>
+    </div>
+    <div class="training-grid">
+      ${players.map(p=>{
+        const d=devData(p), potential=p[5]||p[2];
+        const color=d.form<40?'#ff6b6b':d.form<65?'#ffb454':'#63d59a';
+        return `<div class="training-card">
+          <b>${p[4]||'⚽'} ${p[0]}</b>
+          <span>${p[1]} · ⭐ ${p[2]}/${potential} · ${getPlayerMeta(p).age} лет</span>
+          <div class="form-line"><span>Форма</span><b>${d.form}%</b></div>
+          <div class="form-bar" style="color:${color}"><div class="form-fill" style="width:${d.form}%"></div></div>
+          <div class="stat-pills"><span class="stat-pill">⚡ ${d.fitness}</span><span class="stat-pill">📈 ${d.training} тренировок</span></div>
+          <div class="squad-actions">
+            <button class="secondary player-action-btn" onclick="trainPlayer(${JSON.stringify(p[0])},'attack')">⚽ Атака</button>
+            <button class="secondary player-action-btn" onclick="trainPlayer(${JSON.stringify(p[0])},'defense')">🛡️ Защита</button>
+            <button class="secondary player-action-btn" onclick="trainPlayer(${JSON.stringify(p[0])},'passing')">🎯 Пасы</button>
+          </div>
+        </div>`;
+      }).join('') || '<div class="empty">Добавь игроков в состав, чтобы начать тренировки.</div>'}
+    </div>`;
+}
+
+function ensureContractState(){
+  state.contracts=state.contracts&&typeof state.contracts==='object'?state.contracts:{};
+  state.notifications=Array.isArray(state.notifications)?state.notifications:[];
+}
+function contractData(player){
+  ensureContractState();
+  const m=getPlayerMeta(player);
+  const name=player[0];
+  if(!state.contracts[name]){
+    state.contracts[name]={
+      until:Number(m.contract||2029),
+      wage:Number(m.salary||0.1),
+      morale:70,
+      role:player[2]>=86?'Ключевой игрок':player[2]>=80?'Ротация':'Перспектива'
+    };
+  }
+  return state.contracts[name];
+}
+function addManagerNotice(text){
+  ensureContractState();
+  state.notifications.unshift({text,day:state.day||1});
+  state.notifications=state.notifications.slice(0,30);
+}
+function renewPlayerContract(name){
+  const p=findMyPlayer(name); if(!p)return;
+  const c=contractData(p), m=getPlayerMeta(p);
+  const requested=Math.max(c.wage*1.08,(m.salary||c.wage)*1.05);
+  const years=3;
+  if(!confirm(`${name} просит €${requested.toFixed(2)}M/год. Продлить на ${years} года?`))return;
+  c.wage=Number(requested.toFixed(2)); c.until=(state.season||2026)+years;
+  c.morale=Math.min(100,c.morale+12);
+  state.wageBudget=Math.max(0,Number(state.wageBudget||12)-(c.wage-(m.salary||0)));
+  addManagerNotice(`${name}: контракт продлён до ${c.until}`);
+  saveState(); renderPlayers(); renderTransfers(); updateHome();
+  showToast(`Контракт ${name} продлён`);
+}
+function setPlayerRole(name,role){
+  const p=findMyPlayer(name); if(!p)return;
+  const c=contractData(p); c.role=role;
+  c.morale=Math.min(100,c.morale+(role==='Ключевой игрок'?8:role==='Ротация'?3:-2));
+  saveState(); renderPlayers(); showToast(`${name}: роль — ${role}`);
+}
+function negotiateWage(name){
+  const p=findMyPlayer(name); if(!p)return;
+  const c=contractData(p), m=getPlayerMeta(p);
+  const newWage=Number(prompt(`Новая зарплата для ${name} (€M/год):`,(c.wage*1.1).toFixed(2)));
+  if(!Number.isFinite(newWage)||newWage<=0)return;
+  if(newWage>Number(state.wageBudget||12)){showToast('Не хватает зарплатного фонда');return}
+  c.wage=Number(newWage.toFixed(2));
+  c.morale=Math.min(100,c.morale+5);
+  saveState(); renderPlayers(); updateHome(); showToast(`Зарплата изменена: €${c.wage.toFixed(2)}M/год`);
+}
+function contractActions(name){
+  const p=findMyPlayer(name); if(!p)return;
+  const c=contractData(p), m=getPlayerMeta(p);
+  const modal=document.getElementById('transferModal');
+  const body=document.getElementById('transferModalBody');
+  transferTarget={careerPlayer:p};
+  document.getElementById('transferModalTitle').textContent='Контракт игрока';
+  const morale=Math.max(0,Math.min(100,c.morale));
+  body.innerHTML=`
+    <div class="transfer-summary">
+      <b>${p[0]}</b><br>${p[1]} · ⭐${p[2]} · ${m.age} лет<br>
+      Роль: <b>${c.role}</b><br>Зарплата: <b>€${c.wage.toFixed(2)}M/год</b><br>
+      Контракт до: <b>${c.until}</b>
+      <div>Настроение: ${morale}/100</div>
+      <div class="morale-bar"><div class="morale-fill" style="width:${morale}%"></div></div>
+    </div>
+    <div class="squad-actions">
+      <button class="primary" onclick="renewPlayerContract(${JSON.stringify(p[0])});closeTransferModal()">📄 Продлить</button>
+      <button class="secondary" onclick="negotiateWage(${JSON.stringify(p[0])});closeTransferModal()">💶 Зарплата</button>
+      <button class="secondary" onclick="setPlayerRole(${JSON.stringify(p[0])},'Ключевой игрок');closeTransferModal()">⭐ Ключевой</button>
+      <button class="secondary" onclick="setPlayerRole(${JSON.stringify(p[0])},'Ротация');closeTransferModal()">🔄 Ротация</button>
+    </div>`;
+  modal.classList.add('show');modal.setAttribute('aria-hidden','false');
+}
+function processContractWarnings(){
+  ensureContractState();
+  const year=Number(state.season||2026);
+  (state.players||[]).forEach(p=>{
+    const c=contractData(p);
+    if(c.until-year<=1 && !c.warned){
+      c.warned=true;
+      addManagerNotice(`${p[0]}: контракт заканчивается после сезона ${c.until}.`);
+    }
+  });
+}
+
+function ensureCareerTransferState(){
+  state.wageBudget=Number(state.wageBudget??12);
+  state.transferHistory=Array.isArray(state.transferHistory)?state.transferHistory:[];
+  state.loans=Array.isArray(state.loans)?state.loans:[];
+}
+function findMyPlayer(name){
+  return (state.players||[]).find(p=>p[0]===name);
+}
+function sellMyPlayer(name){
+  ensureCareerTransferState();
+ensureTacticalState();
+ensureSeasonState();
+ensureDevelopmentState();
+ensureContractState();
+processContractWarnings();
+  const idx=(state.players||[]).findIndex(p=>p[0]===name);
+  if(idx<0)return;
+  const p=state.players[idx], m=getPlayerMeta(p);
+  const fee=Math.max(.3,Math.round((m.value||1)*.92*10)/10);
+  if(!confirm(`Продать ${name} за €${fee.toFixed(1)}M?`))return;
+  state.players.splice(idx,1);
+  state.money=Number(state.money||0)+fee;
+  state.transferHistory.unshift({type:'sale',player:name,from:state.club,to:'Рынок',fee,season:state.season||1});
+  saveState(); renderPlayers(); renderTransfers(); updateHome();
+  showToast(`${name} продан за €${fee.toFixed(1)}M`);
+}
+function loanMyPlayer(name){
+  ensureCareerTransferState();
+  const p=findMyPlayer(name);
+  if(!p){showToast('Игрок не найден');return}
+  const m=getPlayerMeta(p);
+  const fee=Math.max(.1,Math.round((m.value||1)*.08*10)/10);
+  state.money=Number(state.money||0)+fee;
+  state.loans.push({player:name,until:(state.season||1)+1,fee});
+  state.transferHistory.unshift({type:'loan-out',player:name,from:state.club,to:'Аренда',fee,season:state.season||1});
+  saveState(); updateHome(); renderPlayers();
+  showToast(`${name} отдан в аренду за €${fee.toFixed(1)}M`);
+}
+function openPlayerActions(name){
+  const p=findMyPlayer(name);
+  if(!p)return;
+  const m=getPlayerMeta(p);
+  const modal=document.getElementById('transferModal');
+  const body=document.getElementById('transferModalBody');
+  transferTarget={careerPlayer:p};
+  document.getElementById('transferModalTitle').textContent='Действия с игроком';
+  body.innerHTML=`
+    <div class="transfer-summary"><b>${p[0]}</b><button class="secondary player-action-btn" type="button" onclick="openPlayerActions(${JSON.stringify(p[0])})">⚙️ Действия</button><button class="secondary player-action-btn" type="button" onclick="contractActions(${JSON.stringify(p[0])})">📄 Контракт</button><br>${p[1]} · ⭐${p[2]} · ${m.age} лет<br>Стоимость: <b>${playerValueText(m.value)}</b><br>Зарплата: €${m.salary.toFixed(2)}M/год</div>
+    <div class="squad-actions">
+      <button class="primary" onclick="sellMyPlayer(${JSON.stringify(name)});closeTransferModal()">💰 Продать</button>
+      <button class="secondary" onclick="loanMyPlayer(${JSON.stringify(name)});closeTransferModal()">↔️ В аренду</button>
+    </div>`;
+  modal.classList.add('show');modal.setAttribute('aria-hidden','false');
+}
+
+function allTransferPlayers(){
+  const out=[];
+  Object.entries(clubs||{}).forEach(([club,c])=>{
+    if(!c || !Array.isArray(c.players)) return;
+    c.players.forEach(p=>{
+      if(!p || !p[0]) return;
+      const m=getPlayerMeta(p);
+      out.push({club,name:p[0],player:p,meta:m});
+    });
+  });
+  return out;
+}
+function transferSearchText(){
+  const input=document.getElementById('transferSearch');
+  return (input?.value||'').trim().toLowerCase();
+}
+function transferPlayerCard(x){
+  const [name,pos,ov,nat,icon,pot]=x.player;
+  const value=x.meta.value||1;
+  const ask=Math.max(value,Math.round(value*1.18*10)/10);
+  return `<div class="transfer-row">
+    <div class="transfer-main">
+      <b>${icon||'⚽'} ${name}</b>
+      <span>${x.club} · ${pos} · ⭐ ${ov} · ${x.meta.age} лет · ${playerValueText(value)} · потенциал ${pot}</span>
+      <span>💶 Зарплата: €${x.meta.salary.toFixed(2)}M/год · контракт до ${x.meta.contract}</span>
+    </div>
+    <div class="transfer-actions">
+      <span class="transfer-badge">€${ask}M</span>
+      <button class="primary" type="button" onclick="openTransferNegotiation(${JSON.stringify(name)})">Переговоры</button>
+    </div>
+  </div>`;
+}
+function renderTransfers(){
+  const page=document.getElementById('transfers');
+  if(!page)return;
+  const players=allTransferPlayers(); const q=transferSearchText();
+  const filtered=players.filter(x=>(x.name+' '+x.club+' '+x.player[1]).toLowerCase().includes(q));
+  const visible=filtered.slice(0,80); const money=Number(state.money||0); const wage=Number(state.wageBudget||12);
+  page.innerHTML=`<div class="section-title"><h2>Трансферы</h2><span>${filtered.length} игроков</span></div>
+  <div class="transfer-budget"><span>💰 Бюджет: <b>€${money.toFixed(1)}M</b></span><span>💶 Зарплатный фонд: <b>€${wage.toFixed(2)}M/год</b></span></div>
+  <div class="transfer-toolbar"><input id="transferSearch" class="input" placeholder="Поиск игрока, клуба или позиции..." value="${q}" oninput="renderTransfers()"></div>
+  <div class="transfer-list">${visible.length?visible.map(transferPlayerCard).join(''):'<div class="empty">Игроки не найдены.</div>'}</div>
+  <div class="transfer-history"><div class="section-title"><h3>История</h3></div>
+  ${(state.transferHistory||[]).slice(0,12).map(h=>`<div class="history-row"><span>${h.type==='sale'?'💰 Продажа':h.type==='loan-out'?'↔️ Аренда':'✅ Трансфер'} · ${h.player}</span><span>€${Number(h.fee||0).toFixed(1)}M</span></div>`).join('')||'<div class="empty">Трансферов пока нет.</div>'}</div>`;
+}
+function openTransferNegotiation(name){
+  const x=allTransferPlayers().find(v=>v.name===name);
+  if(!x)return;
+  transferTarget=x;
+  const m=x.meta, value=Number(m.value||1), ask=Math.round(value*1.18*10)/10;
+  const modal=document.getElementById('transferModal');
+  const body=document.getElementById('transferModalBody');
+  document.getElementById('transferModalTitle').textContent='Переговоры о трансфере';
+  body.innerHTML=`
+    <div class="transfer-summary">
+      <b>${x.name}</b><br>
+      ${x.club} · ${x.player[1]} · ⭐ ${x.player[2]}<br>
+      Возраст: ${m.age} · Потенциал: ${x.player[5]}<br>
+      Рыночная стоимость: <b>€${value.toFixed(1)}M</b><br>
+      Запрашиваемая цена: <b>€${ask.toFixed(1)}M</b>
+    </div>
+    <label>Ваше предложение, €M</label>
+    <input id="transferOffer" class="input" type="number" min="0.1" step="0.1" value="${ask.toFixed(1)}">
+    <label>Зарплата игрока, €M/год</label>
+    <input id="transferWage" class="input" type="number" min="0.05" step="0.05" value="${m.salary.toFixed(2)}">`;
+  modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+}
+function closeTransferModal(){
+  const modal=document.getElementById('transferModal');
+  if(modal){modal.classList.remove('show');modal.setAttribute('aria-hidden','true')}
+  transferTarget=null;
+}
+function confirmTransfer(){
+  if(!transferTarget)return;
+  if(transferTarget.careerPlayer){closeTransferModal();return;}
+  const offer=Number(document.getElementById('transferOffer')?.value||0);
+  const wage=Number(document.getElementById('transferWage')?.value||0);
+  const m=transferTarget.meta, ask=Number(m.value||1)*1.12;
+  if(offer<=0 || wage<=0){showToast('Укажи сумму и зарплату');return}
+  if(offer>Number(state.money||0)){showToast('Недостаточно денег в бюджете');return}
+  if(offer<ask){showToast('Клуб отклонил предложение. Попробуй повысить сумму.');return}
+  if(wage>Number(state.wageBudget||12)){showToast('Не хватает места в зарплатном фонде');return}
+
+  // Clone player into user's squad. The selling club's database remains intact;
+  // this is a local career simulation, so the player is removed only from the career.
+  const p=JSON.parse(JSON.stringify(transferTarget.player));
+  const oldClub=transferTarget.club;
+  state.players=Array.isArray(state.players)?state.players:[];
+  if(state.players.some(v=>v[0]===p[0])){showToast('Этот игрок уже в твоём составе');return}
+  state.players.push(p);
+  state.money=Math.max(0,Number(state.money||0)-offer);
+  state.wageBudget=Math.max(0,Number(state.wageBudget||12)-wage);
+  state.transferHistory=Array.isArray(state.transferHistory)?state.transferHistory:[];
+  state.transferHistory.unshift({player:p[0],from:oldClub,to:state.club,fee:offer,wage,season:state.season||1});
+  saveState();
+  closeTransferModal();
+  renderTransfers();
+  renderPlayers();
+  updateHome();
+  showToast(`${p[0]} подписан за €${offer.toFixed(1)}M`);
+}
+
 function changeClub(){
   if(confirm('Сменить клуб? Текущий прогресс этой карьеры будет заменён новой карьерой.')){
     localStorage.removeItem('fm_state');
@@ -636,7 +2623,8 @@ function changeClub(){
     document.querySelectorAll('main.page').forEach(x=>x.classList.add('hidden'));
     document.getElementById('appContent').classList.add('hidden');
     document.getElementById('clubSelect').classList.remove('hidden');
-    renderClubChoices();
+    ensureCareerTransferState();
+renderClubChoices();
     window.scrollTo({top:0,behavior:'smooth'});
   }
 }
@@ -651,7 +2639,7 @@ function initCareer(){
    renderClubChoices();
  }
 }
-const initialState={
+const initialState={wageBudget:12,transferHistory:[],
  club:'Rizvan FC',country:'🇷🇺',league:'Премьер-лига',money:4.2,rating:64,place:8,wins:3,draws:2,losses:6,played:11,season:1,round:12,
  tactic:'counter',
  players:[
@@ -795,6 +2783,8 @@ function advanceMatch(){
  matchSession.minute=Math.min(90,matchSession.minute+step);
  const opRating=60+((state.round*7)%13);
  const teamStrength=state.rating+(matchSession.style==='counter'?3:matchSession.style==='press'?4:matchSession.style==='possession'?2:-1);
+  const tactical=calculateTacticalImpact();
+  teamStrength += (tactical.attack+tactical.control+tactical.press+tactical.defense-4*tactical.quality)*0.04;
  const fatigue=state.players.reduce((a,p)=>a+p[5],0)/state.players.length;
  const attackChance=Math.max(.05,Math.min(.32,.12+(teamStrength-opRating)*.012+(fatigue-75)*.001));
  const eventRoll=Math.random();
@@ -917,5 +2907,17 @@ function showToast(text){
 renderClubChoices();
 updateHome();renderPlayers();renderMarket();renderLeague();renderFixtures();
 </script>
+
+<div id="transferModal" class="transfer-modal" aria-hidden="true">
+  <div class="transfer-box">
+    <h3 id="transferModalTitle">Переговоры</h3>
+    <div id="transferModalBody"></div>
+    <div class="transfer-actions">
+      <button class="secondary" type="button" onclick="closeTransferModal()">Отмена</button>
+      <button class="primary" type="button" onclick="confirmTransfer()">Сделать предложение</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
