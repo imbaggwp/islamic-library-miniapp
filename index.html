@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0b0d10">
+
 <title>Football Hub</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -26,6 +27,7 @@
     --green: #35c77a;
     --red: #ff4d5f;
     --yellow: #f6c945;
+    --blue: #4e9cff;
     --nav: rgba(15,17,21,.94);
 }
 
@@ -53,7 +55,9 @@ body {
 }
 
 button,
-input {
+input,
+textarea,
+select {
     font-family: inherit;
 }
 
@@ -89,6 +93,7 @@ button {
         opacity: 0;
         transform: translateY(4px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -213,6 +218,73 @@ button {
     color: var(--muted);
     font-size: 13px;
     margin: 0;
+}
+
+/* BANNER */
+
+.content-banner {
+    margin-top: 12px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--card);
+}
+
+.content-banner img {
+    width: 100%;
+    display: block;
+    max-height: 210px;
+    object-fit: cover;
+}
+
+.banner-body {
+    padding: 13px;
+}
+
+.banner-body strong {
+    display: block;
+    font-size: 14px;
+}
+
+.banner-body span {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+/* NEWS */
+
+.news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.news-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    padding: 14px;
+}
+
+.news-card strong {
+    display: block;
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.news-card p {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.news-date {
+    margin-top: 8px;
+    color: var(--accent);
+    font-size: 9px;
 }
 
 /* LIVE */
@@ -411,7 +483,31 @@ button {
     color: var(--yellow);
 }
 
-/* DATE SELECTOR */
+.stream-mini {
+    margin-top: 11px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stream-mini span {
+    color: var(--red);
+    font-size: 10px;
+    font-weight: 750;
+}
+
+.stream-mini button {
+    background: rgba(255,107,53,.1);
+    color: var(--accent2);
+    padding: 7px 10px;
+    border-radius: 9px;
+    font-size: 10px;
+    font-weight: 750;
+}
+
+/* DATE */
 
 .date-scroller {
     display: flex;
@@ -620,7 +716,7 @@ button {
     font-size: 9px;
 }
 
-/* TEAM PAGE */
+/* TEAM */
 
 .back-btn {
     display: inline-flex;
@@ -684,8 +780,6 @@ button {
     font-weight: 700;
 }
 
-/* FORM */
-
 .form-row {
     display: flex;
     gap: 5px;
@@ -730,7 +824,7 @@ button {
 .table-head,
 .table-row {
     display: grid;
-    grid-template-columns: 30px minmax(0,1fr) repeat(5, 30px);
+    grid-template-columns: 30px minmax(0,1fr) repeat(5,30px);
     gap: 3px;
     align-items: center;
     padding: 10px 11px;
@@ -874,7 +968,6 @@ button {
 /* EVENTS */
 
 .events {
-    position: relative;
     margin-top: 15px;
 }
 
@@ -896,16 +989,12 @@ button {
     font-weight: 650;
 }
 
-.event.right {
-    text-align: right;
-}
-
 .event-icon {
     text-align: center;
     font-size: 16px;
 }
 
-/* STATISTICS */
+/* STATS */
 
 .stats-list {
     display: flex;
@@ -1010,6 +1099,168 @@ button {
     font-weight: 650;
 }
 
+/* ADMIN */
+
+.admin-login-card,
+.admin-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 16px;
+}
+
+.admin-tabs {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-bottom: 14px;
+}
+
+.admin-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.admin-tab {
+    flex: 0 0 auto;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 9px 12px;
+    border-radius: 11px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.admin-tab.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    display: block;
+    color: var(--muted);
+    font-size: 10px;
+    margin-bottom: 6px;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+    width: 100%;
+    border: 1px solid var(--border);
+    outline: 0;
+    background: var(--card2);
+    color: var(--text);
+    border-radius: 12px;
+    padding: 11px 12px;
+    font-size: 12px;
+}
+
+.form-textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+    border-color: rgba(255,107,53,.45);
+}
+
+.admin-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 13px;
+}
+
+.admin-actions button {
+    flex: 1;
+}
+
+.admin-stream-list,
+.admin-news-list,
+.admin-banner-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 13px;
+}
+
+.admin-item {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 12px;
+}
+
+.admin-item-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.admin-item-title {
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.admin-item-sub {
+    color: var(--muted);
+    font-size: 9px;
+    margin-top: 4px;
+    word-break: break-all;
+}
+
+.admin-item-actions {
+    display: flex;
+    gap: 5px;
+    margin-top: 9px;
+}
+
+.small-btn {
+    background: rgba(255,255,255,.05);
+    border: 1px solid var(--border);
+    padding: 7px 9px;
+    border-radius: 9px;
+    font-size: 9px;
+}
+
+.small-btn.danger {
+    color: var(--red);
+}
+
+.admin-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--muted);
+    font-size: 10px;
+    margin-bottom: 12px;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+}
+
+.logout-btn {
+    background: rgba(255,77,95,.08);
+    color: var(--red);
+    border: 1px solid rgba(255,77,95,.12);
+    padding: 9px 12px;
+    border-radius: 11px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
 /* EMPTY */
 
 .empty {
@@ -1058,7 +1309,7 @@ button {
     }
 }
 
-/* BOTTOM NAV */
+/* NAV */
 
 .bottom-nav {
     position: fixed;
@@ -1135,6 +1386,7 @@ button {
     from {
         transform: translateY(100%);
     }
+
     to {
         transform: translateY(0);
     }
@@ -1168,8 +1420,6 @@ button {
     color: var(--muted);
     font-size: 17px;
 }
-
-/* SEARCH MODAL */
 
 .search-modal {
     align-items: flex-start;
@@ -1207,9 +1457,8 @@ button {
     transform: translateX(-50%) translateY(0);
 }
 
-/* RESPONSIVE */
-
 @media (max-width: 390px) {
+
     .page {
         padding-left: 12px;
         padding-right: 12px;
@@ -1227,6 +1476,7 @@ button {
         width: 57px;
         height: 57px;
     }
+
 }
 </style>
 </head>
@@ -1235,196 +1485,807 @@ button {
 
 <div class="app">
 
-    <!-- HOME -->
-    <main id="page-home" class="page active">
+<!-- =====================================================
+     HOME
+===================================================== -->
 
-        <header class="header">
-            <div class="header-left">
-                <h1>Football Hub</h1>
-                <p id="home-date">Сегодня</p>
-            </div>
+<main id="page-home" class="page active">
 
-            <div class="header-actions">
-                <button class="icon-btn" onclick="openSearch()">⌕</button>
-                <button class="icon-btn" onclick="showPage('profile')">☻</button>
-            </div>
-        </header>
+    <header class="header">
 
-        <section class="hero">
-            <div class="hero-label">
-                <span>⚡</span>
-                <span>FOOTBALL CENTER</span>
-            </div>
+        <div class="header-left">
+            <h1>Football Hub</h1>
+            <p id="home-date">Сегодня</p>
+        </div>
 
-            <h2>Весь футбол<br>в одном месте</h2>
-            <p>Матчи, результаты, команды и турниры.</p>
-        </section>
-
-        <section class="section">
-            <div class="section-title">
-                <h2>🔴 Сейчас играют</h2>
-                <button onclick="showPage('live')">Все LIVE</button>
-            </div>
-
-            <div id="home-live"></div>
-        </section>
-
-        <section class="section">
-            <div class="section-title">
-                <h2>Сегодня</h2>
-                <button onclick="showPage('matches')">Все матчи</button>
-            </div>
-
-            <div id="home-matches" class="match-list"></div>
-        </section>
-
-        <section class="section">
-            <div class="section-title">
-                <h2>Популярные турниры</h2>
-                <button onclick="showPage('leagues')">Все</button>
-            </div>
-
-            <div id="home-leagues" class="grid"></div>
-        </section>
-
-    </main>
-
-
-    <!-- MATCHES -->
-    <main id="page-matches" class="page">
-
-        <header class="header">
-            <div class="header-left">
-                <h1>Матчи</h1>
-                <p>Расписание и результаты</p>
-            </div>
-
+        <div class="header-actions">
             <button class="icon-btn" onclick="openSearch()">⌕</button>
-        </header>
+            <button class="icon-btn" onclick="showPage('profile')">☻</button>
+        </div>
 
-        <div id="date-selector" class="date-scroller"></div>
-
-        <section class="section">
-            <div id="matches-list" class="match-list"></div>
-        </section>
-
-    </main>
+    </header>
 
 
-    <!-- LIVE -->
-    <main id="page-live" class="page">
+    <section class="hero">
 
-        <header class="header">
-            <div class="header-left">
-                <h1>LIVE</h1>
-                <p>Матчи прямо сейчас</p>
+        <div class="hero-label">
+            <span>⚡</span>
+            <span>FOOTBALL CENTER</span>
+        </div>
+
+        <h2>
+            Весь футбол<br>
+            в одном месте
+        </h2>
+
+        <p>
+            Матчи, результаты, команды и турниры.
+        </p>
+
+    </section>
+
+
+    <div id="home-banners"></div>
+
+
+    <section class="section">
+
+        <div class="section-title">
+            <h2>🔴 Сейчас играют</h2>
+            <button onclick="showPage('live')">
+                Все LIVE
+            </button>
+        </div>
+
+        <div id="home-live"></div>
+
+    </section>
+
+
+    <section class="section">
+
+        <div class="section-title">
+            <h2>Сегодня</h2>
+            <button onclick="showPage('matches')">
+                Все матчи
+            </button>
+        </div>
+
+        <div id="home-matches" class="match-list"></div>
+
+    </section>
+
+
+    <section class="section">
+
+        <div class="section-title">
+            <h2>Популярные турниры</h2>
+            <button onclick="showPage('leagues')">
+                Все
+            </button>
+        </div>
+
+        <div id="home-leagues" class="grid"></div>
+
+    </section>
+
+
+    <section class="section">
+
+        <div class="section-title">
+            <h2>📰 Новости</h2>
+        </div>
+
+        <div id="home-news" class="news-list"></div>
+
+    </section>
+
+</main>
+
+
+<!-- =====================================================
+     MATCHES
+===================================================== -->
+
+<main id="page-matches" class="page">
+
+    <header class="header">
+
+        <div class="header-left">
+            <h1>Матчи</h1>
+            <p>Расписание и результаты</p>
+        </div>
+
+        <button class="icon-btn" onclick="openSearch()">⌕</button>
+
+    </header>
+
+    <div id="date-selector" class="date-scroller"></div>
+
+    <section class="section">
+        <div id="matches-list" class="match-list"></div>
+    </section>
+
+</main>
+
+
+<!-- =====================================================
+     LIVE
+===================================================== -->
+
+<main id="page-live" class="page">
+
+    <header class="header">
+
+        <div class="header-left">
+            <h1>LIVE</h1>
+            <p>Матчи прямо сейчас</p>
+        </div>
+
+        <button class="icon-btn" onclick="loadLivePage()">↻</button>
+
+    </header>
+
+    <div id="live-page-list"></div>
+
+</main>
+
+
+<!-- =====================================================
+     LEAGUES
+===================================================== -->
+
+<main id="page-leagues" class="page">
+
+    <header class="header">
+
+        <div class="header-left">
+            <h1>Турниры</h1>
+            <p>Главные футбольные чемпионаты</p>
+        </div>
+
+    </header>
+
+    <div id="league-list" class="grid"></div>
+
+</main>
+
+
+<!-- =====================================================
+     PROFILE
+===================================================== -->
+
+<main id="page-profile" class="page">
+
+    <header class="header">
+
+        <div class="header-left">
+            <h1>Профиль</h1>
+            <p>Твои футбольные предпочтения</p>
+        </div>
+
+    </header>
+
+
+    <div class="profile-card">
+
+        <div class="profile-avatar">
+            ⚽
+        </div>
+
+        <h2 id="profile-name">
+            Football Fan
+        </h2>
+
+        <p>
+            Добро пожаловать в Football Hub
+        </p>
+
+
+        <div class="profile-stat">
+
+            <div class="stat-box">
+                <strong id="favorite-count">0</strong>
+                <span>Избранных</span>
             </div>
 
-            <button class="icon-btn" onclick="loadLivePage()">↻</button>
-        </header>
-
-        <div id="live-page-list"></div>
-
-    </main>
-
-
-    <!-- LEAGUES -->
-    <main id="page-leagues" class="page">
-
-        <header class="header">
-            <div class="header-left">
-                <h1>Турниры</h1>
-                <p>Главные футбольные чемпионаты</p>
+            <div class="stat-box">
+                <strong id="cache-count">0</strong>
+                <span>Кэшей</span>
             </div>
-        </header>
 
-        <div id="league-list" class="grid"></div>
-
-    </main>
-
-
-    <!-- PROFILE -->
-    <main id="page-profile" class="page">
-
-        <header class="header">
-            <div class="header-left">
-                <h1>Профиль</h1>
-                <p>Твои футбольные предпочтения</p>
-            </div>
-        </header>
-
-        <div class="profile-card">
-
-            <div class="profile-avatar">⚽</div>
-
-            <h2 id="profile-name">Football Fan</h2>
-            <p>Добро пожаловать в Football Hub</p>
-
-            <div class="profile-stat">
-                <div class="stat-box">
-                    <strong id="favorite-count">0</strong>
-                    <span>Избранных</span>
-                </div>
-
-                <div class="stat-box">
-                    <strong id="cache-count">0</strong>
-                    <span>Кэшей</span>
-                </div>
-
-                <div class="stat-box">
-                    <strong>v2</strong>
-                    <span>Версия</span>
-                </div>
+            <div class="stat-box">
+                <strong>2.0</strong>
+                <span>Версия</span>
             </div>
 
         </div>
 
-        <section class="section">
+    </div>
+
+
+    <section class="section">
+
+        <div class="section-title">
+            <h2>⭐ Избранные команды</h2>
+        </div>
+
+        <div id="favorite-teams"></div>
+
+    </section>
+
+
+    <section class="section">
+
+        <button
+            class="secondary-btn"
+            style="width:100%;"
+            onclick="openAdmin()"
+        >
+            ⚙️ Админка
+        </button>
+
+    </section>
+
+</main>
+
+
+<!-- =====================================================
+     TEAM
+===================================================== -->
+
+<main id="page-team" class="page">
+
+    <button class="back-btn" onclick="goBack()">
+        ‹ Назад
+    </button>
+
+    <div id="team-content"></div>
+
+</main>
+
+
+<!-- =====================================================
+     MATCH
+===================================================== -->
+
+<main id="page-match" class="page">
+
+    <button class="back-btn" onclick="goBack()">
+        ‹ Назад
+    </button>
+
+    <div id="match-content"></div>
+
+</main>
+
+
+<!-- =====================================================
+     ADMIN
+===================================================== -->
+
+<main id="page-admin" class="page">
+
+    <button class="back-btn" onclick="goBack()">
+        ‹ Назад
+    </button>
+
+
+    <header class="header">
+
+        <div class="header-left">
+            <h1>Админка</h1>
+            <p>Управление Football Hub</p>
+        </div>
+
+    </header>
+
+
+    <!-- LOGIN -->
+
+    <div id="admin-login">
+
+        <div class="admin-login-card">
 
             <div class="section-title">
-                <h2>⭐ Избранные команды</h2>
+                <h2>🔐 Вход</h2>
             </div>
 
-            <div id="favorite-teams"></div>
 
-        </section>
+            <div class="form-group">
 
-    </main>
+                <label>
+                    GitHub Owner
+                </label>
+
+                <input
+                    id="github-owner"
+                    class="form-input"
+                    placeholder="например: rizvan123"
+                    autocomplete="off"
+                >
+
+            </div>
 
 
-    <!-- TEAM -->
-    <main id="page-team" class="page">
+            <div class="form-group">
 
-        <button class="back-btn" onclick="goBack()">‹ Назад</button>
+                <label>
+                    Repository
+                </label>
 
-        <div id="team-content"></div>
+                <input
+                    id="github-repo"
+                    class="form-input"
+                    placeholder="например: football-hub"
+                    autocomplete="off"
+                >
 
-    </main>
+            </div>
 
 
-    <!-- MATCH -->
-    <main id="page-match" class="page">
+            <div class="form-group">
 
-        <button class="back-btn" onclick="goBack()">‹ Назад</button>
+                <label>
+                    GitHub Token
+                </label>
 
-        <div id="match-content"></div>
+                <input
+                    id="github-token"
+                    class="form-input"
+                    type="password"
+                    placeholder="github_pat_..."
+                    autocomplete="off"
+                >
 
-    </main>
+            </div>
+
+
+            <button
+                class="primary-btn"
+                style="width:100%;"
+                onclick="adminLogin()"
+            >
+                ВОЙТИ
+            </button>
+
+
+            <div style="
+                margin-top:12px;
+                color:var(--muted);
+                font-size:9px;
+                line-height:1.5;
+            ">
+                Токен хранится только в текущей сессии
+                браузера и не записывается в index.html.
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ADMIN PANEL -->
+
+    <div id="admin-panel" class="hidden">
+
+        <div class="admin-status">
+
+            <span class="status-dot"></span>
+
+            <span>
+                GitHub подключён
+            </span>
+
+            <button
+                class="logout-btn"
+                onclick="adminLogout()"
+                style="margin-left:auto;"
+            >
+                Выйти
+            </button>
+
+        </div>
+
+
+        <div class="admin-tabs">
+
+            <button
+                class="admin-tab active"
+                data-admin-tab="streams"
+                onclick="switchAdminTab('streams')"
+            >
+                🔴 Трансляции
+            </button>
+
+            <button
+                class="admin-tab"
+                data-admin-tab="news"
+                onclick="switchAdminTab('news')"
+            >
+                📰 Новости
+            </button>
+
+            <button
+                class="admin-tab"
+                data-admin-tab="banners"
+                onclick="switchAdminTab('banners')"
+            >
+                📢 Баннеры
+            </button>
+
+        </div>
+
+
+        <!-- STREAMS -->
+
+        <div id="admin-streams">
+
+            <div class="admin-card">
+
+                <div class="section-title">
+
+                    <h2>
+                        🔴 Трансляция
+                    </h2>
+
+                    <button onclick="resetStreamForm()">
+                        Сбросить
+                    </button>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        ID матча
+                    </label>
+
+                    <input
+                        id="stream-fixture-id"
+                        class="form-input"
+                        type="number"
+                        placeholder="Например: 123456"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Название
+                    </label>
+
+                    <input
+                        id="stream-title"
+                        class="form-input"
+                        placeholder="Real Madrid — Barcelona"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Ссылка на трансляцию
+                    </label>
+
+                    <input
+                        id="stream-url"
+                        class="form-input"
+                        type="url"
+                        placeholder="https://example.com/stream"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Тип
+                    </label>
+
+                    <select
+                        id="stream-type"
+                        class="form-select"
+                    >
+                        <option value="external">
+                            Внешний сайт
+                        </option>
+
+                        <option value="embed">
+                            Встроенная трансляция
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Текст кнопки
+                    </label>
+
+                    <input
+                        id="stream-button"
+                        class="form-input"
+                        value="Смотреть трансляцию"
+                    >
+
+                </div>
+
+
+                <div class="admin-actions">
+
+                    <button
+                        class="primary-btn"
+                        onclick="saveStream()"
+                    >
+                        💾 Сохранить
+                    </button>
+
+                    <button
+                        class="secondary-btn"
+                        onclick="resetStreamForm()"
+                    >
+                        Отмена
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="admin-stream-list"
+                class="admin-stream-list"
+            ></div>
+
+        </div>
+
+
+        <!-- NEWS -->
+
+        <div id="admin-news" class="hidden">
+
+            <div class="admin-card">
+
+                <div class="section-title">
+
+                    <h2>
+                        📰 Новость
+                    </h2>
+
+                    <button onclick="resetNewsForm()">
+                        Сбросить
+                    </button>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Заголовок
+                    </label>
+
+                    <input
+                        id="news-title"
+                        class="form-input"
+                        placeholder="Заголовок новости"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Текст
+                    </label>
+
+                    <textarea
+                        id="news-text"
+                        class="form-textarea"
+                        placeholder="Текст новости..."
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Ссылка
+                    </label>
+
+                    <input
+                        id="news-url"
+                        class="form-input"
+                        placeholder="https://..."
+                    >
+
+                </div>
+
+
+                <div class="admin-actions">
+
+                    <button
+                        class="primary-btn"
+                        onclick="saveNews()"
+                    >
+                        💾 Сохранить
+                    </button>
+
+                    <button
+                        class="secondary-btn"
+                        onclick="resetNewsForm()"
+                    >
+                        Отмена
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="admin-news-list"
+                class="admin-news-list"
+            ></div>
+
+        </div>
+
+
+        <!-- BANNERS -->
+
+        <div id="admin-banners" class="hidden">
+
+            <div class="admin-card">
+
+                <div class="section-title">
+
+                    <h2>
+                        📢 Баннер
+                    </h2>
+
+                    <button onclick="resetBannerForm()">
+                        Сбросить
+                    </button>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Заголовок
+                    </label>
+
+                    <input
+                        id="banner-title"
+                        class="form-input"
+                        placeholder="Например: Большой матч сегодня"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Текст
+                    </label>
+
+                    <input
+                        id="banner-text"
+                        class="form-input"
+                        placeholder="Описание"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Изображение
+                    </label>
+
+                    <input
+                        id="banner-image"
+                        class="form-input"
+                        placeholder="https://..."
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Ссылка
+                    </label>
+
+                    <input
+                        id="banner-url"
+                        class="form-input"
+                        placeholder="https://..."
+                    >
+
+                </div>
+
+
+                <div class="admin-actions">
+
+                    <button
+                        class="primary-btn"
+                        onclick="saveBanner()"
+                    >
+                        💾 Сохранить
+                    </button>
+
+                    <button
+                        class="secondary-btn"
+                        onclick="resetBannerForm()"
+                    >
+                        Отмена
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="admin-banner-list"
+                class="admin-banner-list"
+            ></div>
+
+        </div>
+
+    </div>
+
+</main>
 
 </div>
 
 
-<!-- SEARCH MODAL -->
-<div id="search-modal" class="modal search-modal" onclick="closeModalOnBackground(event, 'search-modal')">
+<!-- =====================================================
+     SEARCH MODAL
+===================================================== -->
+
+<div
+    id="search-modal"
+    class="modal search-modal"
+    onclick="closeModalOnBackground(event, 'search-modal')"
+>
 
     <div class="modal-content">
 
         <div class="modal-header">
-            <h2>Поиск команды</h2>
-            <button class="close-btn" onclick="closeModal('search-modal')">×</button>
+
+            <h2>
+                Поиск команды
+            </h2>
+
+            <button
+                class="close-btn"
+                onclick="closeModal('search-modal')"
+            >
+                ×
+            </button>
+
         </div>
 
+
         <div class="search-box">
+
             <input
                 id="search-input"
                 type="text"
@@ -1432,8 +2293,13 @@ button {
                 autocomplete="off"
                 onkeydown="if(event.key === 'Enter') searchTeams()"
             >
-            <button onclick="searchTeams()">⌕</button>
+
+            <button onclick="searchTeams()">
+                ⌕
+            </button>
+
         </div>
+
 
         <div id="search-results"></div>
 
@@ -1442,15 +2308,33 @@ button {
 </div>
 
 
-<!-- LEAGUE MODAL -->
-<div id="league-modal" class="modal" onclick="closeModalOnBackground(event, 'league-modal')">
+<!-- =====================================================
+     LEAGUE MODAL
+===================================================== -->
+
+<div
+    id="league-modal"
+    class="modal"
+    onclick="closeModalOnBackground(event, 'league-modal')"
+>
 
     <div class="modal-content">
 
         <div class="modal-header">
-            <h2 id="league-modal-title">Турнир</h2>
-            <button class="close-btn" onclick="closeModal('league-modal')">×</button>
+
+            <h2 id="league-modal-title">
+                Турнир
+            </h2>
+
+            <button
+                class="close-btn"
+                onclick="closeModal('league-modal')"
+            >
+                ×
+            </button>
+
         </div>
+
 
         <div id="league-modal-content"></div>
 
@@ -1459,34 +2343,64 @@ button {
 </div>
 
 
-<!-- TOAST -->
+<!-- =====================================================
+     TOAST
+===================================================== -->
+
 <div id="toast" class="toast"></div>
 
 
-<!-- BOTTOM NAV -->
+<!-- =====================================================
+     NAV
+===================================================== -->
+
 <nav class="bottom-nav">
 
-    <button class="nav-item active" data-page="home" onclick="showPage('home')">
+    <button
+        class="nav-item active"
+        data-page="home"
+        onclick="showPage('home')"
+    >
         <span class="nav-icon">⌂</span>
         <span class="nav-label">Главная</span>
     </button>
 
-    <button class="nav-item" data-page="matches" onclick="showPage('matches')">
+
+    <button
+        class="nav-item"
+        data-page="matches"
+        onclick="showPage('matches')"
+    >
         <span class="nav-icon">⚽</span>
         <span class="nav-label">Матчи</span>
     </button>
 
-    <button class="nav-item" data-page="live" onclick="showPage('live')">
+
+    <button
+        class="nav-item"
+        data-page="live"
+        onclick="showPage('live')"
+    >
         <span class="nav-icon">●</span>
         <span class="nav-label">LIVE</span>
     </button>
 
-    <button class="nav-item" data-page="leagues" onclick="showPage('leagues')">
+
+    <button
+        class="nav-item"
+        data-page="leagues"
+        onclick="showPage('leagues')"
+    >
         <span class="nav-icon">🏆</span>
         <span class="nav-label">Турниры</span>
     </button>
 
-    <button class="nav-item" data-page="profile" onclick="showPage('profile')">
+
+    <button
+        class="nav-item"
+        data-page="profile"
+        onclick="showPage('profile')"
+    >
         <span class="nav-icon">☻</span>
         <span class="nav-label">Профиль</span>
     </button>
@@ -1497,44 +2411,51 @@ button {
 <script>
 
 /* =========================================================
-   FOOTBALL HUB
-   API-FOOTBALL
-   ========================================================= */
-
-
-/* =========================
-   API CONFIG
-   ========================= */
+   CONFIG
+========================================================= */
 
 const API_KEY = "a7e484c8b00a5f0ce88ae51284e0fe59";
 
-const API_BASE = "https://v3.football.api-sports.io";
+const API_BASE =
+    "https://v3.football.api-sports.io";
 
-const TIMEZONE = "Europe/Berlin";
+const TIMEZONE =
+    "Europe/Berlin";
 
-const CURRENT_SEASON = 2026;
+const CURRENT_SEASON =
+    2026;
+
+const CONTENT_FILE =
+    "content.json";
 
 
-/* =========================
+/* =========================================================
    TELEGRAM
-   ========================= */
+========================================================= */
 
-const tg = window.Telegram?.WebApp;
+const tg =
+    window.Telegram?.WebApp;
 
 if (tg) {
+
     tg.ready();
+
     tg.expand();
 
     try {
+
         tg.setHeaderColor("#0b0d10");
+
         tg.setBackgroundColor("#0b0d10");
+
     } catch (e) {}
+
 }
 
 
-/* =========================
+/* =========================================================
    STATE
-   ========================= */
+========================================================= */
 
 const state = {
 
@@ -1551,23 +2472,57 @@ const state = {
     currentLeague: null,
 
     favorites: JSON.parse(
-        localStorage.getItem("footballHubFavorites") || "[]"
+        localStorage.getItem(
+            "footballHubFavorites"
+        ) || "[]"
     ),
 
     teamFavorites: JSON.parse(
-        localStorage.getItem("footballHubTeamFavorites") || "[]"
+        localStorage.getItem(
+            "footballHubTeamFavorites"
+        ) || "[]"
     ),
 
     cache: {},
 
-    apiReady: false
+    content: {
+
+        streams: {},
+
+        news: [],
+
+        banners: []
+
+    },
+
+    contentLoaded: false,
+
+    admin: {
+
+        owner: "",
+
+        repo: "",
+
+        token: "",
+
+        sha: null,
+
+        loggedIn: false,
+
+        editingStreamId: null,
+
+        editingNewsId: null,
+
+        editingBannerId: null
+
+    }
 
 };
 
 
-/* =========================
+/* =========================================================
    LEAGUES
-   ========================= */
+========================================================= */
 
 const LEAGUES = [
 
@@ -1622,126 +2577,240 @@ const LEAGUES = [
 ];
 
 
-/* =========================
+/* =========================================================
    INIT
-   ========================= */
+========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
 
-    updateHomeDate();
+        updateHomeDate();
 
-    renderLeagues();
+        renderLeagues();
 
-    renderHomeLeagues();
+        renderHomeLeagues();
 
-    renderDateSelector();
+        renderDateSelector();
 
-    renderProfile();
+        renderProfile();
 
-    loadHome();
+        await loadContent();
 
-});
+        loadHome();
+
+    }
+);
 
 
-/* =========================
+/* =========================================================
    DATE
-   ========================= */
+========================================================= */
 
-function getLocalDate(date = new Date()) {
+function getLocalDate(
+    date = new Date()
+) {
 
-    const year = date.getFullYear();
+    const year =
+        date.getFullYear();
 
-    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0");
 
-    const day = String(date.getDate()).padStart(2, "0");
+    const day =
+        String(
+            date.getDate()
+        ).padStart(2, "0");
 
     return `${year}-${month}-${day}`;
 
 }
 
 
-function formatDate(dateString) {
-
-    const date = new Date(dateString + "T12:00:00");
-
-    return date.toLocaleDateString("ru-RU", {
-        day: "numeric",
-        month: "long"
-    });
-
-}
-
-
 function formatTime(dateString) {
 
-    if (!dateString) return "--:--";
+    if (!dateString)
+        return "--:--";
 
-    const date = new Date(dateString);
+    const date =
+        new Date(dateString);
 
-    return date.toLocaleTimeString("ru-RU", {
-        hour: "2-digit",
-        minute: "2-digit",
-        timeZone: TIMEZONE
-    });
+    return date.toLocaleTimeString(
+        "ru-RU",
+        {
+            hour: "2-digit",
+            minute: "2-digit",
+            timeZone: TIMEZONE
+        }
+    );
 
 }
 
 
 function updateHomeDate() {
 
-    const el = document.getElementById("home-date");
+    const el =
+        document.getElementById(
+            "home-date"
+        );
 
-    if (!el) return;
+    if (!el)
+        return;
 
-    const now = new Date();
-
-    el.textContent = now.toLocaleDateString("ru-RU", {
-        weekday: "long",
-        day: "numeric",
-        month: "long"
-    });
+    el.textContent =
+        new Date().toLocaleDateString(
+            "ru-RU",
+            {
+                weekday: "long",
+                day: "numeric",
+                month: "long"
+            }
+        );
 
 }
 
 
-/* =========================
-   API
-   ========================= */
+/* =========================================================
+   CONTENT.JSON
+========================================================= */
 
-async function apiRequest(endpoint, params = {}, cacheSeconds = 60) {
+async function loadContent() {
 
-    if (!API_KEY || API_KEY === "ВСТАВЬ_СЮДА_API_KEY") {
+    try {
 
-        state.apiReady = false;
+        const response =
+            await fetch(
+                `${CONTENT_FILE}?v=${Date.now()}`,
+                {
+                    cache: "no-store"
+                }
+            );
 
-        throw new Error("API_KEY_NOT_SET");
+
+        if (!response.ok)
+            throw new Error(
+                "content.json HTTP " +
+                response.status
+            );
+
+
+        const data =
+            await response.json();
+
+
+        state.content = {
+
+            streams:
+                data.streams || {},
+
+            news:
+                Array.isArray(data.news)
+                    ? data.news
+                    : [],
+
+            banners:
+                Array.isArray(data.banners)
+                    ? data.banners
+                    : []
+
+        };
+
+
+        state.contentLoaded =
+            true;
+
+
+        renderHomeContent();
+
+        renderAdminLists();
+
+
+    } catch (error) {
+
+        console.warn(
+            "Не удалось загрузить content.json",
+            error
+        );
+
+        state.content = {
+
+            streams: {},
+
+            news: [],
+
+            banners: []
+
+        };
 
     }
 
-    state.apiReady = true;
-
-    const url = new URL(API_BASE + endpoint);
-
-    Object.entries(params).forEach(([key, value]) => {
-
-        if (
-            value !== undefined &&
-            value !== null &&
-            value !== ""
-        ) {
-            url.searchParams.set(key, value);
-        }
-
-    });
+}
 
 
-    const cacheKey = url.toString();
+/* =========================================================
+   API
+========================================================= */
 
-    const cached = state.cache[cacheKey];
+async function apiRequest(
+    endpoint,
+    params = {},
+    cacheSeconds = 60
+) {
+
+    if (
+        !API_KEY ||
+        API_KEY === "ВСТАВЬ_СЮДА_API_KEY"
+    ) {
+
+        throw new Error(
+            "API_KEY_NOT_SET"
+        );
+
+    }
+
+
+    const url =
+        new URL(
+            API_BASE + endpoint
+        );
+
+
+    Object.entries(params)
+        .forEach(
+            ([key, value]) => {
+
+                if (
+                    value !== undefined &&
+                    value !== null &&
+                    value !== ""
+                ) {
+
+                    url.searchParams.set(
+                        key,
+                        value
+                    );
+
+                }
+
+            }
+        );
+
+
+    const cacheKey =
+        url.toString();
+
+
+    const cached =
+        state.cache[cacheKey];
+
 
     if (
         cached &&
-        Date.now() - cached.timestamp < cacheSeconds * 1000
+        Date.now() -
+            cached.timestamp <
+            cacheSeconds * 1000
     ) {
 
         return cached.data;
@@ -1749,154 +2818,155 @@ async function apiRequest(endpoint, params = {}, cacheSeconds = 60) {
     }
 
 
-    const response = await fetch(url.toString(), {
+    const response =
+        await fetch(
+            url.toString(),
+            {
 
-        method: "GET",
+                method: "GET",
 
-        headers: {
-            "x-apisports-key": API_KEY,
-            "Accept": "application/json"
-        }
+                headers: {
 
-    });
+                    "x-apisports-key":
+                        API_KEY,
+
+                    "Accept":
+                        "application/json"
+
+                }
+
+            }
+        );
 
 
     if (!response.ok) {
 
-        if (response.status === 401) {
-            throw new Error("API_KEY_INVALID");
-        }
+        if (response.status === 401)
+            throw new Error(
+                "API_KEY_INVALID"
+            );
 
-        if (response.status === 429) {
-            throw new Error("API_LIMIT");
-        }
+        if (response.status === 429)
+            throw new Error(
+                "API_LIMIT"
+            );
 
-        throw new Error("API_ERROR_" + response.status);
+        throw new Error(
+            "API_ERROR_" +
+            response.status
+        );
 
     }
 
 
-    const data = await response.json();
+    const data =
+        await response.json();
 
 
-    if (data.errors && Object.keys(data.errors).length) {
+    if (
+        data.errors &&
+        Object.keys(data.errors).length
+    ) {
 
-        const errorText =
-            Object.values(data.errors).join(", ");
-
-        throw new Error(errorText);
+        throw new Error(
+            Object.values(
+                data.errors
+            ).join(", ")
+        );
 
     }
 
 
     state.cache[cacheKey] = {
+
         timestamp: Date.now(),
+
         data
+
     };
 
+
     saveCacheInfo();
+
 
     return data;
 
 }
 
 
-/* =========================
-   ERROR
-   ========================= */
-
-function apiErrorMessage(error) {
-
-    if (!error) return "Неизвестная ошибка.";
-
-    if (error.message === "API_KEY_NOT_SET") {
-
-        return "Добавь API-ключ API-Football в index.html.";
-
-    }
-
-    if (error.message === "API_KEY_INVALID") {
-
-        return "API-ключ недействителен или заблокирован.";
-
-    }
-
-    if (error.message === "API_LIMIT") {
-
-        return "Лимит API на сегодня исчерпан.";
-
-    }
-
-    return "Не удалось загрузить данные футбола.";
-
-}
-
-
-function errorBlock(error) {
-
-    return `
-        <div class="empty">
-            <div class="empty-icon">⚠️</div>
-            <strong>Не удалось загрузить данные</strong>
-            <span>${escapeHtml(apiErrorMessage(error))}</span>
-        </div>
-    `;
-
-}
-
-
-/* =========================
+/* =========================================================
    HOME
-   ========================= */
+========================================================= */
 
 async function loadHome() {
 
-    const liveEl = document.getElementById("home-live");
+    const liveEl =
+        document.getElementById(
+            "home-live"
+        );
 
-    const matchesEl = document.getElementById("home-matches");
+    const matchesEl =
+        document.getElementById(
+            "home-matches"
+        );
 
-    liveEl.innerHTML = loadingBlock();
 
-    matchesEl.innerHTML = loadingBlock();
+    liveEl.innerHTML =
+        loadingBlock();
+
+    matchesEl.innerHTML =
+        loadingBlock();
 
 
     try {
 
-        const [liveData, matchesData] = await Promise.all([
+        const [
+            liveData,
+            matchesData
+        ] =
+            await Promise.all([
 
-            apiRequest(
-                "/fixtures",
-                { live: "all" },
-                45
-            ),
+                apiRequest(
+                    "/fixtures",
+                    {
+                        live: "all"
+                    },
+                    45
+                ),
 
-            apiRequest(
-                "/fixtures",
-                {
-                    date: state.selectedDate,
-                    timezone: TIMEZONE
-                },
-                300
-            )
+                apiRequest(
+                    "/fixtures",
+                    {
+                        date:
+                            state.selectedDate,
 
-        ]);
+                        timezone:
+                            TIMEZONE
+                    },
+                    300
+                )
 
-
-        const liveMatches = liveData.response || [];
-
-        const matches = matchesData.response || [];
+            ]);
 
 
-        renderHomeLive(liveMatches);
+        renderHomeLive(
+            liveData.response || []
+        );
 
-        renderMatchList(matchesEl, matches);
+
+        renderMatchList(
+            matchesEl,
+            matchesData.response || []
+        );
 
 
     } catch (error) {
 
-        liveEl.innerHTML = errorBlock(error);
+        liveEl.innerHTML =
+            errorBlock(error);
 
-        matchesEl.innerHTML = errorBlock(error);
+        matchesEl.innerHTML =
+            errorBlock(error);
 
     }
 
@@ -1905,18 +2975,37 @@ async function loadHome() {
 
 function renderHomeLive(matches) {
 
-    const el = document.getElementById("home-live");
+    const el =
+        document.getElementById(
+            "home-live"
+        );
+
 
     if (!matches.length) {
 
         el.innerHTML = `
+
             <div class="live-card">
+
                 <div class="empty">
-                    <div class="empty-icon">🌙</div>
-                    <strong>Сейчас матчей нет</strong>
-                    <span>Когда начнутся матчи, они появятся здесь.</span>
+
+                    <div class="empty-icon">
+                        🌙
+                    </div>
+
+                    <strong>
+                        Сейчас матчей нет
+                    </strong>
+
+                    <span>
+                        Когда начнутся матчи,
+                        они появятся здесь.
+                    </span>
+
                 </div>
+
             </div>
+
         `;
 
         return;
@@ -1924,10 +3013,16 @@ function renderHomeLive(matches) {
     }
 
 
-    const match = matches[0];
+    const match =
+        matches[0];
+
 
     el.innerHTML = `
-        <div class="live-card" onclick="openMatch(${match.fixture.id})">
+
+        <div
+            class="live-card"
+            onclick="openMatch(${match.fixture.id})"
+        >
 
             <div class="live-head">
 
@@ -1942,56 +3037,280 @@ function renderHomeLive(matches) {
 
             </div>
 
+
             <div class="match-row">
 
                 ${teamMini(match.teams.home)}
 
+
                 <div class="score">
-                    ${match.goals.home ?? 0} : ${match.goals.away ?? 0}
+
+                    ${match.goals.home ?? 0}
+                    :
+                    ${match.goals.away ?? 0}
 
                     <div class="score-status">
                         ${formatStatus(match.fixture.status)}
                     </div>
+
                 </div>
+
 
                 ${teamMini(match.teams.away)}
 
             </div>
 
         </div>
+
     `;
 
 }
 
 
-/* =========================
-   MATCHES PAGE
-   ========================= */
+/* =========================================================
+   HOME CONTENT
+========================================================= */
+
+function renderHomeContent() {
+
+    renderHomeBanners();
+
+    renderHomeNews();
+
+}
+
+
+function renderHomeBanners() {
+
+    const el =
+        document.getElementById(
+            "home-banners"
+        );
+
+
+    const banners =
+        state.content.banners
+            .filter(
+                item =>
+                    item.active !== false
+            )
+            .slice(0, 3);
+
+
+    if (!banners.length) {
+
+        el.innerHTML = "";
+
+        return;
+
+    }
+
+
+    el.innerHTML =
+        banners
+            .map(
+                banner => {
+
+                    const content = `
+
+                        ${
+                            banner.image
+                                ? `
+                                    <img
+                                        src="${escapeAttribute(banner.image)}"
+                                        alt=""
+                                    >
+                                  `
+                                : ""
+                        }
+
+                        <div class="banner-body">
+
+                            <strong>
+                                ${escapeHtml(banner.title || "")}
+                            </strong>
+
+                            <span>
+                                ${escapeHtml(banner.text || "")}
+                            </span>
+
+                        </div>
+
+                    `;
+
+
+                    if (banner.url) {
+
+                        return `
+
+                            <a
+                                class="content-banner"
+                                href="${escapeAttribute(banner.url)}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style="display:block;text-decoration:none;color:inherit;"
+                            >
+                                ${content}
+                            </a>
+
+                        `;
+
+                    }
+
+
+                    return `
+                        <div class="content-banner">
+                            ${content}
+                        </div>
+                    `;
+
+                }
+            )
+            .join("");
+
+}
+
+
+function renderHomeNews() {
+
+    const el =
+        document.getElementById(
+            "home-news"
+        );
+
+
+    const news =
+        state.content.news
+            .filter(
+                item =>
+                    item.active !== false
+            )
+            .slice(0, 5);
+
+
+    if (!news.length) {
+
+        el.innerHTML = `
+
+            <div class="empty">
+
+                <div class="empty-icon">
+                    📰
+                </div>
+
+                <strong>
+                    Пока нет новостей
+                </strong>
+
+                <span>
+                    Новости появятся здесь.
+                </span>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    el.innerHTML =
+        news
+            .map(
+                item => {
+
+                    const card = `
+
+                        <strong>
+                            ${escapeHtml(item.title || "")}
+                        </strong>
+
+                        <p>
+                            ${escapeHtml(item.text || "")}
+                        </p>
+
+                        <div class="news-date">
+                            ${escapeHtml(item.date || "")}
+                        </div>
+
+                    `;
+
+
+                    if (item.url) {
+
+                        return `
+
+                            <a
+                                class="news-card"
+                                href="${escapeAttribute(item.url)}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style="text-decoration:none;color:inherit;"
+                            >
+                                ${card}
+                            </a>
+
+                        `;
+
+                    }
+
+
+                    return `
+                        <div class="news-card">
+                            ${card}
+                        </div>
+                    `;
+
+                }
+            )
+            .join("");
+
+}
+
+
+/* =========================================================
+   MATCHES
+========================================================= */
 
 async function loadMatchesPage() {
 
-    const el = document.getElementById("matches-list");
+    const el =
+        document.getElementById(
+            "matches-list"
+        );
 
-    el.innerHTML = loadingBlock();
+
+    el.innerHTML =
+        loadingBlock();
 
 
     try {
 
-        const data = await apiRequest(
-            "/fixtures",
-            {
-                date: state.selectedDate,
-                timezone: TIMEZONE
-            },
-            300
+        const data =
+            await apiRequest(
+                "/fixtures",
+                {
+                    date:
+                        state.selectedDate,
+
+                    timezone:
+                        TIMEZONE
+                },
+                300
+            );
+
+
+        renderMatchList(
+            el,
+            data.response || []
         );
 
 
-        renderMatchList(el, data.response || []);
-
     } catch (error) {
 
-        el.innerHTML = errorBlock(error);
+        el.innerHTML =
+            errorBlock(error);
 
     }
 
@@ -2000,40 +3319,77 @@ async function loadMatchesPage() {
 
 function renderDateSelector() {
 
-    const el = document.getElementById("date-selector");
+    const el =
+        document.getElementById(
+            "date-selector"
+        );
+
 
     el.innerHTML = "";
 
-    const today = new Date();
 
-    for (let i = -2; i <= 4; i++) {
+    const today =
+        new Date();
 
-        const date = new Date(today);
 
-        date.setDate(today.getDate() + i);
+    for (
+        let i = -2;
+        i <= 4;
+        i++
+    ) {
 
-        const value = getLocalDate(date);
+        const date =
+            new Date(today);
+
+
+        date.setDate(
+            today.getDate() + i
+        );
+
+
+        const value =
+            getLocalDate(date);
+
 
         const weekday =
-            date.toLocaleDateString("ru-RU", {
-                weekday: "short"
-            });
+            date.toLocaleDateString(
+                "ru-RU",
+                {
+                    weekday: "short"
+                }
+            );
+
 
         const day =
-            date.toLocaleDateString("ru-RU", {
-                day: "numeric",
-                month: "short"
-            });
+            date.toLocaleDateString(
+                "ru-RU",
+                {
+                    day: "numeric",
+                    month: "short"
+                }
+            );
 
 
-        const button = document.createElement("button");
+        const button =
+            document.createElement(
+                "button"
+            );
+
 
         button.className =
             "date-btn " +
-            (value === state.selectedDate ? "active" : "");
+            (
+                value ===
+                state.selectedDate
+                    ? "active"
+                    : ""
+            );
+
 
         button.innerHTML = `
+
             <strong>
+
                 ${
                     i === 0
                         ? "Сегодня"
@@ -2041,38 +3397,64 @@ function renderDateSelector() {
                             ? "Завтра"
                             : weekday
                 }
+
             </strong>
 
-            <span>${day}</span>
+            <span>
+                ${day}
+            </span>
+
         `;
 
-        button.onclick = () => {
 
-            state.selectedDate = value;
+        button.onclick =
+            () => {
 
-            renderDateSelector();
+                state.selectedDate =
+                    value;
 
-            loadMatchesPage();
+                renderDateSelector();
 
-        };
+                loadMatchesPage();
 
-        el.appendChild(button);
+            };
+
+
+        el.appendChild(
+            button
+        );
 
     }
 
 }
 
 
-function renderMatchList(container, matches) {
+function renderMatchList(
+    container,
+    matches
+) {
 
     if (!matches.length) {
 
         container.innerHTML = `
+
             <div class="empty">
-                <div class="empty-icon">⚽</div>
-                <strong>Матчей нет</strong>
-                <span>На выбранную дату матчи не найдены.</span>
+
+                <div class="empty-icon">
+                    ⚽
+                </div>
+
+                <strong>
+                    Матчей нет
+                </strong>
+
+                <span>
+                    На выбранную дату
+                    матчи не найдены.
+                </span>
+
             </div>
+
         `;
 
         return;
@@ -2080,40 +3462,63 @@ function renderMatchList(container, matches) {
     }
 
 
-    const sorted = [...matches].sort((a, b) => {
+    const sorted =
+        [...matches]
+            .sort(
+                (a, b) =>
+                    new Date(
+                        a.fixture.date
+                    ) -
+                    new Date(
+                        b.fixture.date
+                    )
+            );
 
-        return new Date(a.fixture.date) - new Date(b.fixture.date);
 
-    });
-
-
-    container.innerHTML = sorted
-        .map(matchCard)
-        .join("");
+    container.innerHTML =
+        sorted
+            .map(matchCard)
+            .join("");
 
 }
 
 
 function matchCard(match) {
 
-    const id = match.fixture.id;
+    const id =
+        match.fixture.id;
+
 
     const favorite =
         state.favorites.includes(id);
 
+
     const isFinished =
-        ["FT", "AET", "PEN"].includes(
+        [
+            "FT",
+            "AET",
+            "PEN"
+        ].includes(
             match.fixture.status.short
         );
 
+
+    const stream =
+        state.content.streams[
+            String(id)
+        ];
+
+
     const homeScore =
         match.goals.home ?? "-";
+
 
     const awayScore =
         match.goals.away ?? "-";
 
 
     return `
+
         <div
             class="match-card"
             onclick="openMatch(${id})"
@@ -2125,7 +3530,12 @@ function matchCard(match) {
 
                     ${
                         match.league.logo
-                            ? `<img src="${match.league.logo}" alt="">`
+                            ? `
+                                <img
+                                    src="${match.league.logo}"
+                                    alt=""
+                                >
+                              `
                             : ""
                     }
 
@@ -2135,9 +3545,17 @@ function matchCard(match) {
 
                 </div>
 
+
                 <button
-                    class="star-btn ${favorite ? "active" : ""}"
-                    onclick="event.stopPropagation(); toggleMatchFavorite(${id})"
+                    class="star-btn ${
+                        favorite
+                            ? "active"
+                            : ""
+                    }"
+                    onclick="
+                        event.stopPropagation();
+                        toggleMatchFavorite(${id})
+                    "
                 >
                     ${favorite ? "★" : "☆"}
                 </button>
@@ -2155,7 +3573,9 @@ function matchCard(match) {
                     >
 
                     <span>
-                        ${escapeHtml(match.teams.home.name)}
+                        ${escapeHtml(
+                            match.teams.home.name
+                        )}
                     </span>
 
                 </div>
@@ -2167,22 +3587,34 @@ function matchCard(match) {
                         isFinished ||
                         match.fixture.status.elapsed
                             ? `
+
                                 <div class="match-score">
-                                    ${homeScore} : ${awayScore}
+                                    ${homeScore}
+                                    :
+                                    ${awayScore}
                                 </div>
 
                                 <div class="match-status">
-                                    ${formatStatus(match.fixture.status)}
+                                    ${formatStatus(
+                                        match.fixture.status
+                                    )}
                                 </div>
+
                               `
                             : `
+
                                 <div class="match-time">
-                                    ${formatTime(match.fixture.date)}
+                                    ${formatTime(
+                                        match.fixture.date
+                                    )}
                                 </div>
 
                                 <div class="match-status">
-                                    ${formatStatus(match.fixture.status)}
+                                    ${formatStatus(
+                                        match.fixture.status
+                                    )}
                                 </div>
+
                               `
                     }
 
@@ -2192,7 +3624,9 @@ function matchCard(match) {
                 <div class="match-team right">
 
                     <span>
-                        ${escapeHtml(match.teams.away.name)}
+                        ${escapeHtml(
+                            match.teams.away.name
+                        )}
                     </span>
 
                     <img
@@ -2204,45 +3638,104 @@ function matchCard(match) {
 
             </div>
 
+
+            ${
+                stream
+                    ? `
+
+                        <div
+                            class="stream-mini"
+                            onclick="event.stopPropagation()"
+                        >
+
+                            <span>
+                                🔴 Трансляция доступна
+                            </span>
+
+                            <button
+                                onclick="
+                                    openStream(
+                                        '${escapeJs(String(stream.url || ""))}',
+                                        '${escapeJs(String(stream.type || "external"))}'
+                                    )
+                                "
+                            >
+                                ${escapeHtml(
+                                    stream.button ||
+                                    "Смотреть"
+                                )}
+                            </button>
+
+                        </div>
+
+                      `
+                    : ""
+            }
+
         </div>
+
     `;
 
 }
 
 
-/* =========================
-   LIVE PAGE
-   ========================= */
+/* =========================================================
+   LIVE
+========================================================= */
 
 async function loadLivePage() {
 
-    const el = document.getElementById("live-page-list");
+    const el =
+        document.getElementById(
+            "live-page-list"
+        );
 
-    el.innerHTML = loadingBlock();
+
+    el.innerHTML =
+        loadingBlock();
 
 
     try {
 
-        const data = await apiRequest(
-            "/fixtures",
-            { live: "all" },
-            30
-        );
+        const data =
+            await apiRequest(
+                "/fixtures",
+                {
+                    live: "all"
+                },
+                30
+            );
 
 
-        const matches = data.response || [];
+        const matches =
+            data.response || [];
 
 
         if (!matches.length) {
 
             el.innerHTML = `
+
                 <div class="live-card">
+
                     <div class="empty">
-                        <div class="empty-icon">🌙</div>
-                        <strong>Сейчас матчей нет</strong>
-                        <span>Здесь появятся все текущие матчи.</span>
+
+                        <div class="empty-icon">
+                            🌙
+                        </div>
+
+                        <strong>
+                            Сейчас матчей нет
+                        </strong>
+
+                        <span>
+                            Здесь появятся
+                            все текущие матчи.
+                        </span>
+
                     </div>
+
                 </div>
+
             `;
 
             return;
@@ -2251,44 +3744,63 @@ async function loadLivePage() {
 
 
         el.innerHTML = `
+
             <div class="match-list">
-                ${matches.map(matchCard).join("")}
+
+                ${
+                    matches
+                        .map(matchCard)
+                        .join("")
+                }
+
             </div>
+
         `;
 
 
     } catch (error) {
 
-        el.innerHTML = errorBlock(error);
+        el.innerHTML =
+            errorBlock(error);
 
     }
 
 }
 
 
-/* =========================
+/* =========================================================
    LEAGUES
-   ========================= */
+========================================================= */
 
 function renderLeagues() {
 
-    const el = document.getElementById("league-list");
+    const el =
+        document.getElementById(
+            "league-list"
+        );
 
-    el.innerHTML = LEAGUES
-        .map(leagueCard)
-        .join("");
+
+    el.innerHTML =
+        LEAGUES
+            .map(leagueCard)
+            .join("");
 
 }
 
 
 function renderHomeLeagues() {
 
-    const el = document.getElementById("home-leagues");
+    const el =
+        document.getElementById(
+            "home-leagues"
+        );
 
-    el.innerHTML = LEAGUES
-        .slice(0, 6)
-        .map(leagueCard)
-        .join("");
+
+    el.innerHTML =
+        LEAGUES
+            .slice(0, 6)
+            .map(leagueCard)
+            .join("");
 
 }
 
@@ -2296,6 +3808,7 @@ function renderHomeLeagues() {
 function leagueCard(league) {
 
     return `
+
         <button
             class="league-card"
             onclick="openLeague(${league.id})"
@@ -2307,72 +3820,122 @@ function leagueCard(league) {
                 alt=""
             >
 
+
             <div>
 
                 <div class="league-name">
-                    ${escapeHtml(league.name)}
+                    ${escapeHtml(
+                        league.name
+                    )}
                 </div>
 
                 <div class="league-country">
-                    ${escapeHtml(league.country)}
+                    ${escapeHtml(
+                        league.country
+                    )}
                 </div>
 
             </div>
 
         </button>
+
     `;
 
 }
 
 
-/* =========================
+/* =========================================================
    LEAGUE
-   ========================= */
+========================================================= */
 
-async function openLeague(leagueId) {
+async function openLeague(
+    leagueId
+) {
 
     const league =
-        LEAGUES.find(x => x.id === leagueId);
+        LEAGUES.find(
+            x =>
+                x.id === leagueId
+        );
 
-    if (!league) return;
+
+    if (!league)
+        return;
 
 
-    state.currentLeague = league;
+    state.currentLeague =
+        league;
 
-    document.getElementById("league-modal-title")
-        .textContent = league.name;
 
-    document.getElementById("league-modal-content")
-        .innerHTML = loadingBlock();
+    document
+        .getElementById(
+            "league-modal-title"
+        )
+        .textContent =
+        league.name;
 
-    document.getElementById("league-modal")
-        .classList.add("active");
+
+    document
+        .getElementById(
+            "league-modal-content"
+        )
+        .innerHTML =
+        loadingBlock();
+
+
+    document
+        .getElementById(
+            "league-modal"
+        )
+        .classList
+        .add("active");
 
 
     try {
 
-        const data = await apiRequest(
-            "/standings",
-            {
-                league: league.id,
-                season: CURRENT_SEASON
-            },
-            900
-        );
+        const data =
+            await apiRequest(
+                "/standings",
+                {
+                    league:
+                        league.id,
+
+                    season:
+                        CURRENT_SEASON
+                },
+                900
+            );
 
 
-        const groups = data.response || [];
+        const groups =
+            data.response || [];
 
 
         if (!groups.length) {
 
-            document.getElementById("league-modal-content")
+            document
+                .getElementById(
+                    "league-modal-content"
+                )
                 .innerHTML = `
+
                     <div class="empty">
-                        <div class="empty-icon">🏆</div>
-                        <strong>Таблица пока недоступна</strong>
-                        <span>API не вернул турнирную таблицу.</span>
+
+                        <div class="empty-icon">
+                            🏆
+                        </div>
+
+                        <strong>
+                            Таблица пока недоступна
+                        </strong>
+
+                        <span>
+                            API не вернул
+                            турнирную таблицу.
+                        </span>
+
                     </div>
+
                 `;
 
             return;
@@ -2381,11 +3944,17 @@ async function openLeague(leagueId) {
 
 
         const standings =
-            groups[0].league.standings?.[0] || [];
+            groups[0]
+                .league
+                .standings?.[0] || [];
 
 
-        document.getElementById("league-modal-content")
-            .innerHTML = renderStandings(
+        document
+            .getElementById(
+                "league-modal-content"
+            )
+            .innerHTML =
+            renderStandings(
                 standings,
                 league
             );
@@ -2393,25 +3962,49 @@ async function openLeague(leagueId) {
 
     } catch (error) {
 
-        document.getElementById("league-modal-content")
-            .innerHTML = errorBlock(error);
+        document
+            .getElementById(
+                "league-modal-content"
+            )
+            .innerHTML =
+            errorBlock(error);
 
     }
 
 }
 
 
-function renderStandings(standings, league) {
+function renderStandings(
+    standings,
+    league
+) {
 
     return `
 
-        <div style="margin-bottom:12px;color:var(--muted);font-size:11px;">
-            ${escapeHtml(league.country)} · сезон ${CURRENT_SEASON}/${String(CURRENT_SEASON + 1).slice(-2)}
+        <div
+            style="
+                margin-bottom:12px;
+                color:var(--muted);
+                font-size:11px;
+            "
+        >
+            ${escapeHtml(
+                league.country
+            )}
+            ·
+            сезон
+            ${CURRENT_SEASON}/${
+                String(
+                    CURRENT_SEASON + 1
+                ).slice(-2)
+            }
         </div>
+
 
         <div class="table-card">
 
             <div class="table-head">
+
                 <span>#</span>
                 <span>Команда</span>
                 <span>И</span>
@@ -2419,76 +4012,124 @@ function renderStandings(standings, league) {
                 <span>Н</span>
                 <span>П</span>
                 <span>О</span>
+
             </div>
 
-            ${standings.map(item => `
 
-                <div
-                    class="table-row"
-                    onclick="closeModal('league-modal'); openTeam(${item.team.id})"
-                    style="cursor:pointer;"
-                >
+            ${
+                standings
+                    .map(
+                        item => `
 
-                    <span class="position">
-                        ${item.rank}
-                    </span>
+                            <div
+                                class="table-row"
+                                onclick="
+                                    closeModal('league-modal');
+                                    openTeam(${item.team.id})
+                                "
+                                style="cursor:pointer;"
+                            >
 
-                    <div class="table-team">
+                                <span class="position">
+                                    ${item.rank}
+                                </span>
 
-                        <img
-                            src="${item.team.logo}"
-                            alt=""
-                        >
 
-                        <span>
-                            ${escapeHtml(item.team.name)}
-                        </span>
+                                <div class="table-team">
 
-                    </div>
+                                    <img
+                                        src="${item.team.logo}"
+                                        alt=""
+                                    >
 
-                    <span>${item.all.played}</span>
-                    <span>${item.all.win}</span>
-                    <span>${item.all.draw}</span>
-                    <span>${item.all.lose}</span>
+                                    <span>
+                                        ${escapeHtml(
+                                            item.team.name
+                                        )}
+                                    </span>
 
-                    <strong>${item.points}</strong>
+                                </div>
 
-                </div>
 
-            `).join("")}
+                                <span>
+                                    ${item.all.played}
+                                </span>
+
+                                <span>
+                                    ${item.all.win}
+                                </span>
+
+                                <span>
+                                    ${item.all.draw}
+                                </span>
+
+                                <span>
+                                    ${item.all.lose}
+                                </span>
+
+                                <strong>
+                                    ${item.points}
+                                </strong>
+
+                            </div>
+
+                        `
+                    )
+                    .join("")
+            }
 
         </div>
+
     `;
 
 }
 
 
-/* =========================
+/* =========================================================
    TEAM
-   ========================= */
+========================================================= */
 
-async function openTeam(teamId) {
+async function openTeam(
+    teamId
+) {
 
-    state.previousPage = state.currentPage;
-
-    state.currentTeam = teamId;
-
-    showPage("team", false);
+    state.previousPage =
+        state.currentPage;
 
 
-    const el = document.getElementById("team-content");
+    state.currentTeam =
+        teamId;
 
-    el.innerHTML = loadingBlock();
+
+    showPage(
+        "team",
+        false
+    );
+
+
+    const el =
+        document.getElementById(
+            "team-content"
+        );
+
+
+    el.innerHTML =
+        loadingBlock();
 
 
     try {
 
-        const [teamData, fixturesData] =
+        const [
+            teamData,
+            fixturesData
+        ] =
             await Promise.all([
 
                 apiRequest(
                     "/teams",
-                    { id: teamId },
+                    {
+                        id: teamId
+                    },
                     3600
                 ),
 
@@ -2496,7 +4137,8 @@ async function openTeam(teamId) {
                     "/fixtures",
                     {
                         team: teamId,
-                        season: CURRENT_SEASON,
+                        season:
+                            CURRENT_SEASON,
                         last: 5
                     },
                     900
@@ -2506,15 +4148,22 @@ async function openTeam(teamId) {
 
 
         const team =
-            teamData.response?.[0]?.team;
+            teamData
+                .response?.[0]?.team;
 
 
         if (!team) {
 
             el.innerHTML = `
+
                 <div class="empty">
-                    <strong>Команда не найдена</strong>
+
+                    <strong>
+                        Команда не найдена
+                    </strong>
+
                 </div>
+
             `;
 
             return;
@@ -2522,154 +4171,245 @@ async function openTeam(teamId) {
         }
 
 
-        const fixtures =
-            fixturesData.response || [];
-
-
-        renderTeam(team, fixtures);
+        renderTeam(
+            team,
+            fixturesData.response || []
+        );
 
 
     } catch (error) {
 
-        el.innerHTML = errorBlock(error);
+        el.innerHTML =
+            errorBlock(error);
 
     }
 
 }
 
 
-function renderTeam(team, fixtures) {
+function renderTeam(
+    team,
+    fixtures
+) {
 
     const favorite =
-        state.teamFavorites.includes(team.id);
+        state.teamFavorites
+            .includes(team.id);
 
 
     const form =
         fixtures
             .slice(0, 5)
             .reverse()
-            .map(f => {
+            .map(
+                f => {
 
-                const isHome =
-                    f.teams.home.id === team.id;
-
-                const teamGoals =
-                    isHome
-                        ? f.goals.home
-                        : f.goals.away;
-
-                const opponentGoals =
-                    isHome
-                        ? f.goals.away
-                        : f.goals.home;
+                    const isHome =
+                        f.teams.home.id ===
+                        team.id;
 
 
-                if (
-                    teamGoals === null ||
-                    opponentGoals === null
-                ) return "";
+                    const teamGoals =
+                        isHome
+                            ? f.goals.home
+                            : f.goals.away;
 
 
-                if (teamGoals > opponentGoals)
-                    return `<span class="form-item w">В</span>`;
+                    const opponentGoals =
+                        isHome
+                            ? f.goals.away
+                            : f.goals.home;
 
-                if (teamGoals < opponentGoals)
-                    return `<span class="form-item l">П</span>`;
 
-                return `<span class="form-item d">Н</span>`;
+                    if (
+                        teamGoals === null ||
+                        opponentGoals === null
+                    )
+                        return "";
 
-            })
+
+                    if (
+                        teamGoals >
+                        opponentGoals
+                    )
+                        return `
+                            <span class="form-item w">
+                                В
+                            </span>
+                        `;
+
+
+                    if (
+                        teamGoals <
+                        opponentGoals
+                    )
+                        return `
+                            <span class="form-item l">
+                                П
+                            </span>
+                        `;
+
+
+                    return `
+                        <span class="form-item d">
+                            Н
+                        </span>
+                    `;
+
+                }
+            )
             .join("");
 
 
-    document.getElementById("team-content").innerHTML = `
+    document
+        .getElementById(
+            "team-content"
+        )
+        .innerHTML = `
 
-        <div class="team-header">
+            <div class="team-header">
 
-            <img
-                src="${team.logo}"
-                alt=""
-            >
-
-            <h1>${escapeHtml(team.name)}</h1>
-
-            <p>
-                ${escapeHtml(team.country || "")}
-                ${team.founded ? " · " + team.founded : ""}
-            </p>
-
-
-            <div class="team-header-actions">
-
-                <button
-                    class="primary-btn"
-                    onclick="toggleTeamFavorite(${team.id})"
+                <img
+                    src="${team.logo}"
+                    alt=""
                 >
-                    ${favorite ? "★ В избранном" : "☆ В избранное"}
-                </button>
+
+
+                <h1>
+                    ${escapeHtml(
+                        team.name
+                    )}
+                </h1>
+
+
+                <p>
+                    ${escapeHtml(
+                        team.country || ""
+                    )}
+
+                    ${
+                        team.founded
+                            ? " · " +
+                              team.founded
+                            : ""
+                    }
+                </p>
+
+
+                <div
+                    class="team-header-actions"
+                >
+
+                    <button
+                        class="primary-btn"
+                        onclick="
+                            toggleTeamFavorite(
+                                ${team.id}
+                            )
+                        "
+                    >
+                        ${
+                            favorite
+                                ? "★ В избранном"
+                                : "☆ В избранное"
+                        }
+                    </button>
+
+                </div>
 
             </div>
 
-        </div>
+
+            <section class="section">
+
+                <div class="section-title">
+                    <h2>Форма</h2>
+                </div>
 
 
-        <section class="section">
+                <div class="form-row">
 
-            <div class="section-title">
-                <h2>Форма</h2>
-            </div>
+                    ${
+                        form ||
+                        `
+                            <span
+                                style="
+                                    color:var(--muted);
+                                    font-size:11px;
+                                "
+                            >
+                                Нет данных
+                            </span>
+                        `
+                    }
 
-            <div class="form-row">
-                ${form || `<span style="color:var(--muted);font-size:11px;">Нет данных</span>`}
-            </div>
+                </div>
 
-        </section>
+            </section>
 
 
-        <section class="section">
+            <section class="section">
 
-            <div class="section-title">
-                <h2>Последние матчи</h2>
-            </div>
+                <div class="section-title">
+                    <h2>Последние матчи</h2>
+                </div>
 
-            <div class="match-list">
 
-                ${
-                    fixtures.length
-                        ? fixtures.map(matchCard).join("")
-                        : `
-                            <div class="empty">
-                                <strong>Матчи не найдены</strong>
-                            </div>
-                          `
-                }
+                <div class="match-list">
 
-            </div>
+                    ${
+                        fixtures.length
+                            ? fixtures
+                                .map(matchCard)
+                                .join("")
+                            : `
+                                <div class="empty">
+                                    <strong>
+                                        Матчи не найдены
+                                    </strong>
+                                </div>
+                              `
+                    }
 
-        </section>
+                </div>
 
-    `;
+            </section>
+
+        `;
 
 }
 
 
-/* =========================
-   MATCH
-   ========================= */
+/* =========================================================
+   MATCH DETAIL
+========================================================= */
 
-async function openMatch(fixtureId) {
+async function openMatch(
+    fixtureId
+) {
 
-    state.previousPage = state.currentPage;
+    state.previousPage =
+        state.currentPage;
 
-    state.currentMatch = fixtureId;
 
-    showPage("match", false);
+    state.currentMatch =
+        fixtureId;
+
+
+    showPage(
+        "match",
+        false
+    );
 
 
     const el =
-        document.getElementById("match-content");
+        document.getElementById(
+            "match-content"
+        );
 
-    el.innerHTML = loadingBlock();
+
+    el.innerHTML =
+        loadingBlock();
 
 
     try {
@@ -2677,7 +4417,9 @@ async function openMatch(fixtureId) {
         const data =
             await apiRequest(
                 "/fixtures",
-                { id: fixtureId },
+                {
+                    id: fixtureId
+                },
                 120
             );
 
@@ -2689,9 +4431,15 @@ async function openMatch(fixtureId) {
         if (!match) {
 
             el.innerHTML = `
+
                 <div class="empty">
-                    <strong>Матч не найден</strong>
+
+                    <strong>
+                        Матч не найден
+                    </strong>
+
                 </div>
+
             `;
 
             return;
@@ -2699,179 +4447,370 @@ async function openMatch(fixtureId) {
         }
 
 
-        renderMatchDetail(match);
+        renderMatchDetail(
+            match
+        );
 
 
     } catch (error) {
 
-        el.innerHTML = errorBlock(error);
+        el.innerHTML =
+            errorBlock(error);
 
     }
 
 }
 
 
-function renderMatchDetail(match) {
+function renderMatchDetail(
+    match
+) {
 
     const fixtureId =
         match.fixture.id;
 
 
     const isLive =
-        match.fixture.status.short !== "NS" &&
-        !["FT", "AET", "PEN", "CANC", "PST"].includes(
+        ![
+            "NS",
+            "FT",
+            "AET",
+            "PEN",
+            "CANC",
+            "PST"
+        ].includes(
             match.fixture.status.short
         );
+
+
+    const stream =
+        state.content.streams[
+            String(fixtureId)
+        ];
 
 
     const homeScore =
         match.goals.home ?? "-";
 
+
     const awayScore =
         match.goals.away ?? "-";
 
 
-    document.getElementById("match-content").innerHTML = `
+    document
+        .getElementById(
+            "match-content"
+        )
+        .innerHTML = `
 
-        <div class="match-detail">
+            <div class="match-detail">
 
-            <div class="match-detail-competition">
+                <div class="match-detail-competition">
 
-                ${escapeHtml(match.league.name)}
-                ·
-                ${escapeHtml(match.league.round || "")}
+                    ${escapeHtml(
+                        match.league.name
+                    )}
 
-            </div>
+                    ·
 
-
-            <div class="match-detail-teams">
-
-                <div class="detail-team">
-
-                    <img
-                        src="${match.teams.home.logo}"
-                        alt=""
-                    >
-
-                    <strong>
-                        ${escapeHtml(match.teams.home.name)}
-                    </strong>
-
-                    <span>
-                        ${escapeHtml(match.teams.home.winner === true ? "Победитель" : "")}
-                    </span>
+                    ${escapeHtml(
+                        match.league.round || ""
+                    )}
 
                 </div>
 
 
-                <div>
+                <div class="match-detail-teams">
 
-                    <div class="detail-score">
-                        ${homeScore} : ${awayScore}
+                    <div class="detail-team">
+
+                        <img
+                            src="${match.teams.home.logo}"
+                            alt=""
+                        >
+
+                        <strong>
+                            ${escapeHtml(
+                                match.teams.home.name
+                            )}
+                        </strong>
+
                     </div>
 
-                    <div class="detail-status">
-                        ${
-                            isLive
-                                ? "🔴 " + formatStatus(match.fixture.status)
-                                : formatStatus(match.fixture.status)
-                        }
+
+                    <div>
+
+                        <div class="detail-score">
+                            ${homeScore}
+                            :
+                            ${awayScore}
+                        </div>
+
+
+                        <div class="detail-status">
+
+                            ${
+                                isLive
+                                    ? "🔴 "
+                                    : ""
+                            }
+
+                            ${formatStatus(
+                                match.fixture.status
+                            )}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="detail-team">
+
+                        <img
+                            src="${match.teams.away.logo}"
+                            alt=""
+                        >
+
+                        <strong>
+                            ${escapeHtml(
+                                match.teams.away.name
+                            )}
+                        </strong>
+
                     </div>
 
                 </div>
 
 
-                <div class="detail-team">
-
-                    <img
-                        src="${match.teams.away.logo}"
-                        alt=""
-                    >
-
-                    <strong>
-                        ${escapeHtml(match.teams.away.name)}
-                    </strong>
+                <div class="detail-meta">
 
                     <span>
-                        ${escapeHtml(match.teams.away.winner === true ? "Победитель" : "")}
+                        🕐
+                        ${formatTime(
+                            match.fixture.date
+                        )}
                     </span>
+
+
+                    ${
+                        match.fixture.venue?.name
+                            ? `
+                                <span>
+                                    🏟
+                                    ${escapeHtml(
+                                        match.fixture.venue.name
+                                    )}
+                                </span>
+                              `
+                            : ""
+                    }
 
                 </div>
 
-            </div>
-
-
-            <div class="detail-meta">
-
-                <span>🕐 ${formatTime(match.fixture.date)}</span>
 
                 ${
-                    match.fixture.venue?.name
-                        ? `<span>🏟 ${escapeHtml(match.fixture.venue.name)}</span>`
-                        : ""
+                    stream
+                        ? `
+
+                            <div
+                                style="
+                                    margin-top:18px;
+                                "
+                            >
+
+                                <button
+                                    class="primary-btn"
+                                    style="
+                                        width:100%;
+                                    "
+                                    onclick="
+                                        openStream(
+                                            '${escapeJs(
+                                                String(
+                                                    stream.url ||
+                                                    ""
+                                                )
+                                            )}',
+                                            '${escapeJs(
+                                                String(
+                                                    stream.type ||
+                                                    "external"
+                                                )
+                                            )}'
+                                        )
+                                    "
+                                >
+                                    🔴
+                                    ${escapeHtml(
+                                        stream.button ||
+                                        "Смотреть трансляцию"
+                                    )}
+                                </button>
+
+                            </div>
+
+                          `
+                        : `
+                            <div
+                                style="
+                                    margin-top:17px;
+                                    color:var(--muted);
+                                    font-size:10px;
+                                "
+                            >
+                                Трансляция недоступна
+                            </div>
+                          `
                 }
 
             </div>
 
-        </div>
+
+            <div class="tabs">
+
+                <button
+                    class="tab active"
+                    onclick="
+                        loadMatchTab(
+                            'events',
+                            ${fixtureId},
+                            this
+                        )
+                    "
+                >
+                    События
+                </button>
 
 
-        <div class="tabs">
-
-            <button
-                class="tab active"
-                onclick="loadMatchTab('events', ${fixtureId}, this)"
-            >
-                События
-            </button>
-
-            <button
-                class="tab"
-                onclick="loadMatchTab('stats', ${fixtureId}, this)"
-            >
-                Статистика
-            </button>
-
-            <button
-                class="tab"
-                onclick="loadMatchTab('lineups', ${fixtureId}, this)"
-            >
-                Составы
-            </button>
-
-        </div>
+                <button
+                    class="tab"
+                    onclick="
+                        loadMatchTab(
+                            'stats',
+                            ${fixtureId},
+                            this
+                        )
+                    "
+                >
+                    Статистика
+                </button>
 
 
-        <div id="match-tab-content">
-            ${loadingBlock()}
-        </div>
+                <button
+                    class="tab"
+                    onclick="
+                        loadMatchTab(
+                            'lineups',
+                            ${fixtureId},
+                            this
+                        )
+                    "
+                >
+                    Составы
+                </button>
 
-    `;
+            </div>
 
 
-    loadMatchTab("events", fixtureId);
+            <div id="match-tab-content">
+                ${loadingBlock()}
+            </div>
+
+        `;
+
+
+    loadMatchTab(
+        "events",
+        fixtureId
+    );
 
 }
 
 
-async function loadMatchTab(tab, fixtureId, button) {
+/* =========================================================
+   STREAM
+========================================================= */
+
+function openStream(
+    url,
+    type = "external"
+) {
+
+    if (!url) {
+
+        showToast(
+            "Ссылка на трансляцию отсутствует."
+        );
+
+        return;
+
+    }
+
+
+    /*
+       Внешние ссылки открываем
+       в новой вкладке.
+
+       Для embed пока также открываем
+       отдельную страницу, чтобы не
+       ломать сайты, которые запрещают iframe.
+    */
+
+    try {
+
+        window.open(
+            url,
+            "_blank",
+            "noopener,noreferrer"
+        );
+
+    } catch {
+
+        window.location.href =
+            url;
+
+    }
+
+}
+
+
+/* =========================================================
+   MATCH TABS
+========================================================= */
+
+async function loadMatchTab(
+    tab,
+    fixtureId,
+    button
+) {
 
     if (button) {
 
         document
-            .querySelectorAll("#page-match .tab")
-            .forEach(x => x.classList.remove("active"));
+            .querySelectorAll(
+                "#page-match .tab"
+            )
+            .forEach(
+                x =>
+                    x.classList
+                        .remove("active")
+            );
 
-        button.classList.add("active");
+
+        button.classList
+            .add("active");
 
     }
 
 
     const el =
-        document.getElementById("match-tab-content");
+        document.getElementById(
+            "match-tab-content"
+        );
 
 
-    el.innerHTML = loadingBlock();
+    el.innerHTML =
+        loadingBlock();
 
 
     try {
@@ -2881,9 +4820,13 @@ async function loadMatchTab(tab, fixtureId, button) {
             const data =
                 await apiRequest(
                     "/fixtures/events",
-                    { fixture: fixtureId },
+                    {
+                        fixture:
+                            fixtureId
+                    },
                     30
                 );
+
 
             renderEvents(
                 data.response || []
@@ -2897,9 +4840,13 @@ async function loadMatchTab(tab, fixtureId, button) {
             const data =
                 await apiRequest(
                     "/fixtures/statistics",
-                    { fixture: fixtureId },
+                    {
+                        fixture:
+                            fixtureId
+                    },
                     60
                 );
+
 
             renderStatistics(
                 data.response || []
@@ -2913,9 +4860,13 @@ async function loadMatchTab(tab, fixtureId, button) {
             const data =
                 await apiRequest(
                     "/fixtures/lineups",
-                    { fixture: fixtureId },
+                    {
+                        fixture:
+                            fixtureId
+                    },
                     300
                 );
+
 
             renderLineups(
                 data.response || []
@@ -2926,31 +4877,49 @@ async function loadMatchTab(tab, fixtureId, button) {
 
     } catch (error) {
 
-        el.innerHTML = errorBlock(error);
+        el.innerHTML =
+            errorBlock(error);
 
     }
 
 }
 
 
-/* =========================
+/* =========================================================
    EVENTS
-   ========================= */
+========================================================= */
 
-function renderEvents(events) {
+function renderEvents(
+    events
+) {
 
     const el =
-        document.getElementById("match-tab-content");
+        document.getElementById(
+            "match-tab-content"
+        );
 
 
     if (!events.length) {
 
         el.innerHTML = `
+
             <div class="empty">
-                <div class="empty-icon">📋</div>
-                <strong>Событий пока нет</strong>
-                <span>Голы, карточки и замены появятся здесь.</span>
+
+                <div class="empty-icon">
+                    📋
+                </div>
+
+                <strong>
+                    Событий пока нет
+                </strong>
+
+                <span>
+                    Голы, карточки и замены
+                    появятся здесь.
+                </span>
+
             </div>
+
         `;
 
         return;
@@ -2959,104 +4928,136 @@ function renderEvents(events) {
 
 
     el.innerHTML = `
+
         <div class="events">
 
-            ${events.map(event => {
+            ${
+                events
+                    .map(
+                        event => {
 
-                const side =
-                    event.team?.id === state.currentMatch
-                        ? ""
-                        : "";
-
-
-                let icon = "•";
+                            let icon =
+                                "•";
 
 
-                if (event.type === "Goal") {
-
-                    icon =
-                        event.detail === "Penalty"
-                            ? "⚽"
-                            : "⚽";
-
-                }
-
-                if (event.type === "Card") {
-
-                    icon =
-                        event.detail?.toLowerCase().includes("red")
-                            ? "🟥"
-                            : "🟨";
-
-                }
-
-                if (event.type === "subst") {
-
-                    icon = "🔄";
-
-                }
+                            if (
+                                event.type ===
+                                "Goal"
+                            )
+                                icon =
+                                    "⚽";
 
 
-                const assist =
-                    event.assist?.name
-                        ? ` · пас ${escapeHtml(event.assist.name)}`
-                        : "";
+                            if (
+                                event.type ===
+                                "Card"
+                            ) {
+
+                                icon =
+                                    event.detail
+                                        ?.toLowerCase()
+                                        .includes(
+                                            "red"
+                                        )
+                                        ? "🟥"
+                                        : "🟨";
+
+                            }
 
 
-                return `
+                            if (
+                                event.type ===
+                                "subst"
+                            )
+                                icon =
+                                    "🔄";
 
-                    <div
-                        class="event ${
-                            event.team?.id ===
-                            state.currentTeam
-                                ? "right"
-                                : ""
-                        }"
-                    >
 
-                        <div class="event-time">
-                            ${event.time?.elapsed ?? ""}'
-                        </div>
+                            return `
 
-                        <div class="event-side">
-                            ${escapeHtml(event.player?.name || event.detail || "")}
-                            ${assist}
-                        </div>
+                                <div class="event">
 
-                        <div class="event-icon">
-                            ${icon}
-                        </div>
+                                    <div class="event-time">
+                                        ${
+                                            event.time?.elapsed ??
+                                            ""
+                                        }'
+                                    </div>
 
-                    </div>
 
-                `;
+                                    <div class="event-side">
 
-            }).join("")}
+                                        ${escapeHtml(
+                                            event.team?.name ||
+                                            ""
+                                        )}
+
+                                        ·
+
+                                        ${escapeHtml(
+                                            event.player?.name ||
+                                            event.detail ||
+                                            ""
+                                        )}
+
+                                    </div>
+
+
+                                    <div class="event-icon">
+                                        ${icon}
+                                    </div>
+
+                                </div>
+
+                            `;
+
+                        }
+                    )
+                    .join("")
+            }
 
         </div>
+
     `;
 
 }
 
 
-/* =========================
+/* =========================================================
    STATISTICS
-   ========================= */
+========================================================= */
 
-function renderStatistics(data) {
+function renderStatistics(
+    data
+) {
 
     const el =
-        document.getElementById("match-tab-content");
+        document.getElementById(
+            "match-tab-content"
+        );
 
 
     if (!data.length) {
 
         el.innerHTML = `
+
             <div class="empty">
-                <div class="empty-icon">📊</div>
-                <strong>Статистика недоступна</strong>
-                <span>Для этого матча API не вернул статистику.</span>
+
+                <div class="empty-icon">
+                    📊
+                </div>
+
+                <strong>
+                    Статистика недоступна
+                </strong>
+
+                <span>
+                    Для этого матча API
+                    не вернул статистику.
+                </span>
+
             </div>
+
         `;
 
         return;
@@ -3067,6 +5068,7 @@ function renderStatistics(data) {
     const home =
         data[0]?.statistics || [];
 
+
     const away =
         data[1]?.statistics || [];
 
@@ -3074,140 +5076,216 @@ function renderStatistics(data) {
     const map = {};
 
 
-    home.forEach(item => {
+    home.forEach(
+        item => {
 
-        map[item.type] = {
-            home: parseStat(item.value),
-            homeRaw: item.value
-        };
+            map[item.type] = {
 
-    });
+                home:
+                    parseStat(
+                        item.value
+                    ),
 
+                homeRaw:
+                    item.value
 
-    away.forEach(item => {
-
-        if (!map[item.type]) {
-
-            map[item.type] = {};
+            };
 
         }
+    );
 
-        map[item.type].away = parseStat(item.value);
 
-        map[item.type].awayRaw = item.value;
+    away.forEach(
+        item => {
 
-    });
+            if (!map[item.type])
+                map[item.type] = {};
+
+
+            map[item.type].away =
+                parseStat(
+                    item.value
+                );
+
+
+            map[item.type].awayRaw =
+                item.value;
+
+        }
+    );
 
 
     const preferred = [
 
         "Ball Possession",
+
         "Total Shots",
+
         "Shots on Goal",
+
         "Shots off Goal",
+
         "Blocked Shots",
+
         "Corner Kicks",
+
         "Fouls",
+
         "Offsides",
+
         "Yellow Cards",
+
         "Red Cards",
+
         "Total passes",
+
         "Passes accurate"
 
     ];
 
 
     const available =
-        preferred.filter(x => map[x]);
+        preferred.filter(
+            x => map[x]
+        );
 
 
     el.innerHTML = `
 
         <div class="stats-list">
 
-            ${available.map(type => {
+            ${
+                available
+                    .map(
+                        type => {
 
-                const item = map[type];
-
-                const homeValue =
-                    item.home ?? 0;
-
-                const awayValue =
-                    item.away ?? 0;
+                            const item =
+                                map[type];
 
 
-                let total =
-                    homeValue + awayValue;
-
-                if (total === 0)
-                    total = 1;
+                            const homeValue =
+                                item.home ?? 0;
 
 
-                let homePercent =
-                    Math.round(homeValue / total * 100);
-
-                let awayPercent =
-                    100 - homePercent;
+                            const awayValue =
+                                item.away ?? 0;
 
 
-                if (type === "Ball Possession") {
-
-                    homePercent =
-                        parseFloat(
-                            String(item.homeRaw || "50")
-                                .replace("%","")
-                        ) || 50;
-
-                    awayPercent =
-                        100 - homePercent;
-
-                }
+                            let total =
+                                homeValue +
+                                awayValue;
 
 
-                return `
-
-                    <div class="stat-line">
-
-                        <div class="stat-value">
-                            ${escapeHtml(String(item.homeRaw ?? "-"))}
-                        </div>
-
-                        <div class="stat-name">
-                            ${escapeHtml(type)}
-                        </div>
-
-                        <div class="stat-value right">
-                            ${escapeHtml(String(item.awayRaw ?? "-"))}
-                        </div>
+                            if (
+                                total === 0
+                            )
+                                total = 1;
 
 
-                        <div class="stat-bars">
+                            let homePercent =
+                                Math.round(
+                                    homeValue /
+                                    total *
+                                    100
+                                );
 
-                            <div class="bar">
 
-                                <div
-                                    class="bar-fill"
-                                    style="width:${homePercent}%"
-                                ></div>
+                            let awayPercent =
+                                100 -
+                                homePercent;
 
-                            </div>
 
-                            <div class="bar right">
+                            if (
+                                type ===
+                                "Ball Possession"
+                            ) {
 
-                                <div
-                                    class="bar-fill"
-                                    style="width:${awayPercent}%"
-                                ></div>
+                                homePercent =
+                                    parseFloat(
+                                        String(
+                                            item.homeRaw ||
+                                            "50"
+                                        )
+                                        .replace(
+                                            "%",
+                                            ""
+                                        )
+                                    ) || 50;
 
-                            </div>
 
-                        </div>
+                                awayPercent =
+                                    100 -
+                                    homePercent;
 
-                    </div>
+                            }
 
-                `;
 
-            }).join("")}
+                            return `
+
+                                <div class="stat-line">
+
+                                    <div class="stat-value">
+                                        ${escapeHtml(
+                                            String(
+                                                item.homeRaw ??
+                                                "-"
+                                            )
+                                        )}
+                                    </div>
+
+
+                                    <div class="stat-name">
+                                        ${escapeHtml(
+                                            type
+                                        )}
+                                    </div>
+
+
+                                    <div class="stat-value right">
+                                        ${escapeHtml(
+                                            String(
+                                                item.awayRaw ??
+                                                "-"
+                                            )
+                                        )}
+                                    </div>
+
+
+                                    <div class="stat-bars">
+
+                                        <div class="bar">
+
+                                            <div
+                                                class="bar-fill"
+                                                style="
+                                                    width:${homePercent}%;
+                                                "
+                                            ></div>
+
+                                        </div>
+
+
+                                        <div class="bar right">
+
+                                            <div
+                                                class="bar-fill"
+                                                style="
+                                                    width:${awayPercent}%;
+                                                "
+                                            ></div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            `;
+
+                        }
+                    )
+                    .join("")
+            }
 
         </div>
 
@@ -3216,15 +5294,24 @@ function renderStatistics(data) {
 }
 
 
-function parseStat(value) {
+function parseStat(
+    value
+) {
 
-    if (value === null || value === undefined)
+    if (
+        value === null ||
+        value === undefined
+    )
         return 0;
 
 
     const number =
         parseFloat(
-            String(value).replace("%","")
+            String(value)
+                .replace(
+                    "%",
+                    ""
+                )
         );
 
 
@@ -3235,24 +5322,41 @@ function parseStat(value) {
 }
 
 
-/* =========================
+/* =========================================================
    LINEUPS
-   ========================= */
+========================================================= */
 
-function renderLineups(data) {
+function renderLineups(
+    data
+) {
 
     const el =
-        document.getElementById("match-tab-content");
+        document.getElementById(
+            "match-tab-content"
+        );
 
 
     if (!data.length) {
 
         el.innerHTML = `
+
             <div class="empty">
-                <div class="empty-icon">👥</div>
-                <strong>Составы недоступны</strong>
-                <span>API пока не вернул составы команд.</span>
+
+                <div class="empty-icon">
+                    👥
+                </div>
+
+                <strong>
+                    Составы недоступны
+                </strong>
+
+                <span>
+                    API пока не вернул
+                    составы команд.
+                </span>
+
             </div>
+
         `;
 
         return;
@@ -3260,98 +5364,137 @@ function renderLineups(data) {
     }
 
 
-    el.innerHTML = data.map(team => `
+    el.innerHTML =
+        data
+            .map(
+                team => `
 
-        <div class="lineup-team">
+                    <div class="lineup-team">
 
-            <div class="lineup-title">
+                        <div class="lineup-title">
 
-                <span>
-                    ${escapeHtml(team.team?.name || "")}
-                </span>
+                            <span>
+                                ${escapeHtml(
+                                    team.team?.name ||
+                                    ""
+                                )}
+                            </span>
 
-                <span style="color:var(--muted)">
-                    ${escapeHtml(team.formation || "")}
-                </span>
+                            <span
+                                style="
+                                    color:var(--muted)
+                                "
+                            >
+                                ${escapeHtml(
+                                    team.formation ||
+                                    ""
+                                )}
+                            </span>
 
-            </div>
+                        </div>
 
 
-            <div class="player-list">
+                        <div class="player-list">
 
-                ${
-                    (team.startXI || [])
-                        .map(item => {
+                            ${
+                                (
+                                    team.startXI ||
+                                    []
+                                )
+                                .map(
+                                    item => {
 
-                            const player =
-                                item.player;
+                                        const player =
+                                            item.player;
 
-                            return `
 
-                                <div class="player">
+                                        return `
 
-                                    <div class="player-number">
-                                        ${player.number ?? ""}
-                                    </div>
+                                            <div class="player">
 
-                                    ${
-                                        player.photo
-                                            ? `
-                                                <img
-                                                    class="player-photo"
-                                                    src="${player.photo}"
-                                                    alt=""
-                                                >
-                                              `
-                                            : `
-                                                <div class="player-photo"></div>
-                                              `
+                                                <div class="player-number">
+                                                    ${
+                                                        player.number ??
+                                                        ""
+                                                    }
+                                                </div>
+
+
+                                                ${
+                                                    player.photo
+                                                        ? `
+                                                            <img
+                                                                class="player-photo"
+                                                                src="${player.photo}"
+                                                                alt=""
+                                                            >
+                                                          `
+                                                        : `
+                                                            <div class="player-photo"></div>
+                                                          `
+                                                }
+
+
+                                                <div class="player-name">
+                                                    ${escapeHtml(
+                                                        player.name ||
+                                                        ""
+                                                    )}
+                                                </div>
+
+                                            </div>
+
+                                        `;
+
                                     }
+                                )
+                                .join("")
+                            }
 
-                                    <div class="player-name">
-                                        ${escapeHtml(player.name || "")}
-                                    </div>
+                        </div>
 
-                                </div>
+                    </div>
 
-                            `;
-
-                        })
-                        .join("")
-                }
-
-            </div>
-
-        </div>
-
-    `).join("");
+                `
+            )
+            .join("");
 
 }
 
 
-/* =========================
+/* =========================================================
    SEARCH
-   ========================= */
+========================================================= */
 
 function openSearch() {
 
     document
-        .getElementById("search-modal")
-        .classList.add("active");
+        .getElementById(
+            "search-modal"
+        )
+        .classList
+        .add("active");
 
 
     document
-        .getElementById("search-results")
+        .getElementById(
+            "search-results"
+        )
         .innerHTML = "";
 
 
-    setTimeout(() => {
+    setTimeout(
+        () => {
 
-        document
-            .getElementById("search-input")
-            .focus();
+            document
+                .getElementById(
+                    "search-input"
+                )
+                .focus();
 
-    }, 100);
+        },
+        100
+    );
 
 }
 
@@ -3359,16 +5502,22 @@ function openSearch() {
 async function searchTeams() {
 
     const input =
-        document.getElementById("search-input");
+        document.getElementById(
+            "search-input"
+        );
 
 
     const query =
         input.value.trim();
 
 
-    if (query.length < 2) {
+    if (
+        query.length < 2
+    ) {
 
-        showToast("Введите минимум 2 символа.");
+        showToast(
+            "Введите минимум 2 символа."
+        );
 
         return;
 
@@ -3376,10 +5525,13 @@ async function searchTeams() {
 
 
     const results =
-        document.getElementById("search-results");
+        document.getElementById(
+            "search-results"
+        );
 
 
-    results.innerHTML = loadingBlock();
+    results.innerHTML =
+        loadingBlock();
 
 
     try {
@@ -3387,7 +5539,10 @@ async function searchTeams() {
         const data =
             await apiRequest(
                 "/teams",
-                { search: query },
+                {
+                    search:
+                        query
+                },
                 3600
             );
 
@@ -3399,11 +5554,23 @@ async function searchTeams() {
         if (!teams.length) {
 
             results.innerHTML = `
+
                 <div class="empty">
-                    <div class="empty-icon">🔎</div>
-                    <strong>Ничего не найдено</strong>
-                    <span>Попробуй другое название.</span>
+
+                    <div class="empty-icon">
+                        🔎
+                    </div>
+
+                    <strong>
+                        Ничего не найдено
+                    </strong>
+
+                    <span>
+                        Попробуй другое название.
+                    </span>
+
                 </div>
+
             `;
 
             return;
@@ -3415,43 +5582,69 @@ async function searchTeams() {
 
             <div class="search-results">
 
-                ${teams.map(item => {
+                ${
+                    teams
+                        .map(
+                            item => {
 
-                    const team = item.team;
+                                const team =
+                                    item.team;
 
-                    return `
 
-                        <button
-                            class="search-team"
-                            onclick="closeModal('search-modal'); openTeam(${team.id})"
-                        >
+                                return `
 
-                            <img
-                                src="${team.logo}"
-                                alt=""
-                            >
+                                    <button
+                                        class="search-team"
+                                        onclick="
+                                            closeModal(
+                                                'search-modal'
+                                            );
+                                            openTeam(
+                                                ${team.id}
+                                            )
+                                        "
+                                    >
 
-                            <div class="search-team-info">
+                                        <img
+                                            src="${team.logo}"
+                                            alt=""
+                                        >
 
-                                <strong>
-                                    ${escapeHtml(team.name)}
-                                </strong>
 
-                                <span>
-                                    ${escapeHtml(team.country || "")}
-                                </span>
+                                        <div class="search-team-info">
 
-                            </div>
+                                            <strong>
+                                                ${escapeHtml(
+                                                    team.name
+                                                )}
+                                            </strong>
 
-                            <span style="color:var(--muted)">
-                                ›
-                            </span>
+                                            <span>
+                                                ${escapeHtml(
+                                                    team.country ||
+                                                    ""
+                                                )}
+                                            </span>
 
-                        </button>
+                                        </div>
 
-                    `;
 
-                }).join("")}
+                                        <span
+                                            style="
+                                                color:var(--muted)
+                                            "
+                                        >
+                                            ›
+                                        </span>
+
+                                    </button>
+
+                                `;
+
+                            }
+                        )
+                        .join("")
+                }
 
             </div>
 
@@ -3460,87 +5653,118 @@ async function searchTeams() {
 
     } catch (error) {
 
-        results.innerHTML = errorBlock(error);
+        results.innerHTML =
+            errorBlock(error);
 
     }
 
 }
 
 
-/* =========================
+/* =========================================================
    FAVORITES
-   ========================= */
+========================================================= */
 
-function toggleMatchFavorite(id) {
+function toggleMatchFavorite(
+    id
+) {
 
-    if (state.favorites.includes(id)) {
+    if (
+        state.favorites.includes(id)
+    ) {
 
         state.favorites =
-            state.favorites.filter(x => x !== id);
+            state.favorites.filter(
+                x => x !== id
+            );
 
-        showToast("Удалено из избранного.");
+
+        showToast(
+            "Удалено из избранного."
+        );
 
     } else {
 
         state.favorites.push(id);
 
-        showToast("Добавлено в избранное.");
+
+        showToast(
+            "Добавлено в избранное."
+        );
 
     }
 
 
     localStorage.setItem(
         "footballHubFavorites",
-        JSON.stringify(state.favorites)
+        JSON.stringify(
+            state.favorites
+        )
     );
 
 
-    if (state.currentPage === "home") {
-
+    if (
+        state.currentPage ===
+        "home"
+    )
         loadHome();
 
-    }
 
-    if (state.currentPage === "matches") {
-
+    if (
+        state.currentPage ===
+        "matches"
+    )
         loadMatchesPage();
 
-    }
 
     renderProfile();
 
 }
 
 
-function toggleTeamFavorite(id) {
+function toggleTeamFavorite(
+    id
+) {
 
-    if (state.teamFavorites.includes(id)) {
+    if (
+        state.teamFavorites
+            .includes(id)
+    ) {
 
         state.teamFavorites =
-            state.teamFavorites.filter(x => x !== id);
+            state.teamFavorites.filter(
+                x => x !== id
+            );
 
-        showToast("Команда удалена из избранного.");
+
+        showToast(
+            "Команда удалена из избранного."
+        );
 
     } else {
 
         state.teamFavorites.push(id);
 
-        showToast("Команда добавлена в избранное.");
+
+        showToast(
+            "Команда добавлена в избранное."
+        );
 
     }
 
 
     localStorage.setItem(
         "footballHubTeamFavorites",
-        JSON.stringify(state.teamFavorites)
+        JSON.stringify(
+            state.teamFavorites
+        )
     );
 
 
-    if (state.currentTeam) {
-
-        openTeam(state.currentTeam);
-
-    }
+    if (state.currentTeam)
+        openTeam(
+            state.currentTeam
+        );
 
 
     renderProfile();
@@ -3548,14 +5772,17 @@ function toggleTeamFavorite(id) {
 }
 
 
-/* =========================
+/* =========================================================
    PROFILE
-   ========================= */
+========================================================= */
 
 function renderProfile() {
 
     const count =
-        document.getElementById("favorite-count");
+        document.getElementById(
+            "favorite-count"
+        );
+
 
     if (count) {
 
@@ -3566,13 +5793,19 @@ function renderProfile() {
 
 
     const name =
-        document.getElementById("profile-name");
+        document.getElementById(
+            "profile-name"
+        );
 
 
-    if (name && tg?.initDataUnsafe?.user) {
+    if (
+        name &&
+        tg?.initDataUnsafe?.user
+    ) {
 
         const user =
             tg.initDataUnsafe.user;
+
 
         name.textContent =
             user.first_name ||
@@ -3591,19 +5824,34 @@ function renderProfile() {
 function renderFavoriteTeams() {
 
     const el =
-        document.getElementById("favorite-teams");
+        document.getElementById(
+            "favorite-teams"
+        );
 
 
-    if (!state.teamFavorites.length) {
+    if (
+        !state.teamFavorites.length
+    ) {
 
         el.innerHTML = `
+
             <div class="empty">
-                <div class="empty-icon">⭐</div>
-                <strong>Пока ничего нет</strong>
+
+                <div class="empty-icon">
+                    ⭐
+                </div>
+
+                <strong>
+                    Пока ничего нет
+                </strong>
+
                 <span>
-                    Добавляй любимые команды через поиск.
+                    Добавляй любимые команды
+                    через поиск.
                 </span>
+
             </div>
+
         `;
 
         return;
@@ -3611,99 +5859,1631 @@ function renderFavoriteTeams() {
     }
 
 
-    el.innerHTML = loadingBlock();
+    el.innerHTML =
+        loadingBlock();
 
 
     Promise.all(
 
         state.teamFavorites
             .slice(0, 10)
-            .map(id =>
-                apiRequest(
-                    "/teams",
-                    { id },
-                    3600
-                )
-                .then(data =>
-                    data.response?.[0]?.team
-                )
-                .catch(() => null)
+            .map(
+                id =>
+                    apiRequest(
+                        "/teams",
+                        {
+                            id
+                        },
+                        3600
+                    )
+                    .then(
+                        data =>
+                            data.response
+                                ?.[0]
+                                ?.team
+                    )
+                    .catch(
+                        () => null
+                    )
             )
 
-    ).then(teams => {
+    )
+    .then(
+        teams => {
 
-        const valid =
-            teams.filter(Boolean);
+            const valid =
+                teams.filter(
+                    Boolean
+                );
 
 
-        if (!valid.length) {
+            if (!valid.length) {
+
+                el.innerHTML = `
+
+                    <div class="empty">
+
+                        <strong>
+                            Не удалось загрузить команды
+                        </strong>
+
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
 
             el.innerHTML = `
-                <div class="empty">
-                    <strong>Не удалось загрузить команды</strong>
+
+                <div class="match-list">
+
+                    ${
+                        valid
+                            .map(
+                                team => `
+
+                                    <button
+                                        class="search-team"
+                                        onclick="
+                                            openTeam(
+                                                ${team.id}
+                                            )
+                                        "
+                                    >
+
+                                        <img
+                                            src="${team.logo}"
+                                            alt=""
+                                        >
+
+
+                                        <div class="search-team-info">
+
+                                            <strong>
+                                                ${escapeHtml(
+                                                    team.name
+                                                )}
+                                            </strong>
+
+                                            <span>
+                                                ${escapeHtml(
+                                                    team.country ||
+                                                    ""
+                                                )}
+                                            </span>
+
+                                        </div>
+
+
+                                        <span
+                                            style="
+                                                color:var(--accent)
+                                            "
+                                        >
+                                            ★
+                                        </span>
+
+                                    </button>
+
+                                `
+                            )
+                            .join("")
+                    }
+
                 </div>
+
             `;
 
-            return;
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ADMIN
+========================================================= */
+
+function openAdmin() {
+
+    state.previousPage =
+        state.currentPage;
+
+
+    showPage(
+        "admin",
+        false
+    );
+
+
+    if (
+        state.admin.loggedIn
+    ) {
+
+        showAdminPanel();
+
+    } else {
+
+        showAdminLogin();
+
+    }
+
+}
+
+
+function showAdminLogin() {
+
+    document
+        .getElementById(
+            "admin-login"
+        )
+        .classList
+        .remove("hidden");
+
+
+    document
+        .getElementById(
+            "admin-panel"
+        )
+        .classList
+        .add("hidden");
+
+
+    const savedOwner =
+        sessionStorage.getItem(
+            "footballHubGithubOwner"
+        );
+
+
+    const savedRepo =
+        sessionStorage.getItem(
+            "footballHubGithubRepo"
+        );
+
+
+    if (savedOwner)
+        document
+            .getElementById(
+                "github-owner"
+            )
+            .value =
+            savedOwner;
+
+
+    if (savedRepo)
+        document
+            .getElementById(
+                "github-repo"
+            )
+            .value =
+            savedRepo;
+
+}
+
+
+function adminLogin() {
+
+    const owner =
+        document
+            .getElementById(
+                "github-owner"
+            )
+            .value
+            .trim();
+
+
+    const repo =
+        document
+            .getElementById(
+                "github-repo"
+            )
+            .value
+            .trim();
+
+
+    const token =
+        document
+            .getElementById(
+                "github-token"
+            )
+            .value
+            .trim();
+
+
+    if (!owner) {
+
+        showToast(
+            "Укажи GitHub Owner."
+        );
+
+        return;
+
+    }
+
+
+    if (!repo) {
+
+        showToast(
+            "Укажи Repository."
+        );
+
+        return;
+
+    }
+
+
+    if (!token) {
+
+        showToast(
+            "Вставь GitHub Token."
+        );
+
+        return;
+
+    }
+
+
+    state.admin.owner =
+        owner;
+
+
+    state.admin.repo =
+        repo;
+
+
+    state.admin.token =
+        token;
+
+
+    state.admin.loggedIn =
+        true;
+
+
+    sessionStorage.setItem(
+        "footballHubGithubOwner",
+        owner
+    );
+
+
+    sessionStorage.setItem(
+        "footballHubGithubRepo",
+        repo
+    );
+
+
+    sessionStorage.setItem(
+        "footballHubGithubToken",
+        token
+    );
+
+
+    showAdminPanel();
+
+
+    loadGithubContent();
+
+}
+
+
+function restoreAdminSession() {
+
+    const owner =
+        sessionStorage.getItem(
+            "footballHubGithubOwner"
+        );
+
+
+    const repo =
+        sessionStorage.getItem(
+            "footballHubGithubRepo"
+        );
+
+
+    const token =
+        sessionStorage.getItem(
+            "footballHubGithubToken"
+        );
+
+
+    if (
+        owner &&
+        repo &&
+        token
+    ) {
+
+        state.admin.owner =
+            owner;
+
+        state.admin.repo =
+            repo;
+
+        state.admin.token =
+            token;
+
+        state.admin.loggedIn =
+            true;
+
+    }
+
+}
+
+
+restoreAdminSession();
+
+
+function showAdminPanel() {
+
+    document
+        .getElementById(
+            "admin-login"
+        )
+        .classList
+        .add("hidden");
+
+
+    document
+        .getElementById(
+            "admin-panel"
+        )
+        .classList
+        .remove("hidden");
+
+
+    renderAdminLists();
+
+}
+
+
+function adminLogout() {
+
+    state.admin.owner =
+        "";
+
+    state.admin.repo =
+        "";
+
+    state.admin.token =
+        "";
+
+    state.admin.sha =
+        null;
+
+    state.admin.loggedIn =
+        false;
+
+
+    sessionStorage.removeItem(
+        "footballHubGithubOwner"
+    );
+
+
+    sessionStorage.removeItem(
+        "footballHubGithubRepo"
+    );
+
+
+    sessionStorage.removeItem(
+        "footballHubGithubToken"
+    );
+
+
+    showAdminLogin();
+
+
+    showToast(
+        "Вы вышли из админки."
+    );
+
+}
+
+
+/* =========================================================
+   GITHUB API
+========================================================= */
+
+function githubHeaders() {
+
+    return {
+
+        "Authorization":
+            `Bearer ${state.admin.token}`,
+
+        "Accept":
+            "application/vnd.github+json",
+
+        "Content-Type":
+            "application/json",
+
+        "X-GitHub-Api-Version":
+            "2022-11-28"
+
+    };
+
+}
+
+
+function githubContentUrl() {
+
+    return (
+        "https://api.github.com/repos/" +
+        encodeURIComponent(
+            state.admin.owner
+        ) +
+        "/" +
+        encodeURIComponent(
+            state.admin.repo
+        ) +
+        "/contents/" +
+        CONTENT_FILE
+    );
+
+}
+
+
+async function loadGithubContent() {
+
+    if (
+        !state.admin.loggedIn
+    )
+        return;
+
+
+    try {
+
+        const response =
+            await fetch(
+                githubContentUrl(),
+                {
+                    method: "GET",
+                    headers:
+                        githubHeaders()
+                }
+            );
+
+
+        if (!response.ok) {
+
+            const text =
+                await response.text();
+
+
+            throw new Error(
+                "GitHub " +
+                response.status +
+                ": " +
+                text
+            );
 
         }
 
 
+        const data =
+            await response.json();
+
+
+        state.admin.sha =
+            data.sha;
+
+
+        const decoded =
+            decodeBase64Unicode(
+                data.content
+            );
+
+
+        const content =
+            JSON.parse(
+                decoded
+            );
+
+
+        state.content = {
+
+            streams:
+                content.streams || {},
+
+            news:
+                Array.isArray(
+                    content.news
+                )
+                    ? content.news
+                    : [],
+
+            banners:
+                Array.isArray(
+                    content.banners
+                )
+                    ? content.banners
+                    : []
+
+        };
+
+
+        renderAdminLists();
+
+        renderHomeContent();
+
+
+        showToast(
+            "content.json загружен."
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        showToast(
+            "Ошибка GitHub: " +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   SAVE CONTENT TO GITHUB
+========================================================= */
+
+async function saveContentToGithub() {
+
+    if (
+        !state.admin.loggedIn
+    ) {
+
+        showToast(
+            "Сначала войди в админку."
+        );
+
+        return false;
+
+    }
+
+
+    try {
+
+        /*
+           Сначала получаем свежий SHA.
+           Это предотвращает ошибку,
+           если файл изменился после
+           предыдущей загрузки.
+        */
+
+        const current =
+            await fetch(
+                githubContentUrl(),
+                {
+                    method: "GET",
+                    headers:
+                        githubHeaders()
+                }
+            );
+
+
+        let sha =
+            state.admin.sha;
+
+
+        if (current.ok) {
+
+            const currentData =
+                await current.json();
+
+            sha =
+                currentData.sha;
+
+        }
+
+
+        const json =
+            JSON.stringify(
+                state.content,
+                null,
+                2
+            );
+
+
+        const encoded =
+            encodeBase64Unicode(
+                json
+            );
+
+
+        const body = {
+
+            message:
+                "Update Football Hub content",
+
+            content:
+                encoded,
+
+            branch:
+                "main"
+
+        };
+
+
+        if (sha) {
+
+            body.sha =
+                sha;
+
+        }
+
+
+        const response =
+            await fetch(
+                githubContentUrl(),
+                {
+
+                    method: "PUT",
+
+                    headers:
+                        githubHeaders(),
+
+                    body:
+                        JSON.stringify(
+                            body
+                        )
+
+                }
+            );
+
+
+        if (!response.ok) {
+
+            const text =
+                await response.text();
+
+
+            throw new Error(
+                "GitHub " +
+                response.status +
+                ": " +
+                text
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        state.admin.sha =
+            result.content?.sha ||
+            null;
+
+
+        showToast(
+            "✅ Сохранено в GitHub."
+        );
+
+
+        renderHomeContent();
+
+        renderAdminLists();
+
+
+        return true;
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        showToast(
+            "Ошибка сохранения: " +
+            error.message
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   STREAM ADMIN
+========================================================= */
+
+function saveStream() {
+
+    const fixtureId =
+        document
+            .getElementById(
+                "stream-fixture-id"
+            )
+            .value
+            .trim();
+
+
+    const title =
+        document
+            .getElementById(
+                "stream-title"
+            )
+            .value
+            .trim();
+
+
+    const url =
+        document
+            .getElementById(
+                "stream-url"
+            )
+            .value
+            .trim();
+
+
+    const type =
+        document
+            .getElementById(
+                "stream-type"
+            )
+            .value;
+
+
+    const button =
+        document
+            .getElementById(
+                "stream-button"
+            )
+            .value
+            .trim();
+
+
+    if (!fixtureId) {
+
+        showToast(
+            "Укажи ID матча."
+        );
+
+        return;
+
+    }
+
+
+    if (!url) {
+
+        showToast(
+            "Вставь ссылку на трансляцию."
+        );
+
+        return;
+
+    }
+
+
+    state.content.streams[
+        String(fixtureId)
+    ] = {
+
+        title:
+            title ||
+            "Трансляция",
+
+        url,
+
+        type,
+
+        button:
+            button ||
+            "Смотреть трансляцию",
+
+        active:
+            true
+
+    };
+
+
+    saveContentToGithub()
+        .then(
+            success => {
+
+                if (success) {
+
+                    resetStreamForm();
+
+                }
+
+            }
+        );
+
+}
+
+
+function editStream(id) {
+
+    const stream =
+        state.content.streams[
+            String(id)
+        ];
+
+
+    if (!stream)
+        return;
+
+
+    document
+        .getElementById(
+            "stream-fixture-id"
+        )
+        .value =
+        id;
+
+
+    document
+        .getElementById(
+            "stream-title"
+        )
+        .value =
+        stream.title || "";
+
+
+    document
+        .getElementById(
+            "stream-url"
+        )
+        .value =
+        stream.url || "";
+
+
+    document
+        .getElementById(
+            "stream-type"
+        )
+        .value =
+        stream.type ||
+        "external";
+
+
+    document
+        .getElementById(
+            "stream-button"
+        )
+        .value =
+        stream.button ||
+        "Смотреть трансляцию";
+
+
+    document
+        .getElementById(
+            "stream-fixture-id"
+        )
+        .focus();
+
+}
+
+
+function deleteStream(id) {
+
+    if (
+        !confirm(
+            "Удалить эту трансляцию?"
+        )
+    )
+        return;
+
+
+    delete state.content.streams[
+        String(id)
+    ];
+
+
+    saveContentToGithub();
+
+}
+
+
+function resetStreamForm() {
+
+    document
+        .getElementById(
+            "stream-fixture-id"
+        )
+        .value = "";
+
+
+    document
+        .getElementById(
+            "stream-title"
+        )
+        .value = "";
+
+
+    document
+        .getElementById(
+            "stream-url"
+        )
+        .value = "";
+
+
+    document
+        .getElementById(
+            "stream-type"
+        )
+        .value =
+        "external";
+
+
+    document
+        .getElementById(
+            "stream-button"
+        )
+        .value =
+        "Смотреть трансляцию";
+
+}
+
+
+/* =========================================================
+   NEWS ADMIN
+========================================================= */
+
+function saveNews() {
+
+    const title =
+        document
+            .getElementById(
+                "news-title"
+            )
+            .value
+            .trim();
+
+
+    const text =
+        document
+            .getElementById(
+                "news-text"
+            )
+            .value
+            .trim();
+
+
+    const url =
+        document
+            .getElementById(
+                "news-url"
+            )
+            .value
+            .trim();
+
+
+    if (!title) {
+
+        showToast(
+            "Укажи заголовок."
+        );
+
+        return;
+
+    }
+
+
+    if (!text) {
+
+        showToast(
+            "Напиши текст новости."
+        );
+
+        return;
+
+    }
+
+
+    const item = {
+
+        id:
+            Date.now(),
+
+        title,
+
+        text,
+
+        url,
+
+        date:
+            new Date()
+                .toLocaleDateString(
+                    "ru-RU"
+                ),
+
+        active:
+            true
+
+    };
+
+
+    state.content.news.unshift(
+        item
+    );
+
+
+    saveContentToGithub()
+        .then(
+            success => {
+
+                if (success)
+                    resetNewsForm();
+
+            }
+        );
+
+}
+
+
+function deleteNews(id) {
+
+    if (
+        !confirm(
+            "Удалить эту новость?"
+        )
+    )
+        return;
+
+
+    state.content.news =
+        state.content.news.filter(
+            item =>
+                String(item.id) !==
+                String(id)
+        );
+
+
+    saveContentToGithub();
+
+}
+
+
+function resetNewsForm() {
+
+    document
+        .getElementById(
+            "news-title"
+        )
+        .value = "";
+
+
+    document
+        .getElementById(
+            "news-text"
+        )
+        .value = "";
+
+
+    document
+        .getElementById(
+            "news-url"
+        )
+        .value = "";
+
+}
+
+
+/* =========================================================
+   BANNER ADMIN
+========================================================= */
+
+function saveBanner() {
+
+    const title =
+        document
+            .getElementById(
+                "banner-title"
+            )
+            .value
+            .trim();
+
+
+    const text =
+        document
+            .getElementById(
+                "banner-text"
+            )
+            .value
+            .trim();
+
+
+    const image =
+        document
+            .getElementById(
+                "banner-image"
+            )
+            .value
+            .trim();
+
+
+    const url =
+        document
+            .getElementById(
+                "banner-url"
+            )
+            .value
+            .trim();
+
+
+    if (!title) {
+
+        showToast(
+            "Укажи заголовок."
+        );
+
+        return;
+
+    }
+
+
+    state.content.banners.unshift({
+
+        id:
+            Date.now(),
+
+        title,
+
+        text,
+
+        image,
+
+        url,
+
+        active:
+            true
+
+    });
+
+
+    saveContentToGithub()
+        .then(
+            success => {
+
+                if (success)
+                    resetBannerForm();
+
+            }
+        );
+
+}
+
+
+function deleteBanner(id) {
+
+    if (
+        !confirm(
+            "Удалить этот баннер?"
+        )
+    )
+        return;
+
+
+    state.content.banners =
+        state.content.banners.filter(
+            item =>
+                String(item.id) !==
+                String(id)
+        );
+
+
+    saveContentToGithub();
+
+}
+
+
+function resetBannerForm() {
+
+    document
+        .getElementById(
+            "banner-title"
+        )
+        .value = "";
+
+
+    document
+        .getElementById(
+            "banner-text"
+        )
+        .value = "";
+
+
+    document
+        .getElementById(
+            "banner-image"
+        )
+        .value = "";
+
+
+    document
+        .getElementById(
+            "banner-url"
+        )
+        .value = "";
+
+}
+
+
+/* =========================================================
+   ADMIN TABS
+========================================================= */
+
+function switchAdminTab(
+    tab
+) {
+
+    document
+        .querySelectorAll(
+            ".admin-tab"
+        )
+        .forEach(
+            button => {
+
+                button.classList.toggle(
+                    "active",
+                    button.dataset.adminTab ===
+                    tab
+                );
+
+            }
+        );
+
+
+    document
+        .getElementById(
+            "admin-streams"
+        )
+        .classList.toggle(
+            "hidden",
+            tab !== "streams"
+        );
+
+
+    document
+        .getElementById(
+            "admin-news"
+        )
+        .classList.toggle(
+            "hidden",
+            tab !== "news"
+        );
+
+
+    document
+        .getElementById(
+            "admin-banners"
+        )
+        .classList.toggle(
+            "hidden",
+            tab !== "banners"
+        );
+
+}
+
+
+/* =========================================================
+   ADMIN LISTS
+========================================================= */
+
+function renderAdminLists() {
+
+    if (
+        !state.admin.loggedIn
+    )
+        return;
+
+
+    renderAdminStreams();
+
+    renderAdminNews();
+
+    renderAdminBanners();
+
+}
+
+
+function renderAdminStreams() {
+
+    const el =
+        document.getElementById(
+            "admin-stream-list"
+        );
+
+
+    const streams =
+        Object.entries(
+            state.content.streams || {}
+        );
+
+
+    if (!streams.length) {
+
         el.innerHTML = `
 
-            <div class="match-list">
+            <div class="empty">
 
-                ${valid.map(team => `
+                <div class="empty-icon">
+                    🔴
+                </div>
 
-                    <button
-                        class="search-team"
-                        onclick="openTeam(${team.id})"
-                    >
+                <strong>
+                    Трансляций пока нет
+                </strong>
 
-                        <img
-                            src="${team.logo}"
-                            alt=""
-                        >
-
-                        <div class="search-team-info">
-
-                            <strong>
-                                ${escapeHtml(team.name)}
-                            </strong>
-
-                            <span>
-                                ${escapeHtml(team.country || "")}
-                            </span>
-
-                        </div>
-
-                        <span style="color:var(--accent)">
-                            ★
-                        </span>
-
-                    </button>
-
-                `).join("")}
+                <span>
+                    Добавь первую трансляцию
+                    выше.
+                </span>
 
             </div>
 
         `;
 
-    });
+        return;
+
+    }
+
+
+    el.innerHTML =
+        streams
+            .map(
+                ([id, stream]) => `
+
+                    <div class="admin-item">
+
+                        <div class="admin-item-top">
+
+                            <div>
+
+                                <div class="admin-item-title">
+                                    ${escapeHtml(
+                                        stream.title ||
+                                        "Трансляция"
+                                    )}
+                                </div>
+
+                                <div class="admin-item-sub">
+                                    Match ID: ${escapeHtml(id)}
+                                </div>
+
+                                <div class="admin-item-sub">
+                                    ${escapeHtml(
+                                        stream.url ||
+                                        ""
+                                    )}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="admin-item-actions">
+
+                            <button
+                                class="small-btn"
+                                onclick="
+                                    editStream(
+                                        '${escapeJs(id)}'
+                                    )
+                                "
+                            >
+                                ✏️ Изменить
+                            </button>
+
+
+                            <button
+                                class="small-btn danger"
+                                onclick="
+                                    deleteStream(
+                                        '${escapeJs(id)}'
+                                    )
+                                "
+                            >
+                                🗑 Удалить
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                `
+            )
+            .join("");
 
 }
 
 
-/* =========================
-   NAVIGATION
-   ========================= */
+function renderAdminNews() {
 
-function showPage(page, updateNav = true) {
+    const el =
+        document.getElementById(
+            "admin-news-list"
+        );
+
+
+    const news =
+        state.content.news || [];
+
+
+    if (!news.length) {
+
+        el.innerHTML = `
+
+            <div class="empty">
+
+                <div class="empty-icon">
+                    📰
+                </div>
+
+                <strong>
+                    Новостей пока нет
+                </strong>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    el.innerHTML =
+        news
+            .map(
+                item => `
+
+                    <div class="admin-item">
+
+                        <div class="admin-item-title">
+                            ${escapeHtml(
+                                item.title ||
+                                ""
+                            )}
+                        </div>
+
+                        <div class="admin-item-sub">
+                            ${escapeHtml(
+                                item.text ||
+                                ""
+                            )}
+                        </div>
+
+
+                        <div class="admin-item-actions">
+
+                            <button
+                                class="small-btn danger"
+                                onclick="
+                                    deleteNews(
+                                        '${escapeJs(
+                                            String(
+                                                item.id
+                                            )
+                                        )}'
+                                    )
+                                "
+                            >
+                                🗑 Удалить
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                `
+            )
+            .join("");
+
+}
+
+
+function renderAdminBanners() {
+
+    const el =
+        document.getElementById(
+            "admin-banner-list"
+        );
+
+
+    const banners =
+        state.content.banners || [];
+
+
+    if (!banners.length) {
+
+        el.innerHTML = `
+
+            <div class="empty">
+
+                <div class="empty-icon">
+                    📢
+                </div>
+
+                <strong>
+                    Баннеров пока нет
+                </strong>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    el.innerHTML =
+        banners
+            .map(
+                item => `
+
+                    <div class="admin-item">
+
+                        <div class="admin-item-title">
+                            ${escapeHtml(
+                                item.title ||
+                                ""
+                            )}
+                        </div>
+
+                        <div class="admin-item-sub">
+                            ${escapeHtml(
+                                item.text ||
+                                ""
+                            )}
+                        </div>
+
+
+                        <div class="admin-item-actions">
+
+                            <button
+                                class="small-btn danger"
+                                onclick="
+                                    deleteBanner(
+                                        '${escapeJs(
+                                            String(
+                                                item.id
+                                            )
+                                        )}'
+                                    )
+                                "
+                            >
+                                🗑 Удалить
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                `
+            )
+            .join("");
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showPage(
+    page,
+    updateNav = true
+) {
 
     if (
         state.currentPage !== page &&
         page !== "team" &&
-        page !== "match"
+        page !== "match" &&
+        page !== "admin"
     ) {
 
         state.previousPage =
@@ -3713,71 +7493,87 @@ function showPage(page, updateNav = true) {
 
 
     document
-        .querySelectorAll(".page")
-        .forEach(el =>
-            el.classList.remove("active")
+        .querySelectorAll(
+            ".page"
+        )
+        .forEach(
+            el =>
+                el.classList
+                    .remove("active")
         );
 
 
     const target =
-        document.getElementById("page-" + page);
+        document.getElementById(
+            "page-" + page
+        );
 
 
-    if (!target) return;
+    if (!target)
+        return;
 
 
-    target.classList.add("active");
+    target.classList
+        .add("active");
 
 
-    state.currentPage = page;
+    state.currentPage =
+        page;
 
 
     if (updateNav) {
 
         document
-            .querySelectorAll(".nav-item")
-            .forEach(item => {
+            .querySelectorAll(
+                ".nav-item"
+            )
+            .forEach(
+                item => {
 
-                item.classList.toggle(
-                    "active",
-                    item.dataset.page === page
-                );
+                    item.classList.toggle(
+                        "active",
+                        item.dataset.page ===
+                        page
+                    );
 
-            });
+                }
+            );
 
     }
 
 
-    window.scrollTo({
-        top: 0,
-        behavior: "instant"
-    });
+    window.scrollTo(
+        {
+            top: 0,
+            behavior: "instant"
+        }
+    );
 
 
-    if (page === "home") {
-
+    if (page === "home")
         loadHome();
 
-    }
 
-
-    if (page === "matches") {
-
+    if (page === "matches")
         loadMatchesPage();
 
-    }
 
-
-    if (page === "live") {
-
+    if (page === "live")
         loadLivePage();
 
-    }
 
-
-    if (page === "profile") {
-
+    if (page === "profile")
         renderProfile();
+
+
+    if (page === "admin") {
+
+        if (
+            state.admin.loggedIn
+        )
+            showAdminPanel();
+        else
+            showAdminLogin();
 
     }
 
@@ -3787,34 +7583,46 @@ function showPage(page, updateNav = true) {
 function goBack() {
 
     const previous =
-        state.previousPage || "home";
+        state.previousPage ||
+        "home";
 
-    showPage(previous);
+
+    showPage(
+        previous
+    );
 
 }
 
 
-/* =========================
+/* =========================================================
    MODALS
-   ========================= */
+========================================================= */
 
-function closeModal(id) {
+function closeModal(
+    id
+) {
 
     const modal =
-        document.getElementById(id);
+        document.getElementById(
+            id
+        );
 
-    if (modal) {
 
-        modal.classList.remove("active");
-
-    }
+    if (modal)
+        modal.classList
+            .remove("active");
 
 }
 
 
-function closeModalOnBackground(event, id) {
+function closeModalOnBackground(
+    event,
+    id
+) {
 
-    if (event.target.id === id) {
+    if (
+        event.target.id === id
+    ) {
 
         closeModal(id);
 
@@ -3823,17 +7631,22 @@ function closeModalOnBackground(event, id) {
 }
 
 
-/* =========================
+/* =========================================================
    HELPERS
-   ========================= */
+========================================================= */
 
-function teamMini(team) {
+function teamMini(
+    team
+) {
 
     return `
 
         <div
             class="team"
-            onclick="event.stopPropagation(); openTeam(${team.id})"
+            onclick="
+                event.stopPropagation();
+                openTeam(${team.id})
+            "
         >
 
             <img
@@ -3842,7 +7655,9 @@ function teamMini(team) {
             >
 
             <div class="team-name">
-                ${escapeHtml(team.name)}
+                ${escapeHtml(
+                    team.name
+                )}
             </div>
 
         </div>
@@ -3852,9 +7667,13 @@ function teamMini(team) {
 }
 
 
-function formatStatus(status) {
+function formatStatus(
+    status
+) {
 
-    if (!status) return "";
+    if (!status)
+        return "";
+
 
     const short =
         status.short;
@@ -3885,32 +7704,20 @@ function formatStatus(status) {
     };
 
 
-    if (map[short]) {
-
-        if (
-            short === "LIVE" ||
-            status.elapsed
-        ) {
-
-            return status.elapsed
-                ? `${status.elapsed}'`
-                : "LIVE";
-
-        }
-
-        return map[short];
-
-    }
-
-
-    if (status.elapsed) {
+    if (
+        status.elapsed
+    ) {
 
         return `${status.elapsed}'`;
 
     }
 
 
-    return short || "";
+    return (
+        map[short] ||
+        short ||
+        ""
+    );
 
 }
 
@@ -3918,137 +7725,357 @@ function formatStatus(status) {
 function loadingBlock() {
 
     return `
+
         <div class="loading">
+
             <div class="spinner"></div>
+
             Загрузка...
+
         </div>
+
     `;
 
 }
 
 
-function showToast(text) {
+function errorBlock(
+    error
+) {
 
-    const el =
-        document.getElementById("toast");
+    return `
 
+        <div class="empty">
 
-    el.textContent = text;
+            <div class="empty-icon">
+                ⚠️
+            </div>
 
-    el.classList.add("show");
+            <strong>
+                Не удалось загрузить данные
+            </strong>
 
+            <span>
+                ${escapeHtml(
+                    apiErrorMessage(
+                        error
+                    )
+                )}
+            </span>
 
-    clearTimeout(window.toastTimer);
+        </div>
 
-
-    window.toastTimer =
-        setTimeout(() => {
-
-            el.classList.remove("show");
-
-        }, 2200);
+    `;
 
 }
 
 
-function escapeHtml(value) {
+function apiErrorMessage(
+    error
+) {
 
-    if (value === null || value === undefined)
+    if (!error)
+        return "Неизвестная ошибка.";
+
+
+    if (
+        error.message ===
+        "API_KEY_NOT_SET"
+    )
+        return (
+            "Добавь API-ключ API-Football в index.html."
+        );
+
+
+    if (
+        error.message ===
+        "API_KEY_INVALID"
+    )
+        return (
+            "API-ключ недействителен или заблокирован."
+        );
+
+
+    if (
+        error.message ===
+        "API_LIMIT"
+    )
+        return (
+            "Лимит API на сегодня исчерпан."
+        );
+
+
+    return (
+        "Не удалось загрузить данные футбола."
+    );
+
+}
+
+
+function showToast(
+    text
+) {
+
+    const el =
+        document.getElementById(
+            "toast"
+        );
+
+
+    el.textContent =
+        text;
+
+
+    el.classList
+        .add("show");
+
+
+    clearTimeout(
+        window.toastTimer
+    );
+
+
+    window.toastTimer =
+        setTimeout(
+            () => {
+
+                el.classList
+                    .remove("show");
+
+            },
+            2600
+        );
+
+}
+
+
+function escapeHtml(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    )
         return "";
 
 
     return String(value)
 
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
 
 }
 
 
-/* =========================
-   CACHE INFO
-   ========================= */
+function escapeAttribute(
+    value
+) {
+
+    return escapeHtml(
+        value
+    );
+
+}
+
+
+function escapeJs(
+    value
+) {
+
+    return String(
+        value || ""
+    )
+    .replaceAll(
+        "\\",
+        "\\\\"
+    )
+    .replaceAll(
+        "'",
+        "\\'"
+    )
+    .replaceAll(
+        "\n",
+        "\\n"
+    )
+    .replaceAll(
+        "\r",
+        "\\r"
+    );
+
+}
+
+
+/* =========================================================
+   BASE64 UNICODE
+========================================================= */
+
+function encodeBase64Unicode(
+    str
+) {
+
+    const bytes =
+        new TextEncoder()
+            .encode(str);
+
+
+    let binary =
+        "";
+
+
+    const chunkSize =
+        0x8000;
+
+
+    for (
+        let i = 0;
+        i < bytes.length;
+        i += chunkSize
+    ) {
+
+        binary +=
+            String.fromCharCode(
+                ...bytes.subarray(
+                    i,
+                    i + chunkSize
+                )
+            );
+
+    }
+
+
+    return btoa(
+        binary
+    );
+
+}
+
+
+function decodeBase64Unicode(
+    base64
+) {
+
+    const clean =
+        base64
+            .replace(
+                /\n/g,
+                ""
+            );
+
+
+    const binary =
+        atob(clean);
+
+
+    const bytes =
+        Uint8Array.from(
+            binary,
+            char =>
+                char.charCodeAt(0)
+        );
+
+
+    return new TextDecoder()
+        .decode(bytes);
+
+}
+
+
+/* =========================================================
+   CACHE
+========================================================= */
 
 function saveCacheInfo() {
 
     const el =
-        document.getElementById("cache-count");
+        document.getElementById(
+            "cache-count"
+        );
 
 
     if (el) {
 
         el.textContent =
-            Object.keys(state.cache).length;
+            Object.keys(
+                state.cache
+            ).length;
 
     }
 
 }
 
 
-/* =========================
+/* =========================================================
    AUTO REFRESH
-   ========================= */
+========================================================= */
 
-/*
-   Не обновляем API каждую минуту постоянно.
-   Это важно для бесплатного лимита API-Football.
-
-   LIVE обновляется только если пользователь
-   находится на LIVE или Главной.
-*/
-
-setInterval(() => {
-
-    if (
-        state.currentPage === "live"
-    ) {
-
-        loadLivePage();
-
-    }
-
-}, 5 * 60 * 1000);
-
-
-/* =========================
-   TELEGRAM BACK BUTTON
-   ========================= */
-
-if (tg) {
-
-    tg.BackButton.onClick(() => {
+setInterval(
+    () => {
 
         if (
-            state.currentPage === "team" ||
-            state.currentPage === "match"
+            state.currentPage ===
+            "live"
         ) {
 
-            goBack();
-
-            return;
+            loadLivePage();
 
         }
 
-        tg.BackButton.hide();
-
-    });
-
-}
+    },
+    5 * 60 * 1000
+);
 
 
-/* =========================
-   INITIAL API CHECK
-   ========================= */
+/* =========================================================
+   TELEGRAM BACK BUTTON
+========================================================= */
 
-if (
-    API_KEY &&
-    API_KEY !== "ВСТАВЬ_СЮДА_API_KEY"
-) {
+if (tg) {
 
-    state.apiReady = true;
+    tg.BackButton.onClick(
+        () => {
+
+            if (
+                state.currentPage ===
+                    "team" ||
+                state.currentPage ===
+                    "match" ||
+                state.currentPage ===
+                    "admin"
+            ) {
+
+                goBack();
+
+                return;
+
+            }
+
+            tg.BackButton.hide();
+
+        }
+    );
 
 }
 
