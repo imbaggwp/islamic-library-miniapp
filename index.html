@@ -4943,5 +4943,449 @@ if(document.readyState==='loading'){
 </script>
 <!-- /WORLD EVENTS & NEWS SYSTEM -->
 
+
+<!-- TRANSFER OFFERS & PLAYER REACTIONS -->
+<style id="transfer-world-styles">
+.transfer-world-panel{margin-top:16px}
+.tw-section{padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.035);margin-bottom:10px}
+.tw-section h3{margin:0 0 10px}
+.tw-offer{padding:12px;border-radius:13px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);margin-top:8px}
+.tw-row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.tw-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.tw-muted{opacity:.58;font-size:12px}
+.tw-good{font-weight:700}
+.tw-warn{font-weight:700}
+.tw-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:999px;background:rgba(255,170,80,.1);font-size:11px}
+</style>
+<script id="transfer-world-script">
+/* TRANSFER OFFERS & PLAYER REACTIONS */
+(function(){
+  function ensureTransferWorld(){
+    state.transferWorld=state.transferWorld||{};
+    state.transferWorld.offers=Array.isArray(state.transferWorld.offers)?state.transferWorld.offers:[];
+    state.transferWorld.playerPromises=state.transferWorld.playerPromises||{};
+  }
+  function players(){return (state.squad||[]).filter(p=>p&&p.name)}
+  function money(v){v=Number(v||0);return v>=1000000?(v/1000000).toFixed(v>=10000000?0:1)+' млн':Math.round(v/1000)+' тыс'}
+  function val(p){return Number(p.value||p.marketValue||10000000)}
+  function addOffer(p){
+    ensureTransferWorld();
+    const clubs=['Chelsea','Manchester United','Newcastle United','Juventus','AC Milan','Borussia Dortmund','Atlético de Madrid','Paris Saint-Germain'];
+    const club=clubs[Math.floor(Math.random()*clubs.length)];
+    const fee=Math.round(val(p)*(1.05+Math.random()*.9)/100000)*100000;
+    state.transferWorld.offers.unshift({
+      id:Date.now()+Math.floor(Math.random()*999),playerId:p.id,playerName:p.name,
+      club,fee,status:'pending',day:state.careerDate||''
+    });
+    state.transferWorld.offers=state.transferWorld.offers.slice(0,20);
+    if(typeof addWorldNews==='function') addWorldNews('market','Официальный оффер по '+p.name,
+      club+' направил предложение в размере '+money(fee)+'. Теперь решение за вами.',
+      {playerId:p.id,urgent:true});
+    save();
+  }
+  function maybeOffer(){
+    const ps=players(); if(!ps.length)return;
+    if(Math.random()<.12)addOffer(ps[Math.floor(Math.random()*ps.length)]);
+  }
+  function moraleTick(){
+    const ps=players();
+    ps.forEach(p=>{
+      const c=state.contracts?.[p.id];
+      if(!c)return;
+      const morale=Number(c.morale??p.morale??70);
+      const role=String(c.role||p.role||'');
+      if(morale<45 && typeof addWorldNews==='function' && Math.random()<.22){
+        addWorldNews('morale',p.name+' требует решения',
+          'Игрок считает своё положение неудовлетворительным. Нужно дать ему роль или рассмотреть трансфер.',
+          {playerId:p.id,urgent:true});
+      }
+      if(role==='Ротация+' && Math.random()<.06){
+        c.morale=Math.min(100,morale+2);
+      }
+    });
+  }
+  window.respondTransferOffer=function(id,action){
+    ensureTransferWorld();
+    const o=state.transferWorld.offers.find(x=>Number(x.id)===Number(id));
+    if(!o||o.status!=='pending')return;
+    const p=players().find(x=>Number(x.id)===Number(o.playerId));
+    if(action==='reject'){
+      o.status='rejected';
+      if(typeof addWorldNews==='function')addWorldNews('market','Оффер отклонён',
+        'Клуб отказал '+o.club+' в трансфере '+o.playerName+'.');
+    }else if(action==='counter'){
+      o.status='counter';
+      o.fee=Math.round(Number(o.fee)*1.2/100000)*100000;
+      if(typeof addWorldNews==='function')addWorldNews('market','Встречное предложение',
+        'За '+o.playerName+' запрошено '+money(o.fee)+'. '+o.club+' должен ответить.');
+    }else if(action==='accept'){
+      o.status='accepted';
+      if(p){
+        state.budget=Number(state.budget||0)+Number(o.fee);
+        const i=(state.squad||[]).findIndex(x=>Number(x.id)===Number(p.id));
+        if(i>=0)state.squad.splice(i,1);
+        delete state.contracts?.[p.id];
+        state.mediaReputation=Math.min(100,Number(state.mediaReputation||50)+1);
+      }
+      if(typeof addWorldNews==='function')addWorldNews('market','Продажа завершена',
+        o.playerName+' переходит в '+o.club+'. Клуб получает '+money(o.fee)+'.');
+    }
+    save(); if(typeof renderAll==='function')renderAll(); renderTransferWorld();
+  };
+  window.keepPlayer=function(id){
+    const p=players().find(x=>Number(x.id)===Number(id)); if(!p)return;
+    const c=state.contracts?.[p.id]; if(c)c.morale=Math.min(100,Number(c.morale||70)+7);
+    if(typeof addWorldNews==='function')addWorldNews('contract',p.name+' получил поддержку',
+      'Тренер подтвердил, что рассчитывает на игрока. Его статус в команде укреплён.');
+    save();renderTransferWorld();
+  };
+  window.renderTransferWorld=function(){
+    ensureTransferWorld();
+    const host=document.getElementById('transferWorldBox');if(!host)return;
+    const pending=state.transferWorld.offers.filter(x=>x.status==='pending'||x.status==='counter');
+    const low=players().filter(p=>Number(state.contracts?.[p.id]?.morale??p.morale??70)<50);
+    host.innerHTML='<div class="transfer-world-panel">'+
+      '<div class="tw-section"><h3>Входящие предложения</h3>'+
+      (pending.length?pending.map(o=>'<div class="tw-offer"><div class="tw-row"><b>'+o.playerName+'</b><span class="tw-pill">'+o.club+'</span></div>'+
+      '<div class="tw-muted">'+(o.status==='counter'?'Встречная цена':'Предложение')+': '+money(o.fee)+'</div>'+
+      '<div class="tw-actions">'+
+      '<button class="btn" onclick="respondTransferOffer('+o.id+',\'accept\')">Принять</button>'+
+      '<button class="btn secondary" onclick="respondTransferOffer('+o.id+',\'counter\')">Запросить больше</button>'+
+      '<button class="btn secondary" onclick="respondTransferOffer('+o.id+',\'reject\')">Отклонить</button>'+
+      '</div></div>').join(''):'<div class="tw-muted">Пока нет официальных предложений.</div>')+
+      '</div>'+
+      '<div class="tw-section"><h3>Игроки, требующие внимания</h3>'+
+      (low.length?low.map(p=>'<div class="tw-offer"><div class="tw-row"><b>'+p.name+'</b><span class="tw-warn">Мораль '+Math.round(Number(state.contracts?.[p.id]?.morale??p.morale??70))+'</span></div>'+
+      '<div class="tw-muted">Игрок недоволен своей текущей ситуацией.</div><div class="tw-actions"><button class="btn" onclick="worldTalkPlayer('+p.id+')">Поговорить</button><button class="btn secondary" onclick="keepPlayer('+p.id+')">Подтвердить роль</button></div></div>').join(''):'<div class="tw-muted">В составе нет игроков с критически низкой моралью.</div>')+
+      '</div></div>';
+    if(typeof replaceEmojiIcons==='function')replaceEmojiIcons(host);
+  };
+  function inject(){
+    if(document.getElementById('transferWorldBox'))return;
+    const host=document.getElementById('worldNewsBox');
+    if(!host)return;
+    const box=document.createElement('div');box.id='transferWorldBox';host.parentNode.insertBefore(box,host.nextSibling);
+  }
+  function daily(){
+    ensureTransferWorld();
+    const d=String(state.careerDate||'');
+    if(!d||state.transferWorld.lastDay===d)return;
+    state.transferWorld.lastDay=d;
+    maybeOffer();moraleTick();save();
+  }
+  // Hook only after the existing functions are available.
+  function install(){
+    if(window.__twInstalled)return;
+    if(typeof window.advanceOneCareerDay==='function'){
+      const old=window.advanceOneCareerDay;
+      window.advanceOneCareerDay=function(){
+        const r=old.apply(this,arguments);try{daily();inject();renderTransferWorld()}catch(e){}return r;
+      };
+    }
+    window.__twInstalled=true;
+  }
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{ensureTransferWorld();install();inject();daily();renderTransferWorld()},700));
+  setInterval(()=>{try{install();inject();renderTransferWorld()}catch(e){}},1500);
+})();
+</script>
+<!-- /TRANSFER OFFERS & PLAYER REACTIONS -->
+
+
+<!-- FULL LEAGUE MATCHDAY ENGINE -->
+<style id="full-league-styles">
+.full-league-wrap{margin-top:14px}
+.full-league-card{padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.035);margin-bottom:10px}
+.full-league-actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.full-league-results{display:grid;gap:6px}
+.full-result{display:grid;grid-template-columns:1fr 52px 1fr;gap:8px;align-items:center;padding:9px 10px;border-radius:11px;background:rgba(255,255,255,.025)}
+.full-result.mine{border:1px solid rgba(255,170,80,.25)}
+.full-result span:last-child{text-align:right}
+.full-result b{text-align:center}
+.full-league-note{font-size:12px;opacity:.58}
+</style>
+<script id="full-league-script">
+/* FULL LEAGUE MATCHDAY ENGINE */
+(function(){
+  function ensure(){
+    if(typeof ensureLeagueSeason==='function')ensureLeagueSeason();
+    state.leagueWorld=state.leagueWorld||{};
+    state.leagueWorld.lastRound=Number(state.leagueWorld.lastRound||0);
+    state.leagueWorld.roundResults=state.leagueWorld.roundResults||{};
+  }
+  function inject(){
+    const page=document.getElementById('league');
+    if(!page||document.getElementById('fullLeagueBox'))return;
+    const box=document.createElement('div');
+    box.id='fullLeagueBox';
+    box.className='full-league-wrap';
+    page.appendChild(box);
+  }
+  function round(){
+    const ls=ensureLeagueSeason();
+    return Math.max(1,Number(ls.matchday||1));
+  }
+  function simulateOthers(){
+    ensure();
+    const ls=ensureLeagueSeason();
+    const r=round();
+    const games=ls.fixtures.filter(f=>f.round===r&&!f.played);
+    const others=games.filter(f=>f.home!==state.club&&f.away!==state.club);
+    if(!others.length){
+      render();
+      return;
+    }
+    const results=[];
+    others.forEach(f=>{
+      const score=simulateLeagueMatch(f.home,f.away);
+      f.played=true;f.gf=score[0];f.ga=score[1];
+      applyLeagueResult(ls,f.gf,f.ga,f.home,f.away);
+      results.push({home:f.home,away:f.away,gf:f.gf,ga:f.ga});
+    });
+    state.leagueWorld.lastRound=r;
+    state.leagueWorld.roundResults[r]=results;
+    save();
+    render();
+    if(typeof updateHome==='function')updateHome();
+    showToast('Остальные матчи тура сыграны');
+  }
+  window.simulateOtherLeagueMatches=simulateOthers;
+
+  function render(){
+    ensure();inject();
+    const box=document.getElementById('fullLeagueBox');if(!box)return;
+    const ls=ensureLeagueSeason(),r=round();
+    const games=ls.fixtures.filter(f=>f.round===r);
+    const previous=state.leagueWorld.roundResults[r]||[];
+    const played=games.filter(f=>f.played);
+    const hasOther=games.some(f=>f.home!==state.club&&f.away!==state.club&&!f.played);
+    const table=leagueSortedTable();
+    const me=table.findIndex(x=>x.name===state.club);
+    state.leaguePosition=me>=0?me+1:0;
+    box.innerHTML='<div class="full-league-card">'+
+      '<div class="section" style="margin:0"><h2>Чемпионат · тур '+r+'</h2><span class="tw-pill">Позиция: '+(me>=0?me+1:'—')+'</span></div>'+
+      '<div class="full-league-actions">'+
+      (hasOther?'<button class="btn" onclick="simulateOtherLeagueMatches()">▶ Сыграть остальные матчи тура</button>':'<span class="full-league-note">Все матчи этого тура уже сыграны.</span>')+
+      '</div>'+
+      '<div class="full-league-note">Твой матч проводится отдельно в интерактивном режиме. После него остальные матчи тура можно симулировать здесь.</div>'+
+      '<div class="full-league-results">'+
+      (played.length?played.map(f=>{
+        const mine=f.home===state.club||f.away===state.club;
+        return '<div class="full-result '+(mine?'mine':'')+'"><span>'+f.home+'</span><b>'+f.gf+' : '+f.ga+'</b><span>'+f.away+'</span></div>';
+      }).join(''):'<div class="tw-muted">Матчи тура ещё не сыграны.</div>')+
+      '</div></div>';
+  }
+
+  // After the user's interactive league match, automatically resolve the rest
+  // of the same round so the table represents the whole matchday.
+  function install(){
+    if(window.__fullLeagueInstalled)return;
+    if(typeof window.finishInteractiveMatch==='function'){
+      const oldFinish=window.finishInteractiveMatch;
+      window.finishInteractiveMatch=function(){
+        const result=oldFinish.apply(this,arguments);
+        try{
+          const lm=window.liveMatch;
+          const competition=lm?.competition;
+          if(competition==='league'||(!competition&&typeof ensureLeagueSeason==='function')){
+            setTimeout(()=>{simulateOthers()},80);
+          }
+        }catch(e){}
+        return result;
+      };
+      window.__fullLeagueInstalled=true;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    setTimeout(()=>{ensure();inject();install();render()},900);
+  });
+  setInterval(()=>{
+    try{
+      ensure();inject();install();
+      if(document.getElementById('league')&&!document.getElementById('league').classList.contains('hidden'))render();
+    }catch(e){}
+  },1800);
+})();
+</script>
+<!-- /FULL LEAGUE MATCHDAY ENGINE -->
+
+
+<!-- PLAYER STATS & LEAGUE FORM -->
+<style id="player-stats-styles">
+.player-stats-wrap{margin-top:14px}
+.ps-card{padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.035);margin-bottom:10px}
+.ps-tabs{display:flex;gap:7px;overflow:auto;padding-bottom:3px}
+.ps-tabs button{white-space:nowrap}
+.ps-table{width:100%;border-collapse:collapse;font-size:13px}
+.ps-table th,.ps-table td{padding:9px 7px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left}
+.ps-table th{font-size:11px;opacity:.55;text-transform:uppercase}
+.ps-table td.num,.ps-table th.num{text-align:right}
+.ps-player{font-weight:700}
+.ps-sub{font-size:11px;opacity:.52;margin-top:2px}
+.ps-form{display:flex;gap:3px;align-items:center}
+.ps-form i{width:8px;height:8px;border-radius:50%;display:block;background:currentColor;opacity:.8}
+.ps-leader{font-size:12px;opacity:.65}
+.ps-empty{padding:16px;text-align:center;opacity:.55}
+@media(max-width:650px){.ps-table{font-size:12px}.ps-table th:nth-child(4),.ps-table td:nth-child(4){display:none}}
+</style>
+<script id="player-stats-script">
+/* PLAYER STATS & LEAGUE FORM */
+(function(){
+  function ensureStats(){
+    state.playerStats=state.playerStats||{};
+    state.leaguePlayerStats=state.leaguePlayerStats||{};
+    state.teamForm=state.teamForm||{};
+  }
+  function squad(){
+    return (state.squad||[]).filter(p=>p&&p.name);
+  }
+  function statFor(p){
+    ensureStats();
+    const x=state.leaguePlayerStats[p.id]||{};
+    return state.leaguePlayerStats[p.id]={
+      id:p.id,name:p.name,club:state.club||state.clubName||'Мой клуб',
+      pos:p.position||p.pos||'—',ovr:Number(p.rating||p.ovr||p.overall||70),
+      apps:Number(x.apps||0),minutes:Number(x.minutes||0),goals:Number(x.goals||0),
+      assists:Number(x.assists||0),yellow:Number(x.yellow||0),red:Number(x.red||0),
+      clean:Number(x.clean||0),rating:Number(x.rating||0),mvp:Number(x.mvp||0)
+    };
+  }
+  function recordMatch(){
+    ensureStats();
+    const report=state.lastMatchReport||state.postMatchReport||null;
+    if(!report||state.__lastStatsMatch===report.id)return;
+    const ps=report.playerStats||[];
+    ps.forEach(x=>{
+      const p=squad().find(y=>String(y.id)===String(x.id));
+      if(!p)return;
+      const st=statFor(p);
+      st.apps++;
+      st.minutes+=Number(x.minutes||90);
+      st.goals+=Number(x.goals||0);
+      st.assists+=Number(x.assists||0);
+      st.yellow+=Number(x.yellow||0);
+      st.red+=Number(x.red||0);
+      st.rating+=Number(x.rating||6.5);
+      if(Number(x.motm||0)>0)st.mvp++;
+    });
+    const club=state.club||state.clubName;
+    state.teamForm[club]=state.teamForm[club]||[];
+    const win=report.homeGoals>report.awayGoals;
+    const draw=report.homeGoals===report.awayGoals;
+    const home=report.homeTeam===club;
+    const points=(win?(home?3:0):(draw?1:1));
+    let res=draw?'D':((home?report.homeGoals>report.awayGoals:report.awayGoals>report.homeGoals)?'W':'L');
+    state.teamForm[club].push(res);
+    state.teamForm[club]=state.teamForm[club].slice(-5);
+    state.__lastStatsMatch=report.id||Date.now();
+    save();
+  }
+  function simulateOtherPlayerStats(){
+    // Give league-wide player statistics plausible values from the actual squad database.
+    ensureStats();
+    const ls=typeof ensureLeagueSeason==='function'?ensureLeagueSeason():null;
+    if(!ls)return;
+    const teams=(clubLeagues?.[state.league]||[]).filter(Boolean);
+    teams.forEach(club=>{
+      if(club===state.club||club===state.clubName)return;
+      const pool=(expandedRosters?.[club]||officialSquads?.[club]||[]).filter(Boolean);
+      if(!pool.length)return;
+      const count=Math.min(pool.length,25);
+      for(let i=0;i<count;i++){
+        const p=pool[i];
+        const id='league-'+club+'-'+String(p.name||p).replace(/\W+/g,'-');
+        const fake={...p,id};
+        const st=state.leaguePlayerStats[id]||{
+          id,name:p.name||p,club,pos:p.position||p.pos||'—',
+          ovr:Number(p.rating||p.ovr||p.overall||70),apps:0,minutes:0,goals:0,assists:0,yellow:0,red:0,clean:0,rating:0,mvp:0
+        };
+        // One statistical line is generated only when the team has played rounds.
+        const rounds=Number(ls.matchday||1)-1;
+        if(rounds>0 && st.apps<rounds){
+          const apps=rounds-st.apps;
+          const role=String(p.position||p.pos||'').toUpperCase();
+          const ovr=st.ovr;
+          const factor=Math.max(.45,Math.min(1.45,ovr/75));
+          st.apps=rounds;
+          st.minutes+=apps*(75+Math.round(Math.random()*15));
+          st.goals+=Math.round(apps*factor*(role.includes('ST')||role.includes('FW')||role.includes('CF')?0.34:role.includes('MF')?0.12:0.035));
+          st.assists+=Math.round(apps*factor*(role.includes('MF')?0.22:(role.includes('FW')||role.includes('ST')?0.13:0.05)));
+          st.yellow+=Math.round(apps*(Math.random()<.22?.8:0));
+          st.rating+=apps*(6.2+factor*.75);
+        }
+        state.leaguePlayerStats[id]=st;
+      }
+    });
+    save();
+  }
+  function rows(mode){
+    ensureStats();
+    recordMatch();
+    simulateOtherPlayerStats();
+    const all=Object.values(state.leaguePlayerStats);
+    if(mode==='goals')return all.sort((a,b)=>b.goals-a.goals||b.assists-a.assists);
+    if(mode==='assists')return all.sort((a,b)=>b.assists-a.assists||b.goals-a.goals);
+    if(mode==='rating')return all.filter(x=>x.apps>0).sort((a,b)=>(b.rating/b.apps)-(a.rating/a.apps)||b.apps-a.apps);
+    if(mode==='minutes')return all.sort((a,b)=>b.minutes-a.minutes);
+    return all.sort((a,b)=>b.mvp-a.mvp||b.goals-a.goals);
+  }
+  function teamTable(){
+    try{return leagueSortedTable()}catch(e){return []}
+  }
+  function form(club){
+    ensureStats();
+    return (state.teamForm[club]||[]).slice(-5);
+  }
+  function render(){
+    const box=document.getElementById('playerStatsBox');if(!box)return;
+    const mode=window.__psMode||'goals';
+    const data=rows(mode).slice(0,12);
+    const table=teamTable();
+    const leaders=[
+      ['Лучший бомбардир',rows('goals')[0]],
+      ['Лучший ассистент',rows('assists')[0]],
+      ['Лучший по оценке',rows('rating')[0]],
+      ['MVP',rows('mvp')[0]]
+    ];
+    box.innerHTML='<div class="player-stats-wrap">'+
+      '<div class="ps-card"><div class="section" style="margin:0"><h2>Статистика сезона</h2><span class="ps-leader">'+data.length+' лидеров</span></div>'+
+      '<div class="ps-tabs">'+
+      '<button class="'+(mode==='goals'?'active':'secondary')+'" onclick="window.__psMode=\'goals\';renderPlayerStats()">⚽ Голы</button>'+
+      '<button class="'+(mode==='assists'?'active':'secondary')+'" onclick="window.__psMode=\'assists\';renderPlayerStats()">↗ Ассисты</button>'+
+      '<button class="'+(mode==='rating'?'active':'secondary')+'" onclick="window.__psMode=\'rating\';renderPlayerStats()">★ Оценка</button>'+
+      '<button class="'+(mode==='minutes'?'active':'secondary')+'" onclick="window.__psMode=\'minutes\';renderPlayerStats()">◷ Минуты</button>'+
+      '</div>'+
+      '<div style="overflow:auto;margin-top:10px"><table class="ps-table"><thead><tr><th>#</th><th>Игрок</th><th>Клуб</th><th>Поз</th><th class="num">Г</th><th class="num">А</th><th class="num">И</th><th class="num">Оц</th></tr></thead><tbody>'+
+      (data.length?data.map((x,i)=>{
+        const avg=x.apps?(x.rating/x.apps).toFixed(1):'—';
+        return '<tr><td>'+(i+1)+'</td><td><div class="ps-player">'+x.name+'</div><div class="ps-sub">'+(x.minutes||0)+' мин</div></td><td>'+x.club+'</td><td>'+x.pos+'</td><td class="num">'+x.goals+'</td><td class="num">'+x.assists+'</td><td class="num">'+x.apps+'</td><td class="num">'+avg+'</td></tr>';
+      }).join(''):'<tr><td colspan="8" class="ps-empty">Статистика появится после матчей.</td></tr>')+
+      '</tbody></table></div></div>'+
+      '<div class="ps-card"><h3>Форма команд</h3>'+
+      (table.length?table.slice(0,10).map((t,i)=>{
+        const f=form(t.name).map(v=>'<i title="'+v+'"></i>').join('');
+        return '<div class="tw-row" style="padding:8px 0"><span>'+(i+1)+'. '+t.name+'</span><span class="ps-form">'+(f||'<span class="tw-muted">—</span>')+'</span></div>';
+      }).join(''):'<div class="ps-empty">Таблица пока недоступна.</div>')+
+      '</div>'+
+      '<div class="ps-card"><h3>Лидеры</h3>'+
+      leaders.map(l=>{
+        const x=l[1];return '<div class="tw-row" style="padding:8px 0"><span>'+l[0]+'</span><b>'+(x?x.name:'—')+(x&&l[0]==='Лучший бомбардир'?' · '+x.goals+' гол.':x&&l[0]==='Лучший ассистент'?' · '+x.assists+' асс.':'')+'</b></div>';
+      }).join('')+
+      '</div></div>';
+    if(typeof replaceEmojiIcons==='function')replaceEmojiIcons(box);
+  }
+  window.renderPlayerStats=render;
+  function inject(){
+    if(document.getElementById('playerStatsBox'))return;
+    const nav=document.getElementById('league');
+    if(!nav)return;
+    const box=document.createElement('div');box.id='playerStatsBox';nav.appendChild(box);
+  }
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{ensureStats();inject();render()},1000));
+  setInterval(()=>{try{ensureStats();inject();render()}catch(e){}},2000);
+})();
+</script>
+<!-- /PLAYER STATS & LEAGUE FORM -->
+
 </body>
 </html>
