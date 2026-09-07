@@ -1257,27 +1257,25 @@ function initPitchDrag(){
   const pitch=document.getElementById('pitch');
   if(!pitch)return;
   pitch.querySelectorAll('.pitch-player').forEach(el=>{
-    if(el.dataset.dragReady==='1')return;
-    el.dataset.dragReady='1';
+    if(el.dataset.dragReady==='2')return;
+    el.dataset.dragReady='2';
     let dragging=false,moved=false,startX=0,startY=0;
 
-    const point=e=>({x:e.clientX,y:e.clientY});
     const move=e=>{
       if(!dragging)return;
       e.preventDefault();
-      const r=pitch.getBoundingClientRect(),pt=point(e);
-      const x=Math.max(3,Math.min(97,(pt.x-r.left)/r.width*100));
-      const y=Math.max(5,Math.min(95,(pt.y-r.top)/r.height*100));
+      const r=pitch.getBoundingClientRect();
+      const x=Math.max(4,Math.min(96,(e.clientX-r.left)/r.width*100));
+      const y=Math.max(7,Math.min(93,(e.clientY-r.top)/r.height*100));
       el.style.left=x+'%';
       el.style.top=y+'%';
       moved=true;
     };
-    const end=e=>{
+    const finish=e=>{
       if(!dragging)return;
       if(e)e.preventDefault();
       dragging=false;
       el.classList.remove('dragging');
-      try{if(el.hasPointerCapture?.(e.pointerId))el.releasePointerCapture(e.pointerId)}catch(_){}
       const key=el.dataset.pitchKey;
       if(key){
         state.pitchPositions=state.pitchPositions||{};
@@ -1287,13 +1285,13 @@ function initPitchDrag(){
         };
         save();
       }
-      setTimeout(()=>{moved=false},80);
+      setTimeout(()=>moved=false,100);
     };
 
     el.addEventListener('pointerdown',e=>{
       if(e.button!==undefined&&e.button!==0)return;
       e.preventDefault();
-      const pt=point(e);startX=pt.x;startY=pt.y;
+      startX=e.clientX;startY=e.clientY;
       dragging=true;moved=false;
       el.classList.add('dragging');
       try{el.setPointerCapture(e.pointerId)}catch(_){}
@@ -1301,19 +1299,17 @@ function initPitchDrag(){
 
     el.addEventListener('pointermove',e=>{
       if(!dragging)return;
-      const pt=point(e);
-      if(Math.abs(pt.x-startX)>3||Math.abs(pt.y-startY)>3)move(e);
+      if(Math.abs(e.clientX-startX)>2||Math.abs(e.clientY-startY)>2)move(e);
     },{passive:false});
 
-    el.addEventListener('pointerup',end,{passive:false});
-    el.addEventListener('pointercancel',end,{passive:false});
+    el.addEventListener('pointerup',finish,{passive:false});
+    el.addEventListener('pointercancel',finish,{passive:false});
+    el.addEventListener('lostpointercapture',e=>{
+      if(dragging)finish(e);
+    },{passive:false});
     el.addEventListener('dragstart',e=>e.preventDefault());
-
     el.addEventListener('click',e=>{
-      if(moved){
-        e.preventDefault();
-        e.stopPropagation();
-      }
+      if(moved){e.preventDefault();e.stopImmediatePropagation();}
     },true);
   });
 }function resetPitchPositions(){
@@ -6463,6 +6459,89 @@ if(document.readyState==='loading'){
 .fin2-log{display:grid;gap:7px}.fin2-log div{padding:8px;border-radius:10px;background:rgba(255,255,255,.025);font-size:12px}
 .fin2-good{font-weight:750}.fin2-bad{font-weight:750}
 @media(max-width:700px){.fin2-grid{grid-template-columns:repeat(2,1fr)}.fin2-line{grid-template-columns:85px 1fr 65px}}
+
+/* ===== FINAL TACTICAL PITCH SIZE ===== */
+.tactical-wrap{
+  width:100%!important;
+  box-sizing:border-box!important;
+  padding:8px!important;
+  margin:0!important;
+}
+.tactical-field{
+  position:relative!important;
+  width:100%!important;
+  max-width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  aspect-ratio:105/68!important;
+  overflow:hidden!important;
+  border-radius:14px!important;
+  box-sizing:border-box!important;
+}
+.tactical-field .pitch-player{
+  width:50px!important;
+  min-width:50px!important;
+  height:auto!important;
+  padding:2px!important;
+  margin:0!important;
+  border-radius:9px!important;
+  line-height:1.05!important;
+  font-size:8px!important;
+}
+.tactical-field .pitch-player .shirt{
+  width:30px!important;
+  height:30px!important;
+  min-width:30px!important;
+  min-height:30px!important;
+  border-radius:50%!important;
+  margin:0 auto!important;
+  font-size:13px!important;
+  border-width:1.5px!important;
+}
+.tactical-field .pitch-player b{
+  display:block!important;
+  max-width:48px!important;
+  margin:2px auto 0!important;
+  font-size:7px!important;
+  line-height:1.05!important;
+}
+.tactical-field .pitch-player small{
+  display:block!important;
+  font-size:6.5px!important;
+  line-height:1!important;
+  opacity:.72!important;
+}
+.tactical-field .pitch-player em{
+  display:none!important;
+}
+.tactical-field .pitch-help{
+  display:none!important;
+}
+@media(max-width:700px){
+  .tactical-wrap{padding:6px!important}
+  .tactical-field{
+    aspect-ratio:105/68!important;
+    border-radius:12px!important;
+  }
+  .tactical-field .pitch-player{
+    width:44px!important;
+    min-width:44px!important;
+    padding:1px!important;
+    border-radius:8px!important;
+  }
+  .tactical-field .pitch-player .shirt{
+    width:27px!important;
+    height:27px!important;
+    min-width:27px!important;
+    min-height:27px!important;
+    font-size:12px!important;
+  }
+  .tactical-field .pitch-player b{
+    max-width:42px!important;
+    font-size:6.5px!important;
+  }
+  .tactical-field .pitch-player small{font-size:6px!important}
+}
 </style>
 <script id="finance2-script">
 /* FINANCE 2.0 COMPLETE SYSTEM */
