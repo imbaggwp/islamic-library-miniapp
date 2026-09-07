@@ -60,7 +60,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
       </div>
     </div>
 
-    <div class="section"><h2>Следующий матч</h2><span class="link">Календарь</span></div>
+    <div class="section"><h2>Следующий матч</h2><button class="link" onclick="navigate('calendar')">Календарь</button></div>
     <div class="match">
       <div class="matchtop"><span>Премьер-лига · Тур 13</span><span id="matchDate">Завтра · 19:00</span></div>
       <div class="opponent">
@@ -76,6 +76,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
       <button class="tile" onclick="navigate('squad')"><div class="ico">👥</div><b>Состав</b><span>23 игрока · 64 OVR</span></button>
       <button class="tile" onclick="navigate('transfers')"><div class="ico">🔄</div><b>Трансферы</b><span>12 новых игроков</span></button>
       <button class="tile" onclick="navigate('training')"><div class="ico">🏋️</div><b>Тренировки</b><span>Развитие игроков</span></button>
+      <button class="tile" onclick="navigate('calendar')"><div class="ico">📅</div><b>Календарь</b><span>18 туров · результаты</span></button>
       <button class="tile" onclick="navigate('club')"><div class="ico">🏟️</div><b>Клуб</b><span>Стадион · академия</span></button>
     </div>
 
@@ -117,6 +118,13 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
     <div class="table" id="leagueTable"></div>
   </main>
 
+  <main id="calendar" class="page hidden">
+    <div class="header"><button class="back" onclick="navigate('home')">←</button><h1>Календарь</h1></div>
+    <div class="notice">Сезон состоит из 18 туров. Победа даёт 3 очка, ничья — 1. Результаты сохраняются автоматически.</div>
+    <div class="section"><h2>Сезон 1</h2><span class="link" id="seasonProgress">Тур 12 / 18</span></div>
+    <div id="fixtures"></div>
+  </main>
+
   <main id="club" class="page hidden">
     <div class="header"><button class="back" onclick="navigate('home')">←</button><h1>Мой клуб</h1></div>
     <div class="grid2">
@@ -125,7 +133,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
       <button class="tile" onclick="upgrade('training')"><div class="ico">🏋️</div><b>База</b><span>Скорость развития</span></button>
       <button class="tile" onclick="upgrade('medical')"><div class="ico">🏥</div><b>Медцентр</b><span>Восстановление</span></button>
     </div>
-    <div class="section"><h2>Финансы</h2></div>
+    <div class="section"><h2>Финансы</h2></div><button class="secondary" style="width:100%;margin-bottom:12px" onclick="if(confirm('Сбросить весь прогресс?')){localStorage.removeItem('fm_state');location.reload()}">♻️ Сбросить сохранение</button>
     <div class="event"><b>Доход за неделю</b><p>🎟 Билеты +€180K · 🤝 Спонсор +€120K · 🏆 Призовые +€40K</p></div>
     <div class="event"><b>Расходы за неделю</b><p>👥 Зарплаты −€210K · 🏟 Содержание −€35K</p></div>
   </main>
@@ -144,21 +152,30 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 </div>
 
 <script>
-const state={
- money:4.2, rating:64, place:8, wins:3,
+const initialState={
+ money:4.2,rating:64,place:8,wins:3,draws:2,losses:6,played:11,season:1,round:12,
+ tactic:'counter',
  players:[
-  ['Алиев','ST',69,'🇷🇺','⚽'],['Магомедов','LW',72,'🇷🇺','⚡'],['Иванов','RW',66,'🇷🇺','🎯'],
-  ['Ахмедов','CM',67,'🇷🇺','🧠'],['Петров','CM',64,'🇷🇺','⚙️'],['Саидов','CDM',65,'🇷🇺','🛡️'],
-  ['Керимов','LB',61,'🇷🇺','🏃'],['Волков','CB',68,'🇷🇺','🛡️'],['Алиев II','CB',63,'🇷🇺','🧱'],
-  ['Смирнов','RB',62,'🇷🇺','🏃'],['Муртазаев','GK',67,'🇷🇺','🧤']
+  ['Алиев','ST',69,'🇷🇺','⚽',88],['Магомедов','LW',72,'🇷🇺','⚡',92],['Иванов','RW',66,'🇷🇺','🎯',84],
+  ['Ахмедов','CM',67,'🇷🇺','🧠',86],['Петров','CM',64,'🇷🇺','⚙️',80],['Саидов','CDM',65,'🇷🇺','🛡️',87],
+  ['Керимов','LB',61,'🇷🇺','🏃',78],['Волков','CB',68,'🇷🇺','🛡️',89],['Алиев II','CB',63,'🇷🇺','🧱',82],
+  ['Смирнов','RB',62,'🇷🇺','🏃',81],['Муртазаев','GK',67,'🇷🇺','🧤',90]
  ],
+ bench:[['Гаджиев','ST',58,'🇷🇺','⚽',75],['Карпов','CM',60,'🇷🇺','⚙️',79],['Исаев','CB',59,'🇷🇺','🛡️',83],['Миронов','GK',55,'🇷🇺','🧤',76]],
  market:[
   ['Lucas Silva','ST',64,'🇧🇷','€1.2M',1.2,83],['Daniel Costa','CM',70,'🇵🇹','€2.8M',2.8,79],
-  ['Emre Kaya','RW',67,'🇹🇷','€1.9M',1.9,84],['Noah Meyer','CB',62,'🇩🇪','€900K',.9,81]
+  ['Emre Kaya','RW',67,'🇹🇷','€1.9M',1.9,84],['Noah Meyer','CB',62,'🇩🇪','€900K',.9,81],
+  ['Kenji Ito','LW',65,'🇯🇵','€1.5M',1.5,86]
  ],
- table:[['Zenit',12,29],['Spartak',12,27],['CSKA',12,24],['Krasnodar',12,22],['Lokomotiv',12,20],['Rostov',12,19],['Dynamo',12,18],['Rizvan FC',12,17],['Rubin',12,15],['Krylya',12,12]]
+ table:[
+  ['Zenit',11,29],['Spartak',11,27],['CSKA',11,24],['Krasnodar',11,22],['Lokomotiv',11,20],
+  ['Rostov',11,19],['Dynamo',11,18],['Rizvan FC',11,17],['Rubin',11,15],['Krylya',11,12]
+ ],
+ opponents:['Rubin','Krylya','Rostov','Dynamo','Lokomotiv','Krasnodar','CSKA','Spartak','Zenit','Rubin','Krylya','Spartak','Dynamo','Rostov','Lokomotiv','CSKA','Krasnodar','Zenit'],
+ results:[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]
 };
-
+let state=JSON.parse(localStorage.getItem('fm_state')||'null')||initialState;
+function save(){localStorage.setItem('fm_state',JSON.stringify(state))}
 function navigate(id){
  document.querySelectorAll('main.page').forEach(x=>x.classList.add('hidden'));
  document.getElementById(id).classList.remove('hidden');
@@ -167,46 +184,86 @@ function navigate(id){
  if(id==='squad')renderPlayers();
  if(id==='transfers')renderMarket();
  if(id==='league')renderLeague();
+ if(id==='calendar')renderFixtures();
 }
 function renderPlayers(){
- document.getElementById('players').innerHTML=state.players.map(p=>`
- <div class="player"><div class="avatar">${p[4]}</div><div class="pinfo"><b>${p[3]} ${p[0]}</b><span>${p[1]} · Хорошая форма</span></div><div class="rating">${p[2]}<span class="pos">${p[1]}</span></div></div>`).join('');
+ const starters=state.players.map((p,i)=>`
+ <div class="player"><div class="avatar">${p[4]}</div><div class="pinfo"><b>${p[3]} ${p[0]}</b><span>${p[1]} · Форма ${p[5]}%</span><div class="progress"><i style="width:${p[5]}%"></i></div></div><div class="rating">${p[2]}<span class="pos">${p[1]}</span></div></div>`).join('');
+ const bench=state.bench.map(p=>`<div class="player"><div class="avatar">${p[4]}</div><div class="pinfo"><b>${p[3]} ${p[0]}</b><span>Запасной · Форма ${p[5]}%</span></div><div class="rating">${p[2]}</div></div>`).join('');
+ document.getElementById('players').innerHTML=starters+'<div class="section"><h2>Запасные</h2></div>'+bench;
 }
 function renderMarket(){
  document.getElementById('budgetText').textContent='€'+state.money.toFixed(1)+'M';
  document.getElementById('market').innerHTML=state.market.map((p,i)=>`
- <div class="player"><div class="avatar">${p[4]}</div><div class="pinfo"><b>${p[3]} ${p[0]}</b><span>${p[1]} · Потенциал ${p[6]}</span></div><div style="text-align:right"><div class="rating">${p[2]}</div><button onclick="buy(${i})" style="margin-top:5px;color:var(--accent);font-size:11px;background:none">${p[5]}</button></div></div>`).join('');
+ <div class="player"><div class="avatar">${p[4]}</div><div class="pinfo"><b>${p[3]} ${p[0]}</b><span>${p[1]} · Потенциал ${p[6]}</span></div>
+ <div style="text-align:right"><div class="rating">${p[2]}</div><button onclick="buy(${i})" style="margin-top:5px;color:var(--accent);font-size:11px;background:none">${p[5]}</button></div></div>`).join('');
 }
 function renderLeague(){
+ const sorted=[...state.table].sort((a,b)=>b[2]-a[2]);
  document.getElementById('leagueTable').innerHTML=`<div class="tr head"><span>#</span><span>Клуб</span><span>И</span><span>О</span><span>Форма</span></div>`+
- state.table.map((r,i)=>`<div class="tr ${r[0]==='Rizvan FC'?'me':''}"><span>${i+1}</span><span>${r[0]}</span><span>${r[1]}</span><span>${r[2]}</span><span>${i===7?'🔥':'—'}</span></div>`).join('');
+ sorted.map((r,i)=>`<div class="tr ${r[0]==='Rizvan FC'?'me':''}"><span>${i+1}</span><span>${r[0]}</span><span>${r[1]}</span><span>${r[2]}</span><span>${r[0]==='Rizvan FC'?'🔥':'—'}</span></div>`).join('');
+}
+function renderFixtures(){
+ const box=document.getElementById('fixtures');
+ document.getElementById('seasonProgress').textContent=`Тур ${Math.min(state.round,18)} / 18`;
+ box.innerHTML=state.opponents.map((op,i)=>{
+   const n=i+1,r=state.results[i];
+   let status=r?`<b>${r.score}</b><span style="color:${r.win?'var(--green)':r.draw?'var(--accent)':'var(--red)'}">${r.win?'Победа':r.draw?'Ничья':'Поражение'}</span>`:
+     (n===state.round?`<button class="primary" style="width:auto;padding:8px 12px" onclick="openMatch()">Играть</button>`:'<span>Предстоит</span>');
+   return `<div class="event" style="display:flex;align-items:center;gap:12px"><div style="font-size:11px;color:var(--muted);width:42px">ТУР ${n}</div><div style="flex:1"><b>${n%2?'Rizvan FC — '+op:op+' — Rizvan FC'}</b><p>${r?'Матч завершён':'Премьер-лига'}</p></div><div style="text-align:right;display:flex;flex-direction:column;gap:4px">${status}</div></div>`;
+ }).join('');
 }
 function openMatch(){
- showModal(`<h2>⚔️ Подготовка к матчу</h2><p>Spartak сильнее по рейтингу, но твоя команда в хорошей форме. Выбери план игры.</p>
- <div class="actions">
- <button class="secondary" onclick="playMatch('counter')">⚡ Контратака</button>
- <button class="secondary" onclick="playMatch('press')">🔥 Высокий прессинг</button>
- <button class="secondary" onclick="playMatch('possession')">🎯 Владение</button>
- <button class="secondary" onclick="playMatch('defense')">🛡 Оборона</button></div>`);
+ showModal(`<h2>⚔️ Тур ${state.round}: ${state.round%2?'Rizvan FC — '+state.opponents[state.round-1]:state.opponents[state.round-1]+' — Rizvan FC'}</h2>
+ <p>Соперник: <b>${state.opponents[state.round-1]}</b>. Твой рейтинг ${state.rating}. Выбери тактику перед стартом.</p>
+ <div class="grid2">
+  <button class="tile" onclick="playMatch('counter')"><div class="ico">⚡</div><b>Контратака</b><span>Хорошо против сильных</span></button>
+  <button class="tile" onclick="playMatch('press')"><div class="ico">🔥</div><b>Прессинг</b><span>Рискованно, но мощно</span></button>
+  <button class="tile" onclick="playMatch('possession')"><div class="ico">🎯</div><b>Владение</b><span>Стабильный стиль</span></button>
+  <button class="tile" onclick="playMatch('defense')"><div class="ico">🛡️</div><b>Оборона</b><span>Шанс на ничью</span></button>
+ </div>`);
 }
 function playMatch(style){
+ state.tactic=style;
+ const opponentRating=62+((state.round*7)%13);
+ const bonus={counter:4,press:3,possession:2,defense:-1}[style];
+ const fatigue=state.players.reduce((s,p)=>s+p[5],0)/state.players.length;
+ const strength=state.rating+bonus+(fatigue-80)*.12;
+ const chance=Math.max(.18,Math.min(.82,.5+(strength-opponentRating)*.035));
  const roll=Math.random();
- let win=style==='counter'?roll>.38:style==='press'?roll>.52:style==='possession'?roll>.48:roll>.62;
- let score=win?(Math.random()>.5?'2:1':'1:0'):(Math.random()>.5?'1:2':'0:1');
- if(win){state.wins++;state.place=Math.max(1,state.place-1);state.money+=.25;state.rating++;showModal(`<h2>🏆 ПОБЕДА!</h2><p>Rizvan FC побеждает Spartak со счётом <b>${score}</b>.<br><br>Команда получает +€250K призовых и +1 к рейтингу.</p><button class="primary" onclick="closeModal();updateHome()">Продолжить</button>`)}
- else showModal(`<h2>😔 Поражение</h2><p>Rizvan FC уступает Spartak со счётом <b>${score}</b>. Неудачный матч, но сезон продолжается.</p><button class="primary" onclick="closeModal()">Продолжить</button>`);
+ let win=roll<chance*.62, draw=!win&&roll<chance*.62+(1-chance)*.58;
+ let home=state.round%2===1;
+ let gf,ga;
+ if(win){gf=2+Math.floor(Math.random()*2);ga=Math.floor(Math.random()*2)}
+ else if(draw){gf=1;ga=1}
+ else {gf=Math.floor(Math.random()*2);ga=2+Math.floor(Math.random()*2)}
+ const score=home?`${gf}:${ga}`:`${ga}:${gf}`;
+ const result={score,win,draw};
+ state.results[state.round-1]=result;state.played++;state.round=Math.min(18,state.round+1);
+ if(win){state.wins++;state.money+=.25;state.rating=Math.min(90,state.rating+1)}
+ else if(draw){state.draws++;state.money+=.08}
+ else {state.losses++;state.money=Math.max(0,state.money-.05);state.rating=Math.max(45,state.rating-1)}
+ state.players.forEach(p=>p[5]=Math.max(55,p[5]-Math.floor(Math.random()*7+3)));
+ const row=state.table.find(x=>x[0]==='Rizvan FC');row[1]++;row[2]+=win?3:draw?1:0;
+ if(win)state.place=Math.max(1,state.place-1); else if(!draw)state.place=Math.min(10,state.place+1);
+ save();updateHome();renderLeague();renderFixtures();
+ const title=win?'🏆 ПОБЕДА!':draw?'🤝 НИЧЬЯ':'😔 ПОРАЖЕНИЕ';
+ const text=win?`Отличная работа. Клуб получает <b>€250K</b> призовых.`:draw?'Команды разделили очки.':'Сегодня соперник оказался сильнее. Впереди следующий тур.';
+ showModal(`<h2>${title}</h2><p style="font-size:22px;text-align:center"><b>${score}</b></p><p>${text}</p><button class="primary" onclick="closeModal();navigate('home')">Продолжить</button>`);
 }
 function buy(i){
  const p=state.market[i];
  if(state.money<p[5])return showToast('Недостаточно средств');
- state.money-=p[5];state.players.push([p[0],p[1],p[2],p[3],p[4]]);state.rating=Math.max(state.rating,Math.round((state.rating+p[2])/2));
- renderMarket();updateHome();showToast(p[0]+' подписан!');
+ state.money-=p[5];state.players.push([p[0],p[1],p[2],p[3],p[4],88]);state.rating=Math.min(90,Math.round((state.rating+p[2])/2+2));
+ state.market.splice(i,1);save();renderMarket();updateHome();showToast(p[0]+' подписан!');
 }
-function train(name,ico){state.rating++;showToast(ico+' Тренировка «'+name+'» завершена · рейтинг команды +1');updateHome()}
+function train(name,ico){
+ state.rating=Math.min(90,state.rating+1);state.players.forEach(p=>p[5]=Math.min(100,p[5]+3));save();updateHome();showToast(ico+' Тренировка «'+name+'» завершена · рейтинг +1');
+}
 function upgrade(type){
  const costs={stadium:1.2,academy:.8,training:1,medical:.7},c=costs[type];
  if(state.money<c)return showToast('Недостаточно средств');
- state.money-=c;updateHome();showToast('Улучшение построено · −€'+c+'M');
+ state.money-=c;save();updateHome();showToast('Улучшение построено · −€'+c+'M');
 }
 function updateHome(){
  document.getElementById('clubRating').textContent=state.rating;
@@ -220,7 +277,7 @@ function showToast(text){
  let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';Object.assign(t.style,{position:'fixed',left:'50%',bottom:'92px',transform:'translateX(-50%)',background:'#f4f6f8',color:'#111',padding:'11px 15px',borderRadius:'13px',fontWeight:'700',fontSize:'12px',zIndex:60,boxShadow:'0 8px 30px #0008'});document.body.appendChild(t)}
  t.textContent=text;t.style.opacity='1';clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.style.opacity='0',2200)
 }
-renderPlayers();renderMarket();renderLeague();
+updateHome();renderPlayers();renderMarket();renderLeague();renderFixtures();
 </script>
 </body>
 </html>
