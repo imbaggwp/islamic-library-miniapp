@@ -1220,7 +1220,8 @@ function renderPitch(){
   if(!pitch)return;
   ensureTacticalState();
   const f=currentFormation();
-  const names=state.startingXI.length===11?state.startingXI:autoXI();
+  let names=state.startingXI.length===11?state.startingXI:autoXI();
+  if(!Array.isArray(names)||names.length!==11)names=autoXI();
   state.startingXI=names;
   const slots=buildPitchSlots(f);
   const byName=new Map((state.players||[]).map(p=>[p[0],p]));
@@ -4342,7 +4343,7 @@ function setScheme(name){
  state.scheme=name;save();renderPitch();
  document.querySelectorAll('#schemes button').forEach(b=>b.classList.toggle('active',b.textContent===name));
 }
-function renderPitch(){
+function renderLegacyPitch(){
  const scheme=state.scheme||'4-3-3',slots=schemes[scheme], arr=state.players.slice(0,11);
  document.getElementById('schemeLabel').textContent=scheme;
  document.getElementById('pitch').innerHTML='<div class="goal top"></div><div class="goal bottom"></div>'+
