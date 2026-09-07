@@ -5387,5 +5387,724 @@ if(document.readyState==='loading'){
 </script>
 <!-- /PLAYER STATS & LEAGUE FORM -->
 
+
+<!-- PLAYER PROFILE & SEASON HISTORY -->
+<style id="player-profile-styles">
+.pp-wrap{margin-top:14px}
+.pp-card{padding:15px;border:1px solid rgba(255,255,255,.08);border-radius:17px;background:rgba(255,255,255,.035);margin-bottom:10px}
+.pp-header{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.pp-player-name{font-size:20px;font-weight:800}
+.pp-sub{font-size:12px;opacity:.58;margin-top:3px}
+.pp-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
+.pp-stat{padding:11px;border-radius:13px;background:rgba(255,255,255,.035)}
+.pp-stat span{display:block;font-size:11px;opacity:.55}
+.pp-stat b{display:block;font-size:18px;margin-top:3px}
+.pp-bars{display:grid;gap:9px;margin-top:12px}
+.pp-bar-row{display:grid;grid-template-columns:92px 1fr 38px;align-items:center;gap:8px;font-size:12px}
+.pp-bar{height:7px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.pp-bar i{display:block;height:100%;border-radius:inherit;background:currentColor}
+.pp-history{display:grid;gap:7px;margin-top:10px}
+.pp-match{display:grid;grid-template-columns:78px 1fr 50px 55px;gap:8px;align-items:center;padding:9px;border-radius:11px;background:rgba(255,255,255,.025);font-size:12px}
+.pp-match b{text-align:right}
+.pp-rating{font-weight:800}
+.pp-list{display:grid;gap:7px;margin-top:10px}
+.pp-player-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px;border-radius:12px;background:rgba(255,255,255,.025)}
+.pp-player-row button{font:inherit}
+.pp-danger{font-weight:700}
+@media(max-width:700px){.pp-grid{grid-template-columns:repeat(2,1fr)}.pp-match{grid-template-columns:65px 1fr 42px 45px}.pp-bar-row{grid-template-columns:76px 1fr 32px}}
+</style>
+<script id="player-profile-script">
+/* PLAYER PROFILE & SEASON HISTORY */
+(function(){
+  function ensureProfile(){
+    state.playerProfiles=state.playerProfiles||{};
+    state.playerProfiles.history=state.playerProfiles.history||{};
+    state.playerProfiles.lastSnapshot=state.playerProfiles.lastSnapshot||{};
+  }
+  function ps(){
+    return (state.squad||[]).filter(p=>p&&p.name);
+  }
+  function st(p){
+    if(typeof statFor==='function')return statFor(p);
+    state.leaguePlayerStats=state.leaguePlayerStats||{};
+    const x=state.leaguePlayerStats[p.id]||{};
+    return state.leaguePlayerStats[p.id]={
+      id:p.id,name:p.name,club:state.club||state.clubName||'Мой клуб',
+      pos:p.position||p.pos||'—',ovr:Number(p.rating||p.ovr||p.overall||70),
+      apps:Number(x.apps||0),minutes:Number(x.minutes||0),goals:Number(x.goals||0),
+      assists:Number(x.assists||0),yellow:Number(x.yellow||0),red:Number(x.red||0),
+      clean:Number(x.clean||0),rating:Number(x.rating||0),mvp:Number(x.mvp||0)
+    };
+  }
+  function ensurePlayer(p){
+    ensureProfile();
+    const h=state.playerProfiles.history[p.id];
+    if(!Array.isArray(h))state.playerProfiles.history[p.id]=[];
+    return state.playerProfiles.history[p.id];
+  }
+  function recordLastMatch(){
+    ensureProfile();
+    const r=state.lastMatchReport||state.postMatchReport;
+    if(!r)return;
+    const key=String(r.id||r.date||r.homeTeam+'-'+r.awayTeam+'-'+r.homeGoals+'-'+r.awayGoals);
+    if(state.playerProfiles.lastSnapshot.match===key)return;
+    const club=state.club||state.clubName||'Мой клуб';
+    (r.playerStats||[]).forEach(x=>{
+      const p=ps().find(y=>String(y.id)===String(x.id));
+      if(!p)return;
+      const h=ensurePlayer(p);
+      h.push({
+        date:r.date||state.careerDate||'',
+        opponent:(r.homeTeam===club?r.awayTeam:r.homeTeam)||'Соперник',
+        score:(r.homeGoals??0)+' : '+(r.awayGoals??0),
+        minutes:Number(x.minutes||90),rating:Number(x.rating||6.5),
+        goals:Number(x.goals||0),assists:Number(x.assists||0),
+        yellow:Number(x.yellow||0),red:Number(x.red||0),
+        events:Array.isArray(x.actions)?x.actions.slice(0,4):[],
+        injury:!!x.injury
+      });
+      state.playerProfiles.history[p.id]=h.slice(-50);
+    });
+    state.playerProfiles.lastSnapshot.match=key;
+    save();
+  }
+  function currentFitness(p){
+    const c=state.contracts?.[p.id];
+    return Math.round(Number(c?.fitness??p.fitness??75));
+  }
+  function currentMorale(p){
+    const c=state.contracts?.[p.id];
+    return Math.round(Number(c?.morale??p.morale??70));
+  }
+  function formScore(h){
+    const a=h.slice(-5);
+    if(!a.length)return 0;
+    return a.reduce((q,x)=>q+Number(x.rating||6.5),0)/a.length;
+  }
+  function profileHtml(p){
+    const x=st(p),h=ensurePlayer(p),avg=x.apps?(x.rating/x.apps):0;
+    const f=formScore(h);
+    const fitness=currentFitness(p),morale=currentMorale(p);
+    const contract=state.contracts?.[p.id]||{};
+    const age=p.age||'—';
+    const potential=p.potential||p.pot||'—';
+    const status=(contract.role||p.role||'Ротация');
+    return '<div class="pp-wrap">'+
+      '<div class="pp-card"><div class="pp-header"><div><div class="pp-player-name">'+p.name+'</div><div class="pp-sub">'+(p.position||p.pos||'Игрок')+' · '+age+' лет · '+status+'</div></div><span class="tw-pill">OVR '+x.ovr+'</span></div>'+
+      '<div class="pp-grid">'+
+      '<div class="pp-stat"><span>Матчи</span><b>'+x.apps+'</b></div>'+
+      '<div class="pp-stat"><span>Минуты</span><b>'+x.minutes+'</b></div>'+
+      '<div class="pp-stat"><span>Голы</span><b>'+x.goals+'</b></div>'+
+      '<div class="pp-stat"><span>Ассисты</span><b>'+x.assists+'</b></div>'+
+      '<div class="pp-stat"><span>Средняя оценка</span><b>'+(avg?avg.toFixed(1):'—')+'</b></div>'+
+      '<div class="pp-stat"><span>Карточки</span><b>'+x.yellow+' / '+x.red+'</b></div>'+
+      '<div class="pp-stat"><span>Форма</span><b>'+(f?f.toFixed(1):'—')+'</b></div>'+
+      '<div class="pp-stat"><span>MVP</span><b>'+x.mvp+'</b></div>'+
+      '</div>'+
+      '<div class="pp-bars">'+
+      '<div class="pp-bar-row"><span>Физика</span><div class="pp-bar"><i style="width:'+Math.max(0,Math.min(100,fitness))+'%"></i></div><b>'+fitness+'</b></div>'+
+      '<div class="pp-bar-row"><span>Мораль</span><div class="pp-bar"><i style="width:'+Math.max(0,Math.min(100,morale))+'%"></i></div><b>'+morale+'</b></div>'+
+      '<div class="pp-bar-row"><span>Потенциал</span><div class="pp-bar"><i style="width:'+Math.max(0,Math.min(100,Number(potential)||x.ovr))+'%"></i></div><b>'+potential+'</b></div>'+
+      '</div>'+
+      '<div class="tw-muted" style="margin-top:12px">Контракт до: '+(contract.until||p.contract||'—')+' · Зарплата: '+(contract.wage?Number(contract.wage).toLocaleString('ru-RU'):'—')+'</div></div>'+
+      '<div class="pp-card"><h3>Последние матчи</h3><div class="pp-history">'+
+      (h.length?h.slice().reverse().slice(0,10).map(m=>'<div class="pp-match"><span>'+m.date+'</span><span>'+m.opponent+'</span><b>'+m.goals+'⚽ '+m.assists+'🅰</b><span class="pp-rating">'+Number(m.rating||0).toFixed(1)+'</span></div>').join(''):'<div class="pp-empty">История появится после первого сыгранного матча.</div>')+
+      '</div></div></div>';
+  }
+  window.openPlayerProfile=function(id){
+    const p=ps().find(x=>String(x.id)===String(id));
+    if(!p)return;
+    recordLastMatch();
+    showModal('<div class="modal-title">Профиль игрока</div>'+profileHtml(p)+'<div class="modal-actions"><button class="btn" onclick="closeModal()">Закрыть</button></div>');
+  };
+  function renderList(){
+    const box=document.getElementById('playerProfilesBox');if(!box)return;
+    recordLastMatch();
+    box.innerHTML='<div class="pp-card"><div class="section" style="margin:0"><h2>Профили игроков</h2><span class="tw-pill">'+ps().length+' игроков</span></div>'+
+      '<div class="pp-list">'+
+      (ps().length?ps().map(p=>{
+        const x=st(p),h=ensurePlayer(p),avg=x.apps?x.rating/x.apps:0;
+        return '<div class="pp-player-row"><div><b>'+p.name+'</b><div class="pp-sub">'+(p.position||p.pos||'—')+' · OVR '+x.ovr+' · '+(avg?avg.toFixed(1):'—')+'</div></div><button class="btn secondary" onclick="openPlayerProfile('+JSON.stringify(String(p.id))+')">Открыть</button></div>';
+      }).join(''):'<div class="pp-empty">Состав пока пуст.</div>')+
+      '</div></div>';
+    if(typeof replaceEmojiIcons==='function')replaceEmojiIcons(box);
+  }
+  window.renderPlayerProfiles=renderList;
+  function inject(){
+    if(document.getElementById('playerProfilesBox'))return;
+    const page=document.getElementById('squad')||document.getElementById('club');
+    if(!page)return;
+    const box=document.createElement('div');box.id='playerProfilesBox';page.appendChild(box);
+  }
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{ensureProfile();inject();renderList()},1100));
+  setInterval(()=>{try{ensureProfile();inject();renderList()}catch(e){}},2200);
+})();
+</script>
+<!-- /PLAYER PROFILE & SEASON HISTORY -->
+
+
+<!-- INJURY & MEDICAL SYSTEM -->
+<style id="injury-medical-styles">
+.injury-wrap{margin-top:14px}
+.injury-card{padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.035);margin-bottom:10px}
+.injury-list{display:grid;gap:8px}
+.injury-item{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;padding:10px;border-radius:12px;background:rgba(255,255,255,.025)}
+.injury-icon{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:rgba(255,170,80,.1)}
+.injury-icon svg{width:18px;height:18px}
+.injury-name{font-weight:750}
+.injury-meta{font-size:12px;opacity:.58;margin-top:3px}
+.injury-days{font-weight:800;text-align:right}
+.injury-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.med-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.med-stat{padding:11px;border-radius:13px;background:rgba(255,255,255,.035)}
+.med-stat span{display:block;font-size:11px;opacity:.55}
+.med-stat b{display:block;font-size:18px;margin-top:3px}
+@media(max-width:700px){.med-grid{grid-template-columns:1fr 1fr}.injury-item{grid-template-columns:34px 1fr auto}}
+</style>
+<script id="injury-medical-script">
+/* INJURY & MEDICAL SYSTEM */
+(function(){
+  const INJURIES=[
+    {name:'Мышечное повреждение',min:5,max:14,risk:1.15},
+    {name:'Растяжение связок',min:10,max:28,risk:1.0},
+    {name:'Ушиб',min:2,max:7,risk:.85},
+    {name:'Повреждение голеностопа',min:7,max:21,risk:1.05},
+    {name:'Проблема с коленом',min:14,max:45,risk:1.25},
+    {name:'Повреждение задней поверхности бедра',min:14,max:35,risk:1.2},
+    {name:'Травма плеча',min:7,max:21,risk:.8},
+    {name:'Перелом',min:35,max:90,risk:.45}
+  ];
+  function ensureInjuries(){
+    state.injuries=state.injuries||{};
+    state.injuryHistory=Array.isArray(state.injuryHistory)?state.injuryHistory:[];
+    state.medical=state.medical||{};
+    state.medical.recovered=Number(state.medical.recovered||0);
+    state.medical.treated=Number(state.medical.treated||0);
+    state.medical.lastDay=state.medical.lastDay||'';
+  }
+  function staffBonus(){
+    try{return Number(typeof staffEffect==='function'?staffEffect('medical'):0)||0}catch(e){return 0}
+  }
+  function squad(){return (state.squad||[]).filter(p=>p&&p.name)}
+  function player(id){return squad().find(p=>String(p.id)===String(id))}
+  function isInjured(id){return !!state.injuries?.[id]}
+  function createInjury(p,context='матч'){
+    ensureInjuries();
+    if(!p||isInjured(p.id))return null;
+    const medical=staffBonus();
+    const baseRisk=(context==='training'?.004:.009);
+    const fitness=Number(p.fitness??state.contracts?.[p.id]?.fitness??75);
+    const risk=baseRisk*(fitness<60?1.8:fitness<72?1.3:1)*(1-Math.min(.35,medical/100));
+    if(Math.random()>risk)return null;
+    const type=INJURIES[Math.floor(Math.random()*INJURIES.length)];
+    const days=Math.round(type.min+Math.random()*(type.max-type.min));
+    const rec={playerId:p.id,name:p.name,type:type.name,days,remaining:days,context,date:state.careerDate||'',severity:days>=35?'тяжёлая':days>=14?'средняя':'лёгкая'};
+    state.injuries[p.id]=rec;
+    state.injuryHistory.unshift({...rec});
+    state.injuryHistory=state.injuryHistory.slice(0,50);
+    state.medical.treated++;
+    if(typeof addWorldNews==='function')addWorldNews('morale',p.name+' получил травму',
+      type.name+'. Ориентировочный срок восстановления — '+days+' дн.',
+      {playerId:p.id,urgent:days>=14});
+    return rec;
+  }
+  function recoverDay(){
+    ensureInjuries();
+    const day=String(state.careerDate||'');
+    if(!day||state.medical.lastDay===day)return;
+    state.medical.lastDay=day;
+    Object.keys(state.injuries).forEach(id=>{
+      const x=state.injuries[id];
+      if(!x)return;
+      let heal=1;
+      const med=staffBonus();
+      if(med>=75)heal=2;
+      if(med>=90)heal=3;
+      x.remaining=Math.max(0,Number(x.remaining||0)-heal);
+      if(x.remaining<=0){
+        const p=player(id);
+        delete state.injuries[id];
+        state.medical.recovered++;
+        if(p){
+          p.fitness=Math.max(45,Number(p.fitness||55)+8);
+          const c=state.contracts?.[p.id];if(c)c.morale=Math.min(100,Number(c.morale||70)+4);
+        }
+        if(typeof addWorldNews==='function')addWorldNews('morale',(p?.name||x.name)+' вернулся после травмы',
+          'Медицинский штаб разрешил игроку вернуться к полноценной работе.');
+      }
+    });
+    save();
+  }
+  function maybeTrainingInjury(){
+    const ps=squad().filter(p=>!isInjured(p.id));
+    if(!ps.length)return;
+    const p=ps[Math.floor(Math.random()*ps.length)];
+    createInjury(p,'тренировка');
+  }
+  window.medicalTreat=function(id){
+    ensureInjuries();
+    const x=state.injuries?.[id];if(!x)return;
+    const reduction=staffBonus()>=70?3:2;
+    x.remaining=Math.max(1,Number(x.remaining)-reduction);
+    if(typeof addWorldNews==='function')addWorldNews('contract','Медицинский штаб ускорил восстановление',
+      (player(id)?.name||x.name)+' получил дополнительную медицинскую процедуру. Срок сокращён.');
+    state.medical.treated++;
+    save();renderMedical();
+  };
+  window.medicalClearance=function(id){
+    ensureInjuries();
+    const x=state.injuries?.[id];if(!x)return;
+    if(Number(x.remaining)>2){
+      showToast('Игрок ещё не готов к возвращению');
+      return;
+    }
+    const p=player(id);
+    if(p)p.fitness=Math.max(Number(p.fitness||50),70);
+    delete state.injuries[id];
+    state.medical.recovered++;
+    if(typeof addWorldNews==='function')addWorldNews('morale',(p?.name||x.name)+' допущен к игре',
+      'После медицинского осмотра игрок получил разрешение вернуться в состав.');
+    save();renderMedical();
+  };
+  window.renderMedical=function(){
+    ensureInjuries();
+    const box=document.getElementById('medicalBox');if(!box)return;
+    const list=Object.values(state.injuries);
+    const med=staffBonus();
+    box.innerHTML='<div class="injury-wrap">'+
+      '<div class="injury-card"><div class="section" style="margin:0"><h2>Медицинский штаб</h2><span class="tw-pill">Эффективность '+Math.round(med)+'</span></div>'+
+      '<div class="med-grid" style="margin-top:10px">'+
+      '<div class="med-stat"><span>Травмированы</span><b>'+list.length+'</b></div>'+
+      '<div class="med-stat"><span>Вылечено</span><b>'+state.medical.recovered+'</b></div>'+
+      '<div class="med-stat"><span>Лечение</span><b>'+state.medical.treated+'</b></div>'+
+      '</div></div>'+
+      '<div class="injury-card"><h3>Травмированные</h3><div class="injury-list">'+
+      (list.length?list.map(x=>{
+        return '<div class="injury-item"><div class="injury-icon">'+svgIcon('injury','18px')+'</div><div><div class="injury-name">'+x.name+'</div><div class="injury-meta">'+x.type+' · '+x.severity+' · получил: '+x.context+'</div></div><div class="injury-days">'+x.remaining+' дн.</div>'+
+        '<div style="grid-column:2/-1"><div class="injury-actions"><button class="btn secondary" onclick="medicalTreat('+JSON.stringify(String(x.playerId))+')">Лечение</button><button class="btn secondary" onclick="medicalClearance('+JSON.stringify(String(x.playerId))+')">Осмотр</button></div></div></div>';
+      }).join(''):'<div class="tw-muted">Сейчас никто не находится в лазарете.</div>')+
+      '</div></div></div>';
+    if(typeof replaceEmojiIcons==='function')replaceEmojiIcons(box);
+  };
+  function inject(){
+    if(document.getElementById('medicalBox'))return;
+    const page=document.getElementById('club')||document.getElementById('squad');
+    if(!page)return;
+    const box=document.createElement('div');box.id='medicalBox';page.appendChild(box);
+  }
+  function hook(){
+    if(window.__injuryHook)return;
+    if(typeof window.advanceOneCareerDay==='function'){
+      const old=window.advanceOneCareerDay;
+      window.advanceOneCareerDay=function(){
+        const r=old.apply(this,arguments);
+        try{recoverDay();if(Math.random()<.035)maybeTrainingInjury();renderMedical()}catch(e){}
+        return r;
+      };
+    }
+    if(typeof window.startInteractiveMatch==='function'){
+      const old=window.startInteractiveMatch;
+      window.startInteractiveMatch=function(){
+        const r=old.apply(this,arguments);
+        try{
+          // Actual in-match injury generation is handled later through liveTick when possible.
+          if(window.liveMatch)window.liveMatch.injuryCheck=true;
+        }catch(e){}
+        return r;
+      };
+    }
+    window.__injuryHook=true;
+  }
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{ensureInjuries();hook();inject();recoverDay();renderMedical()},1200));
+  setInterval(()=>{try{ensureInjuries();hook();inject();recoverDay();renderMedical()}catch(e){}},2200);
+})();
+</script>
+<!-- /INJURY & MEDICAL SYSTEM -->
+
+
+<!-- TRAINING 2.0 COMPLETE SYSTEM -->
+<style id="training2-styles">
+.training2-wrap{margin-top:14px}
+.tr2-card{padding:15px;border:1px solid rgba(255,255,255,.08);border-radius:17px;background:rgba(255,255,255,.035);margin-bottom:10px}
+.tr2-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tr2-stat{padding:11px;border-radius:13px;background:rgba(255,255,255,.035)}
+.tr2-stat span{display:block;font-size:11px;opacity:.55}
+.tr2-stat b{display:block;font-size:18px;margin-top:3px}
+.tr2-days{display:grid;grid-template-columns:repeat(7,minmax(80px,1fr));gap:7px;overflow:auto}
+.tr2-day{min-width:80px;padding:10px;border-radius:13px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);cursor:pointer}
+.tr2-day.active{border-color:rgba(255,170,80,.5);box-shadow:0 0 0 1px rgba(255,170,80,.08) inset}
+.tr2-day b{display:block}
+.tr2-day span{font-size:11px;opacity:.55}
+.tr2-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.tr2-option{padding:12px;border:1px solid rgba(255,255,255,.07);border-radius:13px;background:rgba(255,255,255,.025);cursor:pointer}
+.tr2-option.active{border-color:rgba(255,170,80,.5)}
+.tr2-option b{display:block}
+.tr2-option span{font-size:11px;opacity:.58;line-height:1.35}
+.tr2-player{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.tr2-bar{height:7px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;min-width:90px}
+.tr2-bar i{display:block;height:100%;background:currentColor;border-radius:inherit}
+.tr2-log{display:grid;gap:7px}
+.tr2-log-item{padding:9px;border-radius:11px;background:rgba(255,255,255,.025);font-size:12px}
+@media(max-width:750px){.tr2-grid{grid-template-columns:repeat(2,1fr)}.tr2-options{grid-template-columns:1fr}.tr2-days{grid-template-columns:repeat(7,90px)}.tr2-player{grid-template-columns:1fr auto}}
+</style>
+<script id="training2-script">
+/* TRAINING 2.0 COMPLETE SYSTEM */
+(function(){
+  const PLANS={
+    recovery:{name:'Восстановление',load:15,fitness:9,form:2,injury:.2,desc:'Минимальная нагрузка. Быстрее возвращает физическую готовность.'},
+    light:{name:'Лёгкая тренировка',load:30,fitness:5,form:3,injury:.45,desc:'Безопасная работа над тонусом и формой.'},
+    balanced:{name:'Сбалансированная',load:55,fitness:1,form:4,injury:1,desc:'Ровное развитие команды без перекоса.'},
+    intense:{name:'Интенсивная',load:78,fitness:-4,form:5,injury:1.8,desc:'Сильная нагрузка. Выше эффект, но больше риск травм.'},
+    tactics:{name:'Тактика',load:48,fitness:-1,form:5,injury:.75,desc:'Работа над взаимодействиями, позициями и сыгранностью.'},
+    attack:{name:'Атака',load:62,fitness:-2,form:4,injury:1.15,desc:'Развитие атакующих действий и завершающей фазы.'},
+    defense:{name:'Оборона',load:60,fitness:-2,form:4,injury:1.1,desc:'Организация обороны, отбор и стандарты.'}
+  };
+  const FOCUS={
+    attack:{name:'Атака',attr:'attack',desc:'Улучшает атакующие характеристики.'},
+    defense:{name:'Оборона',attr:'defense',desc:'Улучшает оборонительные характеристики.'},
+    passing:{name:'Пас',attr:'passing',desc:'Развивает передачу и контроль.'},
+    physical:{name:'Физика',attr:'physical',desc:'Укрепляет физические показатели.'},
+    finishing:{name:'Завершение',attr:'finishing',desc:'Повышает эффективность у ворот.'},
+    goalkeeping:{name:'Вратарская',attr:'goalkeeping',desc:'Развитие вратарей.'}
+  };
+  function ensureTraining2(){
+    state.training2=state.training2||{};
+    state.training2.week=state.training2.week||{};
+    state.training2.focus=state.training2.focus||'balanced';
+    state.training2.individual=state.training2.individual||{};
+    state.training2.sessions=Number(state.training2.sessions||0);
+    state.training2.load=Number(state.training2.load||35);
+    state.training2.totalGrowth=Number(state.training2.totalGrowth||0);
+    state.training2.log=Array.isArray(state.training2.log)?state.training2.log:[];
+    state.training2.lastDay=state.training2.lastDay||'';
+  }
+  function squad(){return (state.squad||[]).filter(p=>p&&p.name)}
+  function staff(role){try{return Number(typeof staffEffect==='function'?staffEffect(role):0)||0}catch(e){return 0}}
+  function playerFitness(p){return Number(state.contracts?.[p.id]?.fitness??p.fitness??75)}
+  function setFitness(p,v){
+    p.fitness=Math.max(0,Math.min(100,Math.round(v)));
+    const c=state.contracts?.[p.id];if(c)c.fitness=p.fitness;
+  }
+  function dateKey(){
+    return String(state.careerDate||new Date().toISOString().slice(0,10));
+  }
+  function weekday(){
+    const d=new Date(dateKey()+'T12:00:00');
+    return isNaN(d)?1:d.getDay()||7;
+  }
+  function plan(){return PLANS[state.training2.focus]||PLANS.balanced}
+  function chooseTraining(id){
+    ensureTraining2();
+    if(!PLANS[id])return;
+    state.training2.focus=id;
+    save();renderTraining2();
+  }
+  window.chooseTraining=chooseTraining;
+  function chooseIndividual(id,focus){
+    ensureTraining2();
+    state.training2.individual[id]=focus;
+    save();renderTraining2();
+  }
+  window.chooseIndividual=chooseIndividual;
+
+  function runSession(){
+    ensureTraining2();
+    const pl=plan(), ps=squad();
+    if(!ps.length)return;
+    const fitnessCoach=staff('fitness');
+    const attackCoach=staff('attack'),defCoach=staff('defense');
+    const focus=state.training2.focus;
+    let growth=0, totalLoad=0, injured=0;
+    ps.forEach(p=>{
+      const f=playerFitness(p);
+      const fatigue=Math.max(0,(pl.load-(fitnessCoach*.22))/100);
+      setFitness(p,f-(pl.load*.035)+fitnessCoach*.035);
+      totalLoad+=pl.load;
+      const c=state.contracts?.[p.id];
+      if(c)c.morale=Math.max(0,Math.min(100,Number(c.morale||70)+(pl.form*.18)));
+      p.form=Math.max(0,Math.min(100,Number(p.form??70)+pl.form*.35));
+      const ind=state.training2.individual[p.id]||focus;
+      const coachBonus=ind==='attack'?attackCoach:ind==='defense'?defCoach:fitnessCoach;
+      const chance=Math.min(.02, .0022*pl.injury*(1+(100-f)/65)*(1-Math.min(.45,coachBonus/220)));
+      if(!state.injuries?.[p.id] && Math.random()<chance && typeof createInjury==='function'){
+        if(createInjury(p,'тренировка'))injured++;
+      }
+      if(f>=45 && f<=96){
+        const base=.018+(Number(p.potential||p.pot||85)>Number(p.rating||p.ovr||70)? .012:0);
+        const bonus=Math.min(.012,coachBonus/8000);
+        const g=base+bonus;
+        const attr=FOCUS[ind]?.attr||'balanced';
+        if(attr!=='balanced'){
+          p.trainingProgress=Number(p.trainingProgress||0)+g*100;
+          if(p.trainingProgress>=100){
+            p.trainingProgress-=100;
+            const old=Number(p.rating||p.ovr||p.overall||70);
+            const cap=Number(p.potential||p.pot||old+5);
+            const nw=Math.min(cap,old+1);
+            if(nw>old){
+              p.rating=nw;p.ovr=nw;p.overall=nw;growth++;
+            }
+          }
+        }
+      }
+    });
+    state.training2.sessions++;
+    state.training2.load=Math.max(0,Math.min(100,Math.round(state.training2.load*.7+pl.load*.3)));
+    state.training2.totalGrowth+=growth;
+    state.training2.log.unshift({
+      date:dateKey(),plan:pl.name,load:pl.load,growth,injured,
+      players:ps.length
+    });
+    state.training2.log=state.training2.log.slice(0,30);
+    if(typeof addWorldNews==='function'){
+      addWorldNews('morale','Тренировка завершена',
+        pl.name+'. Нагрузка: '+pl.load+'/100. Развитие: +'+growth+' OVR. Травм: '+injured+'.');
+    }
+    save();renderTraining2();
+    if(typeof renderAll==='function')renderAll();
+  }
+  window.runTrainingSession=runSession;
+
+  function weekPlan(){
+    ensureTraining2();
+    const days=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+    return days.map((d,i)=>{
+      const saved=state.training2.week[i];
+      return {day:d,plan:saved||['balanced','attack','recovery','tactics','defense','intense','recovery'][i]};
+    });
+  }
+  function setWeekPlan(i,id){
+    ensureTraining2();
+    if(!PLANS[id])return;
+    state.training2.week[i]=id;
+    save();renderTraining2();
+  }
+  window.setWeekPlan=setWeekPlan;
+
+  function renderTraining2(){
+    ensureTraining2();
+    const box=document.getElementById('training2Box');if(!box)return;
+    const ps=squad(),pl=plan();
+    const avgFit=ps.length?ps.reduce((a,p)=>a+playerFitness(p),0)/ps.length:0;
+    const med=staff('medical'),fit=staff('fitness');
+    const days=weekPlan();
+    box.innerHTML='<div class="training2-wrap">'+
+      '<div class="tr2-card"><div class="section" style="margin:0"><h2>Тренировки 2.0</h2><span class="tw-pill">'+pl.name+'</span></div>'+
+      '<div class="tr2-grid" style="margin-top:10px">'+
+      '<div class="tr2-stat"><span>Средняя физика</span><b>'+Math.round(avgFit)+'</b></div>'+
+      '<div class="tr2-stat"><span>Нагрузка</span><b>'+Math.round(state.training2.load)+'</b></div>'+
+      '<div class="tr2-stat"><span>Сессий</span><b>'+state.training2.sessions+'</b></div>'+
+      '<div class="tr2-stat"><span>Рост OVR</span><b>+'+state.training2.totalGrowth+'</b></div>'+
+      '</div>'+
+      '<div class="tr2-options">'+Object.entries(PLANS).map(([id,x])=>
+        '<div class="tr2-option '+(state.training2.focus===id?'active':'')+'" onclick="chooseTraining(\''+id+'\')"><b>'+x.name+'</b><span>'+x.desc+'<br>Нагрузка '+x.load+'/100</span></div>'
+      ).join('')+'</div>'+
+      '<div class="full-league-actions"><button class="btn" onclick="runTrainingSession()">Провести тренировку</button></div>'+
+      '<div class="tw-muted">Тренер по физподготовке: '+Math.round(fit)+' · Медштаб: '+Math.round(med)+'</div></div>'+
+      '<div class="tr2-card"><h3>Недельное расписание</h3><div class="tr2-days">'+days.map((x,i)=>
+        '<div class="tr2-day '+(i+1===weekday()?'active':'')+'"><b>'+x.day+'</b><span>'+PLANS[x.plan].name+'</span>'+
+        '<select style="margin-top:7px;width:100%" onchange="setWeekPlan('+i+',this.value)">'+
+        Object.entries(PLANS).map(([id,z])=>'<option value="'+id+'" '+(x.plan===id?'selected':'')+'>'+z.name+'</option>').join('')+
+        '</select></div>'
+      ).join('')+'</div></div>'+
+      '<div class="tr2-card"><h3>Индивидуальные планы</h3>'+
+      (ps.length?ps.slice(0,30).map(p=>{
+        const f=playerFitness(p),ind=state.training2.individual[p.id]||state.training2.focus;
+        return '<div class="tr2-player"><span><b>'+p.name+'</b><br><span class="tw-muted">'+(p.position||p.pos||'—')+' · физика '+Math.round(f)+'</span></span>'+
+        '<div class="tr2-bar"><i style="width:'+Math.max(0,Math.min(100,f))+'%"></i></div>'+
+        '<select onchange="chooseIndividual('+JSON.stringify(String(p.id))+',this.value)">'+Object.entries(FOCUS).map(([id,z])=>'<option value="'+id+'" '+(ind===id?'selected':'')+'>'+z.name+'</option>').join('')+'</select></div>'
+      }).join(''):'<div class="tw-muted">Нет игроков.</div>')+
+      '</div>'+
+      '<div class="tr2-card"><h3>Журнал тренировок</h3><div class="tr2-log">'+
+      (state.training2.log.length?state.training2.log.slice(0,10).map(x=>'<div class="tr2-log-item"><b>'+x.date+'</b> · '+x.plan+' · нагрузка '+x.load+' · OVR +'+x.growth+' · травм '+x.injured+'</div>').join(''):'<div class="tw-muted">Тренировок ещё не было.</div>')+
+      '</div></div></div>';
+    if(typeof replaceEmojiIcons==='function')replaceEmojiIcons(box);
+  }
+  function inject(){
+    if(document.getElementById('training2Box'))return;
+    const page=document.getElementById('club')||document.getElementById('squad');
+    if(!page)return;
+    const box=document.createElement('div');box.id='training2Box';page.appendChild(box);
+  }
+  function hook(){
+    if(window.__training2Hook)return;
+    if(typeof window.advanceOneCareerDay==='function'){
+      const old=window.advanceOneCareerDay;
+      window.advanceOneCareerDay=function(){
+        const r=old.apply(this,arguments);
+        try{
+          ensureTraining2();
+          // Automatically recover from the previous day's load.
+          squad().forEach(p=>{
+            const f=playerFitness(p);
+            setFitness(p,f+(staff('fitness')>=70?5:3));
+          });
+          renderTraining2();
+        }catch(e){}
+        return r;
+      };
+    }
+    window.__training2Hook=true;
+  }
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{ensureTraining2();hook();inject();renderTraining2()},1300));
+  setInterval(()=>{try{ensureTraining2();hook();inject();renderTraining2()}catch(e){}},2400);
+})();
+</script>
+<!-- /TRAINING 2.0 COMPLETE SYSTEM -->
+
+
+<!-- SCOUTING & ACADEMY 2.0 -->
+<style id="scout-academy2-styles">
+.sa2-wrap{margin-top:14px}
+.sa2-card{padding:15px;border:1px solid rgba(255,255,255,.08);border-radius:17px;background:rgba(255,255,255,.035);margin-bottom:10px}
+.sa2-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.sa2-stat{padding:11px;border-radius:13px;background:rgba(255,255,255,.035)}
+.sa2-stat span{display:block;font-size:11px;opacity:.55}.sa2-stat b{display:block;font-size:18px;margin-top:3px}
+.sa2-filters{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:8px;margin-top:10px}
+.sa2-report{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:11px;border-radius:13px;background:rgba(255,255,255,.025);margin-top:8px}
+.sa2-player{font-weight:750}.sa2-meta{font-size:11px;opacity:.55;margin-top:3px}
+.sa2-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.sa2-progress{height:7px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}.sa2-progress i{display:block;height:100%;background:currentColor}
+.sa2-academy-list{display:grid;gap:8px}
+.sa2-youth{padding:12px;border-radius:13px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06)}
+.sa2-youth-top{display:flex;justify-content:space-between;gap:8px}
+.sa2-youth-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:9px}
+.sa2-mini{padding:8px;border-radius:10px;background:rgba(255,255,255,.03)}.sa2-mini span{display:block;font-size:10px;opacity:.5}.sa2-mini b{font-size:14px}
+.sa2-stars{letter-spacing:1px}
+@media(max-width:750px){.sa2-grid{grid-template-columns:repeat(2,1fr)}.sa2-filters{grid-template-columns:1fr 1fr}.sa2-youth-grid{grid-template-columns:1fr 1fr}}
+</style>
+<script id="scout-academy2-script">
+/* SCOUTING & ACADEMY 2.0 */
+(function(){
+  const COUNTRIES=['Испания','Англия','Германия','Италия','Франция','Нидерланды','Португалия','Бразилия','Аргентина','Хорватия','Сербия','Марокко'];
+  const POS=['ВР','ЦЗ','ЛЗ','ПЗ','ЦП','ЦАП','ЛП','ПП','ЛВ','ПВ','НП'];
+  const NAMES=['Алекс','Матео','Лукас','Даниэль','Андре','Милан','Нико','Тьяго','Энцо','Лео','Марко','Адриан','Рафаэль','Икер','Давид','Серхио','Ян','Томас','Оливер','Юлиан'];
+  function ensureSA2(){
+    state.scouting2=state.scouting2||{};
+    state.scouting2.reports=Array.isArray(state.scouting2.reports)?state.scouting2.reports:[];
+    state.scouting2.country=state.scouting2.country||'Все';
+    state.scouting2.position=state.scouting2.position||'Все';
+    state.scouting2.minAge=Number(state.scouting2.minAge||15);
+    state.scouting2.maxAge=Number(state.scouting2.maxAge||21);
+    state.scouting2.scans=Number(state.scouting2.scans||0);
+    state.scouting2.signings=Number(state.scouting2.signings||0);
+    state.scouting2.academyLevel=Number(state.scouting2.academyLevel||1);
+    state.scouting2.youth=Array.isArray(state.scouting2.youth)?state.scouting2.youth:[];
+    state.scouting2.lastScout=state.scouting2.lastScout||'';
+  }
+  function scoutRating(){
+    try{return Math.max(1,Math.min(99,Math.round(Number(typeof staffEffect==='function'?staffEffect('scout'):50))))}catch(e){return 50}
+  }
+  function rnd(a,b){return Math.round(a+Math.random()*(b-a))}
+  function money(v){return Math.round(v).toLocaleString('ru-RU')+' €'}
+  function scoutSearch(){
+    ensureSA2();
+    const sr=scoutRating(),age=rnd(state.scouting2.minAge,state.scouting2.maxAge);
+    const country=state.scouting2.country==='Все'?COUNTRIES[rnd(0,COUNTRIES.length-1)]:state.scouting2.country;
+    const pos=state.scouting2.position==='Все'?POS[rnd(0,POS.length-1)]:state.scouting2.position;
+    const ovr=rnd(52,Math.min(76,58+Math.round(sr*.16)));
+    const pot=Math.min(99,Math.max(ovr+4,rnd(ovr+7,Math.min(96,ovr+22))));
+    const interest=Math.max(15,Math.min(100,rnd(35,85)+(sr-50)*.35));
+    const value=Math.round((age<=17?Math.max(50000,ovr*ovr*900):ovr*ovr*1700)*(1+Math.random())/1000)*1000;
+    const wage=rnd(500,Math.max(1500,Math.round(value*.012)));
+    const name=NAMES[rnd(0,NAMES.length-1)]+' '+['Гарсия','Силва','Мюллер','Росси','Новак','Ковач','Мартинес','Фернандес','Попов','Иванов'][rnd(0,9)];
+    const report={
+      id:'sr-'+Date.now()+Math.floor(Math.random()*9999),name,country,position:pos,age,ovr,potential:pot,
+      value,wage,interest,scout:sr,status:'scouted',date:state.careerDate||''
+    };
+    state.scouting2.reports.unshift(report);state.scouting2.reports=state.scouting2.reports.slice(0,40);state.scouting2.scans++;
+    state.scouting2.lastScout=report.id;
+    save();renderSA2();
+    if(typeof addWorldNews==='function')addWorldNews('market','Скаут нашёл игрока',
+      name+' ('+country+', '+age+' лет) · '+pos+' · OVR '+ovr+' · потенциал '+pot+'.');
+  }
+  window.scoutSearch2=scoutSearch;
+  function signYouth(id){
+    ensureSA2();const r=state.scouting2.reports.find(x=>x.id===id);if(!r)return;
+    if(r.status==='signed')return;
+    if(r.interest<35){showToast('Игрок пока не заинтересован в переходе');return}
+    r.status='signed';state.scouting2.signings++;
+    const y={id:'y-'+Date.now()+Math.floor(Math.random()*999),name:r.name,country:r.country,position:r.position,age:r.age,
+      rating:r.ovr,potential:r.potential,fitness:82,morale:76,training:0,status:'Академия',value:r.value,wage:r.wage,
+      signedDate:state.careerDate||''};
+    state.scouting2.youth.unshift(y);
+    if(typeof addWorldNews==='function')addWorldNews('contract','Молодой игрок подписан',
+      r.name+' присоединился к академии. Потенциал: '+r.potential+'.');
+    save();renderSA2();
+  }
+  window.signYouth2=signYouth;
+  function trainYouth(id){
+    ensureSA2();const y=state.scouting2.youth.find(x=>x.id===id);if(!y)return;
+    const coach=(()=>{try{return Number(typeof staffEffect==='function'?staffEffect('attack'):50)}catch(e){return 50}})();
+    y.training+=rnd(5,11)+Math.round(coach/25);
+    y.fitness=Math.max(55,Number(y.fitness||75)-rnd(1,4));
+    y.morale=Math.min(100,Number(y.morale||70)+2);
+    if(y.training>=100){
+      y.training-=100;
+      const old=Number(y.rating||50);y.rating=Math.min(Number(y.potential||old+1),old+1);
+      if(typeof addWorldNews==='function')addWorldNews('morale','Прогресс академии',
+        y.name+' повысил рейтинг до '+y.rating+'.');
+    }
+    save();renderSA2();
+  }
+  window.trainYouth2=trainYouth;
+  function promoteYouth(id){
+    ensureSA2();const y=state.scouting2.youth.find(x=>x.id===id);if(!y)return;
+    if(Number(y.rating)<60){showToast('Игроку желательно достичь OVR 60 перед повышением');return}
+    y.status='Первая команда';
+    const p={id:'academy-'+y.id,name:y.name,position:y.position,age:y.age,rating:y.rating,ovr:y.rating,overall:y.rating,
+      potential:y.potential,value:y.value,wage:y.wage,fitness:y.fitness,morale:y.morale,role:'Молодой игрок'};
+    state.squad=state.squad||[];state.squad.push(p);
+    state.contracts=state.contracts||{};state.contracts[p.id]={wage:y.wage,until:Number(state.season||2026)+3,morale:y.morale,role:'Молодой игрок',fitness:y.fitness};
+    if(typeof addWorldNews==='function')addWorldNews('contract',y.name+' вызван в первую команду',
+      'Академия дала результат: '+y.name+' теперь тренируется с основным составом.');
+    save();renderSA2();if(typeof renderAll==='function')renderAll();
+  }
+  window.promoteYouth2=promoteYouth;
+  function releaseYouth(id){
+    ensureSA2();const i=state.scouting2.youth.findIndex(x=>x.id===id);if(i<0)return;
+    const y=state.scouting2.youth[i];state.scouting2.youth.splice(i,1);
+    if(typeof addWorldNews==='function')addWorldNews('contract',y.name+' покинул академию','Клуб решил не продолжать развитие игрока.');
+    save();renderSA2();
+  }
+  window.releaseYouth2=releaseYouth;
+  function upgradeAcademy2(){
+    ensureSA2();
+    const cost=150000*state.scouting2.academyLevel;
+    if(Number(state.budget||0)<cost){showToast('Недостаточно средств для улучшения академии');return}
+    state.budget=Number(state.budget)-cost;state.scouting2.academyLevel++;
+    if(typeof addWorldNews==='function')addWorldNews('market','Академия улучшена',
+      'Уровень академии повышен до '+state.scouting2.academyLevel+'. Новые игроки будут качественнее.');
+    save();renderSA2();
+  }
+  window.upgradeAcademy2=upgradeAcademy2;
+  function renderSA2(){
+    ensureSA2();const box=document.getElementById('scoutAcademy2Box');if(!box)return;
+    const sr=scoutRating(),r=state.scouting2.reports.slice(0,12),y=state.scouting2.youth;
+    const filt=r.filter(x=>(state.scouting2.country==='Все'||x.country===state.scouting2.country)&&(state.scouting2.position==='Все'||x.position===state.scouting2.position));
+    box.innerHTML='<div class="sa2-wrap">'+
+      '<div class="sa2-card"><div class="section" style="margin:0"><h2>Скаутинг и академия 2.0</h2><span class="tw-pill">Скаут '+sr+'</span></div>'+
+      '<div class="sa2-grid" style="margin-top:10px"><div class="sa2-stat"><span>Уровень академии</span><b>'+state.scouting2.academyLevel+'</b></div><div class="sa2-stat"><span>Скаутинги</span><b>'+state.scouting2.scans+'</b></div><div class="sa2-stat"><span>Подписано</span><b>'+state.scouting2.signings+'</b></div><div class="sa2-stat"><span>В академии</span><b>'+y.length+'</b></div></div>'+
+      '<div class="sa2-actions"><button class="btn" onclick="scoutSearch2()">Найти молодого игрока</button><button class="btn secondary" onclick="upgradeAcademy2()">Улучшить академию</button></div></div>'+
+      '<div class="sa2-card"><h3>Фильтры скаутинга</h3><div class="sa2-filters"><select onchange="state.scouting2.country=this.value;renderSA2()"><option>Все</option>'+COUNTRIES.map(x=>'<option '+(state.scouting2.country===x?'selected':'')+'>'+x+'</option>').join('')+'</select><select onchange="state.scouting2.position=this.value;renderSA2()"><option>Все</option>'+POS.map(x=>'<option '+(state.scouting2.position===x?'selected':'')+'>'+x+'</option>').join('')+'</select><input type="number" min="15" max="30" value="'+state.scouting2.minAge+'" onchange="state.scouting2.minAge=Number(this.value);renderSA2()"><input type="number" min="15" max="30" value="'+state.scouting2.maxAge+'" onchange="state.scouting2.maxAge=Number(this.value);renderSA2()"></div>'+
+      '<div class="sa2-academy-list">'+(filt.length?filt.map(x=>'<div class="sa2-report"><div><div class="sa2-player">'+x.name+'</div><div class="sa2-meta">'+x.country+' · '+x.position+' · '+x.age+' лет · скаут '+x.scout+'</div><div class="sa2-meta">OVR <b>'+x.ovr+'</b> · потенциал <b>'+x.potential+'</b> · стоимость '+money(x.value)+' · интерес '+x.interest+'%</div></div><div class="sa2-actions"><button class="btn secondary" '+(x.status==='signed'?'disabled':'')+' onclick="signYouth2(\''+x.id+'\')">'+(x.status==='signed'?'Подписан':'Подписать')+'</button></div></div>').join(''):'<div class="tw-muted">Отчётов пока нет. Запусти поиск.</div>')+'</div></div>'+
+      '<div class="sa2-card"><h3>Академия</h3><div class="sa2-academy-list">'+
+      (y.length?y.map(q=>'<div class="sa2-youth"><div class="sa2-youth-top"><div><b>'+q.name+'</b><div class="sa2-meta">'+q.country+' · '+q.position+' · '+q.age+' лет · '+q.status+'</div></div><span class="tw-pill">OVR '+q.rating+' / POT '+q.potential+'</span></div><div class="sa2-youth-grid"><div class="sa2-mini"><span>Физика</span><b>'+q.fitness+'</b></div><div class="sa2-mini"><span>Мораль</span><b>'+q.morale+'</b></div><div class="sa2-mini"><span>Тренинг</span><b>'+q.training+'%</b></div><div class="sa2-mini"><span>Стоимость</span><b>'+money(q.value)+'</b></div></div><div class="sa2-progress" style="margin-top:9px"><i style="width:'+Math.max(0,Math.min(100,q.training))+'%"></i></div><div class="sa2-actions"><button class="btn secondary" onclick="trainYouth2(\''+q.id+'\')">Тренировать</button><button class="btn secondary" onclick="promoteYouth2(\''+q.id+'\')">В первую команду</button><button class="btn secondary" onclick="releaseYouth2(\''+q.id+'\')">Отпустить</button></div></div>').join(''):'<div class="tw-muted">Академия пока пуста.</div>')+
+      '</div></div></div>';
+    if(typeof replaceEmojiIcons==='function')replaceEmojiIcons(box);
+  }
+  window.renderScoutAcademy2=renderSA2;
+  function inject(){
+    if(document.getElementById('scoutAcademy2Box'))return;
+    const page=document.getElementById('academy')||document.getElementById('club')||document.getElementById('squad');
+    if(!page)return;
+    const box=document.createElement('div');box.id='scoutAcademy2Box';page.appendChild(box);
+  }
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{ensureSA2();inject();renderSA2()},1400));
+  setInterval(()=>{try{ensureSA2();inject();renderSA2()}catch(e){}},2500);
+})();
+</script>
+<!-- /SCOUTING & ACADEMY 2.0 -->
+
 </body>
 </html>
