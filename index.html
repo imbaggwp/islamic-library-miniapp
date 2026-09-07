@@ -1,2079 +1,2589 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     >
 
+    <meta
+        name="theme-color"
+        content="#f4f1ec"
+    >
+
     <title>Требуй знания!</title>
+
+
+    <!-- Telegram -->
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <style>
-        :root {
-            --bg: #f4f1ec;
-            --surface: #ffffff;
-            --surface-2: #ece8e1;
-            --surface-3: #e3ded5;
-
-            --text: #171717;
-            --text-soft: #74716c;
-            --text-muted: #9a958d;
-
-            --dark: #181817;
-            --dark-2: #242321;
-
-            --accent: #a47d59;
-            --accent-light: #d7b99b;
-
-            --border: rgba(30, 27, 24, .08);
-
-            --shadow:
-                0 10px 35px rgba(30, 25, 20, .08);
-
-            --radius-xl: 26px;
-            --radius-lg: 20px;
-            --radius-md: 16px;
-
-            --nav-height: 78px;
-        }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100%;
-            font-family:
-                Inter,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                sans-serif;
-            background: var(--bg);
-            color: var(--text);
-        }
-
-        body {
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        button,
-        input {
-            font: inherit;
-        }
-
-        button {
-            border: 0;
-            cursor: pointer;
-        }
-
-        .app {
-            min-height: 100vh;
-            position: relative;
-        }
-
-        .screen {
-            display: none;
-            min-height: 100vh;
-            padding-bottom: calc(var(--nav-height) + 18px);
-            animation: fadeIn .25s ease;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(5px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* =========================================================
-           WELCOME
-        ========================================================= */
-
-        .welcome {
-            min-height: 100vh;
-            padding: 28px 22px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            background:
-                radial-gradient(
-                    circle at 50% 35%,
-                    rgba(164, 125, 89, .16),
-                    transparent 34%
-                ),
-                linear-gradient(
-                    145deg,
-                    #151514 0%,
-                    #0e0e0d 100%
-                );
-            color: #fff;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .welcome::before {
-            content: "";
-            position: absolute;
-            width: 360px;
-            height: 360px;
-            border-radius: 50%;
-            background: rgba(164, 125, 89, .08);
-            filter: blur(50px);
-            top: 18%;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .welcome-top {
-            display: flex;
-            justify-content: flex-end;
-            position: relative;
-            z-index: 2;
-        }
-
-        .skip {
-            background: transparent;
-            color: rgba(255,255,255,.55);
-            font-size: 13px;
-            padding: 8px;
-        }
-
-        .welcome-center {
-            text-align: center;
-            position: relative;
-            z-index: 2;
-            margin-top: -30px;
-        }
-
-        .welcome-symbol {
-            width: 190px;
-            height: 240px;
-            margin: 0 auto 38px;
-            position: relative;
-        }
-
-        .welcome-symbol::before {
-            content: "";
-            position: absolute;
-            inset: 0 18px;
-            border: 1px solid rgba(215,185,155,.65);
-            border-radius: 95px 95px 22px 22px;
-            clip-path: polygon(
-                50% 0,
-                100% 15%,
-                100% 100%,
-                0 100%,
-                0 15%
-            );
-        }
-
-        .welcome-symbol::after {
-            content: "";
-            position: absolute;
-            width: 54px;
-            height: 54px;
-            background: #d6b89a;
-            border-radius: 50%;
-            left: 68px;
-            bottom: 48px;
-            box-shadow:
-                0 0 45px rgba(215,185,155,.25);
-        }
-
-        .welcome-title {
-            margin: 0;
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: clamp(38px, 11vw, 54px);
-            line-height: .98;
-            font-weight: 400;
-            letter-spacing: -1.5px;
-        }
-
-        .welcome-title span {
-            color: var(--accent-light);
-        }
-
-        .welcome-subtitle {
-            max-width: 300px;
-            margin: 24px auto 0;
-            color: rgba(255,255,255,.54);
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 15px;
-            line-height: 1.55;
-        }
-
-        .welcome-bottom {
-            position: relative;
-            z-index: 2;
-        }
-
-        .progress-dots {
-            display: flex;
-            justify-content: center;
-            gap: 7px;
-            margin-bottom: 28px;
-        }
-
-        .progress-dots span {
-            width: 22px;
-            height: 3px;
-            border-radius: 10px;
-            background: rgba(255,255,255,.16);
-        }
-
-        .progress-dots span.active {
-            background: var(--accent-light);
-        }
-
-        .welcome-button {
-            width: 100%;
-            height: 58px;
-            border-radius: 30px;
-            background: #e5c8ad;
-            color: #171513;
-            font-weight: 600;
-            font-size: 15px;
-        }
-
-        .welcome-footer {
-            text-align: center;
-            color: rgba(255,255,255,.28);
-            font-size: 12px;
-            margin-top: 18px;
-        }
-
-        /* =========================================================
-           COMMON
-        ========================================================= */
-
-        .page {
-            padding: 22px 18px 0;
-            max-width: 680px;
-            margin: 0 auto;
-        }
-
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 22px;
-        }
-
-        .brand h1 {
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 28px;
-            line-height: 1;
-            font-weight: 500;
-            margin: 0;
-            letter-spacing: -.8px;
-        }
-
-        .brand p {
-            margin: 7px 0 0;
-            color: var(--text-soft);
-            font-size: 13px;
-        }
-
-        .top-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .icon-button {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text);
-            box-shadow: 0 4px 15px rgba(0,0,0,.04);
-        }
-
-        .icon-button svg {
-            width: 19px;
-            height: 19px;
-        }
-
-        .section-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 26px 2px 12px;
-        }
-
-        .section-title h2 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 650;
-        }
-
-        .section-title button {
-            background: transparent;
-            color: var(--text-soft);
-            font-size: 13px;
-        }
-
-        /* =========================================================
-           CONTINUE CARD
-        ========================================================= */
-
-        .continue-card {
-            background:
-                radial-gradient(
-                    circle at 100% 0,
-                    rgba(215,185,155,.13),
-                    transparent 40%
-                ),
-                linear-gradient(
-                    135deg,
-                    #242321,
-                    #171716
-                );
-            color: #fff;
-            border-radius: var(--radius-xl);
-            padding: 21px;
-            min-height: 170px;
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .continue-card::after {
-            content: "";
-            position: absolute;
-            width: 130px;
-            height: 130px;
-            right: -40px;
-            bottom: -45px;
-            border: 1px solid rgba(215,185,155,.13);
-            border-radius: 50%;
-        }
-
-        .continue-label {
-            color: rgba(255,255,255,.48);
-            font-size: 12px;
-            margin-bottom: 12px;
-        }
-
-        .continue-title {
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 22px;
-            margin-bottom: 5px;
-        }
-
-        .continue-description {
-            color: rgba(255,255,255,.58);
-            font-size: 12px;
-        }
-
-        .play-button {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background: #e0c3a7;
-            color: #28231e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .play-button svg {
-            width: 20px;
-            margin-left: 2px;
-        }
-
-        .continue-progress {
-            margin-top: 27px;
-            height: 4px;
-            background: rgba(255,255,255,.13);
-            border-radius: 5px;
-            width: calc(100% - 70px);
-            overflow: hidden;
-        }
-
-        .continue-progress span {
-            display: block;
-            height: 100%;
-            width: 42%;
-            background: #d7b99b;
-            border-radius: 5px;
-        }
-
-        .continue-time {
-            position: absolute;
-            right: 21px;
-            bottom: 18px;
-            font-size: 10px;
-            color: rgba(255,255,255,.45);
-        }
-
-        /* =========================================================
-           CATEGORY GRID
-        ========================================================= */
-
-        .category-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 11px;
-        }
-
-        .category-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 19px;
-            min-height: 142px;
-            text-align: left;
-            box-shadow: 0 5px 20px rgba(30,25,20,.035);
-            transition: transform .15s ease;
-        }
-
-        .category-card:active {
-            transform: scale(.98);
-        }
-
-        .category-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 13px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--surface-2);
-            color: var(--accent);
-            margin-bottom: 16px;
-        }
-
-        .category-icon svg {
-            width: 21px;
-            height: 21px;
-        }
-
-        .category-card h3 {
-            margin: 0;
-            font-size: 14px;
-            font-weight: 650;
-        }
-
-        .category-card p {
-            margin: 5px 0 0;
-            color: var(--text-muted);
-            font-size: 11px;
-        }
-
-        /* =========================================================
-           QUOTE
-        ========================================================= */
-
-        .quote-card {
-            margin-top: 16px;
-            padding: 20px;
-            background: var(--surface-2);
-            border-radius: var(--radius-lg);
-            text-align: center;
-        }
-
-        .quote-card p {
-            margin: 0;
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 14px;
-            line-height: 1.55;
-        }
-
-        .quote-card small {
-            display: block;
-            margin-top: 9px;
-            color: var(--text-muted);
-            font-size: 10px;
-        }
-
-        /* =========================================================
-           LIST PAGE
-        ========================================================= */
-
-        .dark-screen {
-            background:
-                radial-gradient(
-                    circle at 80% 10%,
-                    rgba(164,125,89,.09),
-                    transparent 30%
-                ),
-                #151514;
-            color: #fff;
-        }
-
-        .dark-screen .page {
-            padding-top: 26px;
-        }
-
-        .dark-topbar {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .back-button {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: rgba(255,255,255,.07);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .dark-heading h1 {
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 27px;
-            font-weight: 400;
-            margin: 0;
-        }
-
-        .dark-heading p {
-            margin: 7px 0 0;
-            color: rgba(255,255,255,.43);
-            font-size: 12px;
-        }
-
-        .filters {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            scrollbar-width: none;
-            padding-bottom: 3px;
-            margin-bottom: 14px;
-        }
-
-        .filters::-webkit-scrollbar {
-            display: none;
-        }
-
-        .filter {
-            white-space: nowrap;
-            padding: 10px 15px;
-            border-radius: 22px;
-            background: rgba(255,255,255,.055);
-            color: rgba(255,255,255,.65);
-            font-size: 12px;
-        }
-
-        .filter.active {
-            background: #e6c8aa;
-            color: #211d19;
-        }
-
-        .lesson-list {
-            display: flex;
-            flex-direction: column;
-            gap: 9px;
-        }
-
-        .lesson-card {
-            width: 100%;
-            background: rgba(255,255,255,.045);
-            border: 1px solid rgba(255,255,255,.045);
-            border-radius: 18px;
-            padding: 12px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #fff;
-            text-align: left;
-        }
-
-        .lesson-cover {
-            flex: 0 0 52px;
-            width: 52px;
-            height: 52px;
-            border-radius: 15px;
-            background:
-                linear-gradient(
-                    145deg,
-                    #5a4b3d,
-                    #292824
-                );
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #d4b596;
-        }
-
-        .lesson-cover svg {
-            width: 23px;
-            height: 23px;
-        }
-
-        .lesson-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .lesson-info h3 {
-            margin: 0 0 5px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .lesson-info p {
-            margin: 0;
-            color: rgba(255,255,255,.42);
-            font-size: 10px;
-            line-height: 1.4;
-        }
-
-        .lesson-arrow {
-            color: rgba(255,255,255,.35);
-            font-size: 18px;
-        }
-
-        /* =========================================================
-           BOOKS
-        ========================================================= */
-
-        .books-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .book-card {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: var(--surface);
-            border-radius: 19px;
-            padding: 14px;
-            border: 1px solid var(--border);
-            box-shadow: 0 5px 20px rgba(30,25,20,.035);
-        }
-
-        .book-cover {
-            width: 62px;
-            height: 82px;
-            border-radius: 9px;
-            background:
-                linear-gradient(
-                    145deg,
-                    #51473d,
-                    #211f1b
-                );
-            color: #d9b999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .book-cover svg {
-            width: 28px;
-        }
-
-        .book-info {
-            flex: 1;
-        }
-
-        .book-info h3 {
-            margin: 0 0 6px;
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 17px;
-            font-weight: 500;
-        }
-
-        .book-info p {
-            margin: 0;
-            color: var(--text-soft);
-            font-size: 11px;
-            line-height: 1.45;
-        }
-
-        .book-meta {
-            margin-top: 9px;
-            display: flex;
-            gap: 8px;
-        }
-
-        .tag {
-            padding: 5px 8px;
-            border-radius: 7px;
-            background: var(--surface-2);
-            color: var(--text-soft);
-            font-size: 9px;
-        }
-
-        /* =========================================================
-           PROGRESS
-        ========================================================= */
-
-        .progress-hero {
-            background: var(--surface);
-            border-radius: var(--radius-xl);
-            padding: 22px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .progress-circle {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            display: grid;
-            place-items: center;
-            position: relative;
-            background:
-                conic-gradient(
-                    var(--accent) var(--progress, 68%),
-                    #e2ddd5 var(--progress, 68%)
-                );
-        }
-
-        .progress-circle::after {
-            content: "";
-            position: absolute;
-            inset: 10px;
-            border-radius: 50%;
-            background: var(--surface);
-        }
-
-        .progress-number {
-            position: relative;
-            z-index: 2;
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 27px;
-        }
-
-        .progress-copy h3 {
-            margin: 0 0 8px;
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 18px;
-            font-weight: 500;
-        }
-
-        .progress-copy p {
-            margin: 0;
-            color: var(--text-soft);
-            font-size: 11px;
-            line-height: 1.5;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 9px;
-            margin-top: 12px;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            border-radius: 17px;
-            border: 1px solid var(--border);
-            padding: 17px 10px;
-            text-align: center;
-        }
-
-        .stat-icon {
-            color: var(--accent);
-            margin-bottom: 8px;
-        }
-
-        .stat-icon svg {
-            width: 19px;
-            height: 19px;
-        }
-
-        .stat-number {
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 22px;
-        }
-
-        .stat-label {
-            margin-top: 4px;
-            color: var(--text-muted);
-            font-size: 9px;
-            line-height: 1.3;
-        }
-
-        .activity {
-            background: var(--surface);
-            border-radius: var(--radius-xl);
-            padding: 19px;
-            border: 1px solid var(--border);
-            margin-top: 12px;
-        }
-
-        .activity-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 18px;
-        }
-
-        .activity-header strong {
-            font-size: 15px;
-        }
-
-        .activity-header span {
-            color: var(--text-muted);
-            font-size: 11px;
-        }
-
-        .bars {
-            height: 130px;
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            gap: 9px;
-        }
-
-        .bar-wrap {
-            flex: 1;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        .bar {
-            width: 100%;
-            max-width: 28px;
-            background: var(--accent-light);
-            border-radius: 7px 7px 3px 3px;
-            min-height: 15px;
-            opacity: .8;
-        }
-
-        .bar-label {
-            margin-top: 8px;
-            font-size: 9px;
-            color: var(--text-muted);
-        }
-
-        /* =========================================================
-           PROFILE
-        ========================================================= */
-
-        .profile-card {
-            background:
-                linear-gradient(
-                    135deg,
-                    #272521,
-                    #161615
-                );
-            color: white;
-            border-radius: var(--radius-xl);
-            padding: 24px;
-            text-align: center;
-        }
-
-        .profile-avatar {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            margin: 0 auto 14px;
-            background: #e0c2a5;
-            color: #32291f;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: Georgia, serif;
-            font-size: 27px;
-        }
-
-        .profile-card h2 {
-            margin: 0;
-            font-family: Georgia, serif;
-            font-weight: 400;
-        }
-
-        .profile-card p {
-            margin: 7px 0 0;
-            color: rgba(255,255,255,.45);
-            font-size: 11px;
-        }
-
-        .settings-list {
-            margin-top: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .setting {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            gap: 13px;
-            background: var(--surface);
-            padding: 16px;
-            border-radius: 16px;
-            text-align: left;
-            color: var(--text);
-        }
-
-        .setting-icon {
-            width: 37px;
-            height: 37px;
-            border-radius: 12px;
-            background: var(--surface-2);
-            color: var(--accent);
-            display: grid;
-            place-items: center;
-        }
-
-        .setting-icon svg {
-            width: 18px;
-        }
-
-        .setting-text {
-            flex: 1;
-        }
-
-        .setting-text strong {
-            display: block;
-            font-size: 13px;
-        }
-
-        .setting-text span {
-            display: block;
-            margin-top: 3px;
-            color: var(--text-muted);
-            font-size: 10px;
-        }
-
-        /* =========================================================
-           BOTTOM NAV
-        ========================================================= */
-
-        .bottom-nav {
-            position: fixed;
-            z-index: 100;
-            left: 50%;
-            bottom: 10px;
-            transform: translateX(-50%);
-            width: min(94%, 520px);
-            height: var(--nav-height);
-            background: rgba(255,255,255,.91);
-            backdrop-filter: blur(22px);
-            -webkit-backdrop-filter: blur(22px);
-            border: 1px solid rgba(0,0,0,.06);
-            border-radius: 27px;
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            padding: 7px;
-            box-shadow: 0 12px 35px rgba(0,0,0,.11);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            background: transparent;
-            color: #99948d;
-            border-radius: 20px;
-            font-size: 9px;
-            transition: .2s ease;
-        }
-
-        .nav-item svg {
-            width: 19px;
-            height: 19px;
-            stroke-width: 1.8;
-        }
-
-        .nav-item.active {
-            color: #866344;
-            background: #eee9e2;
-        }
-
-        /* =========================================================
-           SEARCH
-        ========================================================= */
-
-        .search-box {
-            display: none;
-            margin-bottom: 15px;
-        }
-
-        .search-box.active {
-            display: block;
-        }
-
-        .search-input {
-            width: 100%;
-            height: 48px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            padding: 0 17px;
-            outline: none;
-            color: var(--text);
-        }
-
-        /* =========================================================
-           PLAYER
-        ========================================================= */
-
-        .player-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 500;
-            display: none;
-            background: rgba(15,15,14,.96);
-            color: white;
-            padding: 25px 20px;
-        }
-
-        .player-overlay.active {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .player-top {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .player-close {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: rgba(255,255,255,.07);
-            color: white;
-        }
-
-        .player-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .player-art {
-            width: 220px;
-            height: 220px;
-            margin: 0 auto 35px;
-            border-radius: 35px;
-            background:
-                radial-gradient(
-                    circle at 50% 45%,
-                    #b99976,
-                    #4a3c2f 37%,
-                    #22211e 70%
-                );
-            box-shadow: 0 20px 60px rgba(0,0,0,.4);
-            display: grid;
-            place-items: center;
-        }
-
-        .player-art svg {
-            width: 55px;
-            color: #e4c8ab;
-        }
-
-        .player-content h2 {
-            margin: 0;
-            font-family: Georgia, serif;
-            font-weight: 400;
-            font-size: 27px;
-        }
-
-        .player-content p {
-            color: rgba(255,255,255,.42);
-            font-size: 12px;
-            margin-top: 8px;
-        }
-
-        .player-progress {
-            margin-top: 35px;
-        }
-
-        .player-line {
-            height: 4px;
-            border-radius: 4px;
-            background: rgba(255,255,255,.15);
-            overflow: hidden;
-        }
-
-        .player-line span {
-            display: block;
-            width: 38%;
-            height: 100%;
-            background: #d8b99b;
-        }
-
-        .player-times {
-            display: flex;
-            justify-content: space-between;
-            color: rgba(255,255,255,.38);
-            font-size: 10px;
-            margin-top: 8px;
-        }
-
-        .player-controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 25px;
-            margin-top: 27px;
-        }
-
-        .control {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: rgba(255,255,255,.07);
-            color: white;
-        }
-
-        .control-main {
-            width: 66px;
-            height: 66px;
-            background: #e0c2a4;
-            color: #27211b;
-        }
-
-        /* =========================================================
-           TOAST
-        ========================================================= */
-
-        .toast {
-            position: fixed;
-            left: 50%;
-            bottom: 100px;
-            transform: translate(-50%, 20px);
-            background: #1b1a18;
-            color: white;
-            padding: 12px 17px;
-            border-radius: 13px;
-            font-size: 12px;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 1000;
-            transition: .25s ease;
-            white-space: nowrap;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translate(-50%, 0);
-        }
-
-        /* =========================================================
-           EMPTY
-        ========================================================= */
-
-        .empty {
-            text-align: center;
-            padding: 50px 20px;
-            color: var(--text-muted);
-        }
-
-        .empty svg {
-            width: 45px;
-            margin-bottom: 15px;
-        }
-
-        .empty p {
-            font-size: 13px;
-        }
-
-        /* =========================================================
-           RESPONSIVE
-        ========================================================= */
-
-        @media (min-width: 700px) {
-            .page {
-                padding-left: 0;
-                padding-right: 0;
-            }
-
-            .bottom-nav {
-                bottom: 20px;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .page {
-                padding-left: 14px;
-                padding-right: 14px;
-            }
-
-            .category-card {
-                padding: 15px;
-            }
-
-            .progress-hero {
-                gap: 13px;
-            }
-
-            .progress-circle {
-                width: 100px;
-                height: 100px;
-            }
-        }
-    </style>
+
+    <!-- Supabase -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<style>
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+:root {
+
+    --bg: #f4f1ec;
+
+    --surface: #ffffff;
+
+    --surface-2: #ece8e1;
+
+    --surface-3: #e3ded5;
+
+    --text: #171717;
+
+    --text-soft: #74716c;
+
+    --text-muted: #9a958d;
+
+    --dark: #171716;
+
+    --dark-2: #242321;
+
+    --accent: #a47d59;
+
+    --accent-light: #d7b99b;
+
+    --danger: #a85b55;
+
+    --border: rgba(30,27,24,.08);
+
+    --shadow:
+        0 10px 35px rgba(30,25,20,.08);
+
+    --radius-xl: 26px;
+
+    --radius-lg: 20px;
+
+    --radius-md: 16px;
+
+    --nav-height: 76px;
+
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+
+    box-sizing: border-box;
+
+    -webkit-tap-highlight-color: transparent;
+
+}
+
+
+html,
+body {
+
+    margin: 0;
+
+    padding: 0;
+
+    width: 100%;
+
+    min-height: 100%;
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    background: var(--bg);
+
+    color: var(--text);
+
+}
+
+
+body {
+
+    min-height: 100vh;
+
+    overflow-x: hidden;
+
+}
+
+
+button,
+input,
+textarea,
+select {
+
+    font: inherit;
+
+}
+
+
+button {
+
+    border: 0;
+
+    cursor: pointer;
+
+}
+
+
+svg {
+
+    display: block;
+
+}
+
+
+/* =========================================================
+   APP
+========================================================= */
+
+.app {
+
+    min-height: 100vh;
+
+}
+
+
+.screen {
+
+    display: none;
+
+    min-height: 100vh;
+
+    padding-bottom:
+        calc(var(--nav-height) + 25px);
+
+    animation: fadeIn .22s ease;
+
+}
+
+
+.screen.active {
+
+    display: block;
+
+}
+
+
+@keyframes fadeIn {
+
+    from {
+
+        opacity: 0;
+
+        transform: translateY(5px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+    }
+
+}
+
+
+/* =========================================================
+   WELCOME
+========================================================= */
+
+.welcome {
+
+    min-height: 100vh;
+
+    padding: 28px 22px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: space-between;
+
+    background:
+        radial-gradient(
+            circle at 50% 35%,
+            rgba(164,125,89,.16),
+            transparent 34%
+        ),
+        linear-gradient(
+            145deg,
+            #151514,
+            #0e0e0d
+        );
+
+    color: white;
+
+    position: relative;
+
+    overflow: hidden;
+
+}
+
+
+.welcome-top {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+}
+
+
+.skip {
+
+    background: transparent;
+
+    color: rgba(255,255,255,.5);
+
+    font-size: 13px;
+
+}
+
+
+.welcome-center {
+
+    text-align: center;
+
+    margin-top: -30px;
+
+}
+
+
+.welcome-symbol {
+
+    width: 190px;
+
+    height: 230px;
+
+    margin: 0 auto 38px;
+
+    position: relative;
+
+}
+
+
+.welcome-symbol:before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0 18px;
+
+    border:
+        1px solid
+        rgba(215,185,155,.65);
+
+    border-radius:
+        95px 95px 22px 22px;
+
+}
+
+
+.welcome-symbol:after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 54px;
+
+    height: 54px;
+
+    background: #d6b89a;
+
+    border-radius: 50%;
+
+    left: 68px;
+
+    bottom: 45px;
+
+}
+
+
+.welcome-title {
+
+    margin: 0;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:
+        clamp(40px,11vw,55px);
+
+    line-height: .98;
+
+    font-weight: 400;
+
+}
+
+
+.welcome-title span {
+
+    color:
+        var(--accent-light);
+
+}
+
+
+.welcome-subtitle {
+
+    max-width: 300px;
+
+    margin:
+        24px auto 0;
+
+    color:
+        rgba(255,255,255,.5);
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size: 15px;
+
+    line-height: 1.55;
+
+}
+
+
+.welcome-bottom {
+
+    position: relative;
+
+}
+
+
+.progress-dots {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    margin-bottom: 28px;
+
+}
+
+
+.progress-dots span {
+
+    width: 22px;
+
+    height: 3px;
+
+    border-radius: 5px;
+
+    background:
+        rgba(255,255,255,.16);
+
+}
+
+
+.progress-dots span.active {
+
+    background:
+        var(--accent-light);
+
+}
+
+
+.welcome-button {
+
+    width: 100%;
+
+    height: 58px;
+
+    border-radius: 30px;
+
+    background: #e5c8ad;
+
+    color: #171513;
+
+    font-weight: 600;
+
+}
+
+
+.welcome-footer {
+
+    text-align: center;
+
+    color:
+        rgba(255,255,255,.27);
+
+    font-size: 12px;
+
+    margin-top: 18px;
+
+}
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.page {
+
+    padding:
+        22px 18px 0;
+
+    max-width: 680px;
+
+    margin: auto;
+
+}
+
+
+.topbar {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 22px;
+
+}
+
+
+.brand h1 {
+
+    margin: 0;
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size: 28px;
+
+    font-weight: 500;
+
+}
+
+
+.brand p {
+
+    margin:
+        7px 0 0;
+
+    color:
+        var(--text-soft);
+
+    font-size: 13px;
+
+}
+
+
+.top-actions {
+
+    display: flex;
+
+    gap: 8px;
+
+}
+
+
+.icon-button {
+
+    width: 44px;
+
+    height: 44px;
+
+    border-radius: 50%;
+
+    background:
+        var(--surface);
+
+    color:
+        var(--text);
+
+    border:
+        1px solid var(--border);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.icon-button svg {
+
+    width: 19px;
+
+}
+
+
+/* =========================================================
+   CONTINUE
+========================================================= */
+
+.continue-card {
+
+    background:
+        radial-gradient(
+            circle at 100% 0,
+            rgba(215,185,155,.13),
+            transparent 40%
+        ),
+        linear-gradient(
+            135deg,
+            #242321,
+            #171716
+        );
+
+    color: white;
+
+    border-radius:
+        var(--radius-xl);
+
+    padding: 21px;
+
+    min-height: 170px;
+
+    position: relative;
+
+    overflow: hidden;
+
+}
+
+
+.continue-label {
+
+    color:
+        rgba(255,255,255,.48);
+
+    font-size: 12px;
+
+    margin-bottom: 12px;
+
+}
+
+
+.continue-title {
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size: 22px;
+
+}
+
+
+.continue-description {
+
+    margin-top: 5px;
+
+    color:
+        rgba(255,255,255,.5);
+
+    font-size: 12px;
+
+}
+
+
+.play-button {
+
+    position: absolute;
+
+    right: 20px;
+
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+    width: 52px;
+
+    height: 52px;
+
+    border-radius: 50%;
+
+    background:
+        #e0c3a7;
+
+    color:
+        #28231e;
+
+    display: grid;
+
+    place-items: center;
+
+}
+
+
+.play-button svg {
+
+    width: 20px;
+
+}
+
+
+.continue-progress {
+
+    margin-top: 28px;
+
+    width:
+        calc(100% - 70px);
+
+    height: 4px;
+
+    background:
+        rgba(255,255,255,.13);
+
+    border-radius: 5px;
+
+    overflow: hidden;
+
+}
+
+
+.continue-progress span {
+
+    display: block;
+
+    width: 5%;
+
+    height: 100%;
+
+    background:
+        #d7b99b;
+
+}
+
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+.section-title {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin:
+        26px 2px 12px;
+
+}
+
+
+.section-title h2 {
+
+    margin: 0;
+
+    font-size: 18px;
+
+}
+
+
+.section-title button {
+
+    background: transparent;
+
+    color:
+        var(--text-soft);
+
+    font-size: 13px;
+
+}
+
+
+/* =========================================================
+   CATEGORY
+========================================================= */
+
+.category-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 11px;
+
+}
+
+
+.category-card {
+
+    background:
+        var(--surface);
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        var(--radius-lg);
+
+    padding: 19px;
+
+    min-height: 142px;
+
+    text-align: left;
+
+}
+
+
+.category-icon {
+
+    width: 40px;
+
+    height: 40px;
+
+    border-radius: 13px;
+
+    background:
+        var(--surface-2);
+
+    color:
+        var(--accent);
+
+    display: grid;
+
+    place-items: center;
+
+    margin-bottom: 16px;
+
+}
+
+
+.category-icon svg {
+
+    width: 21px;
+
+}
+
+
+.category-card h3 {
+
+    margin: 0;
+
+    font-size: 14px;
+
+}
+
+
+.category-card p {
+
+    margin:
+        5px 0 0;
+
+    color:
+        var(--text-muted);
+
+    font-size: 11px;
+
+}
+
+
+/* =========================================================
+   QUOTE
+========================================================= */
+
+.quote-card {
+
+    margin-top: 16px;
+
+    padding: 20px;
+
+    background:
+        var(--surface-2);
+
+    border-radius:
+        var(--radius-lg);
+
+    text-align: center;
+
+}
+
+
+.quote-card p {
+
+    margin: 0;
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size: 14px;
+
+    line-height: 1.55;
+
+}
+
+
+.quote-card small {
+
+    display: block;
+
+    margin-top: 9px;
+
+    color:
+        var(--text-muted);
+
+    font-size: 10px;
+
+}
+
+
+/* =========================================================
+   DARK
+========================================================= */
+
+.dark-screen {
+
+    background:
+        radial-gradient(
+            circle at 80% 10%,
+            rgba(164,125,89,.09),
+            transparent 30%
+        ),
+        #151514;
+
+    color: white;
+
+}
+
+
+.dark-screen .page {
+
+    padding-top: 26px;
+
+}
+
+
+.dark-topbar {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-bottom: 20px;
+
+}
+
+
+.back-button {
+
+    width: 40px;
+
+    height: 40px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,.07);
+
+    color: white;
+
+    display: grid;
+
+    place-items: center;
+
+}
+
+
+.back-button svg {
+
+    width: 20px;
+
+}
+
+
+.dark-heading h1 {
+
+    margin: 0;
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-weight: 400;
+
+    font-size: 28px;
+
+}
+
+
+.dark-heading p {
+
+    margin:
+        7px 0 0;
+
+    color:
+        rgba(255,255,255,.4);
+
+    font-size: 12px;
+
+}
+
+
+/* =========================================================
+   FILTERS
+========================================================= */
+
+.filters {
+
+    display: flex;
+
+    gap: 8px;
+
+    overflow-x: auto;
+
+    scrollbar-width: none;
+
+    margin-bottom: 15px;
+
+}
+
+
+.filters::-webkit-scrollbar {
+
+    display: none;
+
+}
+
+
+.filter {
+
+    white-space: nowrap;
+
+    padding:
+        10px 15px;
+
+    border-radius: 22px;
+
+    background:
+        rgba(255,255,255,.055);
+
+    color:
+        rgba(255,255,255,.65);
+
+    font-size: 12px;
+
+}
+
+
+.filter.active {
+
+    background:
+        #e6c8aa;
+
+    color:
+        #211d19;
+
+}
+
+
+/* =========================================================
+   LESSON
+========================================================= */
+
+.lesson-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 9px;
+
+}
+
+
+.lesson-card {
+
+    width: 100%;
+
+    background:
+        rgba(255,255,255,.045);
+
+    border:
+        1px solid
+        rgba(255,255,255,.05);
+
+    border-radius: 18px;
+
+    padding: 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    color: white;
+
+    text-align: left;
+
+}
+
+
+.lesson-cover {
+
+    width: 52px;
+
+    height: 52px;
+
+    flex-shrink: 0;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #5a4b3d,
+            #292824
+        );
+
+    color:
+        #d4b596;
+
+    display: grid;
+
+    place-items: center;
+
+}
+
+
+.lesson-cover svg {
+
+    width: 23px;
+
+}
+
+
+.lesson-info {
+
+    flex: 1;
+
+    min-width: 0;
+
+}
+
+
+.lesson-info h3 {
+
+    margin: 0 0 5px;
+
+    font-size: 14px;
+
+}
+
+
+.lesson-info p {
+
+    margin: 0;
+
+    color:
+        rgba(255,255,255,.42);
+
+    font-size: 10px;
+
+    line-height: 1.4;
+
+}
+
+
+.lesson-status {
+
+    color:
+        #d7b99b;
+
+    font-size: 17px;
+
+}
+
+
+/* =========================================================
+   BOOKS
+========================================================= */
+
+.books-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+}
+
+
+.book-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    background:
+        var(--surface);
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 19px;
+
+    padding: 14px;
+
+}
+
+
+.book-cover {
+
+    width: 62px;
+
+    height: 82px;
+
+    flex-shrink: 0;
+
+    border-radius: 9px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #51473d,
+            #211f1b
+        );
+
+    color:
+        #d9b999;
+
+    display: grid;
+
+    place-items: center;
+
+}
+
+
+.book-cover img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    border-radius: 9px;
+
+}
+
+
+.book-cover svg {
+
+    width: 28px;
+
+}
+
+
+.book-info {
+
+    flex: 1;
+
+    min-width: 0;
+
+}
+
+
+.book-info h3 {
+
+    margin: 0 0 6px;
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size: 17px;
+
+    font-weight: 500;
+
+}
+
+
+.book-info p {
+
+    margin: 0;
+
+    color:
+        var(--text-soft);
+
+    font-size: 11px;
+
+    line-height: 1.45;
+
+}
+
+
+.book-meta {
+
+    display: flex;
+
+    gap: 6px;
+
+    margin-top: 9px;
+
+}
+
+
+.tag {
+
+    padding:
+        5px 8px;
+
+    border-radius: 7px;
+
+    background:
+        var(--surface-2);
+
+    color:
+        var(--text-soft);
+
+    font-size: 9px;
+
+}
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+.progress-hero {
+
+    background:
+        var(--surface);
+
+    border-radius:
+        var(--radius-xl);
+
+    padding: 22px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+
+    border:
+        1px solid var(--border);
+
+}
+
+
+.progress-circle {
+
+    width: 115px;
+
+    height: 115px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background:
+        conic-gradient(
+            var(--accent)
+            var(--progress, 0%),
+            #e2ddd5
+            var(--progress, 0%)
+        );
+
+    display: grid;
+
+    place-items: center;
+
+    position: relative;
+
+}
+
+
+.progress-circle:after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 10px;
+
+    border-radius: 50%;
+
+    background:
+        var(--surface);
+
+}
+
+
+.progress-number {
+
+    position: relative;
+
+    z-index: 2;
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size: 26px;
+
+}
+
+
+.progress-copy h3 {
+
+    margin: 0 0 8px;
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-weight: 500;
+
+}
+
+
+.progress-copy p {
+
+    margin: 0;
+
+    color:
+        var(--text-soft);
+
+    font-size: 11px;
+
+    line-height: 1.5;
+
+}
+
+
+.stats-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 9px;
+
+    margin-top: 12px;
+
+}
+
+
+.stat-card {
+
+    background:
+        var(--surface);
+
+    border-radius: 17px;
+
+    border:
+        1px solid var(--border);
+
+    padding: 17px 8px;
+
+    text-align: center;
+
+}
+
+
+.stat-icon {
+
+    color:
+        var(--accent);
+
+}
+
+
+.stat-icon svg {
+
+    width: 19px;
+
+    margin: auto;
+
+}
+
+
+.stat-number {
+
+    margin-top: 7px;
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size: 22px;
+
+}
+
+
+.stat-label {
+
+    margin-top: 4px;
+
+    color:
+        var(--text-muted);
+
+    font-size: 9px;
+
+    line-height: 1.3;
+
+}
+
+
+/* =========================================================
+   ACTIVITY
+========================================================= */
+
+.activity {
+
+    background:
+        var(--surface);
+
+    border-radius:
+        var(--radius-xl);
+
+    padding: 19px;
+
+    margin-top: 12px;
+
+}
+
+
+.activity-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 18px;
+
+}
+
+
+.activity-header strong {
+
+    font-size: 15px;
+
+}
+
+
+.activity-header span {
+
+    color:
+        var(--text-muted);
+
+    font-size: 11px;
+
+}
+
+
+.bars {
+
+    height: 130px;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    gap: 8px;
+
+}
+
+
+.bar-wrap {
+
+    flex: 1;
+
+    height: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: flex-end;
+
+    align-items: center;
+
+}
+
+
+.bar {
+
+    width: 100%;
+
+    max-width: 28px;
+
+    min-height: 12px;
+
+    background:
+        var(--accent-light);
+
+    border-radius:
+        7px 7px 3px 3px;
+
+}
+
+
+.bar-label {
+
+    margin-top: 8px;
+
+    color:
+        var(--text-muted);
+
+    font-size: 9px;
+
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+.profile-card {
+
+    background:
+        linear-gradient(
+            135deg,
+            #272521,
+            #161615
+        );
+
+    color: white;
+
+    border-radius:
+        var(--radius-xl);
+
+    padding: 25px;
+
+    text-align: center;
+
+}
+
+
+.profile-avatar {
+
+    width: 70px;
+
+    height: 70px;
+
+    margin: auto;
+
+    border-radius: 50%;
+
+    background:
+        #e0c2a5;
+
+    color:
+        #32291f;
+
+    display: grid;
+
+    place-items: center;
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size: 28px;
+
+}
+
+
+.profile-card h2 {
+
+    margin:
+        14px 0 0;
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-weight: 400;
+
+}
+
+
+.profile-card p {
+
+    margin:
+        7px 0 0;
+
+    color:
+        rgba(255,255,255,.45);
+
+    font-size: 11px;
+
+}
+
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+.settings-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+}
+
+
+.setting {
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    background:
+        var(--surface);
+
+    padding: 15px;
+
+    border-radius: 16px;
+
+    color:
+        var(--text);
+
+    text-align: left;
+
+}
+
+
+.setting-icon {
+
+    width: 38px;
+
+    height: 38px;
+
+    border-radius: 12px;
+
+    background:
+        var(--surface-2);
+
+    color:
+        var(--accent);
+
+    display: grid;
+
+    place-items: center;
+
+}
+
+
+.setting-icon svg {
+
+    width: 18px;
+
+}
+
+
+.setting-text {
+
+    flex: 1;
+
+}
+
+
+.setting-text strong {
+
+    display: block;
+
+    font-size: 13px;
+
+}
+
+
+.setting-text span {
+
+    display: block;
+
+    margin-top: 3px;
+
+    color:
+        var(--text-muted);
+
+    font-size: 10px;
+
+}
+
+
+/* =========================================================
+   ADMIN
+========================================================= */
+
+.admin-screen {
+
+    background:
+        #111110;
+
+    color: white;
+
+}
+
+
+.admin-screen .page {
+
+    padding-bottom: 30px;
+
+}
+
+
+.admin-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 20px;
+
+}
+
+
+.admin-header h1 {
+
+    margin: 0;
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size: 28px;
+
+    font-weight: 400;
+
+}
+
+
+.admin-header p {
+
+    margin: 6px 0 0;
+
+    color:
+        rgba(255,255,255,.4);
+
+    font-size: 11px;
+
+}
+
+
+.admin-close {
+
+    width: 42px;
+
+    height: 42px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,.08);
+
+    color: white;
+
+}
+
+
+.admin-tabs {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 7px;
+
+    margin-bottom: 15px;
+
+}
+
+
+.admin-tab {
+
+    padding: 12px 5px;
+
+    border-radius: 13px;
+
+    background:
+        rgba(255,255,255,.06);
+
+    color:
+        rgba(255,255,255,.5);
+
+    font-size: 11px;
+
+}
+
+
+.admin-tab.active {
+
+    background:
+        #e0c2a4;
+
+    color:
+        #211c18;
+
+}
+
+
+.admin-form {
+
+    background:
+        rgba(255,255,255,.045);
+
+    border:
+        1px solid rgba(255,255,255,.05);
+
+    border-radius:
+        var(--radius-xl);
+
+    padding: 18px;
+
+}
+
+
+.admin-form h2 {
+
+    margin:
+        0 0 16px;
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-weight: 400;
+
+    font-size: 21px;
+
+}
+
+
+.form-group {
+
+    margin-bottom: 12px;
+
+}
+
+
+.form-group label {
+
+    display: block;
+
+    margin-bottom: 6px;
+
+    color:
+        rgba(255,255,255,.48);
+
+    font-size: 10px;
+
+}
+
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+
+    width: 100%;
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    background:
+        rgba(255,255,255,.06);
+
+    color: white;
+
+    border-radius: 13px;
+
+    padding:
+        13px;
+
+    outline: none;
+
+}
+
+
+.form-group textarea {
+
+    min-height: 90px;
+
+    resize: vertical;
+
+}
+
+
+.form-group select option {
+
+    background:
+        #222;
+
+}
+
+
+.admin-button {
+
+    width: 100%;
+
+    height: 51px;
+
+    border-radius: 14px;
+
+    background:
+        #e0c2a4;
+
+    color:
+        #211c18;
+
+    font-weight: 600;
+
+    margin-top: 4px;
+
+}
+
+
+.admin-list {
+
+    margin-top: 15px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+}
+
+
+.admin-item {
+
+    background:
+        rgba(255,255,255,.045);
+
+    border-radius: 15px;
+
+    padding: 13px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+}
+
+
+.admin-item-info {
+
+    flex: 1;
+
+    min-width: 0;
+
+}
+
+
+.admin-item-info strong {
+
+    display: block;
+
+    font-size: 13px;
+
+}
+
+
+.admin-item-info span {
+
+    display: block;
+
+    margin-top: 4px;
+
+    color:
+        rgba(255,255,255,.38);
+
+    font-size: 10px;
+
+}
+
+
+.admin-delete {
+
+    width: 35px;
+
+    height: 35px;
+
+    border-radius: 10px;
+
+    background:
+        rgba(168,91,85,.15);
+
+    color:
+        #d99690;
+
+}
+
+
+/* =========================================================
+   BOTTOM NAV
+========================================================= */
+
+.bottom-nav {
+
+    position: fixed;
+
+    z-index: 100;
+
+    left: 50%;
+
+    bottom: 10px;
+
+    transform:
+        translateX(-50%);
+
+    width:
+        min(94%,520px);
+
+    height:
+        var(--nav-height);
+
+    background:
+        rgba(255,255,255,.91);
+
+    backdrop-filter:
+        blur(22px);
+
+    -webkit-backdrop-filter:
+        blur(22px);
+
+    border:
+        1px solid rgba(0,0,0,.06);
+
+    border-radius:
+        27px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5,1fr);
+
+    padding: 7px;
+
+    box-shadow:
+        0 12px 35px
+        rgba(0,0,0,.11);
+
+}
+
+
+.nav-item {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 5px;
+
+    background: transparent;
+
+    color:
+        #99948d;
+
+    border-radius: 20px;
+
+    font-size: 9px;
+
+}
+
+
+.nav-item svg {
+
+    width: 19px;
+
+}
+
+
+.nav-item.active {
+
+    color:
+        #866344;
+
+    background:
+        #eee9e2;
+
+}
+
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+.player {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 500;
+
+    display: none;
+
+    flex-direction: column;
+
+    padding:
+        24px 20px;
+
+    background:
+        #111110;
+
+    color: white;
+
+}
+
+
+.player.active {
+
+    display: flex;
+
+}
+
+
+.player-top {
+
+    display: flex;
+
+    justify-content: flex-start;
+
+}
+
+
+.player-close {
+
+    width: 42px;
+
+    height: 42px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,.07);
+
+    color: white;
+
+}
+
+
+.player-body {
+
+    flex: 1;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    text-align: center;
+
+}
+
+
+.player-art {
+
+    width: 220px;
+
+    height: 220px;
+
+    margin:
+        0 auto 35px;
+
+    border-radius: 35px;
+
+    background:
+        radial-gradient(
+            circle at 50% 40%,
+            #b99976,
+            #4a3c2f 35%,
+            #22211e 70%
+        );
+
+    display: grid;
+
+    place-items: center;
+
+}
+
+
+.player-art svg {
+
+    width: 55px;
+
+    color:
+        #e4c8ab;
+
+}
+
+
+.player-body h2 {
+
+    margin: 0;
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-weight: 400;
+
+    font-size: 27px;
+
+}
+
+
+.player-body p {
+
+    color:
+        rgba(255,255,255,.4);
+
+    font-size: 12px;
+
+}
+
+
+.player-progress {
+
+    margin-top: 30px;
+
+}
+
+
+.player-range {
+
+    width: 100%;
+
+    accent-color:
+        #d8b99b;
+
+}
+
+
+.player-times {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    color:
+        rgba(255,255,255,.4);
+
+    font-size: 10px;
+
+}
+
+
+.player-controls {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 25px;
+
+    margin-top: 25px;
+
+}
+
+
+.control {
+
+    width: 48px;
+
+    height: 48px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,.07);
+
+    color: white;
+
+}
+
+
+.control-main {
+
+    width: 65px;
+
+    height: 65px;
+
+    background:
+        #e0c2a4;
+
+    color:
+        #28221c;
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+.toast {
+
+    position: fixed;
+
+    z-index: 1000;
+
+    left: 50%;
+
+    bottom: 100px;
+
+    transform:
+        translate(-50%,20px);
+
+    background:
+        #1c1b19;
+
+    color: white;
+
+    padding:
+        12px 17px;
+
+    border-radius: 13px;
+
+    font-size: 12px;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition: .25s;
+
+    white-space: nowrap;
+
+}
+
+
+.toast.show {
+
+    opacity: 1;
+
+    transform:
+        translate(-50%,0);
+
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty {
+
+    padding: 50px 20px;
+
+    text-align: center;
+
+    color:
+        var(--text-muted);
+
+}
+
+
+.empty p {
+
+    font-size: 13px;
+
+}
+
+
+@media(max-width:360px) {
+
+    .page {
+
+        padding-left: 14px;
+
+        padding-right: 14px;
+
+    }
+
+    .progress-hero {
+
+        gap: 12px;
+
+    }
+
+    .progress-circle {
+
+        width: 100px;
+
+        height: 100px;
+
+    }
+
+}
+
+</style>
+
 </head>
+
 
 <body>
 
+
 <div class="app">
 
-    <!-- =========================================================
-         WELCOME
-    ========================================================= -->
 
-    <section id="welcomeScreen" class="welcome">
+<!-- =====================================================
+     WELCOME
+===================================================== -->
 
-        <div class="welcome-top">
-            <button class="skip" onclick="enterApp()">
-                Пропустить
-            </button>
-        </div>
+<section
+    id="welcomeScreen"
+    class="welcome"
+>
 
-        <div class="welcome-center">
-
-            <div class="welcome-symbol"></div>
-
-            <h1 class="welcome-title">
-                Требуй<br>
-                <span>знания!</span>
-            </h1>
-
-            <p class="welcome-subtitle">
-                «Поистине, требование знания —
-                обязанность для каждого мусульманина»
-            </p>
-
-        </div>
-
-        <div class="welcome-bottom">
-
-            <div class="progress-dots">
-                <span class="active"></span>
-                <span></span>
-                <span></span>
-            </div>
-
-            <button class="welcome-button" onclick="enterApp()">
-                Начать
-            </button>
-
-            <div class="welcome-footer">
-                Знание приближает к Аллаху
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================================
-         HOME
-    ========================================================= -->
-
-    <section id="homeScreen" class="screen">
-
-        <div class="page">
-
-            <header class="topbar">
-
-                <div class="brand">
-                    <h1>Требуй знания!</h1>
-                    <p>Путь к благому</p>
-                </div>
-
-                <div class="top-actions">
-
-                    <button
-                        class="icon-button"
-                        onclick="toggleSearch()"
-                        aria-label="Поиск"
-                    >
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-width="2"
-                        >
-                            <circle cx="11" cy="11" r="7"></circle>
-                            <path d="m20 20-4-4"></path>
-                        </svg>
-                    </button>
-
-                    <button
-                        class="icon-button"
-                        onclick="showToast('Напоминания пока пусты')"
-                        aria-label="Уведомления"
-                    >
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-width="1.8"
-                        >
-                            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
-                            <path d="M10 21h4"></path>
-                        </svg>
-                    </button>
-
-                </div>
-
-            </header>
-
-
-            <div id="searchBox" class="search-box">
-                <input
-                    id="searchInput"
-                    class="search-input"
-                    type="search"
-                    placeholder="Поиск уроков и книг..."
-                    oninput="performSearch(this.value)"
-                >
-            </div>
-
-
-            <div class="continue-card">
-
-                <div class="continue-label">
-                    Продолжить урок
-                </div>
-
-                <div class="continue-title">
-                    Китаб ат-Таухид
-                </div>
-
-                <div class="continue-description">
-                    Урок 12 · Единобожие в поклонении
-                </div>
-
-                <button
-                    class="play-button"
-                    onclick="openPlayer(12)"
-                >
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                    >
-                        <path d="M8 5v14l11-7z"></path>
-                    </svg>
-                </button>
-
-                <div class="continue-progress">
-                    <span id="continueProgress"></span>
-                </div>
-
-                <div class="continue-time">
-                    12:45 / 28:10
-                </div>
-
-            </div>
-
-
-            <div class="section-title">
-                <h2>Разделы</h2>
-
-                <button onclick="goTo('audio')">
-                    Все →
-                </button>
-            </div>
-
-
-            <div class="category-grid">
-
-                <button class="category-card" onclick="goTo('audio')">
-                    <div class="category-icon">
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <path d="M5 10v4"></path>
-                            <path d="M9 7v10"></path>
-                            <path d="M13 4v16"></path>
-                            <path d="M17 8v8"></path>
-                        </svg>
-                    </div>
-
-                    <h3>Аудиоуроки</h3>
-                    <p>Слушай и изучай</p>
-                </button>
-
-
-                <button class="category-card" onclick="goTo('books')">
-
-                    <div class="category-icon">
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"></path>
-                            <path d="M4 5.5v16"></path>
-                        </svg>
-                    </div>
-
-                    <h3>Книги</h3>
-                    <p>Читай в любое время</p>
-
-                </button>
-
-
-                <button class="category-card" onclick="goTo('progress')">
-
-                    <div class="category-icon">
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <path d="M4 19V9"></path>
-                            <path d="M10 19V5"></path>
-                            <path d="M16 19v-8"></path>
-                            <path d="M22 19V3"></path>
-                        </svg>
-                    </div>
-
-                    <h3>Мой прогресс</h3>
-                    <p>Следи за развитием</p>
-
-                </button>
-
-
-                <button class="category-card" onclick="goTo('favorites')">
-
-                    <div class="category-icon">
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <path d="m12 20-1.45-1.32C5.4 14.06 2 10.96 2 7.5A5.5 5.5 0 0 1 7.5 2c1.74 0 3.41.81 4.5 2.09A6 6 0 0 1 16.5 2 5.5 5.5 0 0 1 22 7.5c0 3.46-3.4 6.56-8.55 11.18z"></path>
-                        </svg>
-                    </div>
-
-                    <h3>Избранное</h3>
-                    <p>Сохрани важное</p>
-
-                </button>
-
-            </div>
-
-
-            <div class="quote-card">
-
-                <p>
-                    «Кто следует по пути в поисках знания,
-                    тому Аллах облегчает путь в Рай»
-                </p>
-
-                <small>
-                    Сахих Муслим
-                </small>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================================
-         AUDIO
-    ========================================================= -->
-
-    <section id="audioScreen" class="screen dark-screen">
-
-        <div class="page">
-
-            <div class="dark-topbar">
-
-                <button class="back-button" onclick="goTo('home')">
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                    >
-                        <path d="m15 18-6-6 6-6"></path>
-                    </svg>
-                </button>
-
-                <div class="dark-heading">
-                    <h1>Аудиоуроки</h1>
-                    <p>Знание, которое всегда с тобой</p>
-                </div>
-
-            </div>
-
-
-            <div class="filters">
-
-                <button
-                    class="filter active"
-                    onclick="filterLessons('all', this)"
-                >
-                    Все
-                </button>
-
-                <button
-                    class="filter"
-                    onclick="filterLessons('aqida', this)"
-                >
-                    Акыда
-                </button>
-
-                <button
-                    class="filter"
-                    onclick="filterLessons('fiqh', this)"
-                >
-                    Фикх
-                </button>
-
-                <button
-                    class="filter"
-                    onclick="filterLessons('sira', this)"
-                >
-                    Сира
-                </button>
-
-                <button
-                    class="filter"
-                    onclick="filterLessons('adab', this)"
-                >
-                    Нравы
-                </button>
-
-            </div>
-
-
-            <div id="lessonList" class="lesson-list"></div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================================
-         BOOKS
-    ========================================================= -->
-
-    <section id="booksScreen" class="screen">
-
-        <div class="page">
-
-            <div class="topbar">
-
-                <div class="brand">
-                    <h1>Книги</h1>
-                    <p>Читай и изучай</p>
-                </div>
-
-                <button
-                    class="icon-button"
-                    onclick="showToast('Поиск книг')"
-                >
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <circle cx="11" cy="11" r="7"></circle>
-                        <path d="m20 20-4-4"></path>
-                    </svg>
-                </button>
-
-            </div>
-
-
-            <div id="booksList" class="books-list"></div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================================
-         PROGRESS
-    ========================================================= -->
-
-    <section id="progressScreen" class="screen">
-
-        <div class="page">
-
-            <div class="topbar">
-
-                <div class="brand">
-                    <h1>Мой прогресс</h1>
-                    <p>Маленькие шаги — большие перемены</p>
-                </div>
-
-            </div>
-
-
-            <div class="progress-hero">
-
-                <div
-                    id="progressCircle"
-                    class="progress-circle"
-                >
-                    <div
-                        id="progressNumber"
-                        class="progress-number"
-                    >
-                        0%
-                    </div>
-                </div>
-
-                <div class="progress-copy">
-
-                    <h3>
-                        Ваш прогресс
-                    </h3>
-
-                    <p>
-                        Продолжай!<br>
-                        Знание — это путь,<br>
-                        а не цель.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <path d="M5 10v4"></path>
-                            <path d="M9 7v10"></path>
-                            <path d="M13 4v16"></path>
-                            <path d="M17 8v8"></path>
-                        </svg>
-                    </div>
-
-                    <div
-                        id="statLessons"
-                        class="stat-number"
-                    >
-                        0
-                    </div>
-
-                    <div class="stat-label">
-                        Прослушано<br>
-                        уроков
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"></path>
-                            <path d="M4 5.5v16"></path>
-                        </svg>
-                    </div>
-
-                    <div
-                        id="statBooks"
-                        class="stat-number"
-                    >
-                        0
-                    </div>
-
-                    <div class="stat-label">
-                        Прочитано<br>
-                        книг
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <path d="M4 19V9"></path>
-                            <path d="M10 19V5"></path>
-                            <path d="M16 19v-8"></path>
-                            <path d="M22 19V3"></path>
-                        </svg>
-                    </div>
-
-                    <div
-                        id="statDays"
-                        class="stat-number"
-                    >
-                        1
-                    </div>
-
-                    <div class="stat-label">
-                        Дней<br>
-                        подряд
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="activity">
-
-                <div class="activity-header">
-
-                    <strong>
-                        Активность
-                    </strong>
-
-                    <span>
-                        Эта неделя
-                    </span>
-
-                </div>
-
-
-                <div class="bars">
-
-                    <div class="bar-wrap">
-                        <div class="bar" style="height:42%"></div>
-                        <div class="bar-label">Пн</div>
-                    </div>
-
-                    <div class="bar-wrap">
-                        <div class="bar" style="height:48%"></div>
-                        <div class="bar-label">Вт</div>
-                    </div>
-
-                    <div class="bar-wrap">
-                        <div class="bar" style="height:72%"></div>
-                        <div class="bar-label">Ср</div>
-                    </div>
-
-                    <div class="bar-wrap">
-                        <div class="bar" style="height:37%"></div>
-                        <div class="bar-label">Чт</div>
-                    </div>
-
-                    <div class="bar-wrap">
-                        <div class="bar" style="height:63%"></div>
-                        <div class="bar-label">Пт</div>
-                    </div>
-
-                    <div class="bar-wrap">
-                        <div class="bar" style="height:83%"></div>
-                        <div class="bar-label">Сб</div>
-                    </div>
-
-                    <div class="bar-wrap">
-                        <div class="bar" style="height:34%"></div>
-                        <div class="bar-label">Вс</div>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="quote-card">
-
-                <p>
-                    «А те, которые стремятся к Нашему
-                    довольству, — Мы непременно поведём
-                    их по прямому пути»
-                </p>
-
-                <small>
-                    Аль-Анкабут, 69
-                </small>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================================
-         FAVORITES
-    ========================================================= -->
-
-    <section id="favoritesScreen" class="screen">
-
-        <div class="page">
-
-            <div class="topbar">
-
-                <div class="brand">
-                    <h1>Избранное</h1>
-                    <p>Сохранённые материалы</p>
-                </div>
-
-            </div>
-
-            <div id="favoritesContent"></div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================================
-         PROFILE
-    ========================================================= -->
-
-    <section id="profileScreen" class="screen">
-
-        <div class="page">
-
-            <div class="topbar">
-
-                <div class="brand">
-                    <h1>Профиль</h1>
-                    <p>Твой путь знаний</p>
-                </div>
-
-            </div>
-
-
-            <div class="profile-card">
-
-                <div
-                    id="profileAvatar"
-                    class="profile-avatar"
-                >
-                    Т
-                </div>
-
-                <h2 id="profileName">
-                    Требуй знания
-                </h2>
-
-                <p>
-                    Продолжай свой путь
-                </p>
-
-            </div>
-
-
-            <div class="section-title">
-                <h2>Настройки</h2>
-            </div>
-
-
-            <div class="settings-list">
-
-                <button
-                    class="setting"
-                    onclick="showToast('Раздел уведомлений')"
-                >
-
-                    <div class="setting-icon">
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
-                            <path d="M10 21h4"></path>
-                        </svg>
-                    </div>
-
-                    <div class="setting-text">
-                        <strong>Напоминания</strong>
-                        <span>Не забывай продолжать обучение</span>
-                    </div>
-
-                    <span>›</span>
-
-                </button>
-
-
-                <button
-                    class="setting"
-                    onclick="showToast('Тема: автоматически')"
-                >
-
-                    <div class="setting-icon">
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <circle cx="12" cy="12" r="4"></circle>
-                            <path d="M12 2v2"></path>
-                            <path d="M12 20v2"></path>
-                            <path d="m4.93 4.93 1.41 1.41"></path>
-                            <path d="m17.66 17.66 1.41 1.41"></path>
-                            <path d="M2 12h2"></path>
-                            <path d="M20 12h2"></path>
-                        </svg>
-                    </div>
-
-                    <div class="setting-text">
-                        <strong>Оформление</strong>
-                        <span>Автоматически</span>
-                    </div>
-
-                    <span>›</span>
-
-                </button>
-
-
-                <button
-                    class="setting"
-                    onclick="showToast('Настройки приложения')"
-                >
-
-                    <div class="setting-icon">
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.42 1.42-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1 1.55V20h-2v-.49a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.88.34l-.06.06-1.42-1.42.06-.06A1.7 1.7 0 0 0 7.6 15a1.7 1.7 0 0 0-1.55-1H5v-2h.49a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.42-1.42.06.06A1.7 1.7 0 0 0 10 8.4a1.7 1.7 0 0 0 1-1.55V6h2v.49a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.88-.34l.06-.06 1.42 1.42-.06.06A1.7 1.7 0 0 0 16.4 11a1.7 1.7 0 0 0 1.55 1H18v2h-.49a1.7 1.7 0 0 0-1.55 1z"></path>
-                        </svg>
-                    </div>
-
-                    <div class="setting-text">
-                        <strong>Настройки</strong>
-                        <span>Общие настройки приложения</span>
-                    </div>
-
-                    <span>›</span>
-
-                </button>
-
-
-                <button
-                    class="setting"
-                    onclick="resetProgress()"
-                >
-
-                    <div class="setting-icon">
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <path d="M3 12a9 9 0 1 0 3-6.7"></path>
-                            <path d="M3 4v6h6"></path>
-                        </svg>
-                    </div>
-
-                    <div class="setting-text">
-                        <strong>Сбросить прогресс</strong>
-                        <span>Удалить сохранённые результаты</span>
-                    </div>
-
-                    <span>›</span>
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================================
-         BOTTOM NAVIGATION
-    ========================================================= -->
-
-    <nav
-        id="bottomNav"
-        class="bottom-nav"
-        style="display:none;"
-    >
+    <div class="welcome-top">
 
         <button
-            class="nav-item active"
-            data-screen="home"
-            onclick="goTo('home')"
+            class="skip"
+            onclick="enterApp()"
         >
+            Пропустить
+        </button>
 
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-            >
-                <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"></path>
-                <path d="M9 21v-7h6v7"></path>
-            </svg>
+    </div>
 
-            <span>Главная</span>
 
+    <div class="welcome-center">
+
+        <div class="welcome-symbol"></div>
+
+        <h1 class="welcome-title">
+
+            Требуй<br>
+
+            <span>знания!</span>
+
+        </h1>
+
+
+        <p class="welcome-subtitle">
+
+            «Поистине, требование знания —
+            обязанность для каждого мусульманина»
+
+        </p>
+
+    </div>
+
+
+    <div class="welcome-bottom">
+
+        <div class="progress-dots">
+
+            <span class="active"></span>
+
+            <span></span>
+
+            <span></span>
+
+        </div>
+
+
+        <button
+            class="welcome-button"
+            onclick="enterApp()"
+        >
+            Начать
         </button>
 
 
+        <div class="welcome-footer">
+
+            Знание приближает к Аллаху
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     HOME
+===================================================== -->
+
+<section
+    id="homeScreen"
+    class="screen"
+>
+
+<div class="page">
+
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <h1>
+            Требуй знания!
+        </h1>
+
+        <p>
+            Путь к благому
+        </p>
+
+    </div>
+
+
+    <div class="top-actions">
+
         <button
-            class="nav-item"
-            data-screen="audio"
+            class="icon-button"
             onclick="goTo('audio')"
         >
 
@@ -2081,514 +2591,2225 @@
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
+                stroke-width="2"
             >
-                <path d="M5 10v4"></path>
-                <path d="M9 7v10"></path>
-                <path d="M13 4v16"></path>
-                <path d="M17 8v8"></path>
-            </svg>
 
-            <span>Аудио</span>
+                <circle
+                    cx="11"
+                    cy="11"
+                    r="7"
+                />
+
+                <path
+                    d="m20 20-4-4"
+                />
+
+            </svg>
 
         </button>
 
 
         <button
-            class="nav-item"
-            data-screen="books"
-            onclick="goTo('books')"
+            class="icon-button"
+            onclick="showToast('Напоминания пока пусты')"
         >
 
             <svg
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
+                stroke-width="1.8"
             >
-                <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"></path>
-                <path d="M4 5.5v16"></path>
-            </svg>
 
-            <span>Книги</span>
+                <path
+                    d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"
+                />
+
+                <path
+                    d="M10 21h4"
+                />
+
+            </svg>
 
         </button>
 
+    </div>
 
-        <button
-            class="nav-item"
-            data-screen="progress"
-            onclick="goTo('progress')"
+</header>
+
+
+<div class="continue-card">
+
+    <div class="continue-label">
+        Продолжить обучение
+    </div>
+
+
+    <div
+        id="continueTitle"
+        class="continue-title"
+    >
+        Загрузка...
+    </div>
+
+
+    <div
+        id="continueDescription"
+        class="continue-description"
+    >
+        Загружаем последний урок
+    </div>
+
+
+    <button
+        class="play-button"
+        onclick="openContinueLesson()"
+    >
+
+        <svg
+            viewBox="0 0 24 24"
+            fill="currentColor"
         >
 
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-            >
-                <path d="M4 19V9"></path>
-                <path d="M10 19V5"></path>
-                <path d="M16 19v-8"></path>
-                <path d="M22 19V3"></path>
-            </svg>
+            <path
+                d="M8 5v14l11-7z"
+            />
 
-            <span>Прогресс</span>
+        </svg>
 
-        </button>
+    </button>
 
 
-        <button
-            class="nav-item"
-            data-screen="profile"
-            onclick="goTo('profile')"
+    <div class="continue-progress">
+
+        <span
+            id="continueProgress"
+        ></span>
+
+    </div>
+
+</div>
+
+
+<div class="section-title">
+
+    <h2>
+        Разделы
+    </h2>
+
+    <button
+        onclick="goTo('audio')"
+    >
+        Все →
+    </button>
+
+</div>
+
+
+<div class="category-grid">
+
+
+<button
+    class="category-card"
+    onclick="goTo('audio')"
+>
+
+    <div class="category-icon">
+
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
         >
 
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-            >
-                <circle cx="12" cy="8" r="4"></circle>
-                <path d="M4 21a8 8 0 0 1 16 0"></path>
-            </svg>
+            <path d="M5 10v4"/>
+            <path d="M9 7v10"/>
+            <path d="M13 4v16"/>
+            <path d="M17 8v8"/>
 
-            <span>Профиль</span>
+        </svg>
 
-        </button>
+    </div>
 
-    </nav>
+    <h3>
+        Аудиоуроки
+    </h3>
 
+    <p>
+        Слушай и изучай
+    </p>
 
-    <!-- =========================================================
-         PLAYER
-    ========================================================= -->
-
-    <div id="player" class="player-overlay">
-
-        <div class="player-top">
-
-            <button
-                class="player-close"
-                onclick="closePlayer()"
-            >
-                <svg
-                    viewBox="0 0 24 24"
-                    width="20"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                >
-                    <path d="m6 6 12 12"></path>
-                    <path d="m18 6-12 12"></path>
-                </svg>
-            </button>
-
-        </div>
+</button>
 
 
-        <div class="player-content">
+<button
+    class="category-card"
+    onclick="goTo('books')"
+>
 
-            <div class="player-art">
+    <div class="category-icon">
 
-                <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.3"
-                >
-                    <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"></path>
-                    <path d="M4 5.5v16"></path>
-                </svg>
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+        >
 
-            </div>
+            <path
+                d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"
+            />
 
-            <h2 id="playerTitle">
-                Китаб ат-Таухид
-            </h2>
+            <path d="M4 5.5v16"/>
 
-            <p id="playerLesson">
-                Урок 12 · Единобожие в поклонении
-            </p>
+        </svg>
 
+    </div>
 
-            <div class="player-progress">
+    <h3>
+        Книги
+    </h3>
 
-                <div class="player-line">
-                    <span></span>
-                </div>
+    <p>
+        Читай в любое время
+    </p>
 
-                <div class="player-times">
-                    <span>12:45</span>
-                    <span>28:10</span>
-                </div>
-
-            </div>
+</button>
 
 
-            <div class="player-controls">
+<button
+    class="category-card"
+    onclick="goTo('progress')"
+>
 
-                <button class="control">
-                    ↶
-                </button>
+    <div class="category-icon">
 
-                <button
-                    id="playerPlay"
-                    class="control control-main"
-                    onclick="toggleAudio()"
-                >
-                    ▶
-                </button>
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+        >
 
-                <button class="control">
-                    ↷
-                </button>
+            <path d="M4 19V9"/>
+            <path d="M10 19V5"/>
+            <path d="M16 19v-8"/>
+            <path d="M22 19V3"/>
 
-            </div>
+        </svg>
 
+    </div>
+
+    <h3>
+        Мой прогресс
+    </h3>
+
+    <p>
+        Следи за развитием
+    </p>
+
+</button>
+
+
+<button
+    class="category-card"
+    onclick="goTo('favorites')"
+>
+
+    <div class="category-icon">
+
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+        >
+
+            <path
+                d="m12 20-1.45-1.32C5.4 14.06 2 10.96 2 7.5A5.5 5.5 0 0 1 7.5 2c1.74 0 3.41.81 4.5 2.09A6 6 0 0 1 16.5 2 5.5 5.5 0 0 1 22 7.5c0 3.46-3.4 6.56-8.55 11.18z"
+            />
+
+        </svg>
+
+    </div>
+
+    <h3>
+        Избранное
+    </h3>
+
+    <p>
+        Сохрани важное
+    </p>
+
+</button>
+
+
+</div>
+
+
+<div class="quote-card">
+
+    <p>
+        «Кто следует по пути в поисках знания,
+        тому Аллах облегчает путь в Рай»
+    </p>
+
+    <small>
+        Сахих Муслим
+    </small>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     AUDIO
+===================================================== -->
+
+<section
+    id="audioScreen"
+    class="screen dark-screen"
+>
+
+<div class="page">
+
+
+<div class="dark-topbar">
+
+    <button
+        class="back-button"
+        onclick="goTo('home')"
+    >
+
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+        >
+
+            <path d="m15 18-6-6 6-6"/>
+
+        </svg>
+
+    </button>
+
+
+    <div class="dark-heading">
+
+        <h1>
+            Аудиоуроки
+        </h1>
+
+        <p>
+            Знание, которое всегда с тобой
+        </p>
+
+    </div>
+
+</div>
+
+
+<div
+    id="categoryFilters"
+    class="filters"
+>
+
+    <button
+        class="filter active"
+        onclick="filterAudio(null,this)"
+    >
+        Все
+    </button>
+
+</div>
+
+
+<div
+    id="lessonList"
+    class="lesson-list"
+>
+
+    <div class="empty">
+        <p>Загрузка уроков...</p>
+    </div>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     BOOKS
+===================================================== -->
+
+<section
+    id="booksScreen"
+    class="screen"
+>
+
+<div class="page">
+
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <h1>
+            Книги
+        </h1>
+
+        <p>
+            Читай и изучай
+        </p>
+
+    </div>
+
+</header>
+
+
+<div
+    id="booksList"
+    class="books-list"
+>
+
+    <div class="empty">
+        <p>Загрузка книг...</p>
+    </div>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     PROGRESS
+===================================================== -->
+
+<section
+    id="progressScreen"
+    class="screen"
+>
+
+<div class="page">
+
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <h1>
+            Мой прогресс
+        </h1>
+
+        <p>
+            Маленькие шаги — большие перемены
+        </p>
+
+    </div>
+
+</header>
+
+
+<div class="progress-hero">
+
+    <div
+        id="progressCircle"
+        class="progress-circle"
+    >
+
+        <div
+            id="progressNumber"
+            class="progress-number"
+        >
+            0%
         </div>
 
     </div>
 
 
-    <!-- =========================================================
-         TOAST
-    ========================================================= -->
+    <div class="progress-copy">
 
-    <div id="toast" class="toast"></div>
+        <h3>
+            Ваш прогресс
+        </h3>
+
+        <p>
+            Продолжай!<br>
+            Знание — это путь,<br>
+            а не цель.
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="stats-grid">
+
+
+<div class="stat-card">
+
+    <div class="stat-icon">
+        🎧
+    </div>
+
+    <div
+        id="statLessons"
+        class="stat-number"
+    >
+        0
+    </div>
+
+    <div class="stat-label">
+        Прослушано<br>
+        уроков
+    </div>
+
+</div>
+
+
+<div class="stat-card">
+
+    <div class="stat-icon">
+        📖
+    </div>
+
+    <div
+        id="statBooks"
+        class="stat-number"
+    >
+        0
+    </div>
+
+    <div class="stat-label">
+        Прочитано<br>
+        книг
+    </div>
+
+</div>
+
+
+<div class="stat-card">
+
+    <div class="stat-icon">
+        ◷
+    </div>
+
+    <div
+        id="statDays"
+        class="stat-number"
+    >
+        0
+    </div>
+
+    <div class="stat-label">
+        Дней<br>
+        обучения
+    </div>
+
+</div>
+
+
+</div>
+
+
+<div class="activity">
+
+    <div class="activity-header">
+
+        <strong>
+            Активность
+        </strong>
+
+        <span>
+            Эта неделя
+        </span>
+
+    </div>
+
+
+    <div class="bars">
+
+        <div class="bar-wrap">
+            <div
+                class="bar"
+                style="height:35%"
+            ></div>
+            <div class="bar-label">Пн</div>
+        </div>
+
+        <div class="bar-wrap">
+            <div
+                class="bar"
+                style="height:55%"
+            ></div>
+            <div class="bar-label">Вт</div>
+        </div>
+
+        <div class="bar-wrap">
+            <div
+                class="bar"
+                style="height:70%"
+            ></div>
+            <div class="bar-label">Ср</div>
+        </div>
+
+        <div class="bar-wrap">
+            <div
+                class="bar"
+                style="height:45%"
+            ></div>
+            <div class="bar-label">Чт</div>
+        </div>
+
+        <div class="bar-wrap">
+            <div
+                class="bar"
+                style="height:65%"
+            ></div>
+            <div class="bar-label">Пт</div>
+        </div>
+
+        <div class="bar-wrap">
+            <div
+                class="bar"
+                style="height:85%"
+            ></div>
+            <div class="bar-label">Сб</div>
+        </div>
+
+        <div class="bar-wrap">
+            <div
+                class="bar"
+                style="height:40%"
+            ></div>
+            <div class="bar-label">Вс</div>
+        </div>
+
+    </div>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     FAVORITES
+===================================================== -->
+
+<section
+    id="favoritesScreen"
+    class="screen"
+>
+
+<div class="page">
+
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <h1>
+            Избранное
+        </h1>
+
+        <p>
+            Сохранённые материалы
+        </p>
+
+    </div>
+
+</header>
+
+
+<div
+    id="favoritesContent"
+>
+
+    <div class="empty">
+
+        <p>
+            Здесь будут сохранённые материалы
+        </p>
+
+    </div>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     PROFILE
+===================================================== -->
+
+<section
+    id="profileScreen"
+    class="screen"
+>
+
+<div class="page">
+
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <h1>
+            Профиль
+        </h1>
+
+        <p>
+            Твой путь знаний
+        </p>
+
+    </div>
+
+</header>
+
+
+<div class="profile-card">
+
+    <div
+        id="profileAvatar"
+        class="profile-avatar"
+    >
+        Т
+    </div>
+
+
+    <h2 id="profileName">
+        Требуй знания
+    </h2>
+
+
+    <p>
+        Продолжай свой путь
+    </p>
+
+</div>
+
+
+<div class="section-title">
+
+    <h2>
+        Настройки
+    </h2>
+
+</div>
+
+
+<div class="settings-list">
+
+
+<button
+    class="setting"
+    onclick="showToast('Раздел напоминаний')"
+>
+
+    <div class="setting-icon">
+        🔔
+    </div>
+
+    <div class="setting-text">
+
+        <strong>
+            Напоминания
+        </strong>
+
+        <span>
+            Не забывай продолжать обучение
+        </span>
+
+    </div>
+
+    <span>›</span>
+
+</button>
+
+
+<button
+    class="setting"
+    onclick="showToast('Оформление: автоматически')"
+>
+
+    <div class="setting-icon">
+        ◐
+    </div>
+
+    <div class="setting-text">
+
+        <strong>
+            Оформление
+        </strong>
+
+        <span>
+            Автоматически
+        </span>
+
+    </div>
+
+    <span>›</span>
+
+</button>
+
+
+<button
+    id="adminButton"
+    class="setting"
+    onclick="openAdmin()"
+    style="display:none"
+>
+
+    <div class="setting-icon">
+        ⚙
+    </div>
+
+    <div class="setting-text">
+
+        <strong>
+            Админ-панель
+        </strong>
+
+        <span>
+            Управление курсами и книгами
+        </span>
+
+    </div>
+
+    <span>›</span>
+
+</button>
+
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     ADMIN
+===================================================== -->
+
+<section
+    id="adminScreen"
+    class="screen admin-screen"
+>
+
+<div class="page">
+
+
+<div class="admin-header">
+
+    <div>
+
+        <h1>
+            Админ-панель
+        </h1>
+
+        <p>
+            Управление контентом
+        </p>
+
+    </div>
+
+
+    <button
+        class="admin-close"
+        onclick="goTo('profile')"
+    >
+        ×
+    </button>
+
+</div>
+
+
+<div class="admin-tabs">
+
+
+<button
+    id="adminTabCourse"
+    class="admin-tab active"
+    onclick="switchAdminTab('course')"
+>
+    🎧 Курс
+</button>
+
+
+<button
+    id="adminTabLesson"
+    class="admin-tab"
+    onclick="switchAdminTab('lesson')"
+>
+    🔊 Урок
+</button>
+
+
+<button
+    id="adminTabBook"
+    class="admin-tab"
+    onclick="switchAdminTab('book')"
+>
+    📚 Книга
+</button>
+
+
+</div>
+
+
+<!-- COURSE FORM -->
+
+<div
+    id="courseAdmin"
+    class="admin-form"
+>
+
+    <h2>
+        Добавить курс
+    </h2>
+
+
+    <div class="form-group">
+
+        <label>
+            Название
+        </label>
+
+        <input
+            id="courseTitle"
+            placeholder="Например: Китаб ат-Таухид"
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Автор
+        </label>
+
+        <input
+            id="courseAuthor"
+            placeholder="Автор / преподаватель"
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Категория
+        </label>
+
+        <select
+            id="courseCategory"
+        ></select>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Описание
+        </label>
+
+        <textarea
+            id="courseDescription"
+            placeholder="Описание курса"
+        ></textarea>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Ссылка на обложку
+        </label>
+
+        <input
+            id="courseCover"
+            type="url"
+            placeholder="https://..."
+        >
+
+    </div>
+
+
+    <button
+        class="admin-button"
+        onclick="addCourse()"
+    >
+        ДОБАВИТЬ КУРС
+    </button>
+
+
+</div>
+
+
+<!-- LESSON FORM -->
+
+<div
+    id="lessonAdmin"
+    class="admin-form"
+    style="display:none"
+>
+
+    <h2>
+        Добавить урок
+    </h2>
+
+
+    <div class="form-group">
+
+        <label>
+            Курс
+        </label>
+
+        <select
+            id="lessonCourse"
+        ></select>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Номер урока
+        </label>
+
+        <input
+            id="lessonNumber"
+            type="number"
+            placeholder="1"
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Название урока
+        </label>
+
+        <input
+            id="lessonTitle"
+            placeholder="Например: Введение"
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Описание
+        </label>
+
+        <textarea
+            id="lessonDescription"
+            placeholder="Краткое описание урока"
+        ></textarea>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            MP3 ссылка
+        </label>
+
+        <input
+            id="lessonAudio"
+            type="url"
+            placeholder="https://example.com/lesson.mp3"
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Продолжительность
+        </label>
+
+        <input
+            id="lessonDuration"
+            placeholder="28:10"
+        >
+
+    </div>
+
+
+    <button
+        class="admin-button"
+        onclick="addLesson()"
+    >
+        ДОБАВИТЬ УРОК
+    </button>
+
+
+</div>
+
+
+<!-- BOOK FORM -->
+
+<div
+    id="bookAdmin"
+    class="admin-form"
+    style="display:none"
+>
+
+    <h2>
+        Добавить книгу
+    </h2>
+
+
+    <div class="form-group">
+
+        <label>
+            Название
+        </label>
+
+        <input
+            id="bookTitle"
+            placeholder="Например: Китаб ат-Таухид"
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Автор
+        </label>
+
+        <input
+            id="bookAuthor"
+            placeholder="Автор"
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Категория
+        </label>
+
+        <select
+            id="bookCategory"
+        ></select>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Описание
+        </label>
+
+        <textarea
+            id="bookDescription"
+            placeholder="Описание книги"
+        ></textarea>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Обложка
+        </label>
+
+        <input
+            id="bookCover"
+            type="url"
+            placeholder="https://..."
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            PDF ссылка
+        </label>
+
+        <input
+            id="bookPdf"
+            type="url"
+            placeholder="https://example.com/book.pdf"
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Количество страниц
+        </label>
+
+        <input
+            id="bookPages"
+            type="number"
+            placeholder="120"
+        >
+
+    </div>
+
+
+    <button
+        class="admin-button"
+        onclick="addBook()"
+    >
+        ДОБАВИТЬ КНИГУ
+    </button>
+
+
+</div>
+
+
+<div
+    id="adminList"
+    class="admin-list"
+></div>
+
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     BOTTOM NAV
+===================================================== -->
+
+<nav
+    id="bottomNav"
+    class="bottom-nav"
+    style="display:none"
+>
+
+
+<button
+    class="nav-item active"
+    data-screen="home"
+    onclick="goTo('home')"
+>
+
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+    >
+
+        <path
+            d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"
+        />
+
+        <path
+            d="M9 21v-7h6v7"
+        />
+
+    </svg>
+
+    <span>
+        Главная
+    </span>
+
+</button>
+
+
+<button
+    class="nav-item"
+    data-screen="audio"
+    onclick="goTo('audio')"
+>
+
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+    >
+
+        <path d="M5 10v4"/>
+        <path d="M9 7v10"/>
+        <path d="M13 4v16"/>
+        <path d="M17 8v8"/>
+
+    </svg>
+
+    <span>
+        Аудио
+    </span>
+
+</button>
+
+
+<button
+    class="nav-item"
+    data-screen="books"
+    onclick="goTo('books')"
+>
+
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+    >
+
+        <path
+            d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"
+        />
+
+        <path d="M4 5.5v16"/>
+
+    </svg>
+
+    <span>
+        Книги
+    </span>
+
+</button>
+
+
+<button
+    class="nav-item"
+    data-screen="progress"
+    onclick="goTo('progress')"
+>
+
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+    >
+
+        <path d="M4 19V9"/>
+        <path d="M10 19V5"/>
+        <path d="M16 19v-8"/>
+        <path d="M22 19V3"/>
+
+    </svg>
+
+    <span>
+        Прогресс
+    </span>
+
+</button>
+
+
+<button
+    class="nav-item"
+    data-screen="profile"
+    onclick="goTo('profile')"
+>
+
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+    >
+
+        <circle
+            cx="12"
+            cy="8"
+            r="4"
+        />
+
+        <path
+            d="M4 21a8 8 0 0 1 16 0"
+        />
+
+    </svg>
+
+    <span>
+        Профиль
+    </span>
+
+</button>
+
+
+</nav>
+
+
+<!-- =====================================================
+     PLAYER
+===================================================== -->
+
+<div
+    id="player"
+    class="player"
+>
+
+
+<div class="player-top">
+
+    <button
+        class="player-close"
+        onclick="closePlayer()"
+    >
+        ×
+    </button>
+
+</div>
+
+
+<div class="player-body">
+
+
+<div class="player-art">
+
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.3"
+    >
+
+        <path
+            d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"
+        />
+
+        <path
+            d="M4 5.5v16"
+        />
+
+    </svg>
+
+</div>
+
+
+<h2
+    id="playerTitle"
+>
+    Загрузка...
+</h2>
+
+
+<p
+    id="playerDescription"
+>
+    Загрузка...
+</p>
+
+
+<div class="player-progress">
+
+    <input
+        id="audioRange"
+        class="player-range"
+        type="range"
+        min="0"
+        max="100"
+        value="0"
+        oninput="seekAudio(this.value)"
+    >
+
+
+    <div class="player-times">
+
+        <span
+            id="currentTime"
+        >
+            0:00
+        </span>
+
+        <span
+            id="durationTime"
+        >
+            0:00
+        </span>
+
+    </div>
+
+</div>
+
+
+<div class="player-controls">
+
+
+<button
+    class="control"
+    onclick="skipAudio(-15)"
+>
+    −15
+</button>
+
+
+<button
+    id="playButton"
+    class="control control-main"
+    onclick="toggleAudio()"
+>
+    ▶
+</button>
+
+
+<button
+    class="control"
+    onclick="skipAudio(15)"
+>
+    +15
+</button>
+
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     TOAST
+===================================================== -->
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
 
 </div>
 
 
 <script>
 
-    /* =========================================================
-       TELEGRAM
-    ========================================================= */
+/* =========================================================
+   SUPABASE
+========================================================= */
 
-    const tg = window.Telegram?.WebApp;
+/*
+    ВСТАВЬ СЮДА ДАННЫЕ СВОЕГО SUPABASE ПРОЕКТА.
 
-    if (tg) {
-        tg.ready();
-        tg.expand();
+    Пример:
 
-        if (tg.setHeaderColor) {
-            tg.setHeaderColor("#f4f1ec");
-        }
+    const SUPABASE_URL =
+        "https://xxxxxxxx.supabase.co";
 
-        if (tg.setBackgroundColor) {
-            tg.setBackgroundColor("#f4f1ec");
-        }
+    const SUPABASE_ANON_KEY =
+        "eyJhbGciOi...";
+*/
+
+
+const SUPABASE_URL =
+    "ВСТАВЬ_СЮДА_SUPABASE_URL";
+
+
+const SUPABASE_ANON_KEY =
+    "ВСТАВЬ_СЮДА_SUPABASE_ANON_KEY";
+
+
+let db = null;
+
+
+if (
+    SUPABASE_URL.startsWith("http") &&
+    SUPABASE_ANON_KEY.length > 20
+) {
+
+    db = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
+
+}
+
+
+/* =========================================================
+   TELEGRAM
+========================================================= */
+
+const tg =
+    window.Telegram?.WebApp;
+
+
+if (tg) {
+
+    tg.ready();
+
+    tg.expand();
+
+    if (tg.setHeaderColor) {
+
+        tg.setHeaderColor(
+            "#f4f1ec"
+        );
+
     }
 
+    if (tg.setBackgroundColor) {
 
-    /* =========================================================
-       DATA
-    ========================================================= */
+        tg.setBackgroundColor(
+            "#f4f1ec"
+        );
 
-    const lessons = [
+    }
 
-        {
-            id: 1,
-            category: "aqida",
-            title: "Китаб ат-Таухид",
-            author: "Шейх Мухаммад ибн Абдуль-Ваххаб",
-            count: "97 уроков"
-        },
+}
 
-        {
-            id: 2,
-            category: "aqida",
-            title: "Три основы",
-            author: "Шейх Мухаммад ибн Абдуль-Ваххаб",
-            count: "38 уроков"
-        },
 
-        {
-            id: 3,
-            category: "aqida",
-            title: "Сорок хадисов",
-            author: "Имам ан-Навави",
-            count: "42 урока"
-        },
+/* =========================================================
+   ADMIN
+========================================================= */
 
-        {
-            id: 4,
-            category: "sira",
-            title: "Рияд ас-Салихин",
-            author: "Имам ан-Навави",
-            count: "189 уроков"
-        },
+/*
+    СЮДА ВСТАВЬ СВОЙ TELEGRAM ID.
 
-        {
-            id: 5,
-            category: "adab",
-            title: "Болезнь и исцеление",
-            author: "Ибн аль-Каййим",
-            count: "113 уроков"
-        },
+    Например:
 
-        {
-            id: 6,
-            category: "aqida",
-            title: "Условия Шахады",
-            author: "Разъяснение",
-            count: "24 урока"
-        },
+    const ADMIN_IDS = [
+        123456789
+    ];
+*/
 
-        {
-            id: 7,
-            category: "fiqh",
-            title: "Основы поклонения",
-            author: "Разъяснение",
-            count: "31 урок"
-        }
+
+const ADMIN_IDS = [
+
+    123456789
+
+];
+
+
+let telegramUser = null;
+
+
+if (
+    tg &&
+    tg.initDataUnsafe &&
+    tg.initDataUnsafe.user
+) {
+
+    telegramUser =
+        tg.initDataUnsafe.user;
+
+}
+
+
+const telegramId =
+    telegramUser?.id
+    ? Number(telegramUser.id)
+    : null;
+
+
+const isAdmin =
+    telegramId !== null &&
+    ADMIN_IDS.includes(
+        telegramId
+    );
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let categories = [];
+
+let courses = [];
+
+let lessons = [];
+
+let books = [];
+
+let currentLesson = null;
+
+let audio = null;
+
+let activeCategory = null;
+
+
+/* =========================================================
+   LOCAL FALLBACK
+========================================================= */
+
+const demoLessons = [
+
+    {
+        id: 1,
+        course_id: 1,
+        lesson_number: 1,
+        title: "Введение в курс",
+        description: "Первый урок",
+        audio_url: "",
+        duration: "00:00"
+    },
+
+    {
+        id: 2,
+        course_id: 1,
+        lesson_number: 2,
+        title: "Единобожие",
+        description: "Основы таухида",
+        audio_url: "",
+        duration: "00:00"
+    }
+
+];
+
+
+const demoCourses = [
+
+    {
+        id: 1,
+        category_id: 1,
+        title: "Китаб ат-Таухид",
+        author:
+            "Мухаммад ибн Абдуль-Ваххаб",
+        description:
+            "Книга единобожия",
+        cover_url: ""
+    }
+
+];
+
+
+const demoBooks = [
+
+    {
+        id: 1,
+        category_id: 1,
+        title: "Китаб ат-Таухид",
+        author:
+            "Мухаммад ибн Абдуль-Ваххаб",
+        description:
+            "Книга единобожия",
+        cover_url: "",
+        pdf_url: "",
+        pages: 120
+    }
+
+];
+
+
+/* =========================================================
+   ENTER
+========================================================= */
+
+function enterApp() {
+
+    document
+        .getElementById(
+            "welcomeScreen"
+        )
+        .style.display = "none";
+
+
+    document
+        .getElementById(
+            "bottomNav"
+        )
+        .style.display = "grid";
+
+
+    goTo("home");
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function goTo(screen) {
+
+    const screens = [
+
+        "home",
+        "audio",
+        "books",
+        "progress",
+        "favorites",
+        "profile",
+        "admin"
 
     ];
 
 
-    const books = [
+    screens.forEach(name => {
 
-        {
-            id: 1,
-            title: "Китаб ат-Таухид",
-            author: "Мухаммад ибн Абдуль-Ваххаб",
-            description: "Книга единобожия и основы поклонения.",
-            type: "PDF",
-            pages: "97 уроков"
-        },
+        const element =
+            document.getElementById(
+                name + "Screen"
+            );
 
-        {
-            id: 2,
-            title: "Акыда аль-Васитыя",
-            author: "Ибн Таймийя",
-            description: "Основы вероубеждения приверженцев Сунны.",
-            type: "PDF",
-            pages: "84 стр."
-        },
+        if (element) {
 
-        {
-            id: 3,
-            title: "Три основы",
-            author: "Мухаммад ибн Абдуль-Ваххаб",
-            description: "Основы, которые необходимо знать каждому мусульманину.",
-            type: "PDF",
-            pages: "38 уроков"
-        },
+            element.classList.remove(
+                "active"
+            );
 
-        {
-            id: 4,
-            title: "Шесть Основ",
-            author: "Мухаммад ибн Абдуль-Ваххаб",
-            description: "Краткое разъяснение важных основ религии.",
-            type: "PDF",
-            pages: "32 стр."
         }
 
-    ];
+    });
 
 
-    /* =========================================================
-       STATE
-    ========================================================= */
-
-    let state = {
-        completedLessons:
-            JSON.parse(
-                localStorage.getItem("completedLessons") || "[]"
-            ),
-
-        readBooks:
-            JSON.parse(
-                localStorage.getItem("readBooks") || "[]"
-            ),
-
-        favorites:
-            JSON.parse(
-                localStorage.getItem("favorites") || "[]"
-            ),
-
-        lastScreen:
-            localStorage.getItem("lastScreen") || "home"
-    };
-
-
-    function saveState() {
-
-        localStorage.setItem(
-            "completedLessons",
-            JSON.stringify(state.completedLessons)
+    const target =
+        document.getElementById(
+            screen + "Screen"
         );
 
-        localStorage.setItem(
-            "readBooks",
-            JSON.stringify(state.readBooks)
-        );
 
-        localStorage.setItem(
-            "favorites",
-            JSON.stringify(state.favorites)
-        );
+    if (!target) return;
 
-        localStorage.setItem(
-            "lastScreen",
-            state.lastScreen
-        );
+
+    target.classList.add("active");
+
+
+    document
+        .querySelectorAll(".nav-item")
+        .forEach(item => {
+
+            item.classList.toggle(
+                "active",
+                item.dataset.screen === screen
+            );
+
+        });
+
+
+    if (screen === "audio") {
+
+        renderLessons();
 
     }
 
 
-    /* =========================================================
-       ENTER APP
-    ========================================================= */
+    if (screen === "books") {
 
-    function enterApp() {
-
-        document.getElementById("welcomeScreen").style.display = "none";
-
-        document.getElementById("bottomNav").style.display = "grid";
-
-        goTo("home");
-
-        if (tg && tg.BackButton) {
-            tg.BackButton.hide();
-        }
+        renderBooks();
 
     }
 
 
-    /* =========================================================
-       NAVIGATION
-    ========================================================= */
+    if (screen === "progress") {
 
-    function goTo(screen) {
+        updateProgress();
 
-        const screens = [
-            "home",
-            "audio",
-            "books",
-            "progress",
-            "favorites",
-            "profile"
+    }
+
+
+    if (screen === "favorites") {
+
+        renderFavorites();
+
+    }
+
+
+    if (screen === "admin") {
+
+        loadAdminData();
+
+    }
+
+
+    window.scrollTo({
+
+        top: 0,
+
+        behavior: "smooth"
+
+    });
+
+}
+
+
+/* =========================================================
+   LOAD DATA
+========================================================= */
+
+async function loadData() {
+
+    if (!db) {
+
+        categories = [
+            {
+                id: 1,
+                name: "Акыда",
+                slug: "aqida"
+            }
         ];
 
-        screens.forEach(name => {
+        courses =
+            demoCourses;
 
-            const element =
-                document.getElementById(name + "Screen");
+        lessons =
+            demoLessons;
 
-            if (element) {
-                element.classList.remove("active");
-            }
+        books =
+            demoBooks;
 
-        });
+        renderEverything();
 
-
-        const target =
-            document.getElementById(screen + "Screen");
-
-        if (!target) return;
-
-        target.classList.add("active");
-
-
-        document
-            .querySelectorAll(".nav-item")
-            .forEach(item => {
-                item.classList.toggle(
-                    "active",
-                    item.dataset.screen === screen
-                );
-            });
-
-
-        state.lastScreen = screen;
-        saveState();
-
-
-        if (screen === "audio") {
-            renderLessons();
-        }
-
-        if (screen === "books") {
-            renderBooks();
-        }
-
-        if (screen === "progress") {
-            updateProgress();
-        }
-
-        if (screen === "favorites") {
-            renderFavorites();
-        }
-
-
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
+        return;
 
     }
 
 
-    /* =========================================================
-       LESSONS
-    ========================================================= */
+    try {
 
-    function renderLessons(
-        category = "all",
-        search = ""
-    ) {
+        const [
+            categoriesResponse,
+            coursesResponse,
+            lessonsResponse,
+            booksResponse
+        ] =
+            await Promise.all([
 
-        const container =
-            document.getElementById("lessonList");
+                db
+                    .from("categories")
+                    .select("*")
+                    .order(
+                        "name"
+                    ),
 
-        if (!container) return;
+                db
+                    .from("courses")
+                    .select("*")
+                    .order(
+                        "created_at",
+                        {
+                            ascending: false
+                        }
+                    ),
 
-        let filtered = lessons.filter(lesson => {
+                db
+                    .from("lessons")
+                    .select("*")
+                    .order(
+                        "lesson_number"
+                    ),
 
-            const matchesCategory =
-                category === "all" ||
-                lesson.category === category;
+                db
+                    .from("books")
+                    .select("*")
+                    .order(
+                        "created_at",
+                        {
+                            ascending: false
+                        }
+                    )
 
-            const text =
-                (
-                    lesson.title +
-                    " " +
-                    lesson.author
-                ).toLowerCase();
+            ]);
 
-            const matchesSearch =
-                !search ||
-                text.includes(search.toLowerCase());
 
-            return matchesCategory && matchesSearch;
+        if (
+            categoriesResponse.error
+        ) {
+
+            console.error(
+                categoriesResponse.error
+            );
+
+        }
+
+
+        if (
+            coursesResponse.error
+        ) {
+
+            console.error(
+                coursesResponse.error
+            );
+
+        }
+
+
+        if (
+            lessonsResponse.error
+        ) {
+
+            console.error(
+                lessonsResponse.error
+            );
+
+        }
+
+
+        if (
+            booksResponse.error
+        ) {
+
+            console.error(
+                booksResponse.error
+            );
+
+        }
+
+
+        categories =
+            categoriesResponse.data ||
+            [];
+
+
+        courses =
+            coursesResponse.data ||
+            [];
+
+
+        lessons =
+            lessonsResponse.data ||
+            [];
+
+
+        books =
+            booksResponse.data ||
+            [];
+
+
+        renderEverything();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            "Ошибка загрузки данных"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   RENDER EVERYTHING
+========================================================= */
+
+function renderEverything() {
+
+    renderCategoryFilters();
+
+    renderLessons();
+
+    renderBooks();
+
+    updateHome();
+
+    updateProgress();
+
+    updateProfile();
+
+    renderFavorites();
+
+}
+
+
+/* =========================================================
+   CATEGORY FILTERS
+========================================================= */
+
+function renderCategoryFilters() {
+
+    const container =
+        document.getElementById(
+            "categoryFilters"
+        );
+
+
+    if (!container) return;
+
+
+    container.innerHTML = `
+
+        <button
+            class="filter active"
+            onclick="filterAudio(null,this)"
+        >
+            Все
+        </button>
+
+    `;
+
+
+    categories.forEach(category => {
+
+        container.innerHTML += `
+
+            <button
+                class="filter"
+                onclick="filterAudio(
+                    ${category.id},
+                    this
+                )"
+            >
+                ${escapeHtml(
+                    category.name
+                )}
+            </button>
+
+        `;
+
+    });
+
+}
+
+
+/* =========================================================
+   FILTER
+========================================================= */
+
+function filterAudio(
+    categoryId,
+    button
+) {
+
+    activeCategory =
+        categoryId;
+
+
+    document
+        .querySelectorAll(
+            ".filter"
+        )
+        .forEach(item => {
+
+            item.classList.remove(
+                "active"
+            );
 
         });
 
 
-        if (!filtered.length) {
-
-            container.innerHTML = `
-                <div class="empty">
-                    <p>Ничего не найдено</p>
-                </div>
-            `;
-
-            return;
-        }
+    button.classList.add(
+        "active"
+    );
 
 
-        container.innerHTML =
-            filtered.map(lesson => {
+    renderLessons();
+
+}
+
+
+/* =========================================================
+   RENDER LESSONS
+========================================================= */
+
+function renderLessons() {
+
+    const container =
+        document.getElementById(
+            "lessonList"
+        );
+
+
+    if (!container) return;
+
+
+    let filtered =
+        lessons;
+
+
+    if (
+        activeCategory !== null
+    ) {
+
+        const courseIds =
+            courses
+                .filter(
+                    course =>
+                        course.category_id ===
+                        activeCategory
+                )
+                .map(
+                    course => course.id
+                );
+
+
+        filtered =
+            lessons.filter(
+                lesson =>
+                    courseIds.includes(
+                        lesson.course_id
+                    )
+            );
+
+    }
+
+
+    if (!filtered.length) {
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                <p>
+                    Пока нет уроков
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        filtered.map(
+            lesson => {
+
+                const course =
+                    courses.find(
+                        item =>
+                            item.id ===
+                            lesson.course_id
+                    );
+
 
                 const completed =
-                    state.completedLessons.includes(
+                    isLessonCompleted(
                         lesson.id
                     );
+
 
                 return `
 
                     <button
                         class="lesson-card"
-                        onclick="openPlayer(${lesson.id})"
+                        onclick="
+                            openPlayer(
+                                ${lesson.id}
+                            )
+                        "
                     >
 
                         <div class="lesson-cover">
@@ -2597,444 +4818,820 @@
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
-                                stroke-width="1.4"
+                                stroke-width="1.3"
                             >
-                                <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"></path>
-                                <path d="M4 5.5v16"></path>
+
+                                <path
+                                    d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"
+                                />
+
+                                <path
+                                    d="M4 5.5v16"
+                                />
+
                             </svg>
 
                         </div>
 
+
                         <div class="lesson-info">
 
                             <h3>
-                                ${lesson.title}
-                                ${completed ? "✓" : ""}
+
+                                ${lesson.lesson_number}.
+                                ${escapeHtml(
+                                    lesson.title
+                                )}
+
                             </h3>
 
                             <p>
-                                ${lesson.author}<br>
-                                ${lesson.count}
+
+                                ${
+                                    course
+                                    ? escapeHtml(
+                                        course.title
+                                    )
+                                    : ""
+                                }
+
+                                <br>
+
+                                ${
+                                    escapeHtml(
+                                        lesson.duration ||
+                                        "Аудиоурок"
+                                    )
+                                }
+
                             </p>
 
                         </div>
 
-                        <div class="lesson-arrow">
-                            ›
+
+                        <div class="lesson-status">
+
+                            ${
+                                completed
+                                ? "✓"
+                                : "›"
+                            }
+
                         </div>
 
                     </button>
 
                 `;
 
-            }).join("");
+            }
+        ).join("");
 
-    }
+}
 
 
-    function filterLessons(
-        category,
-        button
-    ) {
+/* =========================================================
+   BOOKS
+========================================================= */
 
-        document
-            .querySelectorAll(".filter")
-            .forEach(item => {
-                item.classList.remove("active");
-            });
+function renderBooks() {
 
-        button.classList.add("active");
+    const container =
+        document.getElementById(
+            "booksList"
+        );
 
-        renderLessons(category);
 
-    }
+    if (!container) return;
 
 
-    /* =========================================================
-       BOOKS
-    ========================================================= */
-
-    function renderBooks() {
-
-        const container =
-            document.getElementById("booksList");
-
-        if (!container) return;
-
-
-        container.innerHTML =
-            books.map(book => {
-
-                const read =
-                    state.readBooks.includes(book.id);
-
-                const favorite =
-                    state.favorites.includes(
-                        "book-" + book.id
-                    );
-
-                return `
-
-                    <div class="book-card">
-
-                        <div class="book-cover">
-
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.3"
-                            >
-                                <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"></path>
-                                <path d="M4 5.5v16"></path>
-                            </svg>
-
-                        </div>
-
-                        <div class="book-info">
-
-                            <h3>
-                                ${book.title}
-                            </h3>
-
-                            <p>
-                                ${book.author}<br>
-                                ${book.description}
-                            </p>
-
-                            <div class="book-meta">
-
-                                <span class="tag">
-                                    ${book.type}
-                                </span>
-
-                                <span class="tag">
-                                    ${book.pages}
-                                </span>
-
-                                ${
-                                    read
-                                    ? `
-                                        <span
-                                            class="tag"
-                                            style="color:#806243"
-                                        >
-                                            Прочитано
-                                        </span>
-                                    `
-                                    : ""
-                                }
-
-                            </div>
-
-                        </div>
-
-                        <button
-                            onclick="toggleFavorite('book-${book.id}')"
-                            style="
-                                background:transparent;
-                                font-size:20px;
-                                color:${favorite ? "#a47d59" : "#aaa"};
-                            "
-                        >
-                            ${favorite ? "♥" : "♡"}
-                        </button>
-
-                    </div>
-
-                `;
-
-            }).join("");
-
-    }
-
-
-    /* =========================================================
-       FAVORITES
-    ========================================================= */
-
-    function toggleFavorite(id) {
-
-        const index =
-            state.favorites.indexOf(id);
-
-        if (index >= 0) {
-
-            state.favorites.splice(index, 1);
-
-            showToast("Удалено из избранного");
-
-        } else {
-
-            state.favorites.push(id);
-
-            showToast("Добавлено в избранное");
-
-        }
-
-        saveState();
-
-        renderBooks();
-        renderFavorites();
-
-    }
-
-
-    function renderFavorites() {
-
-        const container =
-            document.getElementById("favoritesContent");
-
-        if (!container) return;
-
-
-        if (!state.favorites.length) {
-
-            container.innerHTML = `
-
-                <div class="empty">
-
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                    >
-                        <path d="m12 20-1.45-1.32C5.4 14.06 2 10.96 2 7.5A5.5 5.5 0 0 1 7.5 2c1.74 0 3.41.81 4.5 2.09A6 6 0 0 1 16.5 2 5.5 5.5 0 0 1 22 7.5c0 3.46-3.4 6.56-8.55 11.18z"></path>
-                    </svg>
-
-                    <p>
-                        Здесь будут сохранённые материалы
-                    </p>
-
-                </div>
-
-            `;
-
-            return;
-        }
-
-
-        const favoriteBooks =
-            books.filter(book =>
-                state.favorites.includes(
-                    "book-" + book.id
-                )
-            );
-
+    if (!books.length) {
 
         container.innerHTML = `
 
-            <div class="books-list">
+            <div class="empty">
 
-                ${favoriteBooks.map(book => `
-
-                    <div class="book-card">
-
-                        <div class="book-cover">
-
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.3"
-                            >
-                                <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"></path>
-                                <path d="M4 5.5v16"></path>
-                            </svg>
-
-                        </div>
-
-                        <div class="book-info">
-
-                            <h3>
-                                ${book.title}
-                            </h3>
-
-                            <p>
-                                ${book.author}
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                `).join("")}
+                <p>
+                    Пока нет книг
+                </p>
 
             </div>
 
         `;
 
+        return;
+
     }
 
 
-    /* =========================================================
-       PLAYER
-    ========================================================= */
+    container.innerHTML =
+        books.map(book => {
 
-    let currentLesson = null;
-    let playing = false;
-
-
-    function openPlayer(id) {
-
-        currentLesson =
-            lessons.find(
-                lesson => lesson.id === id
-            ) || lessons[0];
+            const favorite =
+                isFavorite(
+                    "book",
+                    book.id
+                );
 
 
-        document.getElementById(
-            "playerTitle"
-        ).textContent =
-            currentLesson.title;
+            return `
+
+                <div class="book-card">
+
+                    <div class="book-cover">
+
+                        ${
+                            book.cover_url
+
+                            ?
+
+                            `<img
+                                src="${escapeAttribute(
+                                    book.cover_url
+                                )}"
+                                alt=""
+                            >`
+
+                            :
+
+                            `
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.3"
+                            >
+
+                                <path
+                                    d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"
+                                />
+
+                                <path
+                                    d="M4 5.5v16"
+                                />
+
+                            </svg>
+                            `
+                        }
+
+                    </div>
 
 
-        document.getElementById(
-            "playerLesson"
-        ).textContent =
-            "Урок · " + currentLesson.count;
+                    <div class="book-info">
+
+                        <h3>
+                            ${escapeHtml(
+                                book.title
+                            )}
+                        </h3>
+
+                        <p>
+
+                            ${escapeHtml(
+                                book.author || ""
+                            )}
+
+                            <br>
+
+                            ${escapeHtml(
+                                book.description || ""
+                            )}
+
+                        </p>
 
 
-        document
-            .getElementById("player")
-            .classList.add("active");
+                        <div class="book-meta">
+
+                            <span class="tag">
+                                PDF
+                            </span>
+
+                            ${
+                                book.pages
+                                ?
+                                `
+                                <span class="tag">
+                                    ${book.pages} стр.
+                                </span>
+                                `
+                                :
+                                ""
+                            }
+
+                        </div>
+
+                    </div>
 
 
-        if (tg && tg.BackButton) {
+                    <button
+                        onclick="
+                            toggleFavorite(
+                                'book',
+                                ${book.id}
+                            )
+                        "
+                        style="
+                            background:transparent;
+                            font-size:22px;
+                            color:
+                            ${
+                                favorite
+                                ? "#a47d59"
+                                : "#aaa"
+                            };
+                        "
+                    >
 
-            tg.BackButton.show();
+                        ${
+                            favorite
+                            ? "♥"
+                            : "♡"
+                        }
 
-            tg.BackButton.onClick(
-                closePlayer
+                    </button>
+
+
+                    ${
+                        book.pdf_url
+                        ?
+                        `
+                        <button
+                            onclick="
+                                openBook(
+                                    '${escapeAttribute(
+                                        book.pdf_url
+                                    )}'
+                                )
+                            "
+                            style="
+                                background:#eee9e2;
+                                color:#806243;
+                                padding:9px 11px;
+                                border-radius:10px;
+                                font-size:10px;
+                            "
+                        >
+                            Читать
+                        </button>
+                        `
+                        :
+                        ""
+                    }
+
+                </div>
+
+            `;
+
+        }).join("");
+
+}
+
+
+/* =========================================================
+   OPEN BOOK
+========================================================= */
+
+function openBook(url) {
+
+    if (!url) {
+
+        showToast(
+            "PDF пока не добавлен"
+        );
+
+        return;
+
+    }
+
+
+    if (tg && tg.openLink) {
+
+        tg.openLink(url);
+
+    } else {
+
+        window.open(
+            url,
+            "_blank"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+function openPlayer(id) {
+
+    const lesson =
+        lessons.find(
+            item =>
+                item.id === id
+        );
+
+
+    if (!lesson) return;
+
+
+    currentLesson =
+        lesson;
+
+
+    document.getElementById(
+        "playerTitle"
+    ).textContent =
+        `${lesson.lesson_number}. ${lesson.title}`;
+
+
+    document.getElementById(
+        "playerDescription"
+    ).textContent =
+        lesson.description ||
+        "Аудиоурок";
+
+
+    document.getElementById(
+        "audioRange"
+    ).value = 0;
+
+
+    document.getElementById(
+        "currentTime"
+    ).textContent =
+        "0:00";
+
+
+    document.getElementById(
+        "durationTime"
+    ).textContent =
+        lesson.duration ||
+        "0:00";
+
+
+    document
+        .getElementById("player")
+        .classList.add("active");
+
+
+    if (audio) {
+
+        audio.pause();
+
+        audio = null;
+
+    }
+
+
+    if (
+        lesson.audio_url
+    ) {
+
+        audio =
+            new Audio(
+                lesson.audio_url
             );
 
-        }
+
+        audio.addEventListener(
+            "loadedmetadata",
+            () => {
+
+                document.getElementById(
+                    "durationTime"
+                ).textContent =
+                    formatTime(
+                        audio.duration
+                    );
+
+            }
+        );
+
+
+        audio.addEventListener(
+            "timeupdate",
+            () => {
+
+                if (!audio) return;
+
+
+                const percent =
+                    audio.duration
+                    ?
+                    (
+                        audio.currentTime /
+                        audio.duration
+                    ) * 100
+                    :
+                    0;
+
+
+                document.getElementById(
+                    "audioRange"
+                ).value =
+                    percent;
+
+
+                document.getElementById(
+                    "currentTime"
+                ).textContent =
+                    formatTime(
+                        audio.currentTime
+                    );
+
+            }
+        );
+
+
+        audio.addEventListener(
+            "ended",
+            () => {
+
+                completeLesson(
+                    lesson.id
+                );
+
+                document.getElementById(
+                    "playButton"
+                ).textContent =
+                    "▶";
+
+            }
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CLOSE PLAYER
+========================================================= */
+
+function closePlayer() {
+
+    if (audio) {
+
+        audio.pause();
 
     }
 
 
-    function closePlayer() {
-
-        document
-            .getElementById("player")
-            .classList.remove("active");
+    document
+        .getElementById("player")
+        .classList.remove("active");
 
 
-        if (tg && tg.BackButton) {
-            tg.BackButton.hide();
-        }
+    currentLesson =
+        null;
 
-        playing = false;
+}
 
-        document.getElementById(
-            "playerPlay"
-        ).textContent = "▶";
+
+/* =========================================================
+   AUDIO PLAY
+========================================================= */
+
+function toggleAudio() {
+
+    if (!currentLesson) return;
+
+
+    if (!currentLesson.audio_url) {
+
+        showToast(
+            "MP3 ссылка ещё не добавлена"
+        );
+
+        return;
 
     }
 
 
-    function toggleAudio() {
+    if (!audio) {
 
-        playing = !playing;
+        return;
+
+    }
+
+
+    if (audio.paused) {
+
+        audio.play();
 
         document.getElementById(
-            "playerPlay"
+            "playButton"
         ).textContent =
-            playing ? "Ⅱ" : "▶";
+            "Ⅱ";
+
+    } else {
+
+        audio.pause();
+
+        document.getElementById(
+            "playButton"
+        ).textContent =
+            "▶";
+
+    }
+
+}
 
 
-        if (playing) {
+/* =========================================================
+   SEEK
+========================================================= */
 
-            showToast("Воспроизведение запущено");
+function seekAudio(percent) {
 
-        } else {
+    if (
+        !audio ||
+        !audio.duration
+    ) {
 
-            showToast("Пауза");
-
-        }
-
-
-        /*
-            Здесь позже можно подключить
-            настоящий MP3-файл:
-
-            const audio = new Audio("audio/lesson.mp3");
-            audio.play();
-
-        */
+        return;
 
     }
 
 
-    /* =========================================================
-       PROGRESS
-    ========================================================= */
+    audio.currentTime =
+        (
+            percent / 100
+        ) *
+        audio.duration;
 
-    function markLessonComplete(id) {
+}
 
-        if (
-            !state.completedLessons.includes(id)
-        ) {
 
-            state.completedLessons.push(id);
+/* =========================================================
+   SKIP
+========================================================= */
 
-            saveState();
+function skipAudio(seconds) {
 
-            showToast(
-                "Урок отмечен как прослушанный"
-            );
+    if (!audio) return;
 
-            updateProgress();
 
-        }
+    audio.currentTime =
+        Math.max(
+            0,
+            Math.min(
+                audio.duration,
+                audio.currentTime +
+                seconds
+            )
+        );
+
+}
+
+
+/* =========================================================
+   FORMAT TIME
+========================================================= */
+
+function formatTime(seconds) {
+
+    if (
+        !seconds ||
+        !isFinite(seconds)
+    ) {
+
+        return "0:00";
 
     }
 
 
-    function updateProgress() {
+    const minutes =
+        Math.floor(
+            seconds / 60
+        );
 
-        const total =
-            lessons.length;
 
-        const completed =
-            state.completedLessons.length;
+    const secs =
+        Math.floor(
+            seconds % 60
+        );
 
-        const percent =
-            Math.round(
-                (completed / total) * 100
+
+    return (
+        minutes +
+        ":" +
+        String(secs)
+            .padStart(2,"0")
+    );
+
+}
+
+
+/* =========================================================
+   COMPLETE LESSON
+========================================================= */
+
+async function completeLesson(
+    lessonId
+) {
+
+    if (!telegramId) {
+
+        localStorage.setItem(
+            "lesson_" + lessonId,
+            "completed"
+        );
+
+        updateProgress();
+
+        return;
+
+    }
+
+
+    if (!db) {
+
+        localStorage.setItem(
+            "lesson_" + lessonId,
+            "completed"
+        );
+
+        updateProgress();
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await db
+            .from("user_progress")
+            .upsert(
+                {
+                    telegram_id:
+                        telegramId,
+
+                    lesson_id:
+                        lessonId,
+
+                    completed:
+                        true,
+
+                    updated_at:
+                        new Date()
+                            .toISOString()
+                },
+                {
+                    onConflict:
+                        "telegram_id,lesson_id"
+                }
             );
 
 
+    if (error) {
+
+        console.error(
+            error
+        );
+
+        return;
+
+    }
+
+
+    updateProgress();
+
+}
+
+
+/* =========================================================
+   CHECK COMPLETED
+========================================================= */
+
+function isLessonCompleted(
+    lessonId
+) {
+
+    return (
+        localStorage.getItem(
+            "lesson_" + lessonId
+        ) ===
+        "completed"
+    );
+
+}
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+async function updateProgress() {
+
+    let completed = 0;
+
+
+    lessons.forEach(
+        lesson => {
+
+            if (
+                isLessonCompleted(
+                    lesson.id
+                )
+            ) {
+
+                completed++;
+
+            }
+
+        }
+    );
+
+
+    const total =
+        lessons.length;
+
+
+    const percent =
+        total
+        ?
+        Math.round(
+            completed /
+            total *
+            100
+        )
+        :
+        0;
+
+
+    const number =
         document.getElementById(
             "progressNumber"
-        ).textContent =
-            percent + "%";
+        );
 
 
+    const circle =
         document.getElementById(
             "progressCircle"
-        ).style.setProperty(
+        );
+
+
+    if (number) {
+
+        number.textContent =
+            percent + "%";
+
+    }
+
+
+    if (circle) {
+
+        circle.style.setProperty(
             "--progress",
             percent + "%"
         );
 
+    }
 
+
+    const statLessons =
         document.getElementById(
             "statLessons"
-        ).textContent =
+        );
+
+
+    if (statLessons) {
+
+        statLessons.textContent =
             completed;
 
+    }
 
+
+    const statBooks =
         document.getElementById(
             "statBooks"
-        ).textContent =
-            state.readBooks.length;
+        );
 
 
+    if (statBooks) {
+
+        statBooks.textContent =
+            localStorage.getItem(
+                "readBooks"
+            ) || 0;
+
+    }
+
+
+    const progress =
         document.getElementById(
             "continueProgress"
-        ).style.width =
+        );
+
+
+    if (progress) {
+
+        progress.style.width =
             Math.max(
                 5,
                 percent
@@ -3042,175 +5639,1231 @@
 
     }
 
-
-    /* =========================================================
-       SEARCH
-    ========================================================= */
-
-    function toggleSearch() {
-
-        const box =
-            document.getElementById(
-                "searchBox"
-            );
-
-        box.classList.toggle("active");
+}
 
 
-        if (box.classList.contains("active")) {
+/* =========================================================
+   HOME
+========================================================= */
 
-            document
-                .getElementById("searchInput")
-                .focus();
+function updateHome() {
+
+    const title =
+        document.getElementById(
+            "continueTitle"
+        );
+
+
+    const description =
+        document.getElementById(
+            "continueDescription"
+        );
+
+
+    const firstLesson =
+        lessons[0];
+
+
+    if (!firstLesson) {
+
+        if (title) {
+
+            title.textContent =
+                "Начни обучение";
 
         }
+
+        if (description) {
+
+            description.textContent =
+                "Выбери первый урок";
+
+        }
+
+        return;
 
     }
 
 
-    function performSearch(value) {
+    const course =
+        courses.find(
+            item =>
+                item.id ===
+                firstLesson.course_id
+        );
 
-        if (!value.trim()) {
-            return;
-        }
 
-        /*
-            В полноценной версии здесь можно
-            показывать отдельную страницу поиска.
-        */
+    if (title) {
+
+        title.textContent =
+            course
+            ?
+            course.title
+            :
+            firstLesson.title;
+
+    }
+
+
+    if (description) {
+
+        description.textContent =
+            `Урок ${firstLesson.lesson_number} · ${firstLesson.title}`;
+
+    }
+
+}
+
+
+/* =========================================================
+   CONTINUE
+========================================================= */
+
+function openContinueLesson() {
+
+    if (!lessons.length) {
 
         showToast(
-            "Поиск: " + value
+            "Пока нет уроков"
+        );
+
+        return;
+
+    }
+
+
+    openPlayer(
+        lessons[0].id
+    );
+
+}
+
+
+/* =========================================================
+   FAVORITES
+========================================================= */
+
+let favoriteItems = [];
+
+
+function isFavorite(
+    type,
+    id
+) {
+
+    const key =
+        `${type}_${id}`;
+
+    const saved =
+        JSON.parse(
+            localStorage.getItem(
+                "favorites"
+            ) || "[]"
+        );
+
+
+    return saved.includes(
+        key
+    );
+
+}
+
+
+async function toggleFavorite(
+    type,
+    id
+) {
+
+    const key =
+        `${type}_${id}`;
+
+
+    let saved =
+        JSON.parse(
+            localStorage.getItem(
+                "favorites"
+            ) || "[]"
+        );
+
+
+    if (
+        saved.includes(key)
+    ) {
+
+        saved =
+            saved.filter(
+                item =>
+                    item !== key
+            );
+
+        showToast(
+            "Удалено из избранного"
+        );
+
+    } else {
+
+        saved.push(key);
+
+        showToast(
+            "Добавлено в избранное"
         );
 
     }
 
 
-    /* =========================================================
-       TOAST
-    ========================================================= */
-
-    let toastTimer;
-
-
-    function showToast(message) {
-
-        const toast =
-            document.getElementById("toast");
-
-        toast.textContent = message;
-
-        toast.classList.add("show");
-
-        clearTimeout(toastTimer);
-
-        toastTimer =
-            setTimeout(() => {
-
-                toast.classList.remove("show");
-
-            }, 1800);
-
-    }
+    localStorage.setItem(
+        "favorites",
+        JSON.stringify(saved)
+    );
 
 
-    /* =========================================================
-       RESET
-    ========================================================= */
+    renderBooks();
 
-    function resetProgress() {
+    renderFavorites();
 
-        const confirmed =
-            confirm(
-                "Сбросить весь прогресс?"
-            );
-
-        if (!confirmed) return;
+}
 
 
-        state.completedLessons = [];
-        state.readBooks = [];
+function renderFavorites() {
 
-        saveState();
-
-        updateProgress();
-
-        showToast(
-            "Прогресс сброшен"
+    const container =
+        document.getElementById(
+            "favoritesContent"
         );
 
+
+    if (!container) return;
+
+
+    const saved =
+        JSON.parse(
+            localStorage.getItem(
+                "favorites"
+            ) || "[]"
+        );
+
+
+    const bookIds =
+        saved
+            .filter(
+                item =>
+                    item.startsWith(
+                        "book_"
+                    )
+            )
+            .map(
+                item =>
+                    Number(
+                        item.split("_")[1]
+                    )
+            );
+
+
+    const favoriteBooks =
+        books.filter(
+            book =>
+                bookIds.includes(
+                    book.id
+                )
+        );
+
+
+    if (!favoriteBooks.length) {
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                <p>
+                    Здесь будут сохранённые материалы
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
     }
 
 
-    /* =========================================================
-       TELEGRAM USER
-    ========================================================= */
+    container.innerHTML = `
 
-    function loadTelegramUser() {
+        <div class="books-list">
 
-        if (!tg || !tg.initDataUnsafe) {
-            return;
-        }
+            ${
+                favoriteBooks.map(
+                    book => `
+
+                    <div class="book-card">
+
+                        <div class="book-cover">
+
+                            ${
+                                book.cover_url
+                                ?
+                                `<img
+                                    src="${escapeAttribute(
+                                        book.cover_url
+                                    )}"
+                                >`
+                                :
+                                "📖"
+                            }
+
+                        </div>
+
+                        <div class="book-info">
+
+                            <h3>
+                                ${escapeHtml(
+                                    book.title
+                                )}
+                            </h3>
+
+                            <p>
+                                ${escapeHtml(
+                                    book.author || ""
+                                )}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                `
+                ).join("")
+            }
+
+        </div>
+
+    `;
+
+}
 
 
-        const user =
-            tg.initDataUnsafe.user;
+/* =========================================================
+   PROFILE
+========================================================= */
 
-        if (!user) return;
+function updateProfile() {
 
-
-        const name =
-            user.first_name ||
-            "Требуй знания";
+    if (!telegramUser) return;
 
 
+    const name =
+        telegramUser.first_name ||
+        "Требуй знания";
+
+
+    const nameElement =
         document.getElementById(
             "profileName"
-        ).textContent =
-            name;
+        );
 
 
-        const firstLetter =
-            name.charAt(0).toUpperCase();
-
-
+    const avatar =
         document.getElementById(
             "profileAvatar"
-        ).textContent =
-            firstLetter;
+        );
+
+
+    if (nameElement) {
+
+        nameElement.textContent =
+            name;
 
     }
 
 
-    /* =========================================================
-       INITIALIZE
-    ========================================================= */
+    if (avatar) {
 
-    document.addEventListener(
-        "DOMContentLoaded",
-        () => {
+        avatar.textContent =
+            name
+                .charAt(0)
+                .toUpperCase();
 
-            loadTelegramUser();
+    }
 
-            renderLessons();
 
-            renderBooks();
+    if (isAdmin) {
 
-            renderFavorites();
+        document.getElementById(
+            "adminButton"
+        ).style.display =
+            "flex";
 
-            updateProgress();
+    }
+
+}
+
+
+/* =========================================================
+   ADMIN OPEN
+========================================================= */
+
+function openAdmin() {
+
+    if (!isAdmin) {
+
+        showToast(
+            "Доступ запрещён"
+        );
+
+        return;
+
+    }
+
+
+    goTo("admin");
+
+}
+
+
+/* =========================================================
+   ADMIN TABS
+========================================================= */
+
+function switchAdminTab(
+    tab
+) {
+
+    document
+        .getElementById(
+            "courseAdmin"
+        )
+        .style.display =
+            "none";
+
+
+    document
+        .getElementById(
+            "lessonAdmin"
+        )
+        .style.display =
+            "none";
+
+
+    document
+        .getElementById(
+            "bookAdmin"
+        )
+        .style.display =
+            "none";
+
+
+    document
+        .querySelectorAll(
+            ".admin-tab"
+        )
+        .forEach(
+            button =>
+                button.classList.remove(
+                    "active"
+                )
+        );
+
+
+    if (tab === "course") {
+
+        document
+            .getElementById(
+                "courseAdmin"
+            )
+            .style.display =
+                "block";
+
+
+        document
+            .getElementById(
+                "adminTabCourse"
+            )
+            .classList.add(
+                "active"
+            );
+
+    }
+
+
+    if (tab === "lesson") {
+
+        document
+            .getElementById(
+                "lessonAdmin"
+            )
+            .style.display =
+                "block";
+
+
+        document
+            .getElementById(
+                "adminTabLesson"
+            )
+            .classList.add(
+                "active"
+            );
+
+    }
+
+
+    if (tab === "book") {
+
+        document
+            .getElementById(
+                "bookAdmin"
+            )
+            .style.display =
+                "block";
+
+
+        document
+            .getElementById(
+                "adminTabBook"
+            )
+            .classList.add(
+                "active"
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   ADMIN DATA
+========================================================= */
+
+async function loadAdminData() {
+
+    if (!isAdmin) return;
+
+
+    populateAdminSelects();
+
+    renderAdminList();
+
+}
+
+
+/* =========================================================
+   ADMIN SELECTS
+========================================================= */
+
+function populateAdminSelects() {
+
+    const categorySelects = [
+
+        document.getElementById(
+            "courseCategory"
+        ),
+
+        document.getElementById(
+            "bookCategory"
+        )
+
+    ];
+
+
+    categorySelects.forEach(
+        select => {
+
+            if (!select) return;
+
+
+            select.innerHTML =
+                categories.map(
+                    category => `
+
+                    <option
+                        value="${category.id}"
+                    >
+                        ${escapeHtml(
+                            category.name
+                        )}
+                    </option>
+
+                `
+                ).join("");
 
         }
     );
 
 
-    /*
-        Для разработки вне Telegram
-        приложение можно открыть напрямую.
+    const courseSelect =
+        document.getElementById(
+            "lessonCourse"
+        );
 
-        Для Telegram автоматически
-        используется WebApp API.
-    */
+
+    if (courseSelect) {
+
+        courseSelect.innerHTML =
+            courses.map(
+                course => `
+
+                <option
+                    value="${course.id}"
+                >
+                    ${escapeHtml(
+                        course.title
+                    )}
+                </option>
+
+            `
+            ).join("");
+
+    }
+
+}
+
+
+/* =========================================================
+   ADD COURSE
+========================================================= */
+
+async function addCourse() {
+
+    if (!isAdmin) return;
+
+
+    const title =
+        document.getElementById(
+            "courseTitle"
+        ).value.trim();
+
+
+    const author =
+        document.getElementById(
+            "courseAuthor"
+        ).value.trim();
+
+
+    const categoryId =
+        Number(
+            document.getElementById(
+                "courseCategory"
+            ).value
+        );
+
+
+    const description =
+        document.getElementById(
+            "courseDescription"
+        ).value.trim();
+
+
+    const cover =
+        document.getElementById(
+            "courseCover"
+        ).value.trim();
+
+
+    if (!title) {
+
+        showToast(
+            "Введите название курса"
+        );
+
+        return;
+
+    }
+
+
+    if (!db) {
+
+        showToast(
+            "Сначала подключи Supabase"
+        );
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await db
+            .from("courses")
+            .insert({
+
+                title,
+
+                author,
+
+                category_id:
+                    categoryId,
+
+                description,
+
+                cover_url:
+                    cover
+
+            });
+
+
+    if (error) {
+
+        console.error(
+            error
+        );
+
+        showToast(
+            "Ошибка добавления курса"
+        );
+
+        return;
+
+    }
+
+
+    showToast(
+        "Курс добавлен"
+    );
+
+
+    document.getElementById(
+        "courseTitle"
+    ).value = "";
+
+
+    document.getElementById(
+        "courseAuthor"
+    ).value = "";
+
+
+    document.getElementById(
+        "courseDescription"
+    ).value = "";
+
+
+    document.getElementById(
+        "courseCover"
+    ).value = "";
+
+
+    await loadData();
+
+    populateAdminSelects();
+
+    renderAdminList();
+
+}
+
+
+/* =========================================================
+   ADD LESSON
+========================================================= */
+
+async function addLesson() {
+
+    if (!isAdmin) return;
+
+
+    const courseId =
+        Number(
+            document.getElementById(
+                "lessonCourse"
+            ).value
+        );
+
+
+    const number =
+        Number(
+            document.getElementById(
+                "lessonNumber"
+            ).value
+        );
+
+
+    const title =
+        document.getElementById(
+            "lessonTitle"
+        ).value.trim();
+
+
+    const description =
+        document.getElementById(
+            "lessonDescription"
+        ).value.trim();
+
+
+    const audioUrl =
+        document.getElementById(
+            "lessonAudio"
+        ).value.trim();
+
+
+    const duration =
+        document.getElementById(
+            "lessonDuration"
+        ).value.trim();
+
+
+    if (
+        !courseId ||
+        !number ||
+        !title
+    ) {
+
+        showToast(
+            "Заполни обязательные поля"
+        );
+
+        return;
+
+    }
+
+
+    if (!db) {
+
+        showToast(
+            "Сначала подключи Supabase"
+        );
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await db
+            .from("lessons")
+            .insert({
+
+                course_id:
+                    courseId,
+
+                lesson_number:
+                    number,
+
+                title,
+
+                description,
+
+                audio_url:
+                    audioUrl,
+
+                duration
+
+            });
+
+
+    if (error) {
+
+        console.error(
+            error
+        );
+
+        showToast(
+            "Ошибка добавления урока"
+        );
+
+        return;
+
+    }
+
+
+    showToast(
+        "Урок добавлен"
+    );
+
+
+    document.getElementById(
+        "lessonNumber"
+    ).value = "";
+
+
+    document.getElementById(
+        "lessonTitle"
+    ).value = "";
+
+
+    document.getElementById(
+        "lessonDescription"
+    ).value = "";
+
+
+    document.getElementById(
+        "lessonAudio"
+    ).value = "";
+
+
+    document.getElementById(
+        "lessonDuration"
+    ).value = "";
+
+
+    await loadData();
+
+    populateAdminSelects();
+
+    renderAdminList();
+
+}
+
+
+/* =========================================================
+   ADD BOOK
+========================================================= */
+
+async function addBook() {
+
+    if (!isAdmin) return;
+
+
+    const title =
+        document.getElementById(
+            "bookTitle"
+        ).value.trim();
+
+
+    const author =
+        document.getElementById(
+            "bookAuthor"
+        ).value.trim();
+
+
+    const categoryId =
+        Number(
+            document.getElementById(
+                "bookCategory"
+            ).value
+        );
+
+
+    const description =
+        document.getElementById(
+            "bookDescription"
+        ).value.trim();
+
+
+    const cover =
+        document.getElementById(
+            "bookCover"
+        ).value.trim();
+
+
+    const pdf =
+        document.getElementById(
+            "bookPdf"
+        ).value.trim();
+
+
+    const pages =
+        Number(
+            document.getElementById(
+                "bookPages"
+            ).value
+        ) || null;
+
+
+    if (!title) {
+
+        showToast(
+            "Введите название книги"
+        );
+
+        return;
+
+    }
+
+
+    if (!db) {
+
+        showToast(
+            "Сначала подключи Supabase"
+        );
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await db
+            .from("books")
+            .insert({
+
+                title,
+
+                author,
+
+                category_id:
+                    categoryId,
+
+                description,
+
+                cover_url:
+                    cover,
+
+                pdf_url:
+                    pdf,
+
+                pages
+
+            });
+
+
+    if (error) {
+
+        console.error(
+            error
+        );
+
+        showToast(
+            "Ошибка добавления книги"
+        );
+
+        return;
+
+    }
+
+
+    showToast(
+        "Книга добавлена"
+    );
+
+
+    document.getElementById(
+        "bookTitle"
+    ).value = "";
+
+
+    document.getElementById(
+        "bookAuthor"
+    ).value = "";
+
+
+    document.getElementById(
+        "bookDescription"
+    ).value = "";
+
+
+    document.getElementById(
+        "bookCover"
+    ).value = "";
+
+
+    document.getElementById(
+        "bookPdf"
+    ).value = "";
+
+
+    document.getElementById(
+        "bookPages"
+    ).value = "";
+
+
+    await loadData();
+
+    populateAdminSelects();
+
+    renderAdminList();
+
+}
+
+
+/* =========================================================
+   ADMIN LIST
+========================================================= */
+
+async function renderAdminList() {
+
+    const container =
+        document.getElementById(
+            "adminList"
+        );
+
+
+    if (!container) return;
+
+
+    container.innerHTML = `
+
+        <div
+            style="
+                color:rgba(255,255,255,.4);
+                font-size:11px;
+                text-align:center;
+                padding:20px;
+            "
+        >
+            Контент обновляется автоматически
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   ESCAPE
+========================================================= */
+
+function escapeHtml(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+function escapeAttribute(
+    value
+) {
+
+    return escapeHtml(
+        value
+    );
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+let toastTimer;
+
+
+function showToast(
+    message
+) {
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    toast.textContent =
+        message;
+
+
+    toast.classList.add(
+        "show"
+    );
+
+
+    clearTimeout(
+        toastTimer
+    );
+
+
+    toastTimer =
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+            2000
+        );
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+async function initialize() {
+
+    updateProfile();
+
+    await loadData();
+
+
+    if (
+        localStorage.getItem(
+            "welcomePassed"
+        )
+    ) {
+
+        enterApp();
+
+    }
+
+
+    if (isAdmin) {
+
+        document.getElementById(
+            "adminButton"
+        ).style.display =
+            "flex";
+
+    }
+
+}
+
+
+/* =========================================================
+   WELCOME STORAGE
+========================================================= */
+
+const originalEnterApp =
+    enterApp;
+
+
+enterApp = function() {
+
+    localStorage.setItem(
+        "welcomePassed",
+        "1"
+    );
+
+
+    originalEnterApp();
+
+};
+
+
+/* =========================================================
+   START
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    initialize
+);
 
 </script>
 
