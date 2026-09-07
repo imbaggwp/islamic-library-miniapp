@@ -1101,6 +1101,18 @@ button {
 
 /* ADMIN */
 
+.admin-match-info {
+    margin-top: 8px;
+    margin-bottom: 12px;
+    padding: 10px 11px;
+    border-radius: 12px;
+    background: rgba(255,107,53,.07);
+    border: 1px solid rgba(255,107,53,.10);
+    color: var(--muted);
+    font-size: 9px;
+    line-height: 1.45;
+}
+
 .admin-login-card,
 .admin-card {
     background: var(--card);
@@ -1695,7 +1707,7 @@ button {
             </div>
 
             <div class="stat-box">
-                <strong>2.0</strong>
+                <strong>2.1</strong>
                 <span>Версия</span>
             </div>
 
@@ -1715,7 +1727,10 @@ button {
     </section>
 
 
-    <section class="section">
+    <section
+        id="admin-entry"
+        class="section hidden"
+    >
 
         <button
             class="secondary-btn"
@@ -1933,6 +1948,51 @@ button {
                         Сбросить
                     </button>
 
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Дата матчей
+                    </label>
+
+                    <select
+                        id="admin-fixture-date"
+                        class="form-select"
+                        onchange="loadAdminFixtureMatches()"
+                    >
+                        <option value="">
+                            Сегодня
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Выбрать матч
+                    </label>
+
+                    <select
+                        id="admin-fixture-select"
+                        class="form-select"
+                        onchange="selectAdminFixture()"
+                    >
+                        <option value="">
+                            Загрузка матчей...
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <div class="admin-match-info">
+                    Здесь отображаются только разрешённые турниры:
+                    10 основных лиг, европейские клубные турниры
+                    и выбранные турниры сборных.
                 </div>
 
 
@@ -2428,6 +2488,37 @@ const CURRENT_SEASON =
 const CONTENT_FILE =
     "content.json";
 
+/*
+   TELEGRAM ADMIN IDS
+   Замени 123456789 на свой Telegram ID.
+*/
+const ADMIN_IDS = [
+    418541686
+];
+
+/*
+   Разрешённые соревнования.
+   10 основных лиг + европейские турниры + сборные.
+*/
+const TOP_LEAGUE_IDS = [
+    39, 140, 135, 78, 61,
+    88, 94, 203, 235, 307
+];
+
+const EUROPEAN_TOURNAMENT_IDS = [
+    2, 3, 848
+];
+
+const NATIONAL_TEAM_TOURNAMENT_IDS = [
+    1, 4, 5, 10
+];
+
+const ALLOWED_LEAGUE_IDS = [
+    ...TOP_LEAGUE_IDS,
+    ...EUROPEAN_TOURNAMENT_IDS,
+    ...NATIONAL_TEAM_TOURNAMENT_IDS
+];
+
 
 /* =========================================================
    TELEGRAM
@@ -2528,50 +2619,155 @@ const LEAGUES = [
 
     {
         id: 2,
-        name: "Champions League",
+        name: "Лига чемпионов",
         short: "UCL",
-        country: "Europe",
+        country: "Европа",
+        category: "europe",
         logo: "https://media.api-sports.io/football/leagues/2.png"
     },
 
     {
+        id: 3,
+        name: "Лига Европы",
+        short: "UEL",
+        country: "Европа",
+        category: "europe",
+        logo: "https://media.api-sports.io/football/leagues/3.png"
+    },
+
+    {
+        id: 848,
+        name: "Лига конференций",
+        short: "UECL",
+        country: "Европа",
+        category: "europe",
+        logo: "https://media.api-sports.io/football/leagues/848.png"
+    },
+
+    {
         id: 39,
-        name: "Premier League",
+        name: "Премьер-лига",
         short: "Premier League",
-        country: "England",
+        country: "Англия",
+        category: "league",
         logo: "https://media.api-sports.io/football/leagues/39.png"
     },
 
     {
         id: 140,
-        name: "La Liga",
+        name: "Ла Лига",
         short: "La Liga",
-        country: "Spain",
+        country: "Испания",
+        category: "league",
         logo: "https://media.api-sports.io/football/leagues/140.png"
     },
 
     {
         id: 135,
-        name: "Serie A",
+        name: "Серия A",
         short: "Serie A",
-        country: "Italy",
+        country: "Италия",
+        category: "league",
         logo: "https://media.api-sports.io/football/leagues/135.png"
     },
 
     {
         id: 78,
-        name: "Bundesliga",
+        name: "Бундеслига",
         short: "Bundesliga",
-        country: "Germany",
+        country: "Германия",
+        category: "league",
         logo: "https://media.api-sports.io/football/leagues/78.png"
     },
 
     {
         id: 61,
-        name: "Ligue 1",
+        name: "Лига 1",
         short: "Ligue 1",
-        country: "France",
+        country: "Франция",
+        category: "league",
         logo: "https://media.api-sports.io/football/leagues/61.png"
+    },
+
+    {
+        id: 88,
+        name: "Эредивизи",
+        short: "Eredivisie",
+        country: "Нидерланды",
+        category: "league",
+        logo: "https://media.api-sports.io/football/leagues/88.png"
+    },
+
+    {
+        id: 94,
+        name: "Примейра-лига",
+        short: "Primeira Liga",
+        country: "Португалия",
+        category: "league",
+        logo: "https://media.api-sports.io/football/leagues/94.png"
+    },
+
+    {
+        id: 203,
+        name: "Суперлига",
+        short: "Süper Lig",
+        country: "Турция",
+        category: "league",
+        logo: "https://media.api-sports.io/football/leagues/203.png"
+    },
+
+    {
+        id: 235,
+        name: "Российская Премьер-лига",
+        short: "РПЛ",
+        country: "Россия",
+        category: "league",
+        logo: "https://media.api-sports.io/football/leagues/235.png"
+    },
+
+    {
+        id: 307,
+        name: "Про-лига",
+        short: "Saudi Pro League",
+        country: "Саудовская Аравия",
+        category: "league",
+        logo: "https://media.api-sports.io/football/leagues/307.png"
+    },
+
+    {
+        id: 1,
+        name: "Чемпионат мира",
+        short: "World Cup",
+        country: "Мир",
+        category: "national",
+        logo: "https://media.api-sports.io/football/leagues/1.png"
+    },
+
+    {
+        id: 4,
+        name: "Чемпионат Европы",
+        short: "Euro",
+        country: "Европа",
+        category: "national",
+        logo: "https://media.api-sports.io/football/leagues/4.png"
+    },
+
+    {
+        id: 5,
+        name: "Лига наций УЕФА",
+        short: "Nations League",
+        country: "Европа",
+        category: "national",
+        logo: "https://media.api-sports.io/football/leagues/5.png"
+    },
+
+    {
+        id: 10,
+        name: "Товарищеские матчи",
+        short: "Friendlies",
+        country: "Сборные",
+        category: "national",
+        logo: "https://media.api-sports.io/football/leagues/10.png"
     }
 
 ];
@@ -2594,6 +2790,8 @@ document.addEventListener(
         renderDateSelector();
 
         renderProfile();
+
+        updateAdminVisibility();
 
         await loadContent();
 
@@ -2979,6 +3177,9 @@ function renderHomeLive(matches) {
         document.getElementById(
             "home-live"
         );
+
+    matches =
+        filterAllowedMatches(matches);
 
 
     if (!matches.length) {
@@ -3434,6 +3635,10 @@ function renderMatchList(
     matches
 ) {
 
+    matches =
+        filterAllowedMatches(matches);
+
+
     if (!matches.length) {
 
         container.innerHTML = `
@@ -3708,7 +3913,9 @@ async function loadLivePage() {
 
 
         const matches =
-            data.response || [];
+            filterAllowedMatches(
+                data.response || []
+            );
 
 
         if (!matches.length) {
@@ -5778,6 +5985,8 @@ function toggleTeamFavorite(
 
 function renderProfile() {
 
+    updateAdminVisibility();
+
     const count =
         document.getElementById(
             "favorite-count"
@@ -5989,6 +6198,9 @@ function renderFavoriteTeams() {
 
 function openAdmin() {
 
+    if (!requireAdminAccess())
+        return;
+
     state.previousPage =
         state.currentPage;
 
@@ -6065,6 +6277,9 @@ function showAdminLogin() {
 
 
 function adminLogin() {
+
+    if (!requireAdminAccess())
+        return;
 
     const owner =
         document
@@ -6233,6 +6448,8 @@ function showAdminPanel() {
 
 
     renderAdminLists();
+
+    prepareAdminStreams();
 
 }
 
@@ -6593,10 +6810,330 @@ async function saveContentToGithub() {
 
 
 /* =========================================================
+   TELEGRAM ADMIN ACCESS
+========================================================= */
+
+function getTelegramUserId() {
+
+    return Number(
+        tg?.initDataUnsafe?.user?.id || 0
+    );
+
+}
+
+
+function isTelegramAdmin() {
+
+    const userId =
+        getTelegramUserId();
+
+    return (
+        userId > 0 &&
+        ADMIN_IDS.includes(userId)
+    );
+
+}
+
+
+function updateAdminVisibility() {
+
+    const adminEntry =
+        document.getElementById(
+            "admin-entry"
+        );
+
+    if (adminEntry) {
+
+        adminEntry.classList.toggle(
+            "hidden",
+            !isTelegramAdmin()
+        );
+
+    }
+
+}
+
+
+function requireAdminAccess() {
+
+    if (isTelegramAdmin())
+        return true;
+
+    showToast(
+        "Нет доступа к админке."
+    );
+
+    return false;
+
+}
+
+
+/* =========================================================
+   MATCH FILTER
+========================================================= */
+
+function isAllowedMatch(match) {
+
+    const leagueId =
+        Number(
+            match?.league?.id
+        );
+
+    return ALLOWED_LEAGUE_IDS.includes(
+        leagueId
+    );
+
+}
+
+
+function filterAllowedMatches(matches) {
+
+    return (matches || [])
+        .filter(isAllowedMatch);
+
+}
+
+
+/* =========================================================
+   ADMIN MATCH PICKER
+========================================================= */
+
+function setupAdminFixtureDates() {
+
+    const select =
+        document.getElementById(
+            "admin-fixture-date"
+        );
+
+    if (!select)
+        return;
+
+    const today =
+        new Date();
+
+    select.innerHTML = "";
+
+    for (
+        let i = 0;
+        i <= 4;
+        i++
+    ) {
+
+        const date =
+            new Date(today);
+
+        date.setDate(
+            today.getDate() + i
+        );
+
+        const value =
+            getLocalDate(date);
+
+        const label =
+            i === 0
+                ? "Сегодня"
+                : i === 1
+                    ? "Завтра"
+                    : date.toLocaleDateString(
+                        "ru-RU",
+                        {
+                            weekday: "short",
+                            day: "numeric",
+                            month: "short"
+                        }
+                    );
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+        option.value =
+            value;
+
+        option.textContent =
+            label;
+
+        select.appendChild(
+            option
+        );
+
+    }
+
+}
+
+
+async function loadAdminFixtureMatches() {
+
+    if (!requireAdminAccess())
+        return;
+
+    const dateSelect =
+        document.getElementById(
+            "admin-fixture-date"
+        );
+
+    const matchSelect =
+        document.getElementById(
+            "admin-fixture-select"
+        );
+
+    if (!dateSelect || !matchSelect)
+        return;
+
+    const date =
+        dateSelect.value ||
+        getLocalDate();
+
+    matchSelect.innerHTML = `
+        <option value="">
+            Загрузка матчей...
+        </option>
+    `;
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/fixtures",
+                {
+                    date,
+                    timezone: TIMEZONE
+                },
+                300
+            );
+
+        const matches =
+            filterAllowedMatches(
+                data.response || []
+            )
+            .sort(
+                (a, b) =>
+                    new Date(
+                        a.fixture.date
+                    ) -
+                    new Date(
+                        b.fixture.date
+                    )
+            );
+
+        if (!matches.length) {
+
+            matchSelect.innerHTML = `
+                <option value="">
+                    На эту дату матчей нет
+                </option>
+            `;
+
+            return;
+
+        }
+
+        matchSelect.innerHTML = `
+            <option value="">
+                Выбери матч
+            </option>
+        `;
+
+        matches.forEach(
+            match => {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    String(
+                        match.fixture.id
+                    );
+
+                option.textContent =
+                    `${match.teams.home.name} — ${match.teams.away.name} · ${formatTime(match.fixture.date)} · ${match.league.name}`;
+
+                option.dataset.title =
+                    `${match.teams.home.name} — ${match.teams.away.name}`;
+
+                matchSelect.appendChild(
+                    option
+                );
+
+            }
+        );
+
+    } catch (error) {
+
+        matchSelect.innerHTML = `
+            <option value="">
+                Ошибка загрузки матчей
+            </option>
+        `;
+
+        showToast(
+            apiErrorMessage(error)
+        );
+
+    }
+
+}
+
+
+function selectAdminFixture() {
+
+    const select =
+        document.getElementById(
+            "admin-fixture-select"
+        );
+
+    if (!select)
+        return;
+
+    const option =
+        select.options[
+            select.selectedIndex
+        ];
+
+    if (
+        !option ||
+        !option.value
+    )
+        return;
+
+    document
+        .getElementById(
+            "stream-fixture-id"
+        )
+        .value =
+        option.value;
+
+    document
+        .getElementById(
+            "stream-title"
+        )
+        .value =
+        option.dataset.title ||
+        "";
+
+}
+
+
+function prepareAdminStreams() {
+
+    setupAdminFixtureDates();
+
+    loadAdminFixtureMatches();
+
+}
+
+
+/* =========================================================
    STREAM ADMIN
 ========================================================= */
 
 function saveStream() {
+    if (!requireAdminAccess())
+        return;
+
 
     const fixtureId =
         document
@@ -6756,6 +7293,18 @@ function editStream(id) {
         "Смотреть трансляцию";
 
 
+    const fixtureSelect =
+        document.getElementById(
+            "admin-fixture-select"
+        );
+
+    if (fixtureSelect) {
+
+        fixtureSelect.value =
+            String(id);
+
+    }
+
     document
         .getElementById(
             "stream-fixture-id"
@@ -6766,6 +7315,9 @@ function editStream(id) {
 
 
 function deleteStream(id) {
+    if (!requireAdminAccess())
+        return;
+
 
     if (
         !confirm(
@@ -6823,6 +7375,18 @@ function resetStreamForm() {
         .value =
         "Смотреть трансляцию";
 
+    const fixtureSelect =
+        document.getElementById(
+            "admin-fixture-select"
+        );
+
+    if (fixtureSelect) {
+
+        fixtureSelect.value =
+            "";
+
+    }
+
 }
 
 
@@ -6831,6 +7395,9 @@ function resetStreamForm() {
 ========================================================= */
 
 function saveNews() {
+    if (!requireAdminAccess())
+        return;
+
 
     const title =
         document
@@ -6923,6 +7490,9 @@ function saveNews() {
 
 
 function deleteNews(id) {
+    if (!requireAdminAccess())
+        return;
+
 
     if (
         !confirm(
@@ -6975,6 +7545,9 @@ function resetNewsForm() {
 ========================================================= */
 
 function saveBanner() {
+    if (!requireAdminAccess())
+        return;
+
 
     const title =
         document
@@ -7056,6 +7629,9 @@ function saveBanner() {
 
 
 function deleteBanner(id) {
+    if (!requireAdminAccess())
+        return;
+
 
     if (
         !confirm(
@@ -7567,6 +8143,20 @@ function showPage(
 
 
     if (page === "admin") {
+
+        if (!isTelegramAdmin()) {
+
+            showToast(
+                "Нет доступа к админке."
+            );
+
+            showPage(
+                state.previousPage || "home"
+            );
+
+            return;
+
+        }
 
         if (
             state.admin.loggedIn
