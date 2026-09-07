@@ -82,8 +82,52 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
       <p>Начни карьеру с реальной командой сезона 2026/27. У каждого клуба свой бюджет, рейтинг и уровень сложности.</p>
     </div>
     <div id="clubChoices"></div>
-    <button class="new-career" onclick="openCustomClub()">⚡ Создать свой клуб</button>
+    <button class="new-career" type="button" onclick="openCustomClub()">⚡ Создать свой клуб</button>
   </section>
+
+  <div id="customClubModal" class="custom-modal" aria-hidden="true" onclick="closeCustomClub()">
+    <div class="custom-box" onclick="event.stopPropagation()">
+      <h2>Создать свой клуб</h2>
+      <p>Придумай название клуба и выбери страну и лигу.</p>
+
+      <div class="custom-field">
+        <label for="customClubName">Название клуба</label>
+        <input id="customClubName" type="text" maxlength="28"
+               placeholder="Например, Rizvan United" autocomplete="off"
+               onkeydown="if(event.key==='Enter')createCustomClub()">
+      </div>
+
+      <div class="custom-field">
+        <label for="customClubCountry">Страна</label>
+        <select id="customClubCountry">
+          <option value="🇷🇺|Россия">🇷🇺 Россия</option>
+          <option value="🇪🇸|Испания">🇪🇸 Испания</option>
+          <option value="🏴|Англия">🏴 Англия</option>
+          <option value="🇩🇪|Германия">🇩🇪 Германия</option>
+          <option value="🇮🇹|Италия">🇮🇹 Италия</option>
+          <option value="🇫🇷|Франция">🇫🇷 Франция</option>
+        </select>
+      </div>
+
+      <div class="custom-field">
+        <label for="customClubLeague">Лига</label>
+        <select id="customClubLeague">
+          <option value="Premier League">Premier League</option>
+          <option value="La Liga">La Liga</option>
+          <option value="Bundesliga">Bundesliga</option>
+          <option value="Serie A">Serie A</option>
+          <option value="Ligue 1">Ligue 1</option>
+          <option value="Премьер-лига">Премьер-лига</option>
+        </select>
+      </div>
+
+      <div class="custom-actions">
+        <button type="button" class="custom-cancel" onclick="closeCustomClub()">Отмена</button>
+        <button type="button" class="custom-create" onclick="createCustomClub()">Создать клуб</button>
+      </div>
+    </div>
+  </div>
+
   <div id="appContent">
   <div class="top">
     <div class="brand">⚽ <span>Football</span> Manager</div>
@@ -311,11 +355,16 @@ function chooseClub(name){
 function openCustomClub(){
  const modal=document.getElementById('customClubModal');
  const input=document.getElementById('customClubName');
+ if(!modal || !input){showToast('Ошибка формы создания клуба');return}
  modal.classList.add('show');
+ modal.setAttribute('aria-hidden','false');
  setTimeout(()=>input.focus(),50);
 }
 function closeCustomClub(){
- document.getElementById('customClubModal').classList.remove('show');
+ const modal=document.getElementById('customClubModal');
+ if(!modal)return;
+ modal.classList.remove('show');
+ modal.setAttribute('aria-hidden','true');
 }
 function createCustomClub(){
  const input=document.getElementById('customClubName');
@@ -480,7 +529,7 @@ function renderMarket(){
 function renderLeague(){
  const sorted=[...state.table].sort((a,b)=>b[2]-a[2]);
  document.getElementById('leagueTable').innerHTML=`<div class="tr head"><span>#</span><span>Клуб</span><span>И</span><span>О</span><span>Форма</span></div>`+
- sorted.map((r,i)=>`<div class="tr ${r[0]==='Rizvan FC'?'me':''}"><span>${i+1}</span><span>${r[0]}</span><span>${r[1]}</span><span>${r[2]}</span><span>${r[0]==='Rizvan FC'?'🔥':'—'}</span></div>`).join('');
+ sorted.map((r,i)=>`<div class="tr ${r[0]===state.club?'me':''}"><span>${i+1}</span><span>${r[0]}</span><span>${r[1]}</span><span>${r[2]}</span><span>${r[0]===state.club?'🔥':'—'}</span></div>`).join('');
 }
 function renderFixtures(){
  const box=document.getElementById('fixtures');
@@ -489,7 +538,7 @@ function renderFixtures(){
    const n=i+1,r=state.results[i];
    let status=r?`<b>${r.score}</b><span style="color:${r.win?'var(--green)':r.draw?'var(--accent)':'var(--red)'}">${r.win?'Победа':r.draw?'Ничья':'Поражение'}</span>`:
      (n===state.round?`<button class="primary" style="width:auto;padding:8px 12px" onclick="openMatch()">Играть</button>`:'<span>Предстоит</span>');
-   return `<div class="event" style="display:flex;align-items:center;gap:12px"><div style="font-size:11px;color:var(--muted);width:42px">ТУР ${n}</div><div style="flex:1"><b>${n%2?'Rizvan FC — '+op:op+' — Rizvan FC'}</b><p>${r?'Матч завершён':'Премьер-лига'}</p></div><div style="text-align:right;display:flex;flex-direction:column;gap:4px">${status}</div></div>`;
+   return `<div class="event" style="display:flex;align-items:center;gap:12px"><div style="font-size:11px;color:var(--muted);width:42px">ТУР ${n}</div><div style="flex:1"><b>${n%2?state.club+' — '+op:op+' — '+state.club}</b><p>${r?'Матч завершён':'Премьер-лига'}</p></div><div style="text-align:right;display:flex;flex-direction:column;gap:4px">${status}</div></div>`;
  }).join('');
 }
 let matchSession=null;
