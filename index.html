@@ -23,9 +23,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 
-    <!-- Supabase -->
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 
 <style>
@@ -1392,7 +1389,7 @@ svg {
     display: grid;
 
     grid-template-columns:
-        repeat(3,1fr);
+        repeat(4,1fr);
 
     gap: 9px;
 
@@ -3444,6 +3441,46 @@ svg {
 
 </div>
 
+<div id="adminStats"></div>
+
+<div style="
+    display:flex;
+    gap:8px;
+    margin-bottom:12px;
+">
+
+    <button
+        onclick="exportContent()"
+        style="
+            flex:1;
+            height:44px;
+            border-radius:13px;
+            background:#e0c2a4;
+            color:#211c18;
+            font-size:11px;
+            font-weight:600;
+        "
+    >
+        📤 Экспорт content.json
+    </button>
+
+    <button
+        onclick="importContent()"
+        style="
+            flex:1;
+            height:44px;
+            border-radius:13px;
+            background:rgba(255,255,255,.07);
+            color:white;
+            font-size:11px;
+            font-weight:600;
+        "
+    >
+        📥 Импорт
+    </button>
+
+</div>
+
 
 <div class="admin-tabs">
 
@@ -3472,6 +3509,14 @@ svg {
     onclick="switchAdminTab('book')"
 >
     📚 Книга
+</button>
+
+<button
+    id="adminTabCategory"
+    class="admin-tab"
+    onclick="switchAdminTab('category')"
+>
+    🗂 Раздел
 </button>
 
 
@@ -3676,6 +3721,45 @@ svg {
         ДОБАВИТЬ УРОК
     </button>
 
+
+</div>
+
+
+
+<!-- CATEGORY FORM -->
+
+<div
+    id="categoryAdmin"
+    class="admin-form"
+    style="display:none"
+>
+
+    <h2>
+        Добавить раздел
+    </h2>
+
+    <div class="form-group">
+        <label>Название</label>
+        <input
+            id="categoryTitle"
+            placeholder="Например: Акыда"
+        >
+    </div>
+
+    <div class="form-group">
+        <label>Описание</label>
+        <input
+            id="categoryDescription"
+            placeholder="Краткое описание"
+        >
+    </div>
+
+    <button
+        class="admin-button"
+        onclick="addCategory()"
+    >
+        ДОБАВИТЬ РАЗДЕЛ
+    </button>
 
 </div>
 
@@ -4111,246 +4195,292 @@ svg {
 
 
 <script>
-
-/* =========================================================
-   SUPABASE
-========================================================= */
-
-/*
-    ВСТАВЬ СЮДА ДАННЫЕ СВОЕГО SUPABASE ПРОЕКТА.
-
-    Пример:
-
-    const SUPABASE_URL =
-        "https://xxxxxxxx.supabase.co";
-
-    const SUPABASE_ANON_KEY =
-        "eyJhbGciOi...";
-*/
-
-
-const SUPABASE_URL =
-    "ВСТАВЬ_СЮДА_SUPABASE_URL";
-
-
-const SUPABASE_ANON_KEY =
-    "ВСТАВЬ_СЮДА_SUPABASE_ANON_KEY";
-
-
-let db = null;
-
-
-if (
-    SUPABASE_URL.startsWith("http") &&
-    SUPABASE_ANON_KEY.length > 20
-) {
-
-    db = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-    );
-
-}
-
-
 /* =========================================================
    TELEGRAM
 ========================================================= */
 
-const tg =
-    window.Telegram?.WebApp;
-
+const tg = window.Telegram?.WebApp;
 
 if (tg) {
-
     tg.ready();
-
     tg.expand();
 
-    if (tg.setHeaderColor) {
-
-        tg.setHeaderColor(
-            "#f4f1ec"
-        );
-
-    }
-
-    if (tg.setBackgroundColor) {
-
-        tg.setBackgroundColor(
-            "#f4f1ec"
-        );
-
-    }
-
+    if (tg.setHeaderColor) tg.setHeaderColor("#f4f1ec");
+    if (tg.setBackgroundColor) tg.setBackgroundColor("#f4f1ec");
 }
-
 
 /* =========================================================
    ADMIN
 ========================================================= */
 
-/*
-    СЮДА ВСТАВЬ СВОЙ TELEGRAM ID.
-
-    Например:
-
-    const ADMIN_IDS = [
-        418541686
-    ];
-*/
-
-
 const ADMIN_IDS = [
-
     418541686
-
 ];
-
 
 let telegramUser = null;
 
-
-if (
-    tg &&
-    tg.initDataUnsafe &&
-    tg.initDataUnsafe.user
-) {
-
-    telegramUser =
-        tg.initDataUnsafe.user;
-
+if (tg?.initDataUnsafe?.user) {
+    telegramUser = tg.initDataUnsafe.user;
 }
 
-
-const telegramId =
-    telegramUser?.id
-    ? Number(telegramUser.id)
-    : null;
-
+const telegramId = telegramUser?.id ? Number(telegramUser.id) : null;
 
 const isAdmin =
     telegramId !== null &&
-    ADMIN_IDS.includes(
-        telegramId
-    );
-
+    ADMIN_IDS.includes(telegramId);
 
 /* =========================================================
    STATE
 ========================================================= */
 
+let content = {
+    categories: [],
+    courses: [],
+    lessons: [],
+    books: []
+};
+
 let categories = [];
-
 let courses = [];
-
 let lessons = [];
-
 let books = [];
 
 let currentLesson = null;
-
 let audio = null;
-
 let activeCategory = null;
-
+let adminMode = "course";
+let editingType = null;
+let editingId = null;
+let toastTimer = null;
 
 /* =========================================================
-   LOCAL FALLBACK
+   CONTENT.JSON
 ========================================================= */
 
-const demoLessons = [
+async function loadContent() {
+    try {
+        const response = await fetch(
+            "content.json?v=" + Date.now(),
+            { cache: "no-store" }
+        );
 
-    {
-        id: 1,
-        course_id: 1,
-        lesson_number: 1,
-        title: "Введение в курс",
-        description: "Первый урок",
-        audio_url: "",
-        duration: "00:00"
-    },
+        if (!response.ok) {
+            throw new Error("HTTP " + response.status);
+        }
 
-    {
-        id: 2,
-        course_id: 1,
-        lesson_number: 2,
-        title: "Единобожие",
-        description: "Основы таухида",
-        audio_url: "",
-        duration: "00:00"
+        const data = await response.json();
+
+        content = {
+            categories: Array.isArray(data.categories)
+                ? data.categories
+                : [],
+            courses: Array.isArray(data.courses)
+                ? data.courses
+                : [],
+            lessons: Array.isArray(data.lessons)
+                ? data.lessons
+                : [],
+            books: Array.isArray(data.books)
+                ? data.books
+                : []
+        };
+
+        categories = content.categories;
+        courses = content.courses;
+        lessons = content.lessons;
+        books = content.books;
+
+        renderEverything();
+
+    } catch (error) {
+        console.error("content.json:", error);
+
+        categories = [];
+        courses = [];
+        lessons = [];
+        books = [];
+
+        renderEverything();
+
+        showToast(
+            "Не удалось загрузить content.json"
+        );
     }
+}
 
-];
+/* =========================================================
+   HELPERS
+========================================================= */
 
+function visibleItems(items) {
+    return items.filter(item => item.published !== false);
+}
 
-const demoCourses = [
+function getCategory(id) {
+    return categories.find(
+        item => String(item.id) === String(id)
+    );
+}
 
-    {
-        id: 1,
-        category_id: 1,
-        title: "Китаб ат-Таухид",
-        author:
-            "Мухаммад ибн Абдуль-Ваххаб",
-        description:
-            "Книга единобожия",
-        cover_url: ""
-    }
+function getCourse(id) {
+    return courses.find(
+        item => String(item.id) === String(id)
+    );
+}
 
-];
+function nextId(items, prefix) {
+    let max = 0;
 
+    items.forEach(item => {
+        const match = String(item.id || "").match(/(\d+)$/);
+        if (match) {
+            max = Math.max(max, Number(match[1]));
+        }
+    });
 
-const demoBooks = [
+    return `${prefix}-${max + 1}`;
+}
 
-    {
-        id: 1,
-        category_id: 1,
-        title: "Китаб ат-Таухид",
-        author:
-            "Мухаммад ибн Абдуль-Ваххаб",
-        description:
-            "Книга единобожия",
-        cover_url: "",
-        pdf_url: "",
-        pages: 120
-    }
+function slugify(value) {
+    return String(value)
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-zа-яё0-9]+/gi, "-")
+        .replace(/^-+|-+$/g, "");
+}
 
-];
+function escapeHtml(value) {
+    if (value === null || value === undefined) return "";
 
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function escapeAttribute(value) {
+    return escapeHtml(value);
+}
+
+function formatTime(seconds) {
+    if (!seconds || !isFinite(seconds)) return "0:00";
+
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+
+    return (
+        minutes +
+        ":" +
+        String(secs).padStart(2, "0")
+    );
+}
+
+/* =========================================================
+   EXPORT / IMPORT CONTENT.JSON
+========================================================= */
+
+function exportContent() {
+    const data = {
+        categories,
+        courses,
+        lessons,
+        books
+    };
+
+    const blob = new Blob(
+        [JSON.stringify(data, null, 2)],
+        { type: "application/json;charset=utf-8" }
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "content.json";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(url);
+
+    showToast("content.json готов");
+}
+
+function importContent() {
+    const input = document.createElement("input");
+
+    input.type = "file";
+    input.accept = ".json,application/json";
+
+    input.onchange = async event => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+
+            if (
+                !data ||
+                !Array.isArray(data.categories) ||
+                !Array.isArray(data.courses) ||
+                !Array.isArray(data.lessons) ||
+                !Array.isArray(data.books)
+            ) {
+                throw new Error("Неверная структура content.json");
+            }
+
+            content = data;
+
+            categories = data.categories;
+            courses = data.courses;
+            lessons = data.lessons;
+            books = data.books;
+
+            renderEverything();
+            populateAdminSelects();
+            renderAdminList();
+
+            showToast("Контент импортирован");
+
+        } catch (error) {
+            console.error(error);
+            showToast("Ошибка импорта JSON");
+        }
+    };
+
+    input.click();
+}
 
 /* =========================================================
    ENTER
 ========================================================= */
 
 function enterApp() {
+    localStorage.setItem(
+        "welcomePassed",
+        "1"
+    );
 
-    document
-        .getElementById(
-            "welcomeScreen"
-        )
-        .style.display = "none";
+    document.getElementById(
+        "welcomeScreen"
+    ).style.display = "none";
 
-
-    document
-        .getElementById(
-            "bottomNav"
-        )
-        .style.display = "grid";
-
+    document.getElementById(
+        "bottomNav"
+    ).style.display = "grid";
 
     goTo("home");
-
 }
-
 
 /* =========================================================
    NAVIGATION
 ========================================================= */
 
 function goTo(screen) {
-
     const screens = [
-
         "home",
         "audio",
         "books",
@@ -4358,2513 +4488,2009 @@ function goTo(screen) {
         "favorites",
         "profile",
         "admin"
-
     ];
 
-
     screens.forEach(name => {
-
-        const element =
-            document.getElementById(
-                name + "Screen"
-            );
-
-        if (element) {
-
-            element.classList.remove(
-                "active"
-            );
-
-        }
-
-    });
-
-
-    const target =
-        document.getElementById(
-            screen + "Screen"
+        const element = document.getElementById(
+            name + "Screen"
         );
 
+        if (element) {
+            element.classList.remove("active");
+        }
+    });
+
+    const target = document.getElementById(
+        screen + "Screen"
+    );
 
     if (!target) return;
 
-
     target.classList.add("active");
-
 
     document
         .querySelectorAll(".nav-item")
         .forEach(item => {
-
             item.classList.toggle(
                 "active",
                 item.dataset.screen === screen
             );
-
         });
 
-
-    if (screen === "audio") {
-
-        renderLessons();
-
-    }
-
-
-    if (screen === "books") {
-
-        renderBooks();
-
-    }
-
-
-    if (screen === "progress") {
-
-        updateProgress();
-
-    }
-
-
-    if (screen === "favorites") {
-
-        renderFavorites();
-
-    }
-
-
-    if (screen === "admin") {
-
-        loadAdminData();
-
-    }
-
+    if (screen === "audio") renderLessons();
+    if (screen === "books") renderBooks();
+    if (screen === "progress") updateProgress();
+    if (screen === "favorites") renderFavorites();
+    if (screen === "admin") loadAdminData();
 
     window.scrollTo({
-
         top: 0,
-
         behavior: "smooth"
-
     });
-
 }
-
-
-/* =========================================================
-   LOAD DATA
-========================================================= */
-
-async function loadData() {
-
-    if (!db) {
-
-        categories = [
-            {
-                id: 1,
-                name: "Акыда",
-                slug: "aqida"
-            }
-        ];
-
-        courses =
-            demoCourses;
-
-        lessons =
-            demoLessons;
-
-        books =
-            demoBooks;
-
-        renderEverything();
-
-        return;
-
-    }
-
-
-    try {
-
-        const [
-            categoriesResponse,
-            coursesResponse,
-            lessonsResponse,
-            booksResponse
-        ] =
-            await Promise.all([
-
-                db
-                    .from("categories")
-                    .select("*")
-                    .order(
-                        "name"
-                    ),
-
-                db
-                    .from("courses")
-                    .select("*")
-                    .order(
-                        "created_at",
-                        {
-                            ascending: false
-                        }
-                    ),
-
-                db
-                    .from("lessons")
-                    .select("*")
-                    .order(
-                        "lesson_number"
-                    ),
-
-                db
-                    .from("books")
-                    .select("*")
-                    .order(
-                        "created_at",
-                        {
-                            ascending: false
-                        }
-                    )
-
-            ]);
-
-
-        if (
-            categoriesResponse.error
-        ) {
-
-            console.error(
-                categoriesResponse.error
-            );
-
-        }
-
-
-        if (
-            coursesResponse.error
-        ) {
-
-            console.error(
-                coursesResponse.error
-            );
-
-        }
-
-
-        if (
-            lessonsResponse.error
-        ) {
-
-            console.error(
-                lessonsResponse.error
-            );
-
-        }
-
-
-        if (
-            booksResponse.error
-        ) {
-
-            console.error(
-                booksResponse.error
-            );
-
-        }
-
-
-        categories =
-            categoriesResponse.data ||
-            [];
-
-
-        courses =
-            coursesResponse.data ||
-            [];
-
-
-        lessons =
-            lessonsResponse.data ||
-            [];
-
-
-        books =
-            booksResponse.data ||
-            [];
-
-
-        renderEverything();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        showToast(
-            "Ошибка загрузки данных"
-        );
-
-    }
-
-}
-
 
 /* =========================================================
    RENDER EVERYTHING
 ========================================================= */
 
 function renderEverything() {
-
     renderCategoryFilters();
-
     renderLessons();
-
     renderBooks();
-
     updateHome();
-
     updateProgress();
-
     updateProfile();
-
     renderFavorites();
-
+    populateAdminSelects();
+    renderAdminList();
 }
-
 
 /* =========================================================
    CATEGORY FILTERS
 ========================================================= */
 
 function renderCategoryFilters() {
-
     const container =
         document.getElementById(
             "categoryFilters"
         );
 
-
     if (!container) return;
 
-
     container.innerHTML = `
-
         <button
-            class="filter active"
+            class="filter ${activeCategory === null ? "active" : ""}"
             onclick="filterAudio(null,this)"
         >
             Все
         </button>
-
     `;
 
-
-    categories.forEach(category => {
-
+    visibleItems(categories).forEach(category => {
         container.innerHTML += `
-
             <button
-                class="filter"
-                onclick="filterAudio(
-                    ${category.id},
-                    this
-                )"
+                class="filter ${
+                    String(activeCategory) === String(category.id)
+                        ? "active"
+                        : ""
+                }"
+                onclick="filterAudio('${escapeAttribute(category.id)}',this)"
             >
-                ${escapeHtml(
-                    category.name
-                )}
+                ${escapeHtml(category.title || category.name)}
             </button>
-
         `;
-
     });
-
 }
 
-
-/* =========================================================
-   FILTER
-========================================================= */
-
-function filterAudio(
-    categoryId,
-    button
-) {
-
-    activeCategory =
-        categoryId;
-
+function filterAudio(categoryId, button) {
+    activeCategory = categoryId;
 
     document
-        .querySelectorAll(
-            ".filter"
-        )
-        .forEach(item => {
+        .querySelectorAll(".filter")
+        .forEach(item => item.classList.remove("active"));
 
-            item.classList.remove(
-                "active"
-            );
-
-        });
-
-
-    button.classList.add(
-        "active"
-    );
-
+    button.classList.add("active");
 
     renderLessons();
-
 }
 
-
 /* =========================================================
-   RENDER LESSONS
+   LESSONS
 ========================================================= */
 
 function renderLessons() {
-
     const container =
-        document.getElementById(
-            "lessonList"
-        );
-
+        document.getElementById("lessonList");
 
     if (!container) return;
 
+    let filtered = visibleItems(lessons);
 
-    let filtered =
-        lessons;
+    if (activeCategory !== null) {
+        const courseIds = visibleItems(courses)
+            .filter(course =>
+                String(course.category_id ?? course.categoryId) ===
+                String(activeCategory)
+            )
+            .map(course => String(course.id));
 
-
-    if (
-        activeCategory !== null
-    ) {
-
-        const courseIds =
-            courses
-                .filter(
-                    course =>
-                        course.category_id ===
-                        activeCategory
-                )
-                .map(
-                    course => course.id
-                );
-
-
-        filtered =
-            lessons.filter(
-                lesson =>
-                    courseIds.includes(
-                        lesson.course_id
-                    )
-            );
-
+        filtered = filtered.filter(lesson =>
+            courseIds.includes(
+                String(lesson.course_id ?? lesson.courseId)
+            )
+        );
     }
 
+    filtered.sort(
+        (a, b) =>
+            Number(a.lesson_number ?? a.number ?? 0) -
+            Number(b.lesson_number ?? b.number ?? 0)
+    );
 
     if (!filtered.length) {
-
         container.innerHTML = `
-
             <div class="empty">
-
-                <p>
-                    Пока нет уроков
-                </p>
-
+                <p>Пока нет уроков</p>
             </div>
-
         `;
-
         return;
-
     }
 
+    container.innerHTML = filtered.map(lesson => {
+        const course = getCourse(
+            lesson.course_id ?? lesson.courseId
+        );
 
-    container.innerHTML =
-        filtered.map(
-            lesson => {
+        const completed = isLessonCompleted(lesson.id);
 
-                const course =
-                    courses.find(
-                        item =>
-                            item.id ===
-                            lesson.course_id
-                    );
-
-
-                const completed =
-                    isLessonCompleted(
-                        lesson.id
-                    );
-
-
-                return `
-
-                    <button
-                        class="lesson-card"
-                        onclick="
-                            openPlayer(
-                                ${lesson.id}
-                            )
-                        "
+        return `
+            <button
+                class="lesson-card"
+                onclick="openPlayer('${escapeAttribute(lesson.id)}')"
+            >
+                <div class="lesson-cover">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.3"
                     >
+                        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/>
+                        <path d="M4 5.5v16"/>
+                    </svg>
+                </div>
 
-                        <div class="lesson-cover">
+                <div class="lesson-info">
+                    <h3>
+                        ${escapeHtml(
+                            lesson.lesson_number ??
+                            lesson.number ??
+                            ""
+                        )}.
+                        ${escapeHtml(lesson.title)}
+                    </h3>
 
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.3"
-                            >
+                    <p>
+                        ${
+                            course
+                                ? escapeHtml(course.title)
+                                : ""
+                        }
+                        <br>
+                        ${escapeHtml(
+                            lesson.duration || "Аудиоурок"
+                        )}
+                    </p>
+                </div>
 
-                                <path
-                                    d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"
-                                />
-
-                                <path
-                                    d="M4 5.5v16"
-                                />
-
-                            </svg>
-
-                        </div>
-
-
-                        <div class="lesson-info">
-
-                            <h3>
-
-                                ${lesson.lesson_number}.
-                                ${escapeHtml(
-                                    lesson.title
-                                )}
-
-                            </h3>
-
-                            <p>
-
-                                ${
-                                    course
-                                    ? escapeHtml(
-                                        course.title
-                                    )
-                                    : ""
-                                }
-
-                                <br>
-
-                                ${
-                                    escapeHtml(
-                                        lesson.duration ||
-                                        "Аудиоурок"
-                                    )
-                                }
-
-                            </p>
-
-                        </div>
-
-
-                        <div class="lesson-status">
-
-                            ${
-                                completed
-                                ? "✓"
-                                : "›"
-                            }
-
-                        </div>
-
-                    </button>
-
-                `;
-
-            }
-        ).join("");
-
+                <div class="lesson-status">
+                    ${completed ? "✓" : "›"}
+                </div>
+            </button>
+        `;
+    }).join("");
 }
-
 
 /* =========================================================
    BOOKS
 ========================================================= */
 
 function renderBooks() {
-
     const container =
-        document.getElementById(
-            "booksList"
-        );
-
+        document.getElementById("booksList");
 
     if (!container) return;
 
+    const visibleBooks = visibleItems(books);
 
-    if (!books.length) {
-
+    if (!visibleBooks.length) {
         container.innerHTML = `
-
             <div class="empty">
-
-                <p>
-                    Пока нет книг
-                </p>
-
+                <p>Пока нет книг</p>
             </div>
-
         `;
-
         return;
-
     }
 
+    container.innerHTML = visibleBooks.map(book => {
+        const favorite = isFavorite(
+            "book",
+            book.id
+        );
 
-    container.innerHTML =
-        books.map(book => {
+        return `
+            <div class="book-card">
 
-            const favorite =
-                isFavorite(
-                    "book",
-                    book.id
-                );
-
-
-            return `
-
-                <div class="book-card">
-
-                    <div class="book-cover">
-
-                        ${
-                            book.cover_url
-
-                            ?
-
-                            `<img
-                                src="${escapeAttribute(
-                                    book.cover_url
-                                )}"
-                                alt=""
-                            >`
-
-                            :
-
-                            `
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.3"
-                            >
-
-                                <path
-                                    d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"
-                                />
-
-                                <path
-                                    d="M4 5.5v16"
-                                />
-
-                            </svg>
-                            `
-                        }
-
-                    </div>
-
-
-                    <div class="book-info">
-
-                        <h3>
-                            ${escapeHtml(
-                                book.title
-                            )}
-                        </h3>
-
-                        <p>
-
-                            ${escapeHtml(
-                                book.author || ""
-                            )}
-
-                            <br>
-
-                            ${escapeHtml(
-                                book.description || ""
-                            )}
-
-                        </p>
-
-
-                        <div class="book-meta">
-
-                            <span class="tag">
-                                PDF
-                            </span>
-
-                            ${
-                                book.pages
-                                ?
-                                `
-                                <span class="tag">
-                                    ${book.pages} стр.
-                                </span>
-                                `
-                                :
-                                ""
-                            }
-
-                        </div>
-
-                    </div>
-
-
-                    <button
-                        onclick="
-                            toggleFavorite(
-                                'book',
-                                ${book.id}
-                            )
-                        "
-                        style="
-                            background:transparent;
-                            font-size:22px;
-                            color:
-                            ${
-                                favorite
-                                ? "#a47d59"
-                                : "#aaa"
-                            };
-                        "
-                    >
-
-                        ${
-                            favorite
-                            ? "♥"
-                            : "♡"
-                        }
-
-                    </button>
-
-
+                <div class="book-cover">
                     ${
-                        book.pdf_url
-                        ?
-                        `
-                        <button
-                            onclick="
-                                openBook(
-                                    '${escapeAttribute(
-                                        book.pdf_url
-                                    )}'
-                                )
-                            "
-                            style="
-                                background:#eee9e2;
-                                color:#806243;
-                                padding:9px 11px;
-                                border-radius:10px;
-                                font-size:10px;
-                            "
-                        >
-                            Читать
-                        </button>
-                        `
-                        :
-                        ""
+                        book.cover_url || book.cover
+                            ? `
+                                <img
+                                    src="${escapeAttribute(
+                                        book.cover_url || book.cover
+                                    )}"
+                                    alt=""
+                                >
+                            `
+                            : `
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.3"
+                                >
+                                    <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/>
+                                    <path d="M4 5.5v16"/>
+                                </svg>
+                            `
                     }
+                </div>
+
+                <div class="book-info">
+
+                    <h3>
+                        ${escapeHtml(book.title)}
+                    </h3>
+
+                    <p>
+                        ${escapeHtml(book.author || "")}
+                        <br>
+                        ${escapeHtml(book.description || "")}
+                    </p>
+
+                    <div class="book-meta">
+                        <span class="tag">PDF</span>
+
+                        ${
+                            book.pages
+                                ? `
+                                    <span class="tag">
+                                        ${escapeHtml(book.pages)} стр.
+                                    </span>
+                                `
+                                : ""
+                        }
+                    </div>
 
                 </div>
 
-            `;
+                <button
+                    onclick="
+                        toggleFavorite(
+                            'book',
+                            '${escapeAttribute(book.id)}'
+                        )
+                    "
+                    style="
+                        background:transparent;
+                        font-size:22px;
+                        color:${favorite ? "#a47d59" : "#aaa"};
+                    "
+                >
+                    ${favorite ? "♥" : "♡"}
+                </button>
 
-        }).join("");
+                ${
+                    book.pdf_url || book.pdf
+                        ? `
+                            <button
+                                onclick="
+                                    openBook(
+                                        '${escapeAttribute(
+                                            book.pdf_url || book.pdf
+                                        )}'
+                                    )
+                                "
+                                style="
+                                    background:#eee9e2;
+                                    color:#806243;
+                                    padding:9px 11px;
+                                    border-radius:10px;
+                                    font-size:10px;
+                                "
+                            >
+                                Читать
+                            </button>
+                        `
+                        : ""
+                }
 
+            </div>
+        `;
+    }).join("");
 }
 
-
 /* =========================================================
-   OPEN BOOK
+   BOOK
 ========================================================= */
 
 function openBook(url) {
-
     if (!url) {
-
-        showToast(
-            "PDF пока не добавлен"
-        );
-
+        showToast("PDF пока не добавлен");
         return;
-
     }
 
-
-    if (tg && tg.openLink) {
-
+    if (tg?.openLink) {
         tg.openLink(url);
-
     } else {
-
-        window.open(
-            url,
-            "_blank"
-        );
-
+        window.open(url, "_blank");
     }
-
 }
-
 
 /* =========================================================
    PLAYER
 ========================================================= */
 
 function openPlayer(id) {
-
-    const lesson =
-        lessons.find(
-            item =>
-                item.id === id
-        );
-
+    const lesson = lessons.find(
+        item => String(item.id) === String(id)
+    );
 
     if (!lesson) return;
 
-
-    currentLesson =
-        lesson;
-
+    currentLesson = lesson;
 
     document.getElementById(
         "playerTitle"
     ).textContent =
-        `${lesson.lesson_number}. ${lesson.title}`;
-
+        `${lesson.lesson_number ?? lesson.number ?? ""}. ${lesson.title}`;
 
     document.getElementById(
         "playerDescription"
     ).textContent =
-        lesson.description ||
-        "Аудиоурок";
-
+        lesson.description || "Аудиоурок";
 
     document.getElementById(
         "audioRange"
     ).value = 0;
 
-
     document.getElementById(
         "currentTime"
-    ).textContent =
-        "0:00";
-
+    ).textContent = "0:00";
 
     document.getElementById(
         "durationTime"
     ).textContent =
-        lesson.duration ||
-        "0:00";
-
+        lesson.duration || "0:00";
 
     document
         .getElementById("player")
         .classList.add("active");
 
-
     if (audio) {
-
         audio.pause();
-
         audio = null;
-
     }
 
+    document.getElementById(
+        "playButton"
+    ).textContent = "▶";
 
-    if (
-        lesson.audio_url
-    ) {
+    const audioUrl =
+        lesson.audio_url || lesson.audio;
 
-        audio =
-            new Audio(
-                lesson.audio_url
-            );
-
+    if (audioUrl) {
+        audio = new Audio(audioUrl);
 
         audio.addEventListener(
             "loadedmetadata",
             () => {
-
                 document.getElementById(
                     "durationTime"
                 ).textContent =
-                    formatTime(
-                        audio.duration
-                    );
-
+                    formatTime(audio.duration);
             }
         );
-
 
         audio.addEventListener(
             "timeupdate",
             () => {
-
                 if (!audio) return;
-
 
                 const percent =
                     audio.duration
-                    ?
-                    (
-                        audio.currentTime /
-                        audio.duration
-                    ) * 100
-                    :
-                    0;
-
+                        ? (
+                            audio.currentTime /
+                            audio.duration
+                        ) * 100
+                        : 0;
 
                 document.getElementById(
                     "audioRange"
-                ).value =
-                    percent;
-
+                ).value = percent;
 
                 document.getElementById(
                     "currentTime"
                 ).textContent =
-                    formatTime(
-                        audio.currentTime
-                    );
-
+                    formatTime(audio.currentTime);
             }
         );
-
 
         audio.addEventListener(
             "ended",
             () => {
-
-                completeLesson(
-                    lesson.id
-                );
+                completeLesson(lesson.id);
 
                 document.getElementById(
                     "playButton"
-                ).textContent =
-                    "▶";
-
+                ).textContent = "▶";
             }
         );
-
     }
-
 }
 
-
-/* =========================================================
-   CLOSE PLAYER
-========================================================= */
-
 function closePlayer() {
-
     if (audio) {
-
         audio.pause();
-
+        audio = null;
     }
-
 
     document
         .getElementById("player")
         .classList.remove("active");
 
-
-    currentLesson =
-        null;
-
+    currentLesson = null;
 }
 
-
-/* =========================================================
-   AUDIO PLAY
-========================================================= */
-
 function toggleAudio() {
-
     if (!currentLesson) return;
 
+    const audioUrl =
+        currentLesson.audio_url ||
+        currentLesson.audio;
 
-    if (!currentLesson.audio_url) {
-
-        showToast(
-            "MP3 ссылка ещё не добавлена"
-        );
-
+    if (!audioUrl || !audio) {
+        showToast("MP3 ссылка ещё не добавлена");
         return;
-
     }
-
-
-    if (!audio) {
-
-        return;
-
-    }
-
 
     if (audio.paused) {
-
-        audio.play();
-
-        document.getElementById(
-            "playButton"
-        ).textContent =
-            "Ⅱ";
-
+        audio.play()
+            .then(() => {
+                document.getElementById(
+                    "playButton"
+                ).textContent = "Ⅱ";
+            })
+            .catch(() => {
+                showToast("Не удалось запустить аудио");
+            });
     } else {
-
         audio.pause();
 
         document.getElementById(
             "playButton"
-        ).textContent =
-            "▶";
-
+        ).textContent = "▶";
     }
-
 }
-
-
-/* =========================================================
-   SEEK
-========================================================= */
 
 function seekAudio(percent) {
-
-    if (
-        !audio ||
-        !audio.duration
-    ) {
-
-        return;
-
-    }
-
+    if (!audio || !audio.duration) return;
 
     audio.currentTime =
-        (
-            percent / 100
-        ) *
-        audio.duration;
-
+        (percent / 100) * audio.duration;
 }
 
-
-/* =========================================================
-   SKIP
-========================================================= */
-
 function skipAudio(seconds) {
-
     if (!audio) return;
-
 
     audio.currentTime =
         Math.max(
             0,
             Math.min(
-                audio.duration,
-                audio.currentTime +
-                seconds
+                audio.duration || 0,
+                audio.currentTime + seconds
             )
         );
-
 }
-
-
-/* =========================================================
-   FORMAT TIME
-========================================================= */
-
-function formatTime(seconds) {
-
-    if (
-        !seconds ||
-        !isFinite(seconds)
-    ) {
-
-        return "0:00";
-
-    }
-
-
-    const minutes =
-        Math.floor(
-            seconds / 60
-        );
-
-
-    const secs =
-        Math.floor(
-            seconds % 60
-        );
-
-
-    return (
-        minutes +
-        ":" +
-        String(secs)
-            .padStart(2,"0")
-    );
-
-}
-
-
-/* =========================================================
-   COMPLETE LESSON
-========================================================= */
-
-async function completeLesson(
-    lessonId
-) {
-
-    if (!telegramId) {
-
-        localStorage.setItem(
-            "lesson_" + lessonId,
-            "completed"
-        );
-
-        updateProgress();
-
-        return;
-
-    }
-
-
-    if (!db) {
-
-        localStorage.setItem(
-            "lesson_" + lessonId,
-            "completed"
-        );
-
-        updateProgress();
-
-        return;
-
-    }
-
-
-    const {
-        error
-    } =
-        await db
-            .from("user_progress")
-            .upsert(
-                {
-                    telegram_id:
-                        telegramId,
-
-                    lesson_id:
-                        lessonId,
-
-                    completed:
-                        true,
-
-                    updated_at:
-                        new Date()
-                            .toISOString()
-                },
-                {
-                    onConflict:
-                        "telegram_id,lesson_id"
-                }
-            );
-
-
-    if (error) {
-
-        console.error(
-            error
-        );
-
-        return;
-
-    }
-
-
-    updateProgress();
-
-}
-
-
-/* =========================================================
-   CHECK COMPLETED
-========================================================= */
-
-function isLessonCompleted(
-    lessonId
-) {
-
-    return (
-        localStorage.getItem(
-            "lesson_" + lessonId
-        ) ===
-        "completed"
-    );
-
-}
-
 
 /* =========================================================
    PROGRESS
 ========================================================= */
 
-async function updateProgress() {
-
-    let completed = 0;
-
-
-    lessons.forEach(
-        lesson => {
-
-            if (
-                isLessonCompleted(
-                    lesson.id
-                )
-            ) {
-
-                completed++;
-
-            }
-
-        }
+function completeLesson(lessonId) {
+    localStorage.setItem(
+        "lesson_" + lessonId,
+        "completed"
     );
 
+    updateProgress();
+    renderLessons();
+}
 
-    const total =
-        lessons.length;
+function isLessonCompleted(lessonId) {
+    return (
+        localStorage.getItem(
+            "lesson_" + lessonId
+        ) === "completed"
+    );
+}
 
+function updateProgress() {
+    let completed = 0;
 
-    const percent =
-        total
-        ?
-        Math.round(
-            completed /
-            total *
-            100
-        )
-        :
-        0;
+    lessons.forEach(lesson => {
+        if (isLessonCompleted(lesson.id)) {
+            completed++;
+        }
+    });
 
+    const total = lessons.length;
+
+    const percent = total
+        ? Math.round((completed / total) * 100)
+        : 0;
 
     const number =
         document.getElementById(
             "progressNumber"
         );
 
-
     const circle =
         document.getElementById(
             "progressCircle"
         );
 
-
     if (number) {
-
         number.textContent =
             percent + "%";
-
     }
 
-
     if (circle) {
-
         circle.style.setProperty(
             "--progress",
             percent + "%"
         );
-
     }
-
 
     const statLessons =
         document.getElementById(
             "statLessons"
         );
 
-
     if (statLessons) {
-
         statLessons.textContent =
             completed;
-
     }
-
 
     const statBooks =
         document.getElementById(
             "statBooks"
         );
 
-
     if (statBooks) {
-
         statBooks.textContent =
             localStorage.getItem(
                 "readBooks"
             ) || 0;
-
     }
-
 
     const progress =
         document.getElementById(
             "continueProgress"
         );
 
-
     if (progress) {
-
         progress.style.width =
-            Math.max(
-                5,
-                percent
-            ) + "%";
-
+            Math.max(5, percent) + "%";
     }
-
 }
-
 
 /* =========================================================
    HOME
 ========================================================= */
 
 function updateHome() {
-
     const title =
         document.getElementById(
             "continueTitle"
         );
-
 
     const description =
         document.getElementById(
             "continueDescription"
         );
 
+    const availableLessons =
+        visibleItems(lessons);
 
     const firstLesson =
-        lessons[0];
-
+        availableLessons[0];
 
     if (!firstLesson) {
-
         if (title) {
-
             title.textContent =
                 "Начни обучение";
-
         }
 
         if (description) {
-
             description.textContent =
                 "Выбери первый урок";
-
         }
 
         return;
-
     }
 
-
-    const course =
-        courses.find(
-            item =>
-                item.id ===
-                firstLesson.course_id
-        );
-
-
-    if (title) {
-
-        title.textContent =
-            course
-            ?
-            course.title
-            :
-            firstLesson.title;
-
-    }
-
-
-    if (description) {
-
-        description.textContent =
-            `Урок ${firstLesson.lesson_number} · ${firstLesson.title}`;
-
-    }
-
-}
-
-
-/* =========================================================
-   CONTINUE
-========================================================= */
-
-function openContinueLesson() {
-
-    if (!lessons.length) {
-
-        showToast(
-            "Пока нет уроков"
-        );
-
-        return;
-
-    }
-
-
-    openPlayer(
-        lessons[0].id
+    const course = getCourse(
+        firstLesson.course_id ??
+        firstLesson.courseId
     );
 
+    if (title) {
+        title.textContent =
+            course
+                ? course.title
+                : firstLesson.title;
+    }
+
+    if (description) {
+        description.textContent =
+            `Урок ${
+                firstLesson.lesson_number ??
+                firstLesson.number ??
+                ""
+            } · ${firstLesson.title}`;
+    }
 }
 
+function openContinueLesson() {
+    const availableLessons =
+        visibleItems(lessons);
+
+    if (!availableLessons.length) {
+        showToast("Пока нет уроков");
+        return;
+    }
+
+    openPlayer(
+        availableLessons[0].id
+    );
+}
 
 /* =========================================================
    FAVORITES
 ========================================================= */
 
-let favoriteItems = [];
+function isFavorite(type, id) {
+    const key = `${type}_${id}`;
 
-
-function isFavorite(
-    type,
-    id
-) {
-
-    const key =
-        `${type}_${id}`;
-
-    const saved =
-        JSON.parse(
-            localStorage.getItem(
-                "favorites"
-            ) || "[]"
-        );
-
-
-    return saved.includes(
-        key
+    const saved = JSON.parse(
+        localStorage.getItem(
+            "favorites"
+        ) || "[]"
     );
 
+    return saved.includes(key);
 }
 
+function toggleFavorite(type, id) {
+    const key = `${type}_${id}`;
 
-async function toggleFavorite(
-    type,
-    id
-) {
+    let saved = JSON.parse(
+        localStorage.getItem(
+            "favorites"
+        ) || "[]"
+    );
 
-    const key =
-        `${type}_${id}`;
-
-
-    let saved =
-        JSON.parse(
-            localStorage.getItem(
-                "favorites"
-            ) || "[]"
+    if (saved.includes(key)) {
+        saved = saved.filter(
+            item => item !== key
         );
-
-
-    if (
-        saved.includes(key)
-    ) {
-
-        saved =
-            saved.filter(
-                item =>
-                    item !== key
-            );
 
         showToast(
             "Удалено из избранного"
         );
-
     } else {
-
         saved.push(key);
 
         showToast(
             "Добавлено в избранное"
         );
-
     }
-
 
     localStorage.setItem(
         "favorites",
         JSON.stringify(saved)
     );
 
-
     renderBooks();
-
     renderFavorites();
-
 }
 
-
 function renderFavorites() {
-
     const container =
         document.getElementById(
             "favoritesContent"
         );
 
-
     if (!container) return;
 
+    const saved = JSON.parse(
+        localStorage.getItem(
+            "favorites"
+        ) || "[]"
+    );
 
-    const saved =
-        JSON.parse(
-            localStorage.getItem(
-                "favorites"
-            ) || "[]"
+    const bookIds = saved
+        .filter(
+            item =>
+                item.startsWith("book_")
+        )
+        .map(
+            item =>
+                item.substring(5)
         );
 
-
-    const bookIds =
-        saved
-            .filter(
-                item =>
-                    item.startsWith(
-                        "book_"
-                    )
-            )
-            .map(
-                item =>
-                    Number(
-                        item.split("_")[1]
-                    )
-            );
-
-
     const favoriteBooks =
-        books.filter(
+        visibleItems(books).filter(
             book =>
                 bookIds.includes(
-                    book.id
+                    String(book.id)
                 )
         );
 
-
     if (!favoriteBooks.length) {
-
         container.innerHTML = `
-
             <div class="empty">
-
                 <p>
                     Здесь будут сохранённые материалы
                 </p>
-
             </div>
-
         `;
-
         return;
-
     }
 
-
     container.innerHTML = `
-
         <div class="books-list">
+            ${favoriteBooks.map(book => `
+                <div class="book-card">
 
-            ${
-                favoriteBooks.map(
-                    book => `
-
-                    <div class="book-card">
-
-                        <div class="book-cover">
-
-                            ${
-                                book.cover_url
-                                ?
-                                `<img
-                                    src="${escapeAttribute(
-                                        book.cover_url
-                                    )}"
-                                >`
-                                :
-                                "📖"
-                            }
-
-                        </div>
-
-                        <div class="book-info">
-
-                            <h3>
-                                ${escapeHtml(
-                                    book.title
-                                )}
-                            </h3>
-
-                            <p>
-                                ${escapeHtml(
-                                    book.author || ""
-                                )}
-                            </p>
-
-                        </div>
-
+                    <div class="book-cover">
+                        ${
+                            book.cover_url || book.cover
+                                ? `
+                                    <img
+                                        src="${escapeAttribute(
+                                            book.cover_url || book.cover
+                                        )}"
+                                        alt=""
+                                    >
+                                `
+                                : "📖"
+                        }
                     </div>
 
-                `
-                ).join("")
-            }
+                    <div class="book-info">
+                        <h3>
+                            ${escapeHtml(book.title)}
+                        </h3>
 
+                        <p>
+                            ${escapeHtml(
+                                book.author || ""
+                            )}
+                        </p>
+                    </div>
+
+                </div>
+            `).join("")}
         </div>
-
     `;
-
 }
-
 
 /* =========================================================
    PROFILE
 ========================================================= */
 
 function updateProfile() {
-
-    if (!telegramUser) return;
-
-
     const name =
-        telegramUser.first_name ||
+        telegramUser?.first_name ||
         "Требуй знания";
-
 
     const nameElement =
         document.getElementById(
             "profileName"
         );
 
-
     const avatar =
         document.getElementById(
             "profileAvatar"
         );
 
-
     if (nameElement) {
-
-        nameElement.textContent =
-            name;
-
+        nameElement.textContent = name;
     }
-
 
     if (avatar) {
-
         avatar.textContent =
-            name
-                .charAt(0)
-                .toUpperCase();
-
+            name.charAt(0).toUpperCase();
     }
 
-
-    if (isAdmin) {
-
+    const adminButton =
         document.getElementById(
             "adminButton"
-        ).style.display =
-            "flex";
+        );
 
+    if (adminButton) {
+        adminButton.style.display =
+            isAdmin ? "flex" : "none";
     }
-
 }
 
-
 /* =========================================================
-   ADMIN OPEN
+   ADMIN
 ========================================================= */
 
 function openAdmin() {
-
     if (!isAdmin) {
-
-        showToast(
-            "Доступ запрещён"
-        );
-
+        showToast("Доступ запрещён");
         return;
-
     }
-
 
     goTo("admin");
-
 }
 
-
-/* =========================================================
-   ADMIN TABS
-========================================================= */
-
-function switchAdminTab(
-    tab
-) {
-
-    document
-        .getElementById(
-            "courseAdmin"
-        )
-        .style.display =
-            "none";
-
-
-    document
-        .getElementById(
-            "lessonAdmin"
-        )
-        .style.display =
-            "none";
-
-
-    document
-        .getElementById(
-            "bookAdmin"
-        )
-        .style.display =
-            "none";
-
-
-    document
-        .querySelectorAll(
-            ".admin-tab"
-        )
-        .forEach(
-            button =>
-                button.classList.remove(
-                    "active"
-                )
-        );
-
-
-    if (tab === "course") {
-
-        document
-            .getElementById(
-                "courseAdmin"
-            )
-            .style.display =
-                "block";
-
-
-        document
-            .getElementById(
-                "adminTabCourse"
-            )
-            .classList.add(
-                "active"
-            );
-
-    }
-
-
-    if (tab === "lesson") {
-
-        document
-            .getElementById(
-                "lessonAdmin"
-            )
-            .style.display =
-                "block";
-
-
-        document
-            .getElementById(
-                "adminTabLesson"
-            )
-            .classList.add(
-                "active"
-            );
-
-    }
-
-
-    if (tab === "book") {
-
-        document
-            .getElementById(
-                "bookAdmin"
-            )
-            .style.display =
-                "block";
-
-
-        document
-            .getElementById(
-                "adminTabBook"
-            )
-            .classList.add(
-                "active"
-            );
-
-    }
-
-}
-
-
-/* =========================================================
-   ADMIN DATA
-========================================================= */
-
-async function loadAdminData() {
-
+function loadAdminData() {
     if (!isAdmin) return;
 
-
     populateAdminSelects();
-
     renderAdminList();
-
+    updateAdminStats();
 }
 
+function switchAdminTab(tab) {
+    adminMode = tab;
+    editingType = null;
+    editingId = null;
+
+    const forms = {
+        course: document.getElementById("courseAdmin"),
+        lesson: document.getElementById("lessonAdmin"),
+        book: document.getElementById("bookAdmin"),
+        category: document.getElementById("categoryAdmin")
+    };
+
+    Object.values(forms).forEach(form => {
+        if (form) form.style.display = "none";
+    });
+
+    document
+        .querySelectorAll(".admin-tab")
+        .forEach(button =>
+            button.classList.remove("active")
+        );
+
+    if (forms[tab]) {
+        forms[tab].style.display = "block";
+    }
+
+    const tabButton =
+        document.getElementById(
+            "adminTab" +
+            tab.charAt(0).toUpperCase() +
+            tab.slice(1)
+        );
+
+    if (tabButton) {
+        tabButton.classList.add("active");
+    }
+
+    resetAdminForms();
+    renderAdminList();
+}
 
 /* =========================================================
    ADMIN SELECTS
 ========================================================= */
 
 function populateAdminSelects() {
+    const categoryOptions =
+        visibleItems(categories).map(
+            category => `
+                <option value="${escapeAttribute(category.id)}">
+                    ${escapeHtml(
+                        category.title ||
+                        category.name
+                    )}
+                </option>
+            `
+        ).join("");
 
-    const categorySelects = [
+    const courseOptions =
+        visibleItems(courses).map(
+            course => `
+                <option value="${escapeAttribute(course.id)}">
+                    ${escapeHtml(course.title)}
+                </option>
+            `
+        ).join("");
 
+    const courseCategory =
         document.getElementById(
             "courseCategory"
-        ),
+        );
 
+    const bookCategory =
         document.getElementById(
             "bookCategory"
-        )
+        );
 
-    ];
-
-
-    categorySelects.forEach(
-        select => {
-
-            if (!select) return;
-
-
-            select.innerHTML =
-                categories.map(
-                    category => `
-
-                    <option
-                        value="${category.id}"
-                    >
-                        ${escapeHtml(
-                            category.name
-                        )}
-                    </option>
-
-                `
-                ).join("");
-
-        }
-    );
-
-
-    const courseSelect =
+    const lessonCourse =
         document.getElementById(
             "lessonCourse"
         );
 
-
-    if (courseSelect) {
-
-        courseSelect.innerHTML =
-            courses.map(
-                course => `
-
-                <option
-                    value="${course.id}"
-                >
-                    ${escapeHtml(
-                        course.title
-                    )}
-                </option>
-
-            `
-            ).join("");
-
+    if (courseCategory) {
+        courseCategory.innerHTML =
+            categoryOptions ||
+            `<option value="">Нет категорий</option>`;
     }
 
+    if (bookCategory) {
+        bookCategory.innerHTML =
+            categoryOptions ||
+            `<option value="">Нет категорий</option>`;
+    }
+
+    if (lessonCourse) {
+        lessonCourse.innerHTML =
+            courseOptions ||
+            `<option value="">Нет курсов</option>`;
+    }
 }
 
-
 /* =========================================================
-   ADD COURSE
+   ADMIN FORM RESET
 ========================================================= */
 
-async function addCourse() {
+function resetAdminForms() {
+    document
+        .querySelectorAll(
+            "#courseAdmin input, #courseAdmin textarea, #lessonAdmin input, #lessonAdmin textarea, #bookAdmin input, #bookAdmin textarea"
+        )
+        .forEach(input => {
+            input.value = "";
+        });
 
-    if (!isAdmin) return;
-
-
-    const title =
-        document.getElementById(
-            "courseTitle"
-        ).value.trim();
-
-
-    const author =
-        document.getElementById(
-            "courseAuthor"
-        ).value.trim();
-
-
-    const categoryId =
-        Number(
-            document.getElementById(
-                "courseCategory"
-            ).value
+    const courseButton =
+        document.querySelector(
+            "#courseAdmin .admin-button"
         );
 
+    const lessonButton =
+        document.querySelector(
+            "#lessonAdmin .admin-button"
+        );
 
+    const bookButton =
+        document.querySelector(
+            "#bookAdmin .admin-button"
+        );
+
+    const categoryButton =
+        document.querySelector(
+            "#categoryAdmin .admin-button"
+        );
+
+    if (courseButton) {
+        courseButton.textContent =
+            "ДОБАВИТЬ КУРС";
+    }
+
+    if (lessonButton) {
+        lessonButton.textContent =
+            "ДОБАВИТЬ УРОК";
+    }
+
+    if (bookButton) {
+        bookButton.textContent =
+            "ДОБАВИТЬ КНИГУ";
+    }
+
+    if (categoryButton) {
+        categoryButton.textContent =
+            "ДОБАВИТЬ РАЗДЕЛ";
+    }
+}
+
+/* =========================================================
+   READ FORM
+========================================================= */
+
+function value(id) {
+    return document.getElementById(id)?.value.trim() || "";
+}
+
+function numberValue(id) {
+    return Number(
+        document.getElementById(id)?.value || 0
+    );
+}
+
+/* =========================================================
+   ADD / EDIT COURSE
+========================================================= */
+
+function addCourse() {
+    if (!isAdmin) return;
+
+    const title = value("courseTitle");
+    const author = value("courseAuthor");
+    const categoryId =
+        document.getElementById(
+            "courseCategory"
+        )?.value || "";
     const description =
-        document.getElementById(
-            "courseDescription"
-        ).value.trim();
-
-
+        value("courseDescription");
     const cover =
-        document.getElementById(
-            "courseCover"
-        ).value.trim();
-
+        value("courseCover");
 
     if (!title) {
-
-        showToast(
-            "Введите название курса"
-        );
-
+        showToast("Введите название курса");
         return;
-
     }
 
-
-    if (!db) {
-
-        showToast(
-            "Сначала подключи Supabase"
-        );
-
+    if (!categoryId) {
+        showToast("Выберите категорию");
         return;
-
     }
 
-
-    const {
-        error
-    } =
-        await db
-            .from("courses")
-            .insert({
-
-                title,
-
-                author,
-
-                category_id:
-                    categoryId,
-
-                description,
-
-                cover_url:
-                    cover
-
-            });
-
-
-    if (error) {
-
-        console.error(
-            error
+    if (editingType === "course" && editingId) {
+        const item = courses.find(
+            course =>
+                String(course.id) ===
+                String(editingId)
         );
 
-        showToast(
-            "Ошибка добавления курса"
-        );
+        if (item) {
+            item.title = title;
+            item.author = author;
+            item.category_id = categoryId;
+            item.description = description;
+            item.cover_url = cover;
+        }
 
-        return;
+        showToast("Курс изменён");
 
+    } else {
+        courses.push({
+            id: nextId(courses, "course"),
+            title,
+            author,
+            category_id: categoryId,
+            description,
+            cover_url: cover,
+            published: true
+        });
+
+        showToast("Курс добавлен");
     }
 
+    editingType = null;
+    editingId = null;
 
-    showToast(
-        "Курс добавлен"
-    );
-
-
-    document.getElementById(
-        "courseTitle"
-    ).value = "";
-
-
-    document.getElementById(
-        "courseAuthor"
-    ).value = "";
-
-
-    document.getElementById(
-        "courseDescription"
-    ).value = "";
-
-
-    document.getElementById(
-        "courseCover"
-    ).value = "";
-
-
-    await loadData();
-
-    populateAdminSelects();
-
-    renderAdminList();
-
+    resetAdminForms();
+    renderEverything();
+    switchAdminTab("course");
 }
 
-
 /* =========================================================
-   ADD LESSON
+   ADD / EDIT LESSON
 ========================================================= */
 
-async function addLesson() {
-
+function addLesson() {
     if (!isAdmin) return;
 
-
     const courseId =
-        Number(
-            document.getElementById(
-                "lessonCourse"
-            ).value
-        );
-
+        document.getElementById(
+            "lessonCourse"
+        )?.value || "";
 
     const number =
-        Number(
-            document.getElementById(
-                "lessonNumber"
-            ).value
-        );
-
+        numberValue("lessonNumber");
 
     const title =
-        document.getElementById(
-            "lessonTitle"
-        ).value.trim();
-
+        value("lessonTitle");
 
     const description =
-        document.getElementById(
-            "lessonDescription"
-        ).value.trim();
-
+        value("lessonDescription");
 
     const audioUrl =
-        document.getElementById(
-            "lessonAudio"
-        ).value.trim();
-
+        value("lessonAudio");
 
     const duration =
-        document.getElementById(
-            "lessonDuration"
-        ).value.trim();
+        value("lessonDuration");
 
-
-    if (
-        !courseId ||
-        !number ||
-        !title
-    ) {
-
+    if (!courseId || !number || !title) {
         showToast(
             "Заполни обязательные поля"
         );
-
         return;
-
     }
 
-
-    if (!db) {
-
-        showToast(
-            "Сначала подключи Supabase"
+    if (editingType === "lesson" && editingId) {
+        const item = lessons.find(
+            lesson =>
+                String(lesson.id) ===
+                String(editingId)
         );
 
-        return;
+        if (item) {
+            item.course_id = courseId;
+            item.lesson_number = number;
+            item.title = title;
+            item.description = description;
+            item.audio_url = audioUrl;
+            item.duration = duration;
+        }
 
+        showToast("Урок изменён");
+
+    } else {
+        lessons.push({
+            id: nextId(lessons, "lesson"),
+            course_id: courseId,
+            lesson_number: number,
+            title,
+            description,
+            audio_url: audioUrl,
+            duration,
+            published: true
+        });
+
+        showToast("Урок добавлен");
     }
 
-
-    const {
-        error
-    } =
-        await db
-            .from("lessons")
-            .insert({
-
-                course_id:
-                    courseId,
-
-                lesson_number:
-                    number,
-
-                title,
-
-                description,
-
-                audio_url:
-                    audioUrl,
-
-                duration
-
-            });
-
-
-    if (error) {
-
-        console.error(
-            error
-        );
-
-        showToast(
-            "Ошибка добавления урока"
-        );
-
-        return;
-
-    }
-
-
-    showToast(
-        "Урок добавлен"
+    lessons.sort(
+        (a, b) =>
+            Number(a.lesson_number || 0) -
+            Number(b.lesson_number || 0)
     );
 
+    editingType = null;
+    editingId = null;
 
-    document.getElementById(
-        "lessonNumber"
-    ).value = "";
-
-
-    document.getElementById(
-        "lessonTitle"
-    ).value = "";
-
-
-    document.getElementById(
-        "lessonDescription"
-    ).value = "";
-
-
-    document.getElementById(
-        "lessonAudio"
-    ).value = "";
-
-
-    document.getElementById(
-        "lessonDuration"
-    ).value = "";
-
-
-    await loadData();
-
-    populateAdminSelects();
-
-    renderAdminList();
-
+    resetAdminForms();
+    renderEverything();
+    switchAdminTab("lesson");
 }
-
 
 /* =========================================================
-   ADD BOOK
+   ADD / EDIT BOOK
 ========================================================= */
 
-async function addBook() {
-
+function addBook() {
     if (!isAdmin) return;
 
-
-    const title =
-        document.getElementById(
-            "bookTitle"
-        ).value.trim();
-
-
-    const author =
-        document.getElementById(
-            "bookAuthor"
-        ).value.trim();
-
+    const title = value("bookTitle");
+    const author = value("bookAuthor");
 
     const categoryId =
-        Number(
-            document.getElementById(
-                "bookCategory"
-            ).value
-        );
-
+        document.getElementById(
+            "bookCategory"
+        )?.value || "";
 
     const description =
-        document.getElementById(
-            "bookDescription"
-        ).value.trim();
-
+        value("bookDescription");
 
     const cover =
-        document.getElementById(
-            "bookCover"
-        ).value.trim();
-
+        value("bookCover");
 
     const pdf =
-        document.getElementById(
-            "bookPdf"
-        ).value.trim();
-
+        value("bookPdf");
 
     const pages =
-        Number(
-            document.getElementById(
-                "bookPages"
-            ).value
-        ) || null;
-
+        numberValue("bookPages") || null;
 
     if (!title) {
-
-        showToast(
-            "Введите название книги"
-        );
-
+        showToast("Введите название книги");
         return;
-
     }
 
-
-    if (!db) {
-
-        showToast(
-            "Сначала подключи Supabase"
-        );
-
+    if (!categoryId) {
+        showToast("Выберите категорию");
         return;
-
     }
 
-
-    const {
-        error
-    } =
-        await db
-            .from("books")
-            .insert({
-
-                title,
-
-                author,
-
-                category_id:
-                    categoryId,
-
-                description,
-
-                cover_url:
-                    cover,
-
-                pdf_url:
-                    pdf,
-
-                pages
-
-            });
-
-
-    if (error) {
-
-        console.error(
-            error
+    if (editingType === "book" && editingId) {
+        const item = books.find(
+            book =>
+                String(book.id) ===
+                String(editingId)
         );
 
-        showToast(
-            "Ошибка добавления книги"
-        );
+        if (item) {
+            item.title = title;
+            item.author = author;
+            item.category_id = categoryId;
+            item.description = description;
+            item.cover_url = cover;
+            item.pdf_url = pdf;
+            item.pages = pages;
+        }
 
-        return;
+        showToast("Книга изменена");
 
+    } else {
+        books.push({
+            id: nextId(books, "book"),
+            title,
+            author,
+            category_id: categoryId,
+            description,
+            cover_url: cover,
+            pdf_url: pdf,
+            pages,
+            published: true
+        });
+
+        showToast("Книга добавлена");
     }
 
+    editingType = null;
+    editingId = null;
 
-    showToast(
-        "Книга добавлена"
+    resetAdminForms();
+    renderEverything();
+    switchAdminTab("book");
+}
+
+/* =========================================================
+   EDIT
+========================================================= */
+
+function editItem(type, id) {
+    const collection = {
+        course: courses,
+        lesson: lessons,
+        book: books
+    }[type];
+
+    const item = collection?.find(
+        element =>
+            String(element.id) ===
+            String(id)
     );
 
+    if (!item) return;
 
-    document.getElementById(
-        "bookTitle"
-    ).value = "";
+    editingType = type;
+    editingId = id;
 
+    switchAdminTab(type);
 
-    document.getElementById(
-        "bookAuthor"
-    ).value = "";
+    if (type === "course") {
+        document.getElementById(
+            "courseTitle"
+        ).value = item.title || "";
 
+        document.getElementById(
+            "courseAuthor"
+        ).value = item.author || "";
 
-    document.getElementById(
-        "bookDescription"
-    ).value = "";
+        document.getElementById(
+            "courseCategory"
+        ).value =
+            item.category_id ??
+            item.categoryId ??
+            "";
 
+        document.getElementById(
+            "courseDescription"
+        ).value =
+            item.description || "";
 
-    document.getElementById(
-        "bookCover"
-    ).value = "";
+        document.getElementById(
+            "courseCover"
+        ).value =
+            item.cover_url ||
+            item.cover ||
+            "";
 
+        document.querySelector(
+            "#courseAdmin .admin-button"
+        ).textContent =
+            "СОХРАНИТЬ ИЗМЕНЕНИЯ";
+    }
 
-    document.getElementById(
-        "bookPdf"
-    ).value = "";
+    if (type === "lesson") {
+        document.getElementById(
+            "lessonCourse"
+        ).value =
+            item.course_id ??
+            item.courseId ??
+            "";
 
+        document.getElementById(
+            "lessonNumber"
+        ).value =
+            item.lesson_number ??
+            item.number ??
+            "";
 
-    document.getElementById(
-        "bookPages"
-    ).value = "";
+        document.getElementById(
+            "lessonTitle"
+        ).value =
+            item.title || "";
 
+        document.getElementById(
+            "lessonDescription"
+        ).value =
+            item.description || "";
 
-    await loadData();
+        document.getElementById(
+            "lessonAudio"
+        ).value =
+            item.audio_url ||
+            item.audio ||
+            "";
 
-    populateAdminSelects();
+        document.getElementById(
+            "lessonDuration"
+        ).value =
+            item.duration || "";
+
+        document.querySelector(
+            "#lessonAdmin .admin-button"
+        ).textContent =
+            "СОХРАНИТЬ ИЗМЕНЕНИЯ";
+    }
+
+    if (type === "category") {
+        document.getElementById(
+            "categoryTitle"
+        ).value =
+            item.title ||
+            item.name ||
+            "";
+
+        document.getElementById(
+            "categoryDescription"
+        ).value =
+            item.description ||
+            "";
+
+        document.querySelector(
+            "#categoryAdmin .admin-button"
+        ).textContent =
+            "СОХРАНИТЬ ИЗМЕНЕНИЯ";
+    }
+
+    if (type === "book") {
+        document.getElementById(
+            "bookTitle"
+        ).value =
+            item.title || "";
+
+        document.getElementById(
+            "bookAuthor"
+        ).value =
+            item.author || "";
+
+        document.getElementById(
+            "bookCategory"
+        ).value =
+            item.category_id ??
+            item.categoryId ??
+            "";
+
+        document.getElementById(
+            "bookDescription"
+        ).value =
+            item.description || "";
+
+        document.getElementById(
+            "bookCover"
+        ).value =
+            item.cover_url ||
+            item.cover ||
+            "";
+
+        document.getElementById(
+            "bookPdf"
+        ).value =
+            item.pdf_url ||
+            item.pdf ||
+            "";
+
+        document.getElementById(
+            "bookPages"
+        ).value =
+            item.pages || "";
+
+        document.querySelector(
+            "#bookAdmin .admin-button"
+        ).textContent =
+            "СОХРАНИТЬ ИЗМЕНЕНИЯ";
+    }
 
     renderAdminList();
 
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
 }
 
+/* =========================================================
+   DELETE
+========================================================= */
+
+function deleteItem(type, id) {
+    if (!isAdmin) return;
+
+    const collection = {
+        course: courses,
+        lesson: lessons,
+        book: books
+    }[type];
+
+    const item = collection?.find(
+        element =>
+            String(element.id) ===
+            String(id)
+    );
+
+    if (!item) return;
+
+    if (
+        !confirm(
+            `Удалить «${item.title}»?`
+        )
+    ) {
+        return;
+    }
+
+    if (type === "course") {
+        courses = courses.filter(
+            item =>
+                String(item.id) !==
+                String(id)
+        );
+
+        lessons = lessons.filter(
+            lesson =>
+                String(
+                    lesson.course_id ??
+                    lesson.courseId
+                ) !== String(id)
+        );
+    }
+
+    if (type === "lesson") {
+        lessons = lessons.filter(
+            item =>
+                String(item.id) !==
+                String(id)
+        );
+    }
+
+    if (type === "book") {
+        books = books.filter(
+            item =>
+                String(item.id) !==
+                String(id)
+        );
+    }
+
+    showToast("Удалено");
+
+    renderEverything();
+    renderAdminList();
+}
+
+/* =========================================================
+   PUBLISH
+========================================================= */
+
+function togglePublished(type, id) {
+    if (!isAdmin) return;
+
+    const collection = {
+        course: courses,
+        lesson: lessons,
+        book: books
+    }[type];
+
+    const item = collection?.find(
+        element =>
+            String(element.id) ===
+            String(id)
+    );
+
+    if (!item) return;
+
+    item.published =
+        item.published === false;
+
+    renderEverything();
+    renderAdminList();
+
+    showToast(
+        item.published
+            ? "Материал опубликован"
+            : "Материал скрыт"
+    );
+}
+
+/* =========================================================
+   ADD / EDIT CATEGORY
+========================================================= */
+
+function addCategory() {
+    if (!isAdmin) return;
+
+    const title = value("categoryTitle");
+    const description = value("categoryDescription");
+
+    if (!title) {
+        showToast("Введите название раздела");
+        return;
+    }
+
+    if (editingType === "category" && editingId) {
+        const item = categories.find(
+            category =>
+                String(category.id) ===
+                String(editingId)
+        );
+
+        if (item) {
+            item.title = title;
+            item.name = title;
+            item.description = description;
+            item.slug = item.slug || slugify(title);
+        }
+
+        showToast("Раздел изменён");
+    } else {
+        categories.push({
+            id: nextId(categories, "category"),
+            title,
+            name: title,
+            slug: slugify(title),
+            description,
+            published: true
+        });
+
+        showToast("Раздел добавлен");
+    }
+
+    editingType = null;
+    editingId = null;
+
+    resetAdminForms();
+    renderEverything();
+    switchAdminTab("category");
+}
+
+function deleteCategory(id) {
+    if (!isAdmin) return;
+
+    const item = categories.find(
+        category =>
+            String(category.id) === String(id)
+    );
+
+    if (!item) return;
+
+    if (!confirm(`Удалить раздел «${item.title || item.name}»?`)) {
+        return;
+    }
+
+    categories = categories.filter(
+        category =>
+            String(category.id) !== String(id)
+    );
+
+    showToast("Раздел удалён");
+
+    renderEverything();
+    renderAdminList();
+}
 
 /* =========================================================
    ADMIN LIST
 ========================================================= */
 
-async function renderAdminList() {
-
+function renderAdminList() {
     const container =
         document.getElementById(
             "adminList"
         );
 
+    if (!container || !isAdmin) return;
 
-    if (!container) return;
+    let items = [];
+    let type = adminMode;
 
-
-    container.innerHTML = `
-
-        <div
-            style="
-                color:rgba(255,255,255,.4);
-                font-size:11px;
-                text-align:center;
-                padding:20px;
-            "
-        >
-            Контент обновляется автоматически
-        </div>
-
-    `;
-
-}
-
-
-/* =========================================================
-   ESCAPE
-========================================================= */
-
-function escapeHtml(
-    value
-) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-
-        return "";
-
+    if (type === "course") {
+        items = courses;
     }
 
+    if (type === "lesson") {
+        items = lessons;
+    }
 
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
+    if (type === "book") {
+        items = books;
+    }
+
+    if (type === "category") {
+        items = categories;
+    }
+
+    if (!items.length) {
+        container.innerHTML = `
+            <div class="empty">
+                <p style="color:rgba(255,255,255,.4)">
+                    Пока ничего нет
+                </p>
+            </div>
+        `;
+        return;
+    }
+
+    items = [...items];
+
+    if (type === "lesson") {
+        items.sort(
+            (a, b) =>
+                Number(a.lesson_number || 0) -
+                Number(b.lesson_number || 0)
         );
+    }
 
+    container.innerHTML = `
+        <div
+            style="
+                display:flex;
+                gap:8px;
+                margin-bottom:10px;
+            "
+        >
+            <button
+                onclick="exportContent()"
+                style="
+                    flex:1;
+                    padding:12px;
+                    border-radius:12px;
+                    background:#e0c2a4;
+                    color:#211c18;
+                    font-size:11px;
+                    font-weight:600;
+                "
+            >
+                📤 ЭКСПОРТ
+            </button>
+
+            <button
+                onclick="importContent()"
+                style="
+                    flex:1;
+                    padding:12px;
+                    border-radius:12px;
+                    background:rgba(255,255,255,.07);
+                    color:white;
+                    font-size:11px;
+                    font-weight:600;
+                "
+            >
+                📥 ИМПОРТ
+            </button>
+        </div>
+
+        ${items.map(item => {
+            let subtitle = "";
+
+            if (type === "course") {
+                subtitle =
+                    item.author ||
+                    getCategory(
+                        item.category_id ??
+                        item.categoryId
+                    )?.title ||
+                    "";
+            }
+
+            if (type === "lesson") {
+                const course =
+                    getCourse(
+                        item.course_id ??
+                        item.courseId
+                    );
+
+                subtitle =
+                    `${
+                        course
+                            ? course.title
+                            : "Без курса"
+                    } · Урок ${
+                        item.lesson_number ??
+                        item.number ??
+                        ""
+                    }`;
+            }
+
+            if (type === "book") {
+                subtitle =
+                    item.author ||
+                    getCategory(
+                        item.category_id ??
+                        item.categoryId
+                    )?.title ||
+                    "";
+            }
+
+            if (type === "category") {
+                subtitle =
+                    item.description ||
+                    item.slug ||
+                    "";
+            }
+
+            return `
+                <div class="admin-item">
+
+                    <div class="admin-item-info">
+
+                        <strong>
+                            ${escapeHtml(
+                                item.title
+                            )}
+                        </strong>
+
+                        <span>
+                            ${escapeHtml(
+                                subtitle
+                            )}
+                        </span>
+
+                        <span
+                            style="
+                                color:${
+                                    item.published === false
+                                        ? "#d99690"
+                                        : "#b9d2b1"
+                                };
+                            "
+                        >
+                            ${
+                                item.published === false
+                                    ? "● Скрыт"
+                                    : "● Опубликован"
+                            }
+                        </span>
+
+                    </div>
+
+                    <button
+                        onclick="
+                            togglePublished(
+                                '${type}',
+                                '${escapeAttribute(item.id)}'
+                            )
+                        "
+                        style="
+                            width:35px;
+                            height:35px;
+                            border-radius:10px;
+                            background:rgba(255,255,255,.06);
+                            color:white;
+                        "
+                    >
+                        ${
+                            item.published === false
+                                ? "○"
+                                : "●"
+                        }
+                    </button>
+
+                    <button
+                        onclick="
+                            editItem(
+                                '${type}',
+                                '${escapeAttribute(item.id)}'
+                            )
+                        "
+                        style="
+                            width:35px;
+                            height:35px;
+                            border-radius:10px;
+                            background:rgba(255,255,255,.06);
+                            color:#e0c2a4;
+                        "
+                    >
+                        ✎
+                    </button>
+
+                    <button
+                        class="admin-delete"
+                        onclick="${
+                            type === "category"
+                                ? `deleteCategory('${escapeAttribute(item.id)}')`
+                                : `deleteItem('${type}','${escapeAttribute(item.id)}')`
+                        }"
+                    >
+                        ×
+                    </button>
+
+                </div>
+            `;
+        }).join("")}
+    `;
 }
 
+/* =========================================================
+   ADMIN STATS
+========================================================= */
 
-function escapeAttribute(
-    value
-) {
-
-    return escapeHtml(
-        value
+function updateAdminStats() {
+    const old = document.getElementById(
+        "adminStats"
     );
 
-}
+    if (!old) return;
 
+    old.innerHTML = `
+        <div style="
+            display:grid;
+            grid-template-columns:repeat(4,1fr);
+            gap:8px;
+            margin-bottom:12px;
+        ">
+            <div style="
+                background:rgba(255,255,255,.05);
+                border-radius:14px;
+                padding:13px 5px;
+                text-align:center;
+            ">
+                <strong style="font-size:20px">
+                    ${courses.length}
+                </strong>
+                <span style="
+                    display:block;
+                    margin-top:4px;
+                    color:rgba(255,255,255,.4);
+                    font-size:9px;
+                ">
+                    Курсов
+                </span>
+            </div>
+
+            <div style="
+                background:rgba(255,255,255,.05);
+                border-radius:14px;
+                padding:13px 5px;
+                text-align:center;
+            ">
+                <strong style="font-size:20px">
+                    ${lessons.length}
+                </strong>
+                <span style="
+                    display:block;
+                    margin-top:4px;
+                    color:rgba(255,255,255,.4);
+                    font-size:9px;
+                ">
+                    Уроков
+                </span>
+            </div>
+
+            <div style="
+                background:rgba(255,255,255,.05);
+                border-radius:14px;
+                padding:13px 5px;
+                text-align:center;
+            ">
+                <strong style="font-size:20px">
+                    ${books.length}
+                </strong>
+                <span style="
+                    display:block;
+                    margin-top:4px;
+                    color:rgba(255,255,255,.4);
+                    font-size:9px;
+                ">
+                    Книг
+                </span>
+            </div>
+
+            <div style="
+                background:rgba(255,255,255,.05);
+                border-radius:14px;
+                padding:13px 5px;
+                text-align:center;
+            ">
+                <strong style="font-size:20px">
+                    ${categories.length}
+                </strong>
+                <span style="
+                    display:block;
+                    margin-top:4px;
+                    color:rgba(255,255,255,.4);
+                    font-size:9px;
+                ">
+                    Разделов
+                </span>
+            </div>
+        </div>
+    `;
+}
 
 /* =========================================================
    TOAST
 ========================================================= */
 
-let toastTimer;
-
-
-function showToast(
-    message
-) {
-
+function showToast(message) {
     const toast =
         document.getElementById(
             "toast"
         );
 
+    if (!toast) return;
 
-    toast.textContent =
-        message;
+    toast.textContent = message;
 
+    toast.classList.add("show");
 
-    toast.classList.add(
-        "show"
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(
+        () => {
+            toast.classList.remove("show");
+        },
+        2000
     );
-
-
-    clearTimeout(
-        toastTimer
-    );
-
-
-    toastTimer =
-        setTimeout(
-            () => {
-
-                toast.classList.remove(
-                    "show"
-                );
-
-            },
-            2000
-        );
-
 }
-
 
 /* =========================================================
    INITIALIZE
 ========================================================= */
 
 async function initialize() {
-
     updateProfile();
 
-    await loadData();
-
+    await loadContent();
 
     if (
         localStorage.getItem(
             "welcomePassed"
         )
     ) {
-
         enterApp();
-
     }
-
 
     if (isAdmin) {
-
         document.getElementById(
             "adminButton"
-        ).style.display =
-            "flex";
-
+        ).style.display = "flex";
     }
-
 }
-
-
-/* =========================================================
-   WELCOME STORAGE
-========================================================= */
-
-const originalEnterApp =
-    enterApp;
-
-
-enterApp = function() {
-
-    localStorage.setItem(
-        "welcomePassed",
-        "1"
-    );
-
-
-    originalEnterApp();
-
-};
-
-
-/* =========================================================
-   START
-========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
     initialize
 );
-
 </script>
 
 </body>
