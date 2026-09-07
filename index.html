@@ -368,6 +368,35 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .live-broadcast{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px}.broadcast-score{display:grid;grid-template-columns:1fr 110px 1fr;align-items:center;gap:10px;padding:12px;background:var(--card2);border-radius:14px}.broadcast-team{display:flex;align-items:center;gap:8px;font-size:13px}.broadcast-team.away{justify-content:flex-end}.broadcast-result{text-align:center}.broadcast-result strong{font-size:30px;letter-spacing:2px}.broadcast-result small{display:block;color:var(--muted);font-size:9px;margin-top:2px}.broadcast-pitch{position:relative;width:100%;aspect-ratio:105/68;margin:12px 0;border-radius:14px;overflow:hidden;background:repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 7.14%,rgba(0,0,0,.025) 7.14% 14.28%),#10472a;border:2px solid rgba(255,255,255,.28)}.bp-border{position:absolute;inset:5%;border:2px solid rgba(255,255,255,.42)}.bp-half{position:absolute;left:50%;top:5%;bottom:5%;border-left:2px solid rgba(255,255,255,.36)}.bp-circle{position:absolute;left:38%;top:32%;width:24%;height:36%;border:2px solid rgba(255,255,255,.36);border-radius:50%}.bp-dot{position:absolute;left:calc(50% - 3px);top:calc(50% - 3px);width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5)}.bp-box{position:absolute;top:25%;height:50%;width:18%;border:2px solid rgba(255,255,255,.38)}.bp-box.left{left:5%;border-left:0}.bp-box.right{right:5%;border-right:0}.bp-six{position:absolute;top:38%;height:24%;width:7%;border:2px solid rgba(255,255,255,.34)}.bp-six.left{left:5%;border-left:0}.bp-six.right{right:5%;border-right:0}.bp-goal{position:absolute;top:41%;height:18%;width:2.5%;border:2px solid rgba(255,255,255,.35)}.bp-goal.left{left:2.5%;border-left:0}.bp-goal.right{right:2.5%;border-right:0}.broadcast-ball{position:absolute;z-index:4;transform:translate(-50%,-50%);font-size:22px;filter:drop-shadow(0 3px 3px rgba(0,0,0,.5));transition:left .35s ease,top .35s ease}.attack-label{position:absolute;z-index:3;top:8px;font-size:8px;font-weight:800;letter-spacing:1px;color:#fff}.attack-label.home{left:8px}.attack-label.away{right:8px}.live-score-strip{display:flex;justify-content:space-around;gap:6px;padding:8px;margin-bottom:8px;background:var(--card2);border-radius:10px;color:var(--muted);font-size:9px}.live-match-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:10px;margin-top:10px}.live-block-title{font-size:10px;font-weight:800;margin-bottom:6px}.live-player-row{position:relative;display:grid;grid-template-columns:18px 1fr auto;gap:5px;align-items:center;padding:6px 8px;margin:3px 0;background:var(--card2);border-radius:8px;font-size:9px;overflow:hidden}.live-player-row span,.live-player-row small{color:var(--muted)}.live-player-row i{position:absolute;left:0;bottom:0;height:2px;background:var(--accent);max-width:100%}.live-player-row b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media(max-width:650px){.broadcast-score{grid-template-columns:1fr 75px 1fr}.broadcast-result strong{font-size:23px}.broadcast-team{font-size:10px}.broadcast-pitch{margin:8px 0}.broadcast-ball{font-size:17px}.live-match-grid{grid-template-columns:1fr}.live-score-strip{font-size:8px}.tactic-grid{grid-template-columns:repeat(2,1fr)}}
 .svg-icon{width:1em;height:1em;display:inline-block;vertical-align:-.16em;flex:0 0 auto;color:currentColor}.svg-icon.inline-svg{width:1em;height:1em}.event-icon .svg-icon{width:18px;height:18px}.ico .svg-icon,.icon .svg-icon{width:22px;height:22px}.avatar .svg-icon{width:22px;height:22px}.pitch-player .svg-icon{width:17px;height:17px}
+.academy-dashboard{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.academy-dashboard>div{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px}.academy-dashboard b{display:block;font-size:9px;color:var(--muted)}.academy-dashboard strong{display:block;font-size:24px;margin:3px 0}.academy-dashboard small{display:block;font-size:8px;color:var(--muted)}.academy-actions{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0}.academy-actions button{flex:1;min-width:150px}.academy-player .rating{display:flex;flex-direction:column;align-items:center;gap:4px}.academy-player .rating button{font-size:8px;padding:5px 7px}.svg-icon-wrap{display:flex;align-items:center;justify-content:center}.svg-icon-wrap .svg-icon{width:22px;height:22px}
+@media(max-width:650px){.academy-dashboard{grid-template-columns:repeat(2,1fr)}.academy-actions{display:grid;grid-template-columns:1fr 1fr}.academy-actions button{min-width:0}}
+.staff-overview{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}.staff-overview>div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}.staff-overview span{display:block;color:var(--muted);font-size:9px}.staff-overview strong{display:block;font-size:22px;margin-top:3px}.staff-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.staff-card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:12px}.staff-icon{float:left;width:38px;height:38px;border-radius:11px;background:var(--card2);display:flex;align-items:center;justify-content:center;color:var(--accent);margin-right:9px}.staff-icon .svg-icon{width:21px;height:21px}.staff-info b{display:block;font-size:11px}.staff-info span,.staff-info small{display:block;color:var(--muted);font-size:8px;margin-top:3px}.staff-info small{line-height:1.3;min-height:20px}.staff-rating{position:absolute;right:12px;top:12px;text-align:right}.staff-rating strong{font-size:20px}.staff-rating span{font-size:9px}.staff-card>.progress{clear:both;margin-top:12px}.staff-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:8px;margin:6px 0}.staff-actions{display:flex;gap:6px}.staff-actions button{flex:1;font-size:8px;padding:7px}.staff-effects{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.staff-effects span{background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:7px;font-size:8px;color:var(--muted)}
+@media(max-width:650px){.staff-overview{grid-template-columns:repeat(2,1fr)}.staff-grid{grid-template-columns:1fr}}
+.manager-contract{margin:10px 0;padding:12px;background:var(--card2);border:1px solid var(--line);border-radius:14px}.manager-contract-head{display:flex;align-items:center;gap:9px}.manager-contract-head>div:nth-child(2){flex:1}.manager-avatar{width:38px;height:38px;border-radius:11px;background:var(--card);display:flex;align-items:center;justify-content:center;color:var(--accent)}.manager-avatar .svg-icon{width:21px;height:21px}.manager-contract-head b{display:block;font-size:11px}.manager-contract-head small{display:block;color:var(--muted);font-size:8px;margin-top:3px}.manager-contract-head>strong{font-size:13px}.manager-confidence{margin-top:10px}.manager-confidence span{font-size:8px;color:var(--muted)}.manager-confidence .progress{margin-top:5px}.manager-contract-meta{display:flex;justify-content:space-between;gap:5px;margin:7px 0;color:var(--muted);font-size:8px}
+<style>
+.player-detail-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.player-detail-head h2{margin:0 0 4px}
+.player-detail-head p{margin:0;opacity:.6}
+.player-detail-avatar{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;background:rgba(255,255,255,.07);font-size:30px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.detail-grid>div{padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.025)}
+.detail-grid span{display:block;font-size:11px;opacity:.5;margin-bottom:4px}
+.detail-grid b{font-size:14px}
+.detail-actions{display:flex;gap:8px;margin-top:16px}
+.detail-actions button{flex:1}
+</style>
+</style>
+<style>
+.scout-report{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.scout-report span{font-size:10px;padding:4px 7px;border-radius:999px;background:rgba(255,255,255,.06);opacity:.78}
+.market-row{align-items:center}
+</style>
+<style>
+.agent-card{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.agent-card>div{padding:10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.025)}
+.agent-card span{display:block;font-size:10px;opacity:.5;margin-bottom:3px}
+.agent-card b{font-size:13px}
+.negotiation-note{margin-top:10px;padding:10px;border-radius:10px;background:rgba(255,255,255,.045);font-size:12px;line-height:1.4;opacity:.8}
 </style>
 </head>
 <body>
@@ -525,6 +554,20 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
     <div id="fixtures"></div>
   </main>
 
+  <main id="staff" class="page hidden">
+    <div class="header"><button class="back" onclick="navigate('club')">←</button><h1>Штаб</h1></div>
+    <div class="notice">Собери тренерский штаб. Специалисты влияют на развитие игроков, физическую готовность, травмы, скаутинг и трансферные переговоры.</div>
+    <div id="staffPanel"></div>
+  </main>
+
+  <main id="academy" class="page hidden">
+    <div class="header"><button class="back" onclick="navigate('club')">←</button><h1>Академия</h1></div>
+    <div class="notice">Развивай молодых игроков, подписывай лучших в основной состав и создавай собственное поколение клуба.</div>
+    <div id="academyPanel"></div>
+    <div class="section"><h2>Молодёжная команда</h2><span class="link" id="academyCount"></span></div>
+    <div class="players" id="academyPlayers"></div>
+  </main>
+
   <main id="club" class="page hidden">
     <div class="header"><button class="back" onclick="navigate('home')">←</button><h1>Мой клуб</h1></div><button class="secondary" style="width:100%;margin-bottom:12px" onclick="changeClub()">🔄 Выбрать другой клуб</button>
     <div class="grid2">
@@ -550,10 +593,10 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
     <div class="card squad-engine-card"><div id="squadEnginePanel"></div></div>
 
     <div class="section"><h2>Кубок страны</h2></div>
-    <div class="card cup-card"><div id="domesticCupPanel"></div></div>
+    <div class="card cup-card"><div id="domesticCupBox"></div></div>
 
     <div class="section"><h2>Еврокубки</h2></div>
-    <div class="card euro-card"><div id="europeanPanel"></div></div>
+    <div class="card euro-card"><div id="europeanBox"></div></div>
 
     <div class="section"><h2>Единый календарь сезона</h2></div>
     <div class="card calendar-card"><div id="unifiedCalendarBox"></div></div>
@@ -1233,6 +1276,168 @@ function renderTactics(){
 function startLiveMatch(){
   if(typeof startInteractiveMatch==='function')startInteractiveMatch('league');
 }
+const STAFF_ROLES=[
+  {id:'assistant',name:'Ассистент главного тренера',icon:'users',base:72,desc:'Тактика, мораль и подготовка к матчам'},
+  {id:'attack',name:'Тренер атаки',icon:'target',base:70,desc:'Развитие нападающих и атакующих ролей'},
+  {id:'defense',name:'Тренер обороны',icon:'shield',base:70,desc:'Защитные навыки и организация'},
+  {id:'fitness',name:'Тренер по физподготовке',icon:'bolt',base:70,desc:'Физика, восстановление и выносливость'},
+  {id:'goalkeeping',name:'Тренер вратарей',icon:'glove',base:68,desc:'Развитие и форма вратарей'},
+  {id:'scout',name:'Главный скаут',icon:'target',base:68,desc:'Поиск игроков и оценка потенциала'},
+  {id:'medical',name:'Медицинский штаб',icon:'injury',base:70,desc:'Снижение риска травм и восстановление'},
+  {id:'negotiator',name:'Трансферный аналитик',icon:'handshake',base:66,desc:'Переговоры, стоимость и контракты'}
+];
+const STAFF_NAMES=['Андреас Кляйн','Марко Сильва','Даниэль Ривера','Томас Бек','Юлиан Вебер','Луис Фернандес','Эрик Нильсен','Самир Хаддад','Мартин Коста','Роберт Ковач'];
+function ensureStaff(){
+  if(!state.staff||typeof state.staff!=='object')state.staff={level:1,budget:10,employees:{}};
+  if(!state.staff.employees||typeof state.staff.employees!=='object')state.staff.employees={};
+  STAFF_ROLES.forEach((r,i)=>{
+    if(!state.staff.employees[r.id])state.staff.employees[r.id]={name:STAFF_NAMES[i%STAFF_NAMES.length],rating:r.base+Math.floor(Math.random()*11),salary:.05+Math.random()*.1,contract:(Number(state.season)||2026)+2,experience:1+Math.floor(Math.random()*5)};
+  });
+}
+function staffEffect(role){
+  ensureStaff();const e=state.staff.employees[role];
+  return e?Math.max(0,(e.rating-65)/10):0;
+}
+function staffUpgrade(role){
+  ensureStaff();const e=state.staff.employees[role];if(!e)return;
+  const cost=.5+e.rating*.008;
+  if((state.money||0)<cost)return showToast(`Нужно €${cost.toFixed(2)}M на повышение специалиста`);
+  state.money-=cost;e.rating=Math.min(99,e.rating+3);e.experience++;
+  save();renderStaff();showToast(`${e.name}: квалификация повышена`);
+}
+function staffHire(role){
+  ensureStaff();const r=STAFF_ROLES.find(x=>x.id===role);if(!r)return;
+  const old=state.staff.employees[role];
+  const candidates=[0,1,2].map((_,i)=>({name:STAFF_NAMES[(i+Math.floor(Math.random()*STAFF_NAMES.length))%STAFF_NAMES.length],rating:r.base+Math.floor(Math.random()*25),salary:.05+Math.random()*.18,contract:(Number(state.season)||2026)+2,experience:1+Math.floor(Math.random()*10)}));
+  const best=candidates.sort((a,b)=>b.rating-a.rating)[0];
+  const cost=Math.max(.1,best.salary*1.2);
+  if((state.money||0)<cost)return showToast('Недостаточно бюджета для нового специалиста');
+  state.money-=cost;state.staff.employees[role]=best;save();renderStaff();showToast(`${best.name} назначен на должность`);
+}
+function renderStaff(){
+  ensureStaff();const box=document.getElementById('staffPanel');if(!box)return;
+  const avg=Math.round(STAFF_ROLES.reduce((a,r)=>a+state.staff.employees[r.id].rating,0)/STAFF_ROLES.length);
+  box.innerHTML=`<div class="staff-overview">
+    <div><span>Средняя квалификация</span><strong>${avg}</strong></div>
+    <div><span>Штаб</span><strong>${STAFF_ROLES.length}</strong></div>
+    <div><span>Уровень</span><strong>${state.staff.level}</strong></div>
+    <div><span>Фонд зарплат</span><strong>€${STAFF_ROLES.reduce((a,r)=>a+state.staff.employees[r.id].salary,0).toFixed(2)}M</strong></div>
+  </div>
+  <div class="staff-grid">${STAFF_ROLES.map(r=>{
+    const e=state.staff.employees[r.id];
+    const effect=Math.round(staffEffect(r.id)*10)/10;
+    return `<div class="staff-card">
+      <div class="staff-icon">${svgIcon(r.icon)}</div><div class="staff-info"><b>${r.name}</b><span>${e.name} · ${e.experience} лет опыта</span><small>${r.desc}</small></div>
+      <div class="staff-rating"><strong>${e.rating}</strong><span>⭐</span></div>
+      <div class="progress"><i style="width:${e.rating}%"></i></div>
+      <div class="staff-meta"><span>€${e.salary.toFixed(2)}M/год</span><span>до ${e.contract}</span><span>эффект +${effect}</span></div>
+      <div class="staff-actions"><button class="secondary" onclick="staffUpgrade('${r.id}')">Повысить</button><button class="secondary" onclick="staffHire('${r.id}')">Заменить</button></div>
+    </div>`;
+  }).join('')}</div>
+  <div class="match-card"><b>Влияние штаба</b><div class="staff-effects">
+    <span>📈 Развитие: +${Math.round((staffEffect('attack')+staffEffect('defense'))/2)}%</span>
+    <span>⚡ Физика: +${Math.round(staffEffect('fitness'))}%</span>
+    <span>🩹 Восстановление: +${Math.round(staffEffect('medical'))}%</span>
+    <span>🔎 Скаутинг: +${Math.round(staffEffect('scout'))}%</span>
+    <span>🤝 Переговоры: +${Math.round(staffEffect('negotiator'))}%</span>
+  </div></div>`;
+}
+function ensureAcademy(){
+  if(!state.academy||typeof state.academy!=='object')state.academy={level:1,facilities:50,coaching:50,scouting:50,players:[],lastIntake:0};
+  if(!Array.isArray(state.academy.players))state.academy.players=[];
+  if(!state.academy.players.length)generateAcademyIntake(6);
+}
+function academyNames(){
+  return ['Алекс','Макс','Леон','Марк','Даниэль','Нико','Тео','Лука','Итан','Адам','Ян','Сами','Эмиль','Матео','Омар','Раян'];
+}
+function generateAcademyIntake(count=6){
+  ensureAcademy();
+  const names=academyNames();
+  for(let i=0;i<count;i++){
+    let name;
+    do{name=names[Math.floor(Math.random()*names.length)]+' '+['Мартин','Ковач','Ромеро','Беккер','Силва','Новак','Мюллер'][Math.floor(Math.random()*7)]}while(state.academy.players.some(x=>x.name===name));
+    const pos=['GK','CB','LB','RB','CM','AM','LW','RW','ST'][Math.floor(Math.random()*9)];
+    const age=15+Math.floor(Math.random()*4);
+    const pot=Math.min(92,66+Math.floor(Math.random()*22)+Math.floor(state.academy.scouting/20));
+    const ovr=Math.min(pot-5,48+Math.floor(Math.random()*18)+Math.floor(state.academy.level*2));
+    state.academy.players.push({id:'y'+Date.now()+i+Math.random().toString(36).slice(2,6),name,pos,age,ovr,pot,fitness:80,training:0,interest:55+Math.floor(Math.random()*40),nationality:'Academy',status:'youth'});
+  }
+  state.academy.lastIntake=state.season||2026;
+  save();
+}
+function academyTrain(id){
+  ensureAcademy();
+  const p=state.academy.players.find(x=>x.id===id);if(!p)return;
+  if(p.age>=20)return showToast('Игрок уже слишком взрослый для академии');
+  p.training++;
+  p.fitness=Math.max(35,p.fitness-5);
+  if(Math.random()<(.35+state.academy.coaching/300+staffEffect('attack')*.02) && p.ovr<p.pot)p.ovr++;
+  save();renderAcademy();showToast(`${p.name}: тренировка завершена`);
+}
+function promoteAcademy(id){
+  ensureAcademy();
+  const p=state.academy.players.find(x=>x.id===id);if(!p)return;
+  if((state.players||[]).length>=25)return showToast('Состав заполнен — максимум 25 игроков');
+  const tuple=[p.name,p.pos,p.ovr,p.nationality,'⚽',p.pot];
+  state.players.push(tuple);
+  if(typeof ensurePlayerManagement==='function')ensurePlayerManagement();
+  state.academy.players=state.academy.players.filter(x=>x.id!==id);
+  if(typeof ensureContractState==='function')ensureContractState();
+  if(typeof contractData==='function'){
+    const c=contractData(tuple);c.wage=Math.max(.03,Number((p.ovr*.0015).toFixed(3)));c.until=(Number(state.season)||2026)+3;
+    c.role='Ротация';
+  }
+  save();renderAcademy();renderPlayers();showToast(`${p.name} переведён в основную команду`);
+}
+function releaseAcademy(id){
+  ensureAcademy();const p=state.academy.players.find(x=>x.id===id);if(!p)return;
+  if(!confirm(`Отпустить ${p.name} из академии?`))return;
+  state.academy.players=state.academy.players.filter(x=>x.id!==id);save();renderAcademy();
+}
+function academyScout(){
+  ensureAcademy();
+  generateAcademyIntake(3+Math.floor(staffEffect('scout')/4));
+  showToast('Скаутинг завершён: найдено 3 новых игрока');
+  renderAcademy();
+}
+function renderAcademy(){
+  ensureAcademy();
+  const box=document.getElementById('academyPanel'),list=document.getElementById('academyPlayers'),count=document.getElementById('academyCount');
+  if(!box||!list)return;
+  const a=state.academy;
+  if(count)count.textContent=a.players.length+' игроков';
+  box.innerHTML=`<div class="academy-dashboard">
+    <div><b>Уровень академии</b><strong>${a.level}</strong><small>Улучшение повышает качество нового поколения</small></div>
+    <div><b>Тренеры</b><strong>${a.coaching}</strong><small>Шанс развития игроков</small></div>
+    <div><b>Скаутинг</b><strong>${a.scouting}</strong><small>Потенциал новых игроков</small></div>
+    <div><b>База</b><strong>${a.facilities}</strong><small>Качество инфраструктуры</small></div>
+  </div>
+  <div class="academy-actions">
+    <button class="primary" onclick="academyScout()">Скаутинг · найти игроков</button>
+    <button class="secondary" onclick="upgradeAcademy('coaching')">Улучшить тренеров</button>
+    <button class="secondary" onclick="upgradeAcademy('facilities')">Улучшить базу</button>
+  </div>`;
+  list.innerHTML=a.players.map(p=>`<div class="player academy-player">
+    <div class="avatar"><span class="svg-icon-wrap">${svgIcon('users')}</span></div>
+    <div class="pinfo"><b>${p.name}</b><span>${p.age} лет · ${p.pos} · ⭐${p.ovr} · Потенциал ⭐${p.pot}</span>
+      <div class="progress"><i style="width:${Math.min(100,(p.ovr/p.pot)*100)}%"></i></div>
+      <small>Тренировки: ${p.training} · Интерес: ${p.interest}% · Физика: ${p.fitness}%</small></div>
+    <div class="rating">${p.ovr}<span class="pos">${p.pos}</span>
+      <button class="secondary" onclick="academyTrain('${p.id}')">Трен.</button>
+      <button class="secondary" onclick="promoteAcademy('${p.id}')">↑</button>
+      <button class="secondary" onclick="releaseAcademy('${p.id}')">×</button>
+    </div>
+  </div>`).join('')||'<div class="empty">В академии пока никого нет.</div>';
+}
+function upgradeAcademy(type){
+  ensureAcademy();
+  const cost=type==='coaching'?3:type==='facilities'?4:3;
+  if((state.money||0)<cost)return showToast('Недостаточно бюджета');
+  state.money-=cost;
+  state.academy[type]=Math.min(100,(state.academy[type]||50)+10);
+  if(type==='coaching')state.academy.level=Math.min(5,state.academy.level+1);
+  save();renderAcademy();showToast('Академия улучшена');
+}
 function calculateTacticalImpact(){
   ensureTacticalState();
   const f=currentFormation();
@@ -1285,7 +1490,7 @@ function calculateTacticalImpact(){
   };
 }
 function startInteractiveMatch(competition='league',euroName=null,knockoutMeta=null){
-  ensureSeasonState();ensurePlayerManagement();ensureLeagueSeason();
+  ensureSeasonState();ensurePlayerManagement();ensureLeagueSeason();ensureContractState();ensureStaff();
   let fixture=null,opponent='',home=true;
   if(competition==='euro'&&knockoutMeta){
     const e=state.europe?.[euroName],tie=e?.knockout?.ties?.find(t=>t.id===knockoutMeta.tieId);
@@ -1309,11 +1514,68 @@ function startInteractiveMatch(competition='league',euroName=null,knockoutMeta=n
   }
   const names=prepareXIForMatch(),xi=names.map(findMyPlayer).filter(Boolean);
   if(xi.length<11){showToast('Нужно 11 доступных игроков в стартовом составе');return}
-  liveMatch={competition,euroName,knockoutMeta,fixture,opponent,home,minute:0,gf:0,ga:0,events:[],finished:false,tactic:(state.tacticStyle||'balanced'),ball:{x:50,y:50,side:'home'},shots:0,onTarget:0,opponentShots:0,opponentOnTarget:0,substitutions:[],
-    xi:xi.map(p=>p[0]),bench:(state.players||[]).filter(p=>!names.includes(p[0])).map(p=>p[0]),usedSubs:0,maxSubs:5,
-    injured:[],yellow:{},paused:false,elapsedTimer:null,extraTime:false,penalties:null};
-  renderLiveMatch();liveMatch.elapsedTimer=setInterval(liveTick,900);
+  const avgFitness=Math.round(xi.reduce((a,p)=>a+Number(playerMgmt(p[0]).fitness||70),0)/xi.length);
+  const avgForm=Math.round(xi.reduce((a,p)=>a+Number(playerMgmt(p[0]).form||75),0)/xi.length);
+  const avgMorale=Math.round(xi.reduce((a,p)=>a+Number(contractData(p).morale||75),0)/xi.length);
+  const opponentPower=opponentStrength(opponent);
+  showPreMatchBriefing({competition,euroName,knockoutMeta,fixture,opponent,home,names,xi,avgFitness,avgForm,avgMorale,opponentPower});
 }
+function showPreMatchBriefing(data){
+  const {competition,euroName,knockoutMeta,fixture,opponent,home,names,xi,avgFitness,avgForm,avgMorale,opponentPower}=data;
+  const tactical=calculateTacticalImpact();
+  const board=state.boardObjectives||{};
+  const fitnessStaff=staffEffect('fitness'),medicalStaff=staffEffect('medical');
+  const readiness=Math.round(avgFitness*.45+avgForm*.3+avgMorale*.25);
+  const predicted=Math.round((state.rating||70)+((readiness-75)*.08)+((tactical.quality-70)*.25)+(fitnessStaff-60)*.04);
+  const homeBoost=home?3:-2;
+  const strength=Math.max(40,Math.min(95,predicted+homeBoost));
+  const advantage=strength-opponentPower;
+  const tone=advantage>=8?'Фаворит':advantage>=2?'Небольшое преимущество':'Матч равных';
+  const opponentText=competition==='europe'?(euroName||'Еврокубок'):competition==='cup'?'Кубок':'Чемпионат';
+  showModal(`
+    <div class="pre-match">
+      <div class="pre-match-kicker">${opponentText} · ${home?'Домашний матч':'Выездной матч'}</div>
+      <h2>${state.club} <span>—</span> ${opponent}</h2>
+      <div class="pre-match-verdict"><b>${tone}</b><span>Оценка ${strength} · соперник ${opponentPower}</span></div>
+      <div class="pre-match-grid">
+        <div><span>Готовность XI</span><b>${readiness}%</b></div>
+        <div><span>Фитнес</span><b>${avgFitness}%</b></div>
+        <div><span>Форма</span><b>${avgForm}%</b></div>
+        <div><span>Мораль</span><b>${avgMorale}%</b></div>
+      </div>
+      <div class="pre-match-section"><b>План на матч</b>
+        <div class="pre-match-options">
+          <button class="secondary" onclick="setPreMatchPlan('balanced')">⚖️ Баланс</button>
+          <button class="secondary" onclick="setPreMatchPlan('attacking')">🔥 Давить</button>
+          <button class="secondary" onclick="setPreMatchPlan('counter')">🚀 Контратаки</button>
+          <button class="secondary" onclick="setPreMatchPlan('defensive')">🛡️ Закрыться</button>
+          <button class="secondary" onclick="setPreMatchPlan('possession')">🎯 Контроль</button>
+        </div>
+      </div>
+      <div class="pre-match-section">
+        <b>Состав</b>
+        <small>${xi.map((p,i)=>`${i+1}. ${p[0]} · ${p[1]} · ⭐${p[2]}`).join(' · ')}</small>
+      </div>
+      <div class="pre-match-note">Штаб: физподготовка ${fitnessStaff}/100 · медицина ${medicalStaff}/100 · цель совета: ${board.goal||'стабильный сезон'}</div>
+      <button class="primary" style="width:100%;margin-top:12px" onclick='launchPreparedMatch(${JSON.stringify(data)})'>▶️ Выйти на матч</button>
+    </div>`);
+}
+function setPreMatchPlan(tactic){
+  state.preMatchTactic=tactic;
+  const btns=document.querySelectorAll('.pre-match-options button');
+  btns.forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase().includes(tactic==='balanced'?'баланс':tactic==='attacking'?'давить':tactic==='counter'?'контратаки':tactic==='defensive'?'закрыться':'контроль')));
+}
+function launchPreparedMatch(data){
+  closeModal();
+  const names=data.names,xi=data.xi;
+  const tactic=state.preMatchTactic||state.tacticStyle||'balanced';
+  const moraleBoost=Math.round((xi.reduce((a,p)=>a+Number(contractData(p).morale||75),0)/Math.max(1,xi.length)-75)*.03);
+  state.matchReadiness={fitness:data.avgFitness,form:data.avgForm,morale:data.avgMorale,tactic};
+  liveMatch={competition:data.competition,euroName:data.euroName,knockoutMeta:data.knockoutMeta,fixture:data.fixture,opponent:data.opponent,home:data.home,minute:0,gf:0,ga:0,events:[],finished:false,tactic,ball:{x:50,y:50,side:'home'},shots:0,onTarget:0,opponentShots:0,opponentOnTarget:0,substitutions:[],xi:xi.map(p=>p[0]),bench:(state.players||[]).filter(p=>!names.includes(p[0])).map(p=>p[0]),usedSubs:0,maxSubs:5,injured:[],yellow:{},paused:false,elapsedTimer:null,extraTime:false,penalties:null,moraleBoost};
+  addLiveEvent('📋',`Предматчевый план: ${TACTIC_STYLES.find(x=>x.id===tactic)?.name||tactic}. Готовность ${data.avgFitness}%, форма ${data.avgForm}%.`);
+  navigate('gameMatch');renderLiveMatch();liveMatch.elapsedTimer=setInterval(liveTick,900);
+}
+
 function setLiveTactic(t){if(liveMatch){liveMatch.tactic=t;renderLiveMatch()}}
 function addLiveEvent(icon,text){if(liveMatch)liveMatch.events.unshift({minute:liveMatch.minute,icon,text})}
 function playerCanEnter(name){const d=playerMgmt(name);return d.injuredUntil<=0&&d.fitness>=30&&!liveMatch.xi.includes(name)}
@@ -1384,8 +1646,11 @@ function liveTick(){
   const attackFactor=1+(t.attack-70)*.006+(t.control-70)*.0015;
   const defenseFactor=1+(t.defense-70)*.005+(t.press-70)*.001;
   const transitionFactor=1+(t.transition-70)*.002;
+  const readiness=liveMatch.matchReadiness||state.matchReadiness||{fitness:75,form:75,morale:75};
+  const readinessFactor=Math.max(.78,Math.min(1.08,1+(Number(readiness.fitness)-75)*.0025+(Number(readiness.form)-75)*.002+(Number(readiness.morale)-75)*.0015+(Number(liveMatch.moraleBoost||0)*.001)));
   const fatigueFactor=Math.max(.72,Math.min(1.05,(xi.reduce((a,p)=>a+playerMgmt(p[0]).fitness,0)/(Math.max(1,xi.length)*100))));
-  const chance=Math.max(.006,Math.min(.18,(strength/100)*.10*attackFactor*transitionFactor*fatigueFactor*homePower));
+  const staffFitness=Math.max(0,staffEffect('fitness')-60)*.0015;
+  const chance=Math.max(.006,Math.min(.18,(strength/100)*.10*attackFactor*transitionFactor*fatigueFactor*readinessFactor*(1+staffFitness)*homePower));
   const oppChance=Math.max(.004,Math.min(.15,(opp/100)*.085*(1-(t.defense-70)*.004)*Math.max(.8,1-(t.press-70)*.0015)));
   const phase=liveMatch.minute<15?'opening':liveMatch.minute<35?'first':liveMatch.minute<55?'second':liveMatch.minute<75?'third':'closing';
   const zoneRoll=Math.random();
@@ -1429,7 +1694,7 @@ function liveTick(){
     liveMatch.yellow[p]=(liveMatch.yellow[p]||0)+1;
     addLiveEvent('🟨',`${p} получает жёлтую карточку.`);
   }
-  if(Math.random()<.0045){
+  if(Math.random()<Math.max(.0015,.0045-staffEffect('medical')*.00035)){
     const c=liveMatch.xi.filter(n=>!liveMatch.injured.includes(n));
     if(c.length)forceInjurySub(c[Math.floor(Math.random()*c.length)]);
   }
@@ -2230,6 +2495,48 @@ function renderSquadEnginePanel(){
 }
 
 
+function ensureManagerContract(){
+  if(!state.managerContract||typeof state.managerContract!=='object'){
+    state.managerContract={salary:.18,until:(Number(state.season)||2026)+3,bonus:1.2,release:0,confidence:72,renewals:0,history:[]};
+  }
+  const c=state.managerContract;
+  c.salary=Number.isFinite(c.salary)?c.salary:.18;
+  c.until=Number(c.until)||((Number(state.season)||2026)+3);
+  c.bonus=Number.isFinite(c.bonus)?c.bonus:1.2;
+  c.release=Number.isFinite(c.release)?c.release:0;
+  c.confidence=Number.isFinite(c.confidence)?Math.max(0,Math.min(100,c.confidence)):72;
+  c.history=Array.isArray(c.history)?c.history:[];
+  return c;
+}
+function managerRequestRenewal(){
+  const c=ensureManagerContract();
+  const years=Number(prompt('На сколько лет продлить контракт? (1–4)','3'));
+  if(!years||years<1||years>4)return;
+  const requested=Number(prompt(`Текущая зарплата €${c.salary.toFixed(2)}M/год. Желаемая зарплата?` ,c.salary.toFixed(2)));
+  if(!Number.isFinite(requested)||requested<=0)return;
+  const max=Math.max(c.salary*1.55,c.salary+.08);
+  if(requested>max && c.confidence<70)return showToast('Руководство не готово принять такие условия');
+  c.salary=requested;c.until=(Number(state.season)||2026)+years;c.renewals++;c.confidence=Math.min(100,c.confidence+4);
+  c.history.unshift({season:state.season,salary:requested,until:c.until,type:'Продление'});
+  save();renderBoardPanel();showToast(`Контракт продлён до ${c.until}`);
+}
+function managerResign(){
+  const c=ensureManagerContract();
+  if(c.confidence>=35)return showToast('Сейчас нет необходимости уходить из клуба');
+  if(!confirm('Подать в отставку? Карьера в этом клубе будет завершена.'))return;
+  careerStarted=false;localStorage.removeItem('fm_career_started');save();showToast('Вы покинули клуб');
+  navigate('home');
+}
+function boardMeeting(){
+  const b=ensureBoardObjectives(),c=ensureManagerContract();
+  const place=leagueSortedTable().findIndex(x=>x.name===state.club)+1;
+  let delta=0;
+  if(place&&place<=b.minLeague)delta+=3;else if(place>10)delta-=2;
+  if((state.money||0)<0)delta-=6;
+  c.confidence=Math.max(0,Math.min(100,c.confidence+delta));
+  b.satisfaction=Math.max(0,Math.min(100,b.satisfaction+delta));
+  save();renderBoardPanel();showToast(delta>=0?'Руководство довольно вашей работой':'Руководство требует улучшений');
+}
 function ensureBoardObjectives(){
   state.board=state.board||{};
   const b=state.board;
@@ -2242,7 +2549,7 @@ function ensureBoardObjectives(){
   return b;
 }
 function updateBoardSatisfaction(){
-  const b=ensureBoardObjectives();
+  const b=ensureBoardObjectives();ensureManagerContract();
   const table=leagueSortedTable();
   const me=table.findIndex(x=>x.name===state.club);
   if(me>=0){
@@ -2285,19 +2592,26 @@ function startNextSeason(){
 }
 function renderBoardPanel(){
   const box=document.getElementById('boardPanel');if(!box)return;
-  const b=ensureBoardObjectives(),f=ensureFinanceState(),table=leagueSortedTable(),place=table.findIndex(x=>x.name===state.club)+1;
+  const b=ensureBoardObjectives(),f=ensureFinanceState(),c=ensureManagerContract(),table=leagueSortedTable(),place=table.findIndex(x=>x.name===state.club)+1;
+  const verdict=b.satisfaction>=70?'Руководство довольно':b.satisfaction>=50?'Руководство ожидает улучшений':'Руководство недовольно';
+  const confidence=c.confidence>=75?'Высокое':c.confidence>=50?'Стабильное':'Низкое';
+  const left=Math.max(0,c.until-(Number(state.season)||2026));
   box.innerHTML=`
-    <div class="board-main"><div><small>ДОВОЛЬСТВО РУКОВОДСТВА</small><strong>${b.satisfaction}%</strong></div><span>${b.verdict||'Сезон продолжается'}</span></div>
-    <div class="board-goals">
-      <div><b>⚽ Чемпионат</b><span>цель: топ-${b.minLeague}</span><em>${place?`сейчас ${place}-е место`:'—'}</em></div>
-      <div><b>🏆 Кубок</b><span>цель: ${b.cupTarget}</span><em>${state.domesticCup?.phase||'—'}</em></div>
-      <div><b>🌍 Европа</b><span>цель: ${b.euroTarget}</span><em>${state.europe?Object.keys(state.europe).length+' турнир(а)':'—'}</em></div>
+    <div class="board-main"><div><small>ДОВОЛЬСТВО РУКОВОДСТВА</small><strong>${b.satisfaction}%</strong></div><span>${verdict}</span></div>
+    <div class="manager-contract">
+      <div class="manager-contract-head"><div class="manager-avatar">${svgIcon('users')}</div><div><b>Главный тренер</b><small>Контракт до ${c.until} · осталось сезонов: ${left}</small></div><strong>€${c.salary.toFixed(2)}M</strong></div>
+      <div class="manager-confidence"><span>Доверие: <b>${c.confidence}%</b> · ${confidence}</span><div class="progress"><i style="width:${c.confidence}%"></i></div></div>
+      <div class="manager-contract-meta"><span>Бонус: ${c.bonus.toFixed(1)}%</span><span>Продлений: ${c.renewals}</span><span>${c.release?'Отступные €'+c.release+'M':'Без отступных'}</span></div>
+      <div class="staff-actions"><button class="secondary" onclick="managerRequestRenewal()">Продлить контракт</button><button class="secondary" onclick="boardMeeting()">Встреча с руководством</button>${c.confidence<35?'<button class="secondary" onclick="managerResign()">Уйти в отставку</button>':''}</div>
     </div>
-    <div class="board-budget">Бюджет на текущий момент: <b>€${f.cash.toFixed(1)} млн</b></div>
-    <button class="secondary" onclick="evaluateSeason();renderBoardPanel()">📋 Оценить сезон</button>
-    <button class="primary" onclick="startNextSeason()">🔄 Начать следующий сезон</button>`;
+    <div class="board-goals">
+      <div><b>Чемпионат</b><span>цель: топ-${b.minLeague}</span><em>${place?`сейчас ${place}-е место`:'—'}</em></div>
+      <div><b>Кубок</b><span>цель: ${b.cupTarget}</span><em>${state.domesticCup?.phase||'—'}</em></div>
+      <div><b>Европа</b><span>цель: ${b.euroTarget}</span><em>${state.europe?Object.keys(state.europe).length+' турнир(а)':'—'}</em></div>
+    </div>
+    <div class="board-budget">Бюджет: <b>€${f.cash.toFixed(1)} млн</b></div>
+    <div class="staff-actions"><button class="secondary" onclick="evaluateSeason();renderBoardPanel()">Оценить сезон</button><button class="primary" onclick="startNextSeason()">Начать следующий сезон</button></div>`;
 }
-
 function ensureFinanceState(){
   state.finance=state.finance||{};
   const f=state.finance;
@@ -3105,9 +3419,26 @@ function scoutMarketPlayer(name){
   const w=ensureTransferWindow();
   const p=marketPlayerPool().find(x=>x.name===name);
   if(!p)return;
+  state.scouting=state.scouting||{};
+  const m=getPlayerMeta(p)||{};
+  const scoutRating=scoutingQuality();
+  const variance=Math.max(1,Math.round((100-scoutRating)*.08));
+  const estimatedValue=Math.max(.5,Number(m.value||marketPlayerValue(p)));
+  const estimatedAge=Number(m.age||24);
+  const estimatedPotential=Math.max(Number(p.ov||60),Math.min(99,Number(p.ov||60)+Math.round((Number(p[5]||p.potential||p.ov||60)-Number(p.ov||60))*.55)));
+  const recommendation=p.ov>=86?'Игрок уровня основы':p.ov>=78?'Сильный кандидат':p.ov>=70?'Игрок ротации':'Долгосрочный проект';
+  state.scouting[name]={
+    date:Date.now(),rating:scoutRating,
+    valueMin:Math.max(.1,estimatedValue*(1-variance/100)),
+    valueMax:estimatedValue*(1+variance/100),
+    age:estimatedAge,
+    potential:estimatedPotential,
+    wage:Number(m.salary||.2),
+    recommendation
+  };
   w.scouted[name]=true;
   save();renderTransferMarket();
-  showToast(`Скаутинг завершён: ${name}`);
+  showToast(`Отчёт скаута готов: ${name}`);
 }
 function makeMarketOffer(name,mode='buy'){
   const w=ensureTransferWindow();
@@ -3175,6 +3506,7 @@ function renderTransferMarket(){
   let pool=marketPlayerPool().filter(p=>(!q||p.name.toLowerCase().includes(q)||p.club.toLowerCase().includes(q))&&(!pos||p.pos===pos));
   pool.sort((a,b)=>b.ov-a.ov);
   pool=pool.slice(0,80);
+  state.scouting=state.scouting||{};
   box.innerHTML=`
     <div class="market-toolbar">
       <input id="marketSearch" placeholder="Поиск игрока или клуба" value="${q}" oninput="renderTransferMarket()">
@@ -3182,9 +3514,11 @@ function renderTransferMarket(){
     </div>
     <div class="window-status">Трансферное окно: <b>${w.open?'ОТКРЫТО':'ЗАКРЫТО'}</b> · осталось <b>${w.daysLeft}</b> дн. · бюджет <b>€${Number(state.money||0).toFixed(1)}M</b></div>
     <div class="market-list">${pool.map(p=>{
-      const sc=!!w.scouted[p.name],value=marketPlayerValue(p);
-      return `<div class="market-row"><div><b>${p.name}</b><small>${p.club} · ${p.pos} · ⭐${p.ov}${sc?` · 💶 €${value}M · ${getPlayerMeta(p)?.age||24} лет`:''}</small></div>
-      <div class="market-actions">${sc?`<button class="secondary" onclick="makeMarketOffer(${JSON.stringify(p.name)})">Предложить</button>`:`<button class="secondary" onclick="scoutMarketPlayer(${JSON.stringify(p.name)})">🔎 Скаут</button>`}</div></div>`;
+      const sc=!!w.scouted[p.name],value=marketPlayerValue(p),report=state.scouting[p.name];
+      const reportText=report?` · 💶 €${report.valueMin.toFixed(1)}–${report.valueMax.toFixed(1)}M · ${report.age} лет · потенциал ${report.potential}`:'';
+      return `<div class="market-row"><div><b>${p.name}</b><small>${p.club} · ${p.pos} · ⭐${p.ov}${sc?reportText:''}</small>
+      ${report?`<div class="scout-report"><span>Скаут: ${report.rating}</span><span>€${report.wage.toFixed(2)}M/год</span><span>${report.recommendation}</span></div>`:''}</div>
+      <div class="market-actions">${sc?`<button class="secondary" onclick="makeMarketOffer(${JSON.stringify(p.name)})">Предложить</button>`:`<button class="secondary" onclick="scoutMarketPlayer(${JSON.stringify(p.name)})">Скаут</button>`}</div></div>`;
     }).join('')||'<div class="empty-state">Игроки не найдены.</div>'}</div>
     <div class="market-history">${w.outgoing.slice(-8).reverse().map(x=>`<div>${x.player} · ${x.club} · €${x.fee}M · <b>${x.status}</b></div>`).join('')}</div>`;
   const sel=document.getElementById('marketPos');if(sel)sel.value=pos;
@@ -3546,26 +3880,53 @@ function renderTransfers(){
   <div class="transfer-history"><div class="section-title"><h3>История</h3></div>
   ${(state.transferHistory||[]).slice(0,12).map(h=>`<div class="history-row"><span>${h.type==='sale'?'💰 Продажа':h.type==='loan-out'?'↔️ Аренда':'✅ Трансфер'} · ${h.player}</span><span>€${Number(h.fee||0).toFixed(1)}M</span></div>`).join('')||'<div class="empty">Трансферов пока нет.</div>'}</div>`;
 }
+
+function transferNegotiationProfile(x){
+  const m=x.meta||getPlayerMeta(x.player)||{};
+  const ov=Number(x.player?.[2]||70), age=Number(m.age||24);
+  const baseWage=Number(m.salary||.5);
+  const role=ov>=88?'Ключевой игрок':ov>=82?'Основа':ov>=75?'Ротация':'Перспектива';
+  const loyalty=Math.max(0,Math.min(100,55+(age<23?8:0)+(ov>=85?5:0)));
+  const ambition=Math.max(20,Math.min(100,50+(ov-75)*2));
+  const wageDemand=Math.max(.08,baseWage*(1+(ambition-50)/180));
+  const signingBonus=Math.max(.05,Math.round((wageDemand*.35)*100)/100);
+  return {role,loyalty,ambition,wageDemand,signingBonus};
+}
 function openTransferNegotiation(name){
   const x=allTransferPlayers().find(v=>v.name===name);
   if(!x)return;
   transferTarget=x;
   const m=x.meta, value=Number(m.value||1), ask=Math.round(value*1.18*10)/10;
+  const profile=transferNegotiationProfile(x);
+  state.negotiations=state.negotiations||{};
+  state.negotiations[x.name]=state.negotiations[x.name]||{rounds:0,lastOffer:null};
+  const n=state.negotiations[x.name];
   const modal=document.getElementById('transferModal');
   const body=document.getElementById('transferModalBody');
   document.getElementById('transferModalTitle').textContent='Переговоры о трансфере';
   body.innerHTML=`
     <div class="transfer-summary">
-      <b>${x.name}</b><br>
-      ${x.club} · ${x.player[1]} · ⭐ ${x.player[2]}<br>
+      <b>${x.name}</b><br>${x.club} · ${x.player[1]} · ⭐ ${x.player[2]}<br>
       Возраст: ${m.age} · Потенциал: ${x.player[5]}<br>
       Рыночная стоимость: <b>€${value.toFixed(1)}M</b><br>
-      Запрашиваемая цена: <b>€${ask.toFixed(1)}M</b>
+      Запрос клуба: <b>€${ask.toFixed(1)}M</b>
     </div>
-    <label>Ваше предложение, €M</label>
+    <div class="agent-card">
+      <div><span>Роль</span><b>${profile.role}</b></div>
+      <div><span>Амбиции</span><b>${profile.ambition}/100</b></div>
+      <div><span>Лояльность</span><b>${profile.loyalty}/100</b></div>
+      <div><span>Мин. зарплата</span><b>€${profile.wageDemand.toFixed(2)}M</b></div>
+    </div>
+    <label>Предложение клубу, €M</label>
     <input id="transferOffer" class="input" type="number" min="0.1" step="0.1" value="${ask.toFixed(1)}">
     <label>Зарплата игрока, €M/год</label>
-    <input id="transferWage" class="input" type="number" min="0.05" step="0.05" value="${m.salary.toFixed(2)}">`;
+    <input id="transferWage" class="input" type="number" min="0.05" step="0.05" value="${profile.wageDemand.toFixed(2)}">
+    <label>Срок контракта</label>
+    <select id="transferYears" class="input"><option>2</option><option>3</option><option selected>4</option><option>5</option></select>
+    <label>Бонус за подписание, €M</label>
+    <input id="transferBonus" class="input" type="number" min="0" step="0.05" value="${profile.signingBonus.toFixed(2)}">
+    <div class="negotiation-note">Раунд переговоров: <b>${n.rounds+1}</b>. Игрок может потребовать больше денег, другую роль или прекратить переговоры.</div>
+    <button class="primary" style="width:100%;margin-top:10px" onclick="confirmTransfer()">Сделать предложение</button>`;
   modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
 }
 function closeTransferModal(){
@@ -3575,32 +3936,64 @@ function closeTransferModal(){
 }
 function confirmTransfer(){
   if(!transferTarget)return;
-  if(transferTarget.careerPlayer){closeTransferModal();return;}
-  const offer=Number(document.getElementById('transferOffer')?.value||0);
+  if(transferTarget.careerPlayer){closeTransferModal();return}
+  const x=transferTarget, offer=Number(document.getElementById('transferOffer')?.value||0);
   const wage=Number(document.getElementById('transferWage')?.value||0);
-  const m=transferTarget.meta, ask=Number(m.value||1)*1.12;
-  if(offer<=0 || wage<=0){showToast('Укажи сумму и зарплату');return}
-  if(offer>Number(state.money||0)){showToast('Недостаточно денег в бюджете');return}
-  if(offer<ask){showToast('Клуб отклонил предложение. Попробуй повысить сумму.');return}
-  if(wage>Number(state.wageBudget||12)){showToast('Не хватает места в зарплатном фонде');return}
-
-  // Clone player into user's squad. The selling club's database remains intact;
-  // this is a local career simulation, so the player is removed only from the career.
-  const p=JSON.parse(JSON.stringify(transferTarget.player));
-  const oldClub=transferTarget.club;
+  const years=Math.max(2,Math.min(5,Number(document.getElementById('transferYears')?.value||4)));
+  const bonus=Math.max(0,Number(document.getElementById('transferBonus')?.value||0));
+  const m=x.meta||getPlayerMeta(x.player), value=Number(m.value||1), profile=transferNegotiationProfile(x);
+  state.negotiations=state.negotiations||{};
+  const n=state.negotiations[x.name]=state.negotiations[x.name]||{rounds:0};
+  if(offer<=0||wage<=0){showToast('Заполни сумму и зарплату');return}
+  if(offer+bonus>Number(state.money||0)){showToast('Недостаточно денег с учётом бонуса');return}
+  if(wage>Number(state.wageBudget||12)){showToast('Не хватает зарплатного фонда');return}
+  n.rounds++;
+  const clubAsk=value*(x.player[2]>=85?1.20:1.12);
+  const clubScore=(offer/clubAsk)*100;
+  const wageScore=(wage/profile.wageDemand)*100;
+  const roleScore=(x.player[2]>=86?1:0.8)*100;
+  const chance=Math.max(.05,Math.min(.97,.28+Math.max(0,clubScore-85)*.008+Math.max(0,wageScore-90)*.006+(Number(state.rating||70)-x.player[2])*.006));
+  if(clubScore<82 || Math.random()>chance){
+    n.lastOffer={offer,wage,bonus,years};
+    if(n.rounds>=3){
+      state.transferHistory=Array.isArray(state.transferHistory)?state.transferHistory:[];
+      state.transferHistory.unshift({player:x.name,from:x.club,to:state.club,fee:offer,status:'Переговоры сорваны',season:state.season||2026});
+      save();closeTransferModal();renderTransferMarket();
+      showToast(`${x.name}: переговоры сорваны после ${n.rounds} раундов`);
+      return;
+    }
+    save();
+    const counter=Math.round(Math.max(clubAsk,offer*1.08)*10)/10;
+    const counterWage=Math.max(profile.wageDemand,Math.round(wage*1.07*100)/100);
+    document.getElementById('transferOffer').value=counter.toFixed(1);
+    document.getElementById('transferWage').value=counterWage.toFixed(2);
+    const note=document.querySelector('.negotiation-note');
+    if(note)note.innerHTML=`Клуб/агент сделал встречное предложение: <b>€${counter.toFixed(1)}M</b> и <b>€${counterWage.toFixed(2)}M/год</b>. Раунд ${n.rounds}.`;
+    showToast('Получено встречное предложение');
+    return;
+  }
+  if(wage<profile.wageDemand*.86){
+    if(n.rounds>=3){showToast('Агент игрока отказался от переговоров');return}
+    const required=Math.round(profile.wageDemand*1.02*100)/100;
+    document.getElementById('transferWage').value=required.toFixed(2);
+    const note=document.querySelector('.negotiation-note');
+    if(note)note.innerHTML=`Агент требует минимум <b>€${required.toFixed(2)}M/год</b> и бонус €${profile.signingBonus.toFixed(2)}M.`;
+    showToast('Агент хочет улучшить условия');
+    return;
+  }
+  const p=JSON.parse(JSON.stringify(x.player)), oldClub=x.club;
   state.players=Array.isArray(state.players)?state.players:[];
   if(state.players.some(v=>v[0]===p[0])){showToast('Этот игрок уже в твоём составе');return}
   state.players.push(p);
-  state.money=Math.max(0,Number(state.money||0)-offer);
+  state.money=Math.max(0,Number(state.money||0)-offer-bonus);
   state.wageBudget=Math.max(0,Number(state.wageBudget||12)-wage);
+  ensureContractState();
+  state.contracts[p[0]]={wage:Number(wage.toFixed(2)),until:(state.season||2026)+years,role:profile.role,morale:82,releaseClause:Number(Math.max(offer*1.7,value*2.2).toFixed(1)),signingBonus:Number(bonus.toFixed(2))};
   state.transferHistory=Array.isArray(state.transferHistory)?state.transferHistory:[];
-  state.transferHistory.unshift({player:p[0],from:oldClub,to:state.club,fee:offer,wage,season:state.season||1});
-  save();
-  closeTransferModal();
-  renderTransfers();
-  renderPlayers();
-  updateHome();
-  showToast(`${p[0]} подписан за €${offer.toFixed(1)}M`);
+  state.transferHistory.unshift({player:p[0],from:oldClub,to:state.club,fee:offer,wage,bonus,years,season:state.season||2026,status:'Подписан'});
+  delete state.negotiations[p[0]];
+  save();closeTransferModal();renderTransferMarket();renderTransfers();renderPlayers();updateHome();
+  showToast(`${p[0]} подписан: €${offer.toFixed(1)}M + €${bonus.toFixed(2)}M бонус`);
 }
 
 function changeClub(){
@@ -3690,6 +4083,8 @@ function navigate(id){
     if(id==='league'){renderLeague();renderLeagueSeason();}
     if(id==='calendar'){renderFixtures();renderMatchCenter();renderSeasonCalendarFull();}
     if(id==='gameMatch')renderTactics();
+    if(id==='academy')renderAcademy();
+    if(id==='staff')renderStaff();
     if(id==='club'){
       renderCareerDayPanel();renderFinancePanel();renderBoardPanel();renderSquadEnginePanel();
       renderDomesticCup();renderEuropean();renderUnifiedCalendar();renderSeasonTimeline();renderSeasonCalendarFull();
@@ -3734,8 +4129,33 @@ function playerValueText(v){
 
 
 function playerDetails(player){
-  const m=getPlayerMeta(player);
-  return `${player[0]} · ${player[1]} · ⭐${player[2]} · ${m.age} лет · ${playerValueText(m.value)} · €${m.salary.toFixed(2)}M/год · контракт до ${m.contract}`;
+  const p=Array.isArray(player)?player:(state.players||[])[player];
+  if(!p)return;
+  const m=getPlayerMeta(p);
+  const mg=playerMgmt(p[0])||{};
+  const c=contractData(p);
+  const status=squadStatus(p[0]);
+  const goals=Number(mg.goals||0), assists=Number(mg.assists||0);
+  const html=`
+    <div class="player-detail-head">
+      <div class="player-detail-avatar">${p[4]||'⚽'}</div>
+      <div><h2>${p[3]||''} ${p[0]}</h2><p>${p[1]} · ⭐${p[2]} · ${status.label}</p></div>
+    </div>
+    <div class="detail-grid">
+      <div><span>Возраст</span><b>${m.age} лет</b></div>
+      <div><span>Стоимость</span><b>${playerValueText(m.value)}</b></div>
+      <div><span>Зарплата</span><b>€${Number(c.wage||m.salary||0).toFixed(2)}M/год</b></div>
+      <div><span>Контракт</span><b>до ${c.until||m.contract}</b></div>
+      <div><span>Форма</span><b>${Math.round(mg.form||p[5]||75)}%</b></div>
+      <div><span>Фитнес</span><b>${Math.round(mg.fitness||80)}%</b></div>
+      <div><span>Голы</span><b>${goals}</b></div>
+      <div><span>Ассисты</span><b>${assists}</b></div>
+    </div>
+    <div class="detail-actions">
+      <button class="secondary" onclick="closeModal();openPlayerActions(${JSON.stringify(p[0])})">Управление игроком</button>
+      <button class="primary" onclick="closeModal()">Закрыть</button>
+    </div>`;
+  openModal(html);
 }
 
 function renderPlayers(){
@@ -3957,6 +4377,8 @@ function safeInit(){
     if(typeof renderUnifiedCalendar==='function')renderUnifiedCalendar();
     if(typeof renderSeasonTimeline==='function')renderSeasonTimeline();
     if(typeof renderSeasonCalendarFull==='function')renderSeasonCalendarFull();
+    if(typeof renderAcademy==='function')renderAcademy();
+    if(typeof renderStaff==='function')renderStaff();
   }catch(err){
     console.error('Football Manager init error:',err);
     // Keep the app visible even if an optional panel has stale data.
