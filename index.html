@@ -17,7 +17,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .top{padding:22px 18px 12px;display:flex;justify-content:space-between;align-items:center}
 .brand{font-size:20px;font-weight:800;letter-spacing:-.4px}.brand span{color:var(--accent)}
 .iconbtn{width:42px;height:42px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
-.page{padding:0 16px}.hidden{display:none!important}#appContent.hidden{display:none!important}
+.page{padding:0 16px}.hidden{display:none!important}.club-select.hidden{pointer-events:none!important}#appContent.hidden{display:none!important}.club-select.hidden{pointer-events:none!important}
 .hero{background:linear-gradient(135deg,#171e29,#10151d);border:1px solid var(--line);border-radius:24px;padding:20px;margin:6px 0 14px;position:relative;overflow:hidden}
 .hero:after{content:"⚽";position:absolute;right:-12px;bottom:-28px;font-size:120px;opacity:.06}
 .clubrow{display:flex;align-items:center;gap:14px}.crest{width:58px;height:58px;border-radius:18px;background:#202936;display:grid;place-items:center;font-size:29px;border:1px solid #303a49}
@@ -67,7 +67,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .match-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.match-controls button{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 5px;font-size:11px}.match-controls button.active{border-color:var(--accent);color:var(--accent)}
 .substitution{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 .full-width{grid-column:1/-1}
-.custom-modal{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;z-index:100}.custom-modal.show{display:flex}.custom-box{width:min(430px,100%);background:var(--card);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:0 20px 70px rgba(0,0,0,.45)}.custom-box h2{margin:0 0 7px;font-size:22px}.custom-box p{margin:0 0 18px;color:var(--muted);font-size:12px;line-height:1.5}.custom-field{margin-bottom:12px}.custom-field label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px}.custom-field input,.custom-field select{width:100%;box-sizing:border-box;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:13px;padding:12px;font:inherit;outline:none}.custom-field input:focus,.custom-field select:focus{border-color:var(--accent)}.custom-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.custom-actions button{padding:12px;border-radius:13px;font-weight:700}.custom-cancel{background:var(--card2);border:1px solid var(--line);color:var(--text)}.custom-create{background:var(--accent);border:0;color:#111}
+.custom-modal{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;z-index:1000;pointer-events:none}.custom-modal.show{display:flex;pointer-events:auto}.custom-box{width:min(430px,100%);background:var(--card);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:0 20px 70px rgba(0,0,0,.45)}.custom-box h2{margin:0 0 7px;font-size:22px}.custom-box p{margin:0 0 18px;color:var(--muted);font-size:12px;line-height:1.5}.custom-field{margin-bottom:12px}.custom-field label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px}.custom-field input,.custom-field select{width:100%;box-sizing:border-box;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:13px;padding:12px;font:inherit;outline:none}.custom-field input:focus,.custom-field select:focus{border-color:var(--accent)}.custom-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.custom-actions button{padding:12px;border-radius:13px;font-weight:700}.custom-cancel{background:var(--card2);border:1px solid var(--line);color:var(--text)}.custom-create{background:var(--accent);border:0;color:#111}
 </style>
 </head>
 <body>
@@ -303,6 +303,7 @@ function chooseClub(name){
  if(!state.table.some(x=>x[0]===name))state.table.push([name,0,0]);
  localStorage.setItem('fm_state',JSON.stringify(state));
  localStorage.setItem('fm_career_started','1');careerStarted=true;
+ if(document.getElementById('customClubModal')) closeCustomClub();
  document.getElementById('clubSelect').classList.add('hidden');document.getElementById('appContent').classList.remove('hidden');
  initCareer();updateHome();renderPlayers();renderMarket();renderLeague();renderFixtures();navigate('home');
  showToast('Карьера началась: '+name);
@@ -367,6 +368,10 @@ function createCustomClub(){
  initCareer();updateHome();renderPlayers();renderMarket();renderLeague();renderFixtures();navigate('home');
  showToast('Создан клуб: '+name);
 }
+
+document.addEventListener('keydown',function(e){
+ if(e.key==='Escape' && document.getElementById('customClubModal')?.classList.contains('show')) closeCustomClub();
+});
 
 function changeClub(){
   if(confirm('Сменить клуб? Текущий прогресс этой карьеры останется в сохранении только до выбора нового клуба.')){
