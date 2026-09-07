@@ -1,90 +1,14 @@
 {
-  "version": 2,
-  "sections": [
-    {
-      "id": "section-aqida",
-      "parent_id": null,
-      "title": "Акыда",
-      "description": "Основы вероубеждения",
-      "cover_url": "",
-      "type": "section",
-      "published": true,
-      "order": 0
+  "streams": {
+    "123456": {
+      "title": "Real Madrid — Manchester City",
+      "url": "https://example.com/stream",
+      "type": "external"
     },
-    {
-      "id": "section-tawhid",
-      "parent_id": "section-aqida",
-      "title": "Таухид",
-      "description": "Раздел о единобожии",
-      "cover_url": "",
-      "type": "section",
-      "published": true,
-      "order": 0
-    },
-    {
-      "id": "section-kitab-tawhid",
-      "parent_id": "section-tawhid",
-      "title": "Китаб ат-Таухид",
-      "description": "Изучение книги единобожия",
-      "cover_url": "",
-      "type": "course",
-      "published": true,
-      "order": 0
-    },
-    {
-      "id": "section-fiqh",
-      "parent_id": null,
-      "title": "Фикх",
-      "description": "Вопросы поклонения и практики",
-      "cover_url": "",
-      "type": "section",
-      "published": true,
-      "order": 1
-    },
-    {
-      "id": "section-sira",
-      "parent_id": null,
-      "title": "Сира",
-      "description": "Жизнеописание Пророка ﷺ",
-      "cover_url": "",
-      "type": "section",
-      "published": true,
-      "order": 2
+    "123457": {
+      "title": "Barcelona — PSG",
+      "url": "https://example.com/stream2",
+      "type": "external"
     }
-  ],
-  "lessons": [
-    {
-      "id": "lesson-1",
-      "section_id": "section-kitab-tawhid",
-      "lesson_number": 1,
-      "title": "Введение в курс",
-      "description": "Первый урок",
-      "audio_url": "",
-      "duration": "00:00",
-      "published": true
-    },
-    {
-      "id": "lesson-2",
-      "section_id": "section-kitab-tawhid",
-      "lesson_number": 2,
-      "title": "Единобожие",
-      "description": "Основы таухида",
-      "audio_url": "",
-      "duration": "00:00",
-      "published": true
-    }
-  ],
-  "books": [
-    {
-      "id": "book-1",
-      "section_id": "section-aqida",
-      "title": "Китаб ат-Таухид",
-      "author": "Мухаммад ибн Абдуль-Ваххаб",
-      "description": "Книга единобожия",
-      "cover_url": "",
-      "pdf_url": "",
-      "pages": 120,
-      "published": true
-    }
-  ]
+  }
 }
