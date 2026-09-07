@@ -1,28 +1,24 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0d0f12">
-<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0b0d10">
 <title>ФОМ — Футбольный Онлайн Менеджер</title>
 
 <style>
 :root{
-    --bg:#0b0d10;
+    --bg:#090b0e;
     --surface:#111419;
     --surface2:#171a20;
-    --surface3:#1d2128;
+    --surface3:#1e232a;
     --border:rgba(255,255,255,.07);
     --text:#f4f5f7;
     --muted:#858b95;
     --accent:#ff8a1f;
-    --accent2:#ffad55;
-    --green:#35c979;
-    --red:#ff5555;
-    --blue:#4d8dff;
-    --radius:18px;
+    --green:#36ca7b;
+    --red:#ff5b5b;
+    --blue:#4f8cff;
 }
 
 *{
@@ -33,7 +29,6 @@
 html,body{
     margin:0;
     padding:0;
-    width:100%;
     min-height:100%;
     background:var(--bg);
     color:var(--text);
@@ -47,22 +42,235 @@ body{
 button{
     font:inherit;
     border:0;
-    outline:0;
+    outline:none;
     cursor:pointer;
 }
 
 .app{
     width:100%;
-    max-width:700px;
+    max-width:720px;
     min-height:100vh;
     margin:auto;
-    padding-bottom:88px;
+    padding-bottom:90px;
 }
 
-/* HEADER */
+/* =========================
+   START SCREEN
+========================= */
+
+.start-screen{
+    min-height:100vh;
+    padding:28px 18px 35px;
+    display:flex;
+    flex-direction:column;
+}
+
+.start-logo{
+    width:68px;
+    height:68px;
+    border-radius:22px;
+    background:linear-gradient(145deg,#ff9c3b,#e55d00);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:34px;
+    box-shadow:0 15px 45px rgba(255,125,20,.2);
+    margin-bottom:25px;
+}
+
+.start-title{
+    font-size:36px;
+    font-weight:900;
+    letter-spacing:-1.7px;
+    margin:0;
+}
+
+.start-subtitle{
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.55;
+    margin:8px 0 27px;
+}
+
+.start-step{
+    color:var(--accent);
+    font-size:11px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.7px;
+    margin-bottom:8px;
+}
+
+.start-heading{
+    font-size:22px;
+    font-weight:850;
+    margin-bottom:13px;
+}
+
+.league-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+}
+
+.league-card{
+    padding:14px;
+    border-radius:17px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    text-align:left;
+    color:var(--text);
+    transition:.18s;
+}
+
+.league-card:active{
+    transform:scale(.97);
+}
+
+.league-card.selected{
+    background:rgba(255,138,31,.11);
+    border-color:rgba(255,138,31,.55);
+}
+
+.league-flag{
+    font-size:24px;
+    margin-bottom:8px;
+}
+
+.league-name{
+    font-size:12px;
+    font-weight:800;
+}
+
+.league-country{
+    color:var(--muted);
+    font-size:9px;
+    margin-top:3px;
+}
+
+.start-next{
+    width:100%;
+    padding:15px;
+    border-radius:15px;
+    background:var(--accent);
+    color:#111;
+    font-weight:900;
+    margin-top:16px;
+}
+
+.start-next:disabled{
+    opacity:.35;
+    cursor:not-allowed;
+}
+
+.back-button{
+    background:var(--surface);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:12px 15px;
+    border-radius:13px;
+    margin-bottom:16px;
+}
+
+/* CLUB SELECTION */
+
+.selected-league{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:13px;
+    margin-bottom:15px;
+}
+
+.selected-league-flag{
+    font-size:26px;
+}
+
+.selected-league-name{
+    font-size:14px;
+    font-weight:800;
+}
+
+.selected-league-country{
+    color:var(--muted);
+    font-size:10px;
+    margin-top:2px;
+}
+
+.club-selection{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.club-select-card{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    width:100%;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:12px;
+    color:var(--text);
+    text-align:left;
+}
+
+.club-select-card.selected{
+    background:rgba(255,138,31,.1);
+    border-color:rgba(255,138,31,.55);
+}
+
+.club-crest-big{
+    width:47px;
+    height:47px;
+    border-radius:14px;
+    background:var(--surface3);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:23px;
+    flex-shrink:0;
+}
+
+.club-select-main{
+    flex:1;
+}
+
+.club-select-name{
+    font-size:13px;
+    font-weight:800;
+}
+
+.club-select-meta{
+    color:var(--muted);
+    font-size:9px;
+    margin-top:3px;
+}
+
+.club-select-rating{
+    font-size:15px;
+    font-weight:900;
+}
+
+
+/* =========================
+   APP
+========================= */
+
+.main-app{
+    display:none;
+}
+
+.main-app.visible{
+    display:block;
+}
 
 .topbar{
-    padding:20px 18px 12px;
+    padding:19px 17px 11px;
     display:flex;
     justify-content:space-between;
     align-items:center;
@@ -71,30 +279,28 @@ button{
 .brand{
     display:flex;
     align-items:center;
-    gap:11px;
+    gap:10px;
 }
 
 .logo{
-    width:42px;
-    height:42px;
+    width:40px;
+    height:40px;
     border-radius:13px;
-    background:linear-gradient(145deg,#ff9a36,#e95f00);
+    background:linear-gradient(145deg,#ff9c3b,#e55d00);
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:21px;
-    box-shadow:0 8px 25px rgba(255,125,20,.18);
+    font-size:20px;
 }
 
 .brand-title{
-    font-weight:800;
-    font-size:17px;
-    letter-spacing:-.3px;
+    font-size:16px;
+    font-weight:900;
 }
 
 .brand-subtitle{
     color:var(--muted);
-    font-size:11px;
+    font-size:10px;
     margin-top:2px;
 }
 
@@ -102,12 +308,10 @@ button{
     width:40px;
     height:40px;
     border-radius:13px;
-    background:var(--surface2);
+    background:var(--surface);
     color:var(--text);
     border:1px solid var(--border);
 }
-
-/* PAGES */
 
 .page{
     display:none;
@@ -119,41 +323,32 @@ button{
 }
 
 .page-title{
-    font-size:27px;
-    font-weight:850;
+    font-size:28px;
+    font-weight:900;
     letter-spacing:-1px;
-    margin:8px 2px 5px;
+    margin:8px 2px 4px;
 }
 
 .page-subtitle{
     color:var(--muted);
-    font-size:13px;
+    font-size:12px;
     margin:0 2px 18px;
 }
 
-/* HOME */
+
+/* =========================
+   HOME
+========================= */
 
 .club-card{
     position:relative;
     overflow:hidden;
     border-radius:25px;
-    padding:22px;
+    padding:21px;
     background:
-        radial-gradient(circle at 100% 0%,rgba(255,138,31,.23),transparent 38%),
+        radial-gradient(circle at 100% 0%,rgba(255,138,31,.22),transparent 38%),
         linear-gradient(145deg,#191d24,#101217);
     border:1px solid var(--border);
-    margin-bottom:13px;
-}
-
-.club-card:after{
-    content:"";
-    position:absolute;
-    width:150px;
-    height:150px;
-    border:1px solid rgba(255,255,255,.04);
-    border-radius:50%;
-    right:-60px;
-    bottom:-65px;
 }
 
 .club-top{
@@ -165,27 +360,27 @@ button{
 .club-info{
     display:flex;
     align-items:center;
-    gap:13px;
+    gap:12px;
 }
 
 .club-crest{
-    width:58px;
-    height:58px;
+    width:57px;
+    height:57px;
     border-radius:18px;
     background:#252a33;
     display:flex;
     justify-content:center;
     align-items:center;
-    font-size:29px;
+    font-size:28px;
 }
 
 .club-name{
-    font-size:19px;
-    font-weight:800;
+    font-size:18px;
+    font-weight:850;
 }
 
 .club-league{
-    font-size:12px;
+    font-size:10px;
     color:var(--muted);
     margin-top:3px;
 }
@@ -195,158 +390,157 @@ button{
 }
 
 .rating-number{
-    font-size:25px;
-    font-weight:850;
+    font-size:24px;
+    font-weight:900;
 }
 
 .rating-label{
     color:var(--muted);
-    font-size:10px;
+    font-size:8px;
 }
 
 .club-stats{
     display:grid;
     grid-template-columns:repeat(3,1fr);
-    gap:8px;
-    margin-top:20px;
+    gap:7px;
+    margin-top:19px;
 }
 
 .stat-box{
     background:rgba(255,255,255,.045);
-    border-radius:14px;
-    padding:12px 9px;
+    border-radius:13px;
+    padding:11px 8px;
 }
 
 .stat-value{
-    font-size:16px;
-    font-weight:800;
+    font-size:15px;
+    font-weight:850;
 }
 
 .stat-label{
-    font-size:10px;
     color:var(--muted);
+    font-size:9px;
     margin-top:3px;
 }
 
 .section-head{
     display:flex;
-    align-items:center;
     justify-content:space-between;
-    margin:22px 2px 10px;
+    align-items:center;
+    margin:20px 2px 10px;
 }
 
 .section-title{
-    font-size:16px;
-    font-weight:800;
+    font-size:15px;
+    font-weight:850;
 }
 
 .section-action{
     color:var(--accent);
-    font-size:12px;
-    font-weight:700;
+    font-size:11px;
+    font-weight:800;
 }
-
-/* MATCH CARD */
 
 .next-match{
     background:var(--surface);
     border:1px solid var(--border);
     border-radius:20px;
-    padding:17px;
+    padding:16px;
 }
 
 .match-meta{
     display:flex;
     justify-content:space-between;
     color:var(--muted);
-    font-size:11px;
+    font-size:9px;
     margin-bottom:15px;
 }
 
 .match-teams{
     display:grid;
     grid-template-columns:1fr 70px 1fr;
-    align-items:center;
     text-align:center;
+    align-items:center;
 }
 
 .team-crest{
-    width:48px;
-    height:48px;
-    border-radius:15px;
+    width:47px;
+    height:47px;
+    border-radius:14px;
     background:var(--surface3);
     display:flex;
-    align-items:center;
     justify-content:center;
-    margin:auto auto 7px;
-    font-size:23px;
+    align-items:center;
+    margin:auto auto 6px;
+    font-size:22px;
 }
 
 .team-name{
-    font-size:12px;
-    font-weight:700;
-}
-
-.match-vs{
-    color:var(--muted);
     font-size:11px;
+    font-weight:750;
 }
 
 .match-time{
     font-size:18px;
-    font-weight:850;
+    font-weight:900;
+}
+
+.match-vs{
+    color:var(--muted);
+    font-size:8px;
 }
 
 .orange-button{
     width:100%;
     background:var(--accent);
     color:#111;
-    font-weight:850;
+    font-weight:900;
     padding:14px;
     border-radius:14px;
-    margin-top:16px;
+    margin-top:15px;
 }
-
-/* QUICK ACTIONS */
 
 .quick-grid{
     display:grid;
     grid-template-columns:repeat(2,1fr);
-    gap:9px;
+    gap:8px;
 }
 
 .quick-card{
     background:var(--surface);
     border:1px solid var(--border);
-    border-radius:18px;
-    padding:15px;
-    min-height:90px;
+    border-radius:17px;
+    padding:14px;
+    min-height:88px;
 }
 
 .quick-icon{
-    font-size:20px;
-    margin-bottom:10px;
+    font-size:19px;
+    margin-bottom:9px;
 }
 
 .quick-title{
-    font-size:13px;
-    font-weight:750;
+    font-size:12px;
+    font-weight:800;
 }
 
 .quick-desc{
     color:var(--muted);
-    font-size:10px;
-    margin-top:4px;
+    font-size:9px;
+    margin-top:3px;
 }
 
-/* SQUAD */
+
+/* =========================
+   SQUAD
+========================= */
 
 .filters{
     display:flex;
     gap:7px;
     overflow:auto;
     scrollbar-width:none;
-    margin-bottom:13px;
+    margin-bottom:12px;
 }
 
 .filters::-webkit-scrollbar{
@@ -355,19 +549,19 @@ button{
 
 .filter{
     white-space:nowrap;
-    padding:9px 13px;
+    padding:9px 12px;
     border-radius:11px;
     background:var(--surface);
     border:1px solid var(--border);
     color:var(--muted);
-    font-size:11px;
+    font-size:10px;
 }
 
 .filter.active{
     color:#111;
     background:var(--accent);
     border-color:var(--accent);
-    font-weight:800;
+    font-weight:900;
 }
 
 .player-list{
@@ -379,150 +573,95 @@ button{
 .player-card{
     display:flex;
     align-items:center;
-    gap:12px;
-    padding:12px;
-    border-radius:17px;
+    gap:11px;
+    padding:11px;
+    border-radius:16px;
     background:var(--surface);
     border:1px solid var(--border);
 }
 
 .player-avatar{
-    width:48px;
-    height:48px;
-    border-radius:15px;
+    width:46px;
+    height:46px;
+    border-radius:14px;
     background:linear-gradient(145deg,#282d36,#191c22);
     display:flex;
-    justify-content:center;
     align-items:center;
-    font-size:21px;
-    flex-shrink:0;
+    justify-content:center;
+    font-size:20px;
 }
 
 .player-main{
     flex:1;
-    min-width:0;
 }
 
 .player-name{
-    font-size:14px;
+    font-size:13px;
     font-weight:800;
 }
 
 .player-position{
     color:var(--muted);
-    font-size:10px;
+    font-size:9px;
     margin-top:3px;
 }
 
 .player-rating{
-    font-size:17px;
-    font-weight:850;
-    margin-right:2px;
+    font-size:16px;
+    font-weight:900;
 }
 
 .player-form{
-    font-size:9px;
     color:var(--green);
-}
-
-/* PLAYER DETAIL */
-
-.detail-card{
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:22px;
-    padding:20px;
-    text-align:center;
-}
-
-.big-avatar{
-    width:82px;
-    height:82px;
-    border-radius:25px;
-    background:linear-gradient(145deg,#303640,#1c2026);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:39px;
-    margin:0 auto 12px;
-}
-
-.detail-name{
-    font-size:21px;
-    font-weight:850;
-}
-
-.detail-position{
-    color:var(--muted);
-    font-size:12px;
-    margin-top:3px;
-}
-
-.attribute-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:7px;
-    margin-top:18px;
-}
-
-.attribute{
-    padding:10px 4px;
-    background:var(--surface2);
-    border-radius:12px;
-}
-
-.attribute-value{
-    font-size:15px;
-    font-weight:800;
-}
-
-.attribute-label{
-    color:var(--muted);
     font-size:8px;
-    margin-top:3px;
+    text-align:right;
+    margin-top:2px;
 }
 
-/* TACTICS */
+
+/* =========================
+   TACTICS
+========================= */
 
 .tactic-toolbar{
     display:flex;
-    gap:7px;
-    margin-bottom:10px;
+    gap:6px;
+    margin-bottom:9px;
 }
 
 .tactic-button{
     flex:1;
-    padding:10px 5px;
-    border-radius:12px;
+    padding:10px 4px;
+    border-radius:11px;
     background:var(--surface);
     border:1px solid var(--border);
     color:var(--muted);
-    font-size:10px;
+    font-size:9px;
 }
 
 .tactic-button.active{
-    background:rgba(255,138,31,.13);
+    background:rgba(255,138,31,.12);
     color:var(--accent);
     border-color:rgba(255,138,31,.4);
 }
 
 .pitch-wrap{
-    padding:8px;
-    background:#15191e;
-    border-radius:23px;
+    padding:7px;
+    background:#14181d;
+    border-radius:22px;
     border:1px solid var(--border);
 }
 
 .pitch{
     position:relative;
     width:100%;
-    aspect-ratio:0.67;
+    aspect-ratio:.67;
     overflow:hidden;
-    border-radius:17px;
+    border-radius:16px;
     background:
         repeating-linear-gradient(
             0deg,
-            #176b43 0px,
+            #176b43 0,
             #176b43 44px,
             #1b754a 44px,
             #1b754a 88px
@@ -539,8 +678,7 @@ button{
 .pitch-outline{
     position:absolute;
     inset:4%;
-    border:2px solid rgba(255,255,255,.75);
-    border-radius:2px;
+    border:2px solid rgba(255,255,255,.72);
 }
 
 .pitch-half{
@@ -563,12 +701,12 @@ button{
 
 .pitch-center{
     position:absolute;
-    width:8px;
-    height:8px;
+    width:7px;
+    height:7px;
     border-radius:50%;
     background:white;
-    left:calc(50% - 4px);
-    top:calc(50% - 4px);
+    left:calc(50% - 3.5px);
+    top:calc(50% - 3.5px);
 }
 
 .penalty-top{
@@ -597,7 +735,7 @@ button{
     height:4%;
     left:41%;
     top:4%;
-    border:2px solid rgba(255,255,255,.8);
+    border:2px solid white;
     border-top:0;
 }
 
@@ -607,98 +745,79 @@ button{
     height:4%;
     left:41%;
     bottom:4%;
-    border:2px solid rgba(255,255,255,.8);
+    border:2px solid white;
     border-bottom:0;
 }
 
 .pitch-player{
     position:absolute;
-    width:46px;
-    height:46px;
+    width:44px;
+    height:44px;
     transform:translate(-50%,-50%);
     border-radius:50%;
     background:#20252d;
     border:3px solid var(--accent);
-    box-shadow:0 5px 15px rgba(0,0,0,.3);
+    box-shadow:0 5px 15px rgba(0,0,0,.35);
     z-index:5;
     display:flex;
-    align-items:center;
     justify-content:center;
-    font-size:17px;
-    font-weight:800;
+    align-items:center;
+    font-size:15px;
+    font-weight:900;
     cursor:grab;
     user-select:none;
 }
 
-.pitch-player:active{
-    cursor:grabbing;
-    transform:translate(-50%,-50%) scale(1.1);
-}
-
 .pitch-player span{
     position:absolute;
-    top:42px;
+    top:40px;
     white-space:nowrap;
     background:rgba(0,0,0,.68);
-    border-radius:7px;
     padding:3px 6px;
-    font-size:8px;
-    font-weight:700;
+    border-radius:6px;
+    font-size:7px;
 }
 
-.tactic-info{
-    margin-top:10px;
-    padding:13px;
-    border-radius:15px;
-    background:var(--surface);
-    border:1px solid var(--border);
-    color:var(--muted);
-    font-size:11px;
-    line-height:1.5;
-}
 
-.tactic-info b{
-    color:var(--text);
-}
-
-/* MATCH */
+/* =========================
+   MATCH
+========================= */
 
 .live-card{
     background:linear-gradient(145deg,#171b21,#101216);
     border:1px solid var(--border);
-    border-radius:24px;
+    border-radius:23px;
     overflow:hidden;
 }
 
 .scoreboard{
     text-align:center;
-    padding:25px 18px;
+    padding:24px 15px;
 }
 
 .live-status{
     display:inline-flex;
     align-items:center;
     gap:5px;
-    background:rgba(255,80,80,.12);
-    color:#ff6767;
-    padding:6px 9px;
-    border-radius:9px;
-    font-size:9px;
-    font-weight:800;
+    color:#ff6868;
+    background:rgba(255,80,80,.11);
+    padding:5px 8px;
+    border-radius:8px;
+    font-size:8px;
+    font-weight:900;
 }
 
 .live-dot{
     width:5px;
     height:5px;
-    background:#ff6767;
     border-radius:50%;
+    background:#ff6868;
 }
 
 .score{
-    font-size:48px;
-    font-weight:900;
-    letter-spacing:-2px;
-    margin:13px 0 5px;
+    font-size:46px;
+    font-weight:950;
+    margin:12px 0 4px;
 }
 
 .score-teams{
@@ -706,62 +825,65 @@ button{
     justify-content:center;
     gap:30px;
     color:var(--muted);
-    font-size:11px;
+    font-size:10px;
 }
 
 .match-minute{
-    margin-top:10px;
     color:var(--accent);
-    font-size:12px;
-    font-weight:800;
+    font-size:11px;
+    font-weight:900;
+    margin-top:8px;
 }
 
 .match-events{
-    padding:0 16px 18px;
+    padding:0 15px 17px;
 }
 
 .event{
     display:flex;
-    gap:10px;
-    padding:10px 0;
+    gap:9px;
+    padding:9px 0;
     border-top:1px solid var(--border);
 }
 
 .event-time{
     color:var(--accent);
-    font-size:10px;
-    font-weight:800;
-    width:27px;
+    font-size:9px;
+    font-weight:900;
+    width:25px;
 }
 
 .event-text{
-    font-size:11px;
+    font-size:10px;
     line-height:1.4;
 }
 
 .match-actions{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:8px;
-    padding:0 16px 18px;
+    gap:7px;
+    padding:0 15px 16px;
 }
 
 .match-action{
     background:var(--surface2);
     color:var(--text);
     border:1px solid var(--border);
-    border-radius:13px;
-    padding:12px 5px;
-    font-size:10px;
-    font-weight:750;
+    border-radius:12px;
+    padding:11px 4px;
+    font-size:9px;
+    font-weight:800;
 }
 
 .match-action.active{
     color:var(--accent);
-    border-color:rgba(255,138,31,.35);
+    border-color:rgba(255,138,31,.4);
 }
 
-/* TRANSFERS */
+
+/* =========================
+   TRANSFERS
+========================= */
 
 .market-list{
     display:flex;
@@ -772,22 +894,21 @@ button{
 .market-card{
     background:var(--surface);
     border:1px solid var(--border);
-    border-radius:17px;
-    padding:13px;
+    border-radius:16px;
+    padding:12px;
     display:flex;
     align-items:center;
-    gap:11px;
+    gap:10px;
 }
 
 .market-avatar{
-    width:45px;
-    height:45px;
-    border-radius:14px;
+    width:44px;
+    height:44px;
+    border-radius:13px;
     background:var(--surface3);
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:19px;
 }
 
 .market-info{
@@ -795,51 +916,55 @@ button{
 }
 
 .market-price{
-    font-weight:850;
-    font-size:13px;
+    font-size:12px;
+    font-weight:900;
 }
 
 .market-meta{
     color:var(--muted);
-    font-size:9px;
+    font-size:8px;
     margin-top:3px;
 }
 
 .buy-button{
-    padding:9px 11px;
-    background:rgba(255,138,31,.13);
+    padding:8px 10px;
+    background:rgba(255,138,31,.12);
     color:var(--accent);
-    border-radius:10px;
-    font-size:10px;
-    font-weight:800;
+    border-radius:9px;
+    font-size:9px;
+    font-weight:900;
 }
 
-/* TABLE */
+
+/* =========================
+   TABLE
+========================= */
 
 .table-card{
     overflow:hidden;
     background:var(--surface);
     border:1px solid var(--border);
-    border-radius:19px;
+    border-radius:18px;
 }
 
-.table-head,.table-row{
+.table-head,
+.table-row{
     display:grid;
-    grid-template-columns:28px 1fr 35px 35px 35px 45px;
+    grid-template-columns:25px 1fr 32px 32px 38px 45px;
     align-items:center;
     gap:3px;
-    padding:11px 12px;
+    padding:10px 11px;
 }
 
 .table-head{
     color:var(--muted);
-    font-size:8px;
+    font-size:7px;
     text-transform:uppercase;
     border-bottom:1px solid var(--border);
 }
 
 .table-row{
-    font-size:10px;
+    font-size:9px;
     border-bottom:1px solid var(--border);
 }
 
@@ -854,21 +979,24 @@ button{
 .club-table{
     display:flex;
     align-items:center;
-    gap:7px;
-    font-weight:750;
+    gap:6px;
+    font-weight:800;
 }
 
 .club-mini{
-    width:24px;
-    height:24px;
-    border-radius:8px;
+    width:23px;
+    height:23px;
+    border-radius:7px;
     background:var(--surface3);
     display:flex;
     justify-content:center;
     align-items:center;
 }
 
-/* BOTTOM NAV */
+
+/* =========================
+   BOTTOM NAV
+========================= */
 
 .bottom-nav{
     position:fixed;
@@ -876,9 +1004,9 @@ button{
     left:50%;
     bottom:0;
     transform:translateX(-50%);
-    width:min(700px,100%);
-    padding:9px 10px calc(9px + env(safe-area-inset-bottom));
-    background:rgba(11,13,16,.92);
+    width:min(720px,100%);
+    padding:8px 9px calc(8px + env(safe-area-inset-bottom));
+    background:rgba(9,11,14,.93);
     backdrop-filter:blur(18px);
     border-top:1px solid var(--border);
     display:grid;
@@ -886,45 +1014,47 @@ button{
 }
 
 .nav-item{
-    color:#747a84;
+    color:#737983;
     background:none;
     display:flex;
     flex-direction:column;
     align-items:center;
-    gap:4px;
+    gap:3px;
     padding:5px 2px;
-    font-size:9px;
-    font-weight:650;
+    font-size:8px;
+    font-weight:700;
 }
 
 .nav-icon{
-    font-size:19px;
-    line-height:20px;
+    font-size:18px;
+    line-height:19px;
 }
 
 .nav-item.active{
     color:var(--accent);
 }
 
-/* TOAST */
+
+/* =========================
+   TOAST
+========================= */
 
 .toast{
     position:fixed;
-    z-index:300;
+    z-index:500;
     left:50%;
-    bottom:90px;
+    bottom:88px;
     transform:translate(-50%,20px);
     background:#f2f3f4;
     color:#111;
-    padding:11px 16px;
-    border-radius:12px;
-    font-size:11px;
-    font-weight:750;
+    padding:10px 15px;
+    border-radius:11px;
+    font-size:10px;
+    font-weight:850;
     opacity:0;
     pointer-events:none;
     transition:.25s;
     white-space:nowrap;
-    box-shadow:0 8px 30px rgba(0,0,0,.3);
 }
 
 .toast.show{
@@ -932,30 +1062,27 @@ button{
     transform:translate(-50%,0);
 }
 
-/* RESPONSIVE */
-
 @media(max-width:380px){
-    .page{
-        padding-left:12px;
-        padding-right:12px;
+
+    .start-title{
+        font-size:31px;
     }
 
-    .page-title{
-        font-size:24px;
+    .league-grid{
+        gap:7px;
+    }
+
+    .league-card{
+        padding:12px;
     }
 
     .pitch-player{
-        width:41px;
-        height:41px;
-        font-size:15px;
+        width:40px;
+        height:40px;
     }
 
     .pitch-player span{
-        top:37px;
-    }
-
-    .table-head,.table-row{
-        grid-template-columns:25px 1fr 28px 28px 28px 40px;
+        top:36px;
     }
 }
 </style>
@@ -965,336 +1092,699 @@ button{
 
 <div class="app">
 
-    <header class="topbar">
-        <div class="brand">
-            <div class="logo">⚽</div>
-            <div>
-                <div class="brand-title">ФОМ</div>
-                <div class="brand-subtitle">Футбольный Онлайн Менеджер</div>
+<!-- =========================================
+     START SCREEN
+========================================= -->
+
+<section id="startScreen" class="start-screen">
+
+    <div class="start-logo">⚽</div>
+
+    <h1 class="start-title">ФОМ</h1>
+
+    <p class="start-subtitle">
+        Футбольный Онлайн Менеджер.<br>
+        Создай свой клуб и начни путь к вершине.
+    </p>
+
+    <!-- STEP 1 -->
+
+    <div id="leagueStep">
+
+        <div class="start-step">Шаг 1 из 2</div>
+
+        <div class="start-heading">
+            Выбери чемпионат
+        </div>
+
+        <div id="leagueGrid" class="league-grid"></div>
+
+        <button
+            id="leagueNext"
+            class="start-next"
+            disabled
+            onclick="showClubSelection()">
+            Продолжить
+        </button>
+
+    </div>
+
+
+    <!-- STEP 2 -->
+
+    <div id="clubStep" style="display:none">
+
+        <button class="back-button" onclick="backToLeagues()">
+            ← Назад
+        </button>
+
+        <div class="start-step">Шаг 2 из 2</div>
+
+        <div class="start-heading">
+            Выбери клуб
+        </div>
+
+        <div id="selectedLeague" class="selected-league"></div>
+
+        <div id="clubSelection" class="club-selection"></div>
+
+        <button
+            id="startCareer"
+            class="start-next"
+            disabled
+            onclick="startCareer()">
+            Начать карьеру
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     MAIN APP
+========================================= -->
+
+<section id="mainApp" class="main-app">
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <div class="logo">⚽</div>
+
+        <div>
+            <div class="brand-title">ФОМ</div>
+            <div class="brand-subtitle">
+                Футбольный Онлайн Менеджер
             </div>
         </div>
 
-        <button class="icon-button" onclick="showToast('Уведомления пока пусты')">🔔</button>
-    </header>
+    </div>
+
+    <button
+        class="icon-button"
+        onclick="showToast('Новых уведомлений нет')">
+        🔔
+    </button>
+
+</header>
 
 
-    <!-- HOME -->
+<!-- =========================================
+     HOME
+========================================= -->
 
-    <main id="home" class="page active">
+<main id="home" class="page active">
 
-        <h1 class="page-title">Мой клуб</h1>
-        <p class="page-subtitle">Добро пожаловать, менеджер</p>
+    <h1 class="page-title">Мой клуб</h1>
 
-        <section class="club-card">
-            <div class="club-top">
+    <p class="page-subtitle">
+        Управляй командой и двигайся к чемпионству
+    </p>
 
-                <div class="club-info">
-                    <div class="club-crest">🦅</div>
-                    <div>
-                        <div class="club-name">FC Кавказ</div>
-                        <div class="club-league">Премьер-лига • 1 сезон</div>
+    <section class="club-card">
+
+        <div class="club-top">
+
+            <div class="club-info">
+
+                <div id="homeClubCrest" class="club-crest">
+                    ⚽
+                </div>
+
+                <div>
+
+                    <div id="homeClubName" class="club-name">
+                        —
                     </div>
-                </div>
 
-                <div class="rating">
-                    <div class="rating-number">78</div>
-                    <div class="rating-label">РЕЙТИНГ</div>
+                    <div id="homeClubLeague" class="club-league">
+                        —
+                    </div>
+
                 </div>
 
             </div>
 
-            <div class="club-stats">
-                <div class="stat-box">
-                    <div class="stat-value">€12.4M</div>
-                    <div class="stat-label">Бюджет</div>
+            <div class="rating">
+
+                <div id="homeClubRating" class="rating-number">
+                    —
                 </div>
 
-                <div class="stat-box">
-                    <div class="stat-value">8 420</div>
-                    <div class="stat-label">Болельщики</div>
+                <div class="rating-label">
+                    РЕЙТИНГ
                 </div>
 
-                <div class="stat-box">
-                    <div class="stat-value">6</div>
-                    <div class="stat-label">Место</div>
-                </div>
             </div>
-        </section>
 
-
-        <div class="section-head">
-            <div class="section-title">Следующий матч</div>
-            <div class="section-action" onclick="openPage('match')">Подробнее</div>
         </div>
 
-        <section class="next-match">
 
-            <div class="match-meta">
-                <span>Чемпионат • 12 тур</span>
-                <span>Сегодня</span>
+        <div class="club-stats">
+
+            <div class="stat-box">
+                <div class="stat-value">€12.4M</div>
+                <div class="stat-label">Бюджет</div>
             </div>
 
-            <div class="match-teams">
+            <div class="stat-box">
+                <div class="stat-value">8 420</div>
+                <div class="stat-label">Болельщики</div>
+            </div>
 
-                <div>
-                    <div class="team-crest">🦅</div>
-                    <div class="team-name">FC Кавказ</div>
+            <div class="stat-box">
+                <div class="stat-value">6</div>
+                <div class="stat-label">Место</div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <div class="section-head">
+
+        <div class="section-title">
+            Следующий матч
+        </div>
+
+        <div
+            class="section-action"
+            onclick="openPage('match')">
+            Подробнее
+        </div>
+
+    </div>
+
+
+    <section class="next-match">
+
+        <div class="match-meta">
+            <span>Чемпионат • 12 тур</span>
+            <span>Сегодня</span>
+        </div>
+
+        <div class="match-teams">
+
+            <div>
+
+                <div
+                    id="nextHomeCrest"
+                    class="team-crest">
+                    ⚽
                 </div>
 
-                <div>
-                    <div class="match-vs">НАЧАЛО</div>
-                    <div class="match-time">20:00</div>
-                </div>
-
-                <div>
-                    <div class="team-crest">🔴</div>
-                    <div class="team-name">Красная Звезда</div>
+                <div
+                    id="nextHomeName"
+                    class="team-name">
+                    —
                 </div>
 
             </div>
 
-            <button class="orange-button" onclick="openPage('tactics')">
-                Настроить тактику
+
+            <div>
+
+                <div class="match-vs">
+                    НАЧАЛО
+                </div>
+
+                <div class="match-time">
+                    20:00
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <div class="team-crest">
+                    🔴
+                </div>
+
+                <div class="team-name">
+                    Manchester United
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="orange-button"
+            onclick="openPage('tactics')">
+            Настроить тактику
+        </button>
+
+    </section>
+
+
+    <div class="section-head">
+
+        <div class="section-title">
+            Быстрые действия
+        </div>
+
+    </div>
+
+
+    <div class="quick-grid">
+
+        <div
+            class="quick-card"
+            onclick="openPage('squad')">
+
+            <div class="quick-icon">👥</div>
+
+            <div class="quick-title">
+                Состав
+            </div>
+
+            <div class="quick-desc">
+                Реальные игроки
+            </div>
+
+        </div>
+
+
+        <div
+            class="quick-card"
+            onclick="openPage('transfers')">
+
+            <div class="quick-icon">🔄</div>
+
+            <div class="quick-title">
+                Трансферы
+            </div>
+
+            <div class="quick-desc">
+                Рынок игроков
+            </div>
+
+        </div>
+
+
+        <div
+            class="quick-card"
+            onclick="openPage('table')">
+
+            <div class="quick-icon">🏆</div>
+
+            <div class="quick-title">
+                Чемпионат
+            </div>
+
+            <div class="quick-desc">
+                Таблица и календарь
+            </div>
+
+        </div>
+
+
+        <div
+            class="quick-card"
+            onclick="showToast('Тренировочный центр скоро будет доступен')">
+
+            <div class="quick-icon">🏋️</div>
+
+            <div class="quick-title">
+                Тренировки
+            </div>
+
+            <div class="quick-desc">
+                Развитие игроков
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- =========================================
+     SQUAD
+========================================= -->
+
+<main id="squad" class="page">
+
+    <h1 class="page-title">Состав</h1>
+
+    <p id="squadSubtitle" class="page-subtitle">
+        Основная команда
+    </p>
+
+    <div class="filters">
+
+        <button
+            class="filter active"
+            onclick="filterPlayers('all',this)">
+            Все
+        </button>
+
+        <button
+            class="filter"
+            onclick="filterPlayers('GK',this)">
+            Вратари
+        </button>
+
+        <button
+            class="filter"
+            onclick="filterPlayers('DEF',this)">
+            Защитники
+        </button>
+
+        <button
+            class="filter"
+            onclick="filterPlayers('MID',this)">
+            Полузащитники
+        </button>
+
+        <button
+            class="filter"
+            onclick="filterPlayers('ATT',this)">
+            Атака
+        </button>
+
+    </div>
+
+    <div id="playerList" class="player-list"></div>
+
+</main>
+
+
+<!-- =========================================
+     TACTICS
+========================================= -->
+
+<main id="tactics" class="page">
+
+    <h1 class="page-title">Тактика</h1>
+
+    <p class="page-subtitle">
+        Расставляй игроков вручную
+    </p>
+
+    <div class="tactic-toolbar">
+
+        <button
+            class="tactic-button active"
+            onclick="setStyle(this,'Контроль')">
+            Контроль
+        </button>
+
+        <button
+            class="tactic-button"
+            onclick="setStyle(this,'Контратаки')">
+            Контратаки
+        </button>
+
+        <button
+            class="tactic-button"
+            onclick="setStyle(this,'Прессинг')">
+            Прессинг
+        </button>
+
+    </div>
+
+
+    <div class="pitch-wrap">
+
+        <div id="pitch" class="pitch">
+
+            <div class="pitch-lines">
+
+                <div class="pitch-outline"></div>
+                <div class="pitch-half"></div>
+                <div class="pitch-circle"></div>
+                <div class="pitch-center"></div>
+                <div class="penalty-top"></div>
+                <div class="penalty-bottom"></div>
+                <div class="goal-top"></div>
+                <div class="goal-bottom"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div
+        style="
+        margin-top:9px;
+        padding:12px;
+        border-radius:14px;
+        background:var(--surface);
+        border:1px solid var(--border);
+        color:var(--muted);
+        font-size:10px;
+        line-height:1.5;
+        ">
+
+        <b
+            id="styleText"
+            style="color:var(--text)">
+            Контроль
+        </b>
+
+        <br>
+
+        В будущем расположение каждого игрока будет
+        непосредственно влиять на зоны, передачи,
+        прессинг и развитие атак.
+
+    </div>
+
+</main>
+
+
+<!-- =========================================
+     MATCH
+========================================= -->
+
+<main id="match" class="page">
+
+    <h1 class="page-title">Матч</h1>
+
+    <p class="page-subtitle">
+        Центр матча
+    </p>
+
+    <section class="live-card">
+
+        <div class="scoreboard">
+
+            <div class="live-status">
+                <span class="live-dot"></span>
+                МАТЧ
+            </div>
+
+            <div id="score" class="score">
+                0 : 0
+            </div>
+
+            <div class="score-teams">
+
+                <span id="matchHomeName">
+                    —
+                </span>
+
+                <span>
+                    Manchester United
+                </span>
+
+            </div>
+
+            <div
+                id="minute"
+                class="match-minute">
+                1'
+            </div>
+
+        </div>
+
+
+        <div
+            id="matchEvents"
+            class="match-events">
+
+            <div class="event">
+
+                <div class="event-time">
+                    1'
+                </div>
+
+                <div class="event-text">
+                    Матч начался.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="match-actions">
+
+            <button
+                class="match-action active"
+                onclick="setMatchStyle(this,'Баланс')">
+                ⚖️ Баланс
             </button>
 
-        </section>
+            <button
+                class="match-action"
+                onclick="setMatchStyle(this,'Атака')">
+                ⚡ Атака
+            </button>
 
+            <button
+                class="match-action"
+                onclick="setMatchStyle(this,'Оборона')">
+                🛡️ Оборона
+            </button>
 
-        <div class="section-head">
-            <div class="section-title">Быстрые действия</div>
-        </div>
-
-        <div class="quick-grid">
-
-            <div class="quick-card" onclick="openPage('squad')">
-                <div class="quick-icon">👥</div>
-                <div class="quick-title">Состав</div>
-                <div class="quick-desc">24 игрока</div>
-            </div>
-
-            <div class="quick-card" onclick="openPage('transfers')">
-                <div class="quick-icon">🔄</div>
-                <div class="quick-title">Трансферы</div>
-                <div class="quick-desc">126 игроков на рынке</div>
-            </div>
-
-            <div class="quick-card" onclick="openPage('table')">
-                <div class="quick-icon">🏆</div>
-                <div class="quick-title">Чемпионат</div>
-                <div class="quick-desc">Таблица и календарь</div>
-            </div>
-
-            <div class="quick-card" onclick="showToast('Тренировочный центр скоро будет доступен')">
-                <div class="quick-icon">🏋️</div>
-                <div class="quick-title">Тренировки</div>
-                <div class="quick-desc">Развитие игроков</div>
-            </div>
+            <button
+                class="match-action"
+                onclick="showToast('Замены будут доступны позже')">
+                🔄 Замены
+            </button>
 
         </div>
 
-    </main>
+    </section>
 
 
-    <!-- SQUAD -->
+    <button
+        class="orange-button"
+        onclick="startMatch()">
+        ▶ Симулировать матч
+    </button>
 
-    <main id="squad" class="page">
-
-        <h1 class="page-title">Состав</h1>
-        <p class="page-subtitle">Основная команда • 24 игрока</p>
-
-        <div class="filters">
-            <button class="filter active" onclick="filterPlayers('all',this)">Все</button>
-            <button class="filter" onclick="filterPlayers('GK',this)">Вратари</button>
-            <button class="filter" onclick="filterPlayers('DEF',this)">Защитники</button>
-            <button class="filter" onclick="filterPlayers('MID',this)">Полузащитники</button>
-            <button class="filter" onclick="filterPlayers('ATT',this)">Атака</button>
-        </div>
-
-        <div id="playerList" class="player-list"></div>
-
-    </main>
+</main>
 
 
-    <!-- PLAYER -->
+<!-- =========================================
+     TRANSFERS
+========================================= -->
 
-    <main id="player" class="page">
+<main id="transfers" class="page">
 
-        <h1 class="page-title">Игрок</h1>
-        <p class="page-subtitle">Профиль футболиста</p>
+    <h1 class="page-title">
+        Трансферы
+    </h1>
 
-        <div id="playerDetail"></div>
+    <p class="page-subtitle">
+        Рынок игроков
+    </p>
 
-    </main>
+    <div id="marketList" class="market-list"></div>
+
+</main>
 
 
-    <!-- TACTICS -->
+<!-- =========================================
+     TABLE
+========================================= -->
 
-    <main id="tactics" class="page">
+<main id="table" class="page">
 
-        <h1 class="page-title">Тактика</h1>
-        <p class="page-subtitle">Перетащите игроков в нужные позиции</p>
+    <h1 class="page-title">
+        Чемпионат
+    </h1>
 
-        <div class="tactic-toolbar">
-            <button class="tactic-button active" onclick="setStyle(this,'Контроль')">Контроль</button>
-            <button class="tactic-button" onclick="setStyle(this,'Контратаки')">Контратаки</button>
-            <button class="tactic-button" onclick="setStyle(this,'Прессинг')">Прессинг</button>
-        </div>
+    <p id="tableSubtitle" class="page-subtitle">
+        Турнирная таблица
+    </p>
 
-        <div class="pitch-wrap">
+    <div class="table-card">
 
-            <div id="pitch" class="pitch">
+        <div class="table-head">
 
-                <div class="pitch-lines">
-                    <div class="pitch-outline"></div>
-                    <div class="pitch-half"></div>
-                    <div class="pitch-circle"></div>
-                    <div class="pitch-center"></div>
-                    <div class="penalty-top"></div>
-                    <div class="penalty-bottom"></div>
-                    <div class="goal-top"></div>
-                    <div class="goal-bottom"></div>
-                </div>
-
-            </div>
+            <span>#</span>
+            <span>Клуб</span>
+            <span>И</span>
+            <span>О</span>
+            <span>РМ</span>
+            <span>Форма</span>
 
         </div>
 
-        <div class="tactic-info">
-            <b id="styleText">Контроль</b><br>
-            Расстановка влияет на реальные зоны игроков, плотность линий,
-            доступные варианты передач и поведение команды во время матча.
-        </div>
+        <div id="leagueTable"></div>
 
-    </main>
+    </div>
+
+</main>
 
 
-    <!-- MATCH -->
-
-    <main id="match" class="page">
-
-        <h1 class="page-title">Матч</h1>
-        <p class="page-subtitle">FC Кавказ — Красная Звезда</p>
-
-        <section class="live-card">
-
-            <div class="scoreboard">
-
-                <div class="live-status">
-                    <span class="live-dot"></span>
-                    МАТЧ ИДЁТ
-                </div>
-
-                <div id="score" class="score">0 : 0</div>
-
-                <div class="score-teams">
-                    <span>FC Кавказ</span>
-                    <span>Красная Звезда</span>
-                </div>
-
-                <div id="minute" class="match-minute">1'</div>
-
-            </div>
-
-            <div id="matchEvents" class="match-events">
-
-                <div class="event">
-                    <div class="event-time">1'</div>
-                    <div class="event-text">Матч начался.</div>
-                </div>
-
-            </div>
-
-            <div class="match-actions">
-                <button class="match-action active" onclick="setMatchStyle(this,'Баланс')">⚖️ Баланс</button>
-                <button class="match-action" onclick="setMatchStyle(this,'Атака')">⚡ Атака</button>
-                <button class="match-action" onclick="setMatchStyle(this,'Оборона')">🛡️ Оборона</button>
-                <button class="match-action" onclick="showToast('Замены будут доступны во время матча')">🔄 Замены</button>
-            </div>
-
-        </section>
-
-        <button class="orange-button" onclick="startMatch()">▶ Симулировать матч</button>
-
-    </main>
-
-
-    <!-- TRANSFERS -->
-
-    <main id="transfers" class="page">
-
-        <h1 class="page-title">Трансферы</h1>
-        <p class="page-subtitle">Рынок игроков</p>
-
-        <div class="filters">
-            <button class="filter active">Все</button>
-            <button class="filter">Вратари</button>
-            <button class="filter">Защитники</button>
-            <button class="filter">Полузащита</button>
-            <button class="filter">Нападение</button>
-        </div>
-
-        <div id="marketList" class="market-list"></div>
-
-    </main>
-
-
-    <!-- TABLE -->
-
-    <main id="table" class="page">
-
-        <h1 class="page-title">Чемпионат</h1>
-        <p class="page-subtitle">Премьер-лига • 12 тур</p>
-
-        <div class="table-card">
-
-            <div class="table-head">
-                <span>#</span>
-                <span>Клуб</span>
-                <span>И</span>
-                <span>О</span>
-                <span>РМ</span>
-                <span>Форма</span>
-            </div>
-
-            <div id="leagueTable"></div>
-
-        </div>
-
-    </main>
-
-</div>
-
-
-<!-- NAV -->
+<!-- =========================================
+     BOTTOM NAV
+========================================= -->
 
 <nav class="bottom-nav">
 
-    <button class="nav-item active" data-page="home" onclick="openPage('home')">
+    <button
+        class="nav-item active"
+        data-page="home"
+        onclick="openPage('home')">
+
         <span class="nav-icon">⌂</span>
         Главная
+
     </button>
 
-    <button class="nav-item" data-page="squad" onclick="openPage('squad')">
+
+    <button
+        class="nav-item"
+        data-page="squad"
+        onclick="openPage('squad')">
+
         <span class="nav-icon">♙</span>
         Состав
+
     </button>
 
-    <button class="nav-item" data-page="tactics" onclick="openPage('tactics')">
+
+    <button
+        class="nav-item"
+        data-page="tactics"
+        onclick="openPage('tactics')">
+
         <span class="nav-icon">⚽</span>
         Тактика
+
     </button>
 
-    <button class="nav-item" data-page="match" onclick="openPage('match')">
+
+    <button
+        class="nav-item"
+        data-page="match"
+        onclick="openPage('match')">
+
         <span class="nav-icon">▣</span>
         Матч
+
     </button>
 
-    <button class="nav-item" data-page="table" onclick="openPage('table')">
+
+    <button
+        class="nav-item"
+        data-page="table"
+        onclick="openPage('table')">
+
         <span class="nav-icon">🏆</span>
         Турнир
+
     </button>
 
 </nav>
+
+</section>
+
+</div>
 
 
 <div id="toast" class="toast"></div>
@@ -1302,107 +1792,772 @@ button{
 
 <script>
 
-/* =========================
-   DATA
-========================= */
+/* =========================================================
+   ЛИГИ
+========================================================= */
 
-const players = [
+const leagues = [
 
-    {id:1,name:"Адам Магомедов",pos:"GK",type:"GK",rating:81,number:1,emoji:"🧤",speed:64,shot:35,pass:70,tackle:72,dribble:41,form:"Отличная"},
-    {id:2,name:"Мурад Алиев",pos:"GK",type:"GK",rating:76,number:16,emoji:"🧤",speed:58,shot:31,pass:62,tackle:68,dribble:35,form:"Хорошая"},
+    {
+        id:"eng",
+        country:"Англия",
+        name:"Premier League",
+        flag:"🇬🇧"
+    },
 
-    {id:3,name:"Ибрагим Саидов",pos:"CB",type:"DEF",rating:82,number:4,emoji:"🛡️",speed:71,shot:42,pass:69,tackle:88,dribble:48,form:"Отличная"},
-    {id:4,name:"Рустам Абдуллаев",pos:"CB",type:"DEF",rating:79,number:5,emoji:"🛡️",speed:67,shot:39,pass:72,tackle:84,dribble:44,form:"Хорошая"},
-    {id:5,name:"Саид Каримов",pos:"LB",type:"DEF",rating:77,number:3,emoji:"🛡️",speed:84,shot:45,pass:73,tackle:78,dribble:61,form:"Хорошая"},
-    {id:6,name:"Тимур Ахмедов",pos:"RB",type:"DEF",rating:78,number:2,emoji:"🛡️",speed:86,shot:48,pass:75,tackle:79,dribble:64,form:"Отличная"},
-    {id:7,name:"Шамиль Исаев",pos:"CB",type:"DEF",rating:73,number:15,emoji:"🛡️",speed:62,shot:35,pass:61,tackle:75,dribble:39,form:"Нормальная"},
+    {
+        id:"esp",
+        country:"Испания",
+        name:"La Liga",
+        flag:"🇪🇸"
+    },
 
-    {id:8,name:"Ислам Магомедов",pos:"CM",type:"MID",rating:84,number:8,emoji:"⚙️",speed:73,shot:68,pass:91,tackle:69,dribble:77,form:"Отличная"},
-    {id:9,name:"Халид Рашидов",pos:"CM",type:"MID",rating:80,number:6,emoji:"⚙️",speed:70,shot:62,pass:85,tackle:75,dribble:69,form:"Хорошая"},
-    {id:10,name:"Магомед Османов",pos:"CAM",type:"MID",rating:85,number:10,emoji:"✨",speed:82,shot:79,pass:90,tackle:42,dribble:91,form:"Отличная"},
-    {id:11,name:"Алихан Нурмагомедов",pos:"LM",type:"MID",rating:77,number:11,emoji:"⚡",speed:89,shot:63,pass:71,tackle:51,dribble:83,form:"Хорошая"},
-    {id:12,name:"Зелимхан Умаров",pos:"RM",type:"MID",rating:76,number:7,emoji:"⚡",speed:91,shot:61,pass:70,tackle:48,dribble:85,form:"Хорошая"},
+    {
+        id:"ita",
+        country:"Италия",
+        name:"Serie A",
+        flag:"🇮🇹"
+    },
 
-    {id:13,name:"Хамзат Саидов",pos:"ST",type:"ATT",rating:86,number:9,emoji:"⚽",speed:88,shot:94,pass:67,tackle:31,dribble:84,form:"Отличная"},
-    {id:14,name:"Абдулла Магомедов",pos:"ST",type:"ATT",rating:80,number:19,emoji:"⚽",speed:81,shot:86,pass:58,tackle:28,dribble:73,form:"Хорошая"},
-    {id:15,name:"Рамазан Алиев",pos:"LW",type:"ATT",rating:79,number:17,emoji:"⚡",speed:94,shot:75,pass:68,tackle:29,dribble:89,form:"Отличная"},
-    {id:16,name:"Юсуф Ахмедов",pos:"RW",type:"ATT",rating:78,number:20,emoji:"⚡",speed:92,shot:72,pass:65,tackle:33,dribble:87,form:"Хорошая"}
+    {
+        id:"ger",
+        country:"Германия",
+        name:"Bundesliga",
+        flag:"🇩🇪"
+    },
+
+    {
+        id:"fra",
+        country:"Франция",
+        name:"Ligue 1",
+        flag:"🇫🇷"
+    },
+
+    {
+        id:"por",
+        country:"Португалия",
+        name:"Primeira Liga",
+        flag:"🇵🇹"
+    },
+
+    {
+        id:"ned",
+        country:"Нидерланды",
+        name:"Eredivisie",
+        flag:"🇳🇱"
+    },
+
+    {
+        id:"bel",
+        country:"Бельгия",
+        name:"Belgian Pro League",
+        flag:"🇧🇪"
+    },
+
+    {
+        id:"tur",
+        country:"Турция",
+        name:"Süper Lig",
+        flag:"🇹🇷"
+    },
+
+    {
+        id:"cze",
+        country:"Чехия",
+        name:"Czech First League",
+        flag:"🇨🇿"
+    },
+
+    {
+        id:"gre",
+        country:"Греция",
+        name:"Super League",
+        flag:"🇬🇷"
+    },
+
+    {
+        id:"aut",
+        country:"Австрия",
+        name:"Austrian Bundesliga",
+        flag:"🇦🇹"
+    },
+
+    {
+        id:"nor",
+        country:"Норвегия",
+        name:"Eliteserien",
+        flag:"🇳🇴"
+    },
+
+    {
+        id:"den",
+        country:"Дания",
+        name:"Superliga",
+        flag:"🇩🇰"
+    },
+
+    {
+        id:"sui",
+        country:"Швейцария",
+        name:"Swiss Super League",
+        flag:"🇨🇭"
+    }
 
 ];
 
-const marketPlayers = [
 
-    {id:101,name:"Арсен Хасанов",pos:"ST",rating:83,price:"€5.2M",emoji:"⚽"},
-    {id:102,name:"Данияр Алиев",pos:"CM",rating:81,price:"€4.8M",emoji:"⚙️"},
-    {id:103,name:"Марат Гасанов",pos:"CB",rating:79,price:"€3.1M",emoji:"🛡️"},
-    {id:104,name:"Сулейман Магомедов",pos:"RW",rating:82,price:"€6.4M",emoji:"⚡"},
-    {id:105,name:"Рашид Абдуллаев",pos:"GK",rating:77,price:"€2.4M",emoji:"🧤"},
-    {id:106,name:"Ахмед Исмаилов",pos:"CAM",rating:85,price:"€8.1M",emoji:"✨"}
-];
+/* =========================================================
+   КЛУБЫ
+========================================================= */
 
-const clubs = [
-    ["1","Динамо Восток","🟦","11","28","+17","W W W W D"],
-    ["2","Альянс","🟪","11","25","+11","W W D W L"],
-    ["3","Олимп","🟨","11","24","+13","W W W L W"],
-    ["4","Сталь","⬜","11","22","+8","D W W W L"],
-    ["5","Крылья","🟩","11","20","+5","W D W L W"],
-    ["6","FC Кавказ","🦅","11","18","+2","W L D W D"],
-    ["7","Красная Звезда","🔴","11","17","0","L W D L W"],
-    ["8","Спартак","🟥","11","15","-3","D L W L D"],
-    ["9","Волна","🌊","11","12","-8","L D L W L"],
-    ["10","Торпедо","⬛","11","10","-11","L L D L W"]
-];
+const clubs = {
+
+    eng:[
+        ["arsenal","Arsenal","🔴",86],
+        ["aston-villa","Aston Villa","🟣",81],
+        ["chelsea","Chelsea","🔵",84],
+        ["liverpool","Liverpool","🔴",88],
+        ["man-city","Manchester City","🔵",91],
+        ["man-united","Manchester United","🔴",82],
+        ["newcastle","Newcastle United","⚫",81],
+        ["tottenham","Tottenham Hotspur","⚪",81]
+    ],
+
+    esp:[
+        ["real-madrid","Real Madrid","⚪",92],
+        ["barcelona","Barcelona","🔵",88],
+        ["atletico","Atlético Madrid","🔴",86],
+        ["athletic","Athletic Club","🔴",80],
+        ["real-sociedad","Real Sociedad","🔵",79],
+        ["villarreal","Villarreal","🟡",80],
+        ["sevilla","Sevilla","🔴",77],
+        ["real-betis","Real Betis","🟢",78]
+    ],
+
+    ita:[
+        ["inter","Inter","🔵",89],
+        ["milan","AC Milan","🔴",84],
+        ["juventus","Juventus","⚪",84],
+        ["napoli","Napoli","🔵",84],
+        ["roma","Roma","🟠",81],
+        ["lazio","Lazio","🔵",80],
+        ["atalanta","Atalanta","⚫",83],
+        ["fiorentina","Fiorentina","🟣",78]
+    ],
+
+    ger:[
+        ["bayern","Bayern München","🔴",91],
+        ["dortmund","Borussia Dortmund","🟡",85],
+        ["leverkusen","Bayer Leverkusen","🔴",87],
+        ["leipzig","RB Leipzig","🔴",83],
+        ["frankfurt","Eintracht Frankfurt","🔴",80],
+        ["stuttgart","VfB Stuttgart","⚪",79],
+        ["wolfsburg","Wolfsburg","🟢",76],
+        ["gladbach","Borussia Mönchengladbach","🟢",76]
+    ],
+
+    fra:[
+        ["psg","Paris Saint-Germain","🔵",91],
+        ["marseille","Marseille","⚪",80],
+        ["monaco","AS Monaco","🔴",82],
+        ["lyon","Lyon","🔵",77],
+        ["lille","Lille","🔴",81],
+        ["nice","Nice","🔴",77],
+        ["rennes","Rennes","🔴",76],
+        ["lens","Lens","🟡",77]
+    ],
+
+    por:[
+        ["benfica","Benfica","🔴",84],
+        ["porto","FC Porto","🔵",84],
+        ["sporting","Sporting CP","🟢",84],
+        ["braga","SC Braga","🔴",77],
+        ["vitoria","Vitória SC","⚪",72],
+        ["boavista","Boavista","⚫",68]
+    ],
+
+    ned:[
+        ["ajax","Ajax","🔴",79],
+        ["psv","PSV Eindhoven","🔴",82],
+        ["feyenoord","Feyenoord","🔴",81],
+        ["az","AZ Alkmaar","🔴",75],
+        ["twente","FC Twente","🔴",73],
+        ["utrecht","FC Utrecht","🔴",70]
+    ],
+
+    bel:[
+        ["club-brugge","Club Brugge","🔵",77],
+        ["anderlecht","Anderlecht","🟣",75],
+        ["genk","Genk","🔵",74],
+        ["gent","Gent","🔵",72],
+        ["union","Union SG","🟡",75]
+    ],
+
+    tur:[
+        ["galatasaray","Galatasaray","🟡",83],
+        ["fenerbahce","Fenerbahçe","🟡",82],
+        ["besiktas","Beşiktaş","⚫",78],
+        ["trabzonspor","Trabzonspor","🔵",76],
+        ["basaksehir","Başakşehir","🟠",73]
+    ],
+
+    cze:[
+        ["slavia","Slavia Praha","🔴",76],
+        ["sparta","Sparta Praha","🔴",76],
+        ["plzen","Viktoria Plzeň","🔵",74],
+        ["banik","Baník Ostrava","🔵",68]
+    ],
+
+    gre:[
+        ["olympiacos","Olympiacos","🔴",78],
+        ["panathinaikos","Panathinaikos","🟢",76],
+        ["paok","PAOK","⚫",76],
+        ["aek","AEK Athens","🟡",75]
+    ],
+
+    aut:[
+        ["salzburg","Red Bull Salzburg","🔴",78],
+        ["rapid","Rapid Wien","🟢",71],
+        ["austria-wien","Austria Wien","🟣",69],
+        ["sturm","Sturm Graz","⚫",75]
+    ],
+
+    nor:[
+        ["bodo","Bodø/Glimt","🟡",73],
+        ["molde","Molde","🔵",71],
+        ["rosenborg","Rosenborg","⚪",68],
+        ["viking","Viking","🔵",69]
+    ],
+
+    den:[
+        ["copenhagen","FC København","⚪",75],
+        ["midtjylland","FC Midtjylland","⚫",74],
+        ["brondby","Brøndby","🟡",71],
+        ["nordsjaelland","Nordsjælland","🔴",70]
+    ],
+
+    sui:[
+        ["young-boys","Young Boys","🟡",73],
+        ["basel","FC Basel","🔴",70],
+        ["zurich","FC Zürich","⚪",68],
+        ["servette","Servette","🔴",69]
+    ]
+
+};
 
 
-/* =========================
-   STORAGE
-========================= */
+/* =========================================================
+   ДЕМО-СОСТАВЫ
+   Позже заменим на полноценную базу реальных составов.
+========================================================= */
 
-let tacticStyle = localStorage.getItem("fom_tactic_style") || "Контроль";
+const demoSquads = {
 
-let positions = JSON.parse(
-    localStorage.getItem("fom_positions") || "null"
-);
+    "real-madrid":[
+        ["Thibaut Courtois","GK",90,"🧤"],
+        ["Dani Carvajal","DEF",84,"🛡️"],
+        ["Antonio Rüdiger","DEF",86,"🛡️"],
+        ["Éder Militão","DEF",85,"🛡️"],
+        ["Jude Bellingham","MID",91,"⭐"],
+        ["Federico Valverde","MID",89,"⚙️"],
+        ["Eduardo Camavinga","MID",85,"⚙️"],
+        ["Vinícius Júnior","ATT",90,"⚡"],
+        ["Kylian Mbappé","ATT",92,"⚽"],
+        ["Rodrygo","ATT",86,"⚡"],
+        ["Arda Güler","MID",80,"✨"]
+    ],
+
+    "barcelona":[
+        ["Marc-André ter Stegen","GK",88,"🧤"],
+        ["Ronald Araújo","DEF",86,"🛡️"],
+        ["Pau Cubarsí","DEF",82,"🛡️"],
+        ["Jules Koundé","DEF",86,"🛡️"],
+        ["Pedri","MID",88,"⭐"],
+        ["Frenkie de Jong","MID",87,"⚙️"],
+        ["Gavi","MID",83,"⚙️"],
+        ["Lamine Yamal","ATT",90,"⚡"],
+        ["Raphinha","ATT",87,"⚡"],
+        ["Robert Lewandowski","ATT",89,"⚽"],
+        ["Dani Olmo","MID",84,"✨"]
+    ],
+
+    "man-city":[
+        ["Ederson","GK",88,"🧤"],
+        ["Rúben Dias","DEF",89,"🛡️"],
+        ["John Stones","DEF",85,"🛡️"],
+        ["Josko Gvardiol","DEF",84,"🛡️"],
+        ["Rodri","MID",91,"⭐"],
+        ["Kevin De Bruyne","MID",90,"✨"],
+        ["Bernardo Silva","MID",88,"⚙️"],
+        ["Phil Foden","ATT",88,"⚡"],
+        ["Erling Haaland","ATT",91,"⚽"],
+        ["Savinho","ATT",80,"⚡"],
+        ["Jack Grealish","ATT",82,"⚡"]
+    ],
+
+    "liverpool":[
+        ["Alisson","GK",89,"🧤"],
+        ["Virgil van Dijk","DEF",89,"🛡️"],
+        ["Ibrahima Konaté","DEF",84,"🛡️"],
+        ["Andrew Robertson","DEF",84,"🛡️"],
+        ["Trent Alexander-Arnold","DEF",86,"✨"],
+        ["Alexis Mac Allister","MID",85,"⚙️"],
+        ["Dominik Szoboszlai","MID",84,"⚙️"],
+        ["Mohamed Salah","ATT",90,"⚡"],
+        ["Luis Díaz","ATT",86,"⚡"],
+        ["Darwin Núñez","ATT",83,"⚽"],
+        ["Cody Gakpo","ATT",82,"⚽"]
+    ],
+
+    "psg":[
+        ["Gianluigi Donnarumma","GK",89,"🧤"],
+        ["Marquinhos","DEF",86,"🛡️"],
+        ["Achraf Hakimi","DEF",87,"⚡"],
+        ["Nuno Mendes","DEF",84,"⚡"],
+        ["Vitinha","MID",87,"⚙️"],
+        ["Warren Zaïre-Emery","MID",82,"⭐"],
+        ["Fabián Ruiz","MID",82,"⚙️"],
+        ["Ousmane Dembélé","ATT",88,"⚡"],
+        ["Khvicha Kvaratskhelia","ATT",88,"⚡"],
+        ["Désiré Doué","ATT",82,"✨"],
+        ["Gonçalo Ramos","ATT",81,"⚽"]
+    ],
+
+    "bayern":[
+        ["Manuel Neuer","GK",86,"🧤"],
+        ["Dayot Upamecano","DEF",84,"🛡️"],
+        ["Kim Min-jae","DEF",85,"🛡️"],
+        ["Alphonso Davies","DEF",86,"⚡"],
+        ["Joshua Kimmich","MID",88,"⚙️"],
+        ["Jamal Musiala","MID",90,"✨"],
+        ["Leon Goretzka","MID",83,"⚙️"],
+        ["Michael Olise","ATT",86,"⚡"],
+        ["Harry Kane","ATT",91,"⚽"],
+        ["Serge Gnabry","ATT",82,"⚡"],
+        ["Kingsley Coman","ATT",84,"⚡"]
+    ]
+
+};
+
+
+/* =========================================================
+   СОСТОЯНИЕ
+========================================================= */
+
+let selectedLeagueId=null;
+let selectedClubId=null;
+
+let currentClub=null;
+
+let tacticStyle=
+    localStorage.getItem("fom_tactic_style")
+    || "Контроль";
+
+let positions=
+    JSON.parse(
+        localStorage.getItem("fom_positions")
+        || "null"
+    );
 
 if(!positions){
-    positions = {
+
+    positions={
         1:{x:50,y:91},
-        3:{x:34,y:76},
-        4:{x:50,y:78},
-        6:{x:66,y:76},
-        5:{x:16,y:77},
-        8:{x:42,y:59},
-        9:{x:58,y:59},
-        10:{x:50,y:48},
-        11:{x:17,y:43},
-        12:{x:83,y:43},
-        13:{x:50,y:20}
+        2:{x:30,y:76},
+        3:{x:50,y:78},
+        4:{x:70,y:76},
+        5:{x:25,y:58},
+        6:{x:50,y:61},
+        7:{x:75,y:58},
+        8:{x:25,y:42},
+        9:{x:50,y:45},
+        10:{x:75,y:42},
+        11:{x:50,y:20}
     };
+
 }
 
 
-/* =========================
-   NAVIGATION
-========================= */
+/* =========================================================
+   START SCREEN — ЛИГИ
+========================================================= */
+
+function renderLeagues(){
+
+    const grid=
+        document.getElementById("leagueGrid");
+
+    grid.innerHTML="";
+
+    leagues.forEach(league=>{
+
+        const card=
+            document.createElement("button");
+
+        card.className="league-card";
+
+        card.innerHTML=`
+
+            <div class="league-flag">
+                ${league.flag}
+            </div>
+
+            <div class="league-name">
+                ${league.name}
+            </div>
+
+            <div class="league-country">
+                ${league.country}
+            </div>
+
+        `;
+
+        card.onclick=()=>{
+
+            selectedLeagueId=league.id;
+
+            document
+                .querySelectorAll(".league-card")
+                .forEach(c=>
+                    c.classList.remove("selected")
+                );
+
+            card.classList.add("selected");
+
+            document
+                .getElementById("leagueNext")
+                .disabled=false;
+        };
+
+        grid.appendChild(card);
+
+    });
+}
+
+
+/* =========================================================
+   ВЫБОР КЛУБА
+========================================================= */
+
+function showClubSelection(){
+
+    if(!selectedLeagueId) return;
+
+    const league=
+        leagues.find(
+            l=>l.id===selectedLeagueId
+        );
+
+    document.getElementById("leagueStep")
+        .style.display="none";
+
+    document.getElementById("clubStep")
+        .style.display="block";
+
+
+    document.getElementById("selectedLeague")
+        .innerHTML=`
+
+            <div class="selected-league-flag">
+                ${league.flag}
+            </div>
+
+            <div>
+                <div class="selected-league-name">
+                    ${league.name}
+                </div>
+
+                <div class="selected-league-country">
+                    ${league.country}
+                </div>
+            </div>
+        `;
+
+
+    const container=
+        document.getElementById("clubSelection");
+
+    container.innerHTML="";
+
+    (clubs[selectedLeagueId] || []).forEach(club=>{
+
+        const card=
+            document.createElement("button");
+
+        card.className="club-select-card";
+
+        card.innerHTML=`
+
+            <div class="club-crest-big">
+                ${club[2]}
+            </div>
+
+            <div class="club-select-main">
+
+                <div class="club-select-name">
+                    ${club[1]}
+                </div>
+
+                <div class="club-select-meta">
+                    ${league.name}
+                </div>
+
+            </div>
+
+            <div class="club-select-rating">
+                ${club[3]}
+            </div>
+
+        `;
+
+
+        card.onclick=()=>{
+
+            selectedClubId=club[0];
+
+            document
+                .querySelectorAll(".club-select-card")
+                .forEach(c=>
+                    c.classList.remove("selected")
+                );
+
+            card.classList.add("selected");
+
+            document
+                .getElementById("startCareer")
+                .disabled=false;
+        };
+
+
+        container.appendChild(card);
+
+    });
+
+}
+
+
+function backToLeagues(){
+
+    selectedClubId=null;
+
+    document.getElementById("clubStep")
+        .style.display="none";
+
+    document.getElementById("leagueStep")
+        .style.display="block";
+}
+
+
+/* =========================================================
+   НАЧАЛО КАРЬЕРЫ
+========================================================= */
+
+function startCareer(){
+
+    if(!selectedLeagueId || !selectedClubId){
+        return;
+    }
+
+    const league=
+        leagues.find(
+            l=>l.id===selectedLeagueId
+        );
+
+    const club=
+        clubs[selectedLeagueId]
+            .find(c=>c[0]===selectedClubId);
+
+
+    const data={
+        leagueId:selectedLeagueId,
+        clubId:selectedClubId
+    };
+
+    localStorage.setItem(
+        "fom_career",
+        JSON.stringify(data)
+    );
+
+
+    currentClub={
+        id:club[0],
+        name:club[1],
+        crest:club[2],
+        rating:club[3],
+        league:league
+    };
+
+
+    enterGame();
+
+}
+
+
+/* =========================================================
+   ЗАГРУЗКА КАРЬЕРЫ
+========================================================= */
+
+function loadCareer(){
+
+    const saved=
+        localStorage.getItem("fom_career");
+
+    if(!saved){
+        return false;
+    }
+
+    try{
+
+        const data=
+            JSON.parse(saved);
+
+        const league=
+            leagues.find(
+                l=>l.id===data.leagueId
+            );
+
+        const club=
+            (clubs[data.leagueId] || [])
+            .find(
+                c=>c[0]===data.clubId
+            );
+
+        if(!league || !club){
+            return false;
+        }
+
+        currentClub={
+            id:club[0],
+            name:club[1],
+            crest:club[2],
+            rating:club[3],
+            league:league
+        };
+
+        return true;
+
+    }catch(e){
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   ВХОД В ИГРУ
+========================================================= */
+
+function enterGame(){
+
+    document
+        .getElementById("startScreen")
+        .style.display="none";
+
+    document
+        .getElementById("mainApp")
+        .classList.add("visible");
+
+
+    updateClubUI();
+
+    renderPlayers("all");
+
+    renderPitch();
+
+    renderMarket();
+
+    renderTable();
+
+}
+
+
+/* =========================================================
+   ОБНОВЛЕНИЕ КЛУБА
+========================================================= */
+
+function updateClubUI(){
+
+    if(!currentClub) return;
+
+    document
+        .getElementById("homeClubCrest")
+        .textContent=
+        currentClub.crest;
+
+    document
+        .getElementById("homeClubName")
+        .textContent=
+        currentClub.name;
+
+    document
+        .getElementById("homeClubLeague")
+        .textContent=
+        `${currentClub.league.name} • ${currentClub.league.country}`;
+
+    document
+        .getElementById("homeClubRating")
+        .textContent=
+        currentClub.rating;
+
+    document
+        .getElementById("nextHomeCrest")
+        .textContent=
+        currentClub.crest;
+
+    document
+        .getElementById("nextHomeName")
+        .textContent=
+        currentClub.name;
+
+    document
+        .getElementById("matchHomeName")
+        .textContent=
+        currentClub.name;
+
+    document
+        .getElementById("squadSubtitle")
+        .textContent=
+        `${currentClub.name} • Основная команда`;
+
+    document
+        .getElementById("tableSubtitle")
+        .textContent=
+        `${currentClub.league.name} • Турнирная таблица`;
+
+}
+
+
+/* =========================================================
+   НАВИГАЦИЯ
+========================================================= */
 
 function openPage(page){
 
-    document.querySelectorAll(".page").forEach(p=>{
-        p.classList.remove("active");
-    });
+    document
+        .querySelectorAll(".page")
+        .forEach(p=>
+            p.classList.remove("active")
+        );
 
-    const target=document.getElementById(page);
+    const target=
+        document.getElementById(page);
 
     if(target){
         target.classList.add("active");
     }
 
-    document.querySelectorAll(".nav-item").forEach(item=>{
-        item.classList.toggle(
-            "active",
-            item.dataset.page===page
-        );
-    });
+    document
+        .querySelectorAll(".nav-item")
+        .forEach(item=>{
+
+            item.classList.toggle(
+                "active",
+                item.dataset.page===page
+            );
+
+        });
 
     window.scrollTo({
         top:0,
@@ -1424,192 +2579,208 @@ function openPage(page){
     if(page==="table"){
         renderTable();
     }
+
 }
 
 
-/* =========================
-   TOAST
-========================= */
+/* =========================================================
+   ИГРОКИ
+========================================================= */
 
-let toastTimer;
+function getSquad(){
 
-function showToast(text){
+    if(!currentClub){
+        return [];
+    }
 
-    const toast=document.getElementById("toast");
+    return demoSquads[currentClub.id] || [
 
-    toast.textContent=text;
-    toast.classList.add("show");
+        ["Основной вратарь","GK",78,"🧤"],
+        ["Центральный защитник","DEF",78,"🛡️"],
+        ["Центральный защитник","DEF",77,"🛡️"],
+        ["Правый защитник","DEF",76,"🛡️"],
+        ["Левый защитник","DEF",76,"🛡️"],
+        ["Центральный полузащитник","MID",78,"⚙️"],
+        ["Атакующий полузащитник","MID",80,"✨"],
+        ["Центральный полузащитник","MID",77,"⚙️"],
+        ["Левый вингер","ATT",79,"⚡"],
+        ["Центральный нападающий","ATT",82,"⚽"],
+        ["Правый вингер","ATT",79,"⚡"]
 
-    clearTimeout(toastTimer);
+    ];
 
-    toastTimer=setTimeout(()=>{
-        toast.classList.remove("show");
-    },2200);
 }
 
-
-/* =========================
-   SQUAD
-========================= */
 
 function renderPlayers(filter="all"){
 
-    const list=document.getElementById("playerList");
+    const list=
+        document.getElementById("playerList");
 
-    const filtered=filter==="all"
-        ? players
-        : players.filter(p=>p.type===filter);
+    if(!list) return;
 
     list.innerHTML="";
 
-    filtered.forEach(player=>{
+    const squad=
+        getSquad();
 
-        const card=document.createElement("div");
+    const filtered=
+        filter==="all"
+        ? squad
+        : squad.filter(
+            p=>p[1]===filter
+        );
+
+
+    filtered.forEach((player,index)=>{
+
+        const card=
+            document.createElement("div");
 
         card.className="player-card";
 
-        card.onclick=()=>{
-            showPlayer(player.id);
-        };
-
         card.innerHTML=`
-            <div class="player-avatar">${player.emoji}</div>
+
+            <div class="player-avatar">
+                ${player[3]}
+            </div>
 
             <div class="player-main">
-                <div class="player-name">${player.name}</div>
-                <div class="player-position">${player.pos} • #${player.number}</div>
+
+                <div class="player-name">
+                    ${player[0]}
+                </div>
+
+                <div class="player-position">
+                    ${positionName(player[1])}
+                </div>
+
             </div>
 
             <div>
-                <div class="player-rating">${player.rating}</div>
-                <div class="player-form">${player.form}</div>
+
+                <div class="player-rating">
+                    ${player[2]}
+                </div>
+
+                <div class="player-form">
+                    Хорошая форма
+                </div>
+
             </div>
+
         `;
 
         list.appendChild(card);
+
     });
+
+
+    if(filtered.length===0){
+
+        list.innerHTML=`
+            <div style="
+                padding:25px;
+                text-align:center;
+                color:var(--muted);
+                font-size:11px;
+            ">
+                В этой категории пока нет игроков.
+            </div>
+        `;
+
+    }
+
 }
+
+
+function positionName(type){
+
+    if(type==="GK") return "Вратарь";
+    if(type==="DEF") return "Защитник";
+    if(type==="MID") return "Полузащитник";
+    if(type==="ATT") return "Нападающий";
+
+    return type;
+
+}
+
 
 function filterPlayers(type,button){
 
-    document.querySelectorAll(".filters .filter").forEach(b=>{
-        b.classList.remove("active");
-    });
+    document
+        .querySelectorAll("#squad .filter")
+        .forEach(b=>
+            b.classList.remove("active")
+        );
 
     button.classList.add("active");
 
     renderPlayers(type);
+
 }
 
 
-/* =========================
-   PLAYER
-========================= */
-
-function showPlayer(id){
-
-    const player=players.find(p=>p.id===id);
-
-    if(!player) return;
-
-    document.getElementById("playerDetail").innerHTML=`
-
-        <div class="detail-card">
-
-            <div class="big-avatar">${player.emoji}</div>
-
-            <div class="detail-name">${player.name}</div>
-
-            <div class="detail-position">
-                ${player.pos} • Номер ${player.number}
-            </div>
-
-            <div class="attribute-grid">
-
-                <div class="attribute">
-                    <div class="attribute-value">${player.speed}</div>
-                    <div class="attribute-label">СКОРОСТЬ</div>
-                </div>
-
-                <div class="attribute">
-                    <div class="attribute-value">${player.shot}</div>
-                    <div class="attribute-label">УДАР</div>
-                </div>
-
-                <div class="attribute">
-                    <div class="attribute-value">${player.pass}</div>
-                    <div class="attribute-label">ПАС</div>
-                </div>
-
-                <div class="attribute">
-                    <div class="attribute-value">${player.tackle}</div>
-                    <div class="attribute-label">ОТБОР</div>
-                </div>
-
-                <div class="attribute">
-                    <div class="attribute-value">${player.dribble}</div>
-                    <div class="attribute-label">ДРИБЛИНГ</div>
-                </div>
-
-                <div class="attribute">
-                    <div class="attribute-value">${player.rating}</div>
-                    <div class="attribute-label">ОБЩИЙ</div>
-                </div>
-
-                <div class="attribute">
-                    <div class="attribute-value">${player.form}</div>
-                    <div class="attribute-label">ФОРМА</div>
-                </div>
-
-                <div class="attribute">
-                    <div class="attribute-value">23</div>
-                    <div class="attribute-label">ВОЗРАСТ</div>
-                </div>
-
-            </div>
-
-        </div>
-
-    `;
-
-    openPage("player");
-}
-
-
-/* =========================
-   TACTICS
-========================= */
+/* =========================================================
+   ТАКТИКА
+========================================================= */
 
 function renderPitch(){
 
-    const pitch=document.getElementById("pitch");
+    const pitch=
+        document.getElementById("pitch");
 
-    pitch.querySelectorAll(".pitch-player").forEach(el=>el.remove());
+    if(!pitch) return;
 
-    Object.keys(positions).forEach(id=>{
+    pitch
+        .querySelectorAll(".pitch-player")
+        .forEach(el=>el.remove());
 
-        const player=players.find(p=>p.id==id);
 
-        if(!player) return;
+    const squad=
+        getSquad().slice(0,11);
 
-        const el=document.createElement("div");
+
+    squad.forEach((player,index)=>{
+
+        const el=
+            document.createElement("div");
 
         el.className="pitch-player";
 
-        el.dataset.id=id;
+        el.dataset.index=index;
 
-        el.style.left=positions[id].x+"%";
-        el.style.top=positions[id].y+"%";
+        const pos=
+            positions[index+1]
+            || {
+                x:50,
+                y:50
+            };
+
+        el.style.left=
+            pos.x+"%";
+
+        el.style.top=
+            pos.y+"%";
+
 
         el.innerHTML=`
-            ${player.number}
-            <span>${player.name.split(" ")[0]}</span>
+
+            ${index+1}
+
+            <span>
+                ${player[0].split(" ")[0]}
+            </span>
+
         `;
+
 
         addDrag(el);
 
         pitch.appendChild(el);
+
     });
+
 }
 
 
@@ -1617,54 +2788,99 @@ function addDrag(element){
 
     let dragging=false;
 
+
     function move(clientX,clientY){
 
-        const rect=document
+        const rect=
+            document
             .getElementById("pitch")
             .getBoundingClientRect();
 
-        let x=((clientX-rect.left)/rect.width)*100;
-        let y=((clientY-rect.top)/rect.height)*100;
 
-        x=Math.max(7,Math.min(93,x));
-        y=Math.max(7,Math.min(93,y));
+        let x=
+            ((clientX-rect.left)
+            /rect.width)*100;
+
+        let y=
+            ((clientY-rect.top)
+            /rect.height)*100;
+
+
+        x=Math.max(
+            7,
+            Math.min(93,x)
+        );
+
+        y=Math.max(
+            7,
+            Math.min(93,y)
+        );
+
 
         element.style.left=x+"%";
         element.style.top=y+"%";
 
-        positions[element.dataset.id]={
+
+        positions[
+            Number(element.dataset.index)+1
+        ]={
             x:x,
             y:y
         };
+
 
         localStorage.setItem(
             "fom_positions",
             JSON.stringify(positions)
         );
+
     }
 
-    element.addEventListener("pointerdown",e=>{
 
-        dragging=true;
+    element.addEventListener(
+        "pointerdown",
+        e=>{
 
-        element.setPointerCapture(e.pointerId);
+            dragging=true;
 
-        e.preventDefault();
-    });
+            element.setPointerCapture(
+                e.pointerId
+            );
 
-    element.addEventListener("pointermove",e=>{
+            e.preventDefault();
 
-        if(!dragging) return;
+        }
+    );
 
-        move(e.clientX,e.clientY);
-    });
 
-    element.addEventListener("pointerup",e=>{
+    element.addEventListener(
+        "pointermove",
+        e=>{
 
-        dragging=false;
+            if(!dragging) return;
 
-        showToast("Позиция сохранена");
-    });
+            move(
+                e.clientX,
+                e.clientY
+            );
+
+        }
+    );
+
+
+    element.addEventListener(
+        "pointerup",
+        ()=>{
+
+            dragging=false;
+
+            showToast(
+                "Позиция сохранена"
+            );
+
+        }
+    );
+
 }
 
 
@@ -1672,7 +2888,9 @@ function setStyle(button,style){
 
     document
         .querySelectorAll(".tactic-button")
-        .forEach(b=>b.classList.remove("active"));
+        .forEach(
+            b=>b.classList.remove("active")
+        );
 
     button.classList.add("active");
 
@@ -1683,15 +2901,193 @@ function setStyle(button,style){
         style
     );
 
-    document.getElementById("styleText").textContent=style;
+    document
+        .getElementById("styleText")
+        .textContent=style;
 
-    showToast("Стиль: "+style);
+    showToast(
+        "Стиль: "+style
+    );
+
 }
 
 
-/* =========================
-   MATCH
-========================= */
+/* =========================================================
+   ТРАНСФЕРЫ
+========================================================= */
+
+function renderMarket(){
+
+    const list=
+        document.getElementById("marketList");
+
+    if(!list) return;
+
+    const market=[
+
+        ["Viktor Gyökeres","ST",88,"€42M","⚽"],
+        ["Rafael Leão","LW",87,"€58M","⚡"],
+        ["Bruno Guimarães","CM",86,"€55M","⚙️"],
+        ["William Saliba","CB",88,"€64M","🛡️"],
+        ["Federico Dimarco","LB",85,"€38M","⚡"],
+        ["Mike Maignan","GK",87,"€45M","🧤"]
+
+    ];
+
+
+    list.innerHTML="";
+
+
+    market.forEach(player=>{
+
+        const card=
+            document.createElement("div");
+
+        card.className="market-card";
+
+        card.innerHTML=`
+
+            <div class="market-avatar">
+                ${player[4]}
+            </div>
+
+            <div class="market-info">
+
+                <div class="player-name">
+                    ${player[0]}
+                </div>
+
+                <div class="market-meta">
+                    ${player[1]} • Рейтинг ${player[2]}
+                </div>
+
+            </div>
+
+            <div style="text-align:right">
+
+                <div class="market-price">
+                    ${player[3]}
+                </div>
+
+                <button
+                    class="buy-button"
+                    onclick="buyPlayer('${player[0]}')">
+                    Купить
+                </button>
+
+            </div>
+
+        `;
+
+        list.appendChild(card);
+
+    });
+
+}
+
+
+function buyPlayer(name){
+
+    showToast(
+        `${name}: переговоры открыты`
+    );
+
+}
+
+
+/* =========================================================
+   ТАБЛИЦА
+========================================================= */
+
+function renderTable(){
+
+    const table=
+        document.getElementById("leagueTable");
+
+    if(!table || !currentClub) return;
+
+    const leagueClubs=
+        clubs[currentClub.league.id] || [];
+
+    const sorted=
+        [...leagueClubs]
+        .sort(
+            (a,b)=>b[3]-a[3]
+        );
+
+
+    table.innerHTML="";
+
+
+    sorted.forEach((club,index)=>{
+
+        const row=
+            document.createElement("div");
+
+        row.className=
+            "table-row "+
+            (
+                club[0]===currentClub.id
+                ? "you"
+                : ""
+            );
+
+
+        const points=
+            Math.max(
+                5,
+                30-index*2
+            );
+
+
+        row.innerHTML=`
+
+            <span>
+                ${index+1}
+            </span>
+
+            <span class="club-table">
+
+                <span class="club-mini">
+                    ${club[2]}
+                </span>
+
+                ${club[1]}
+
+            </span>
+
+            <span>
+                ${11}
+            </span>
+
+            <span>
+                ${points}
+            </span>
+
+            <span>
+                +${Math.max(1,15-index)}
+            </span>
+
+            <span style="
+                color:var(--muted);
+                font-size:7px;
+            ">
+                W W D W
+            </span>
+
+        `;
+
+
+        table.appendChild(row);
+
+    });
+
+}
+
+
+/* =========================================================
+   МАТЧ
+========================================================= */
 
 let matchRunning=false;
 let matchMinute=1;
@@ -1699,37 +3095,66 @@ let homeGoals=0;
 let awayGoals=0;
 let matchTimer=null;
 
-const events=[
-    "FC Кавказ контролирует мяч.",
-    "Хорошая передача через центр.",
-    "Красная Звезда пытается провести атаку.",
-    "Отбор в центре поля.",
-    "Атака развивается по левому флангу.",
-    "Опасный навес в штрафную.",
-    "Удар! Вратарь спасает команду.",
-    "Полузащитник перехватил мяч.",
-    "Команда перестраивается после потери."
+
+const matchEvents=[
+
+    "Команда начинает атаку через центр.",
+    "Хорошая передача в полуфланг.",
+    "Мяч перехвачен в центре поля.",
+    "Атака развивается через левый фланг.",
+    "Опасная передача в штрафную.",
+    "Соперник отвечает контратакой.",
+    "Удар из-за пределов штрафной.",
+    "Вратарь уверенно забирает мяч.",
+    "Команда контролирует владение."
+
 ];
+
 
 function startMatch(){
 
     if(matchRunning){
-        showToast("Матч уже идёт");
+
+        showToast(
+            "Матч уже идёт"
+        );
+
         return;
+
     }
 
+
     matchRunning=true;
+
     matchMinute=1;
     homeGoals=0;
     awayGoals=0;
 
-    document.getElementById("score").textContent="0 : 0";
-    document.getElementById("minute").textContent="1'";
-    document.getElementById("matchEvents").innerHTML="";
 
-    matchTimer=setInterval(simulateMinute,700);
+    document
+        .getElementById("score")
+        .textContent="0 : 0";
 
-    showToast("Матч начался!");
+    document
+        .getElementById("minute")
+        .textContent="1'";
+
+    document
+        .getElementById("matchEvents")
+        .innerHTML="";
+
+
+    matchTimer=
+        setInterval(
+            simulateMinute,
+            650
+        );
+
+
+    showToast(
+        "Матч начался!"
+    );
+
 }
 
 
@@ -1737,40 +3162,60 @@ function simulateMinute(){
 
     matchMinute++;
 
-    document.getElementById("minute").textContent=
+
+    document
+        .getElementById("minute")
+        .textContent=
         matchMinute+"'";
 
-    const random=Math.random();
 
-    if(random<0.06){
+    const random=
+        Math.random();
+
+
+    if(random<.045){
 
         homeGoals++;
 
         addEvent(
             matchMinute,
-            "⚽ ГОЛ! FC Кавказ забивает!"
+            `⚽ ГОЛ! ${currentClub.name}!`
         );
 
         updateScore();
 
-    }else if(random<0.11){
+    }
+
+    else if(random<.085){
 
         awayGoals++;
 
         addEvent(
             matchMinute,
-            "⚽ Гол Красной Звезды."
+            "⚽ Гол Manchester United."
         );
 
         updateScore();
 
-    }else if(random<0.42){
-
-        const text=
-            events[Math.floor(Math.random()*events.length)];
-
-        addEvent(matchMinute,text);
     }
+
+    else if(random<.40){
+
+        const event=
+            matchEvents[
+                Math.floor(
+                    Math.random()
+                    *matchEvents.length
+                )
+            ];
+
+        addEvent(
+            matchMinute,
+            event
+        );
+
+    }
+
 
     if(matchMinute>=90){
 
@@ -1780,38 +3225,57 @@ function simulateMinute(){
 
         addEvent(
             90,
-            "🏁 Финальный свисток. Матч завершён."
+            "🏁 Финальный свисток."
         );
 
         showToast(
             `Матч завершён: ${homeGoals}:${awayGoals}`
         );
+
     }
+
 }
 
 
 function updateScore(){
 
-    document.getElementById("score").textContent=
+    document
+        .getElementById("score")
+        .textContent=
         `${homeGoals} : ${awayGoals}`;
+
 }
 
 
 function addEvent(minute,text){
 
-    const eventsBox=
-        document.getElementById("matchEvents");
+    const box=
+        document.getElementById(
+            "matchEvents"
+        );
 
-    const event=document.createElement("div");
+
+    const event=
+        document.createElement("div");
 
     event.className="event";
 
+
     event.innerHTML=`
-        <div class="event-time">${minute}'</div>
-        <div class="event-text">${text}</div>
+
+        <div class="event-time">
+            ${minute}'
+        </div>
+
+        <div class="event-text">
+            ${text}
+        </div>
+
     `;
 
-    eventsBox.prepend(event);
+
+    box.prepend(event);
+
 }
 
 
@@ -1819,129 +3283,60 @@ function setMatchStyle(button,style){
 
     document
         .querySelectorAll(".match-action")
-        .forEach(b=>b.classList.remove("active"));
+        .forEach(
+            b=>b.classList.remove("active")
+        );
 
     button.classList.add("active");
 
-    showToast("Тактика матча: "+style);
-}
-
-
-/* =========================
-   TRANSFERS
-========================= */
-
-function renderMarket(){
-
-    const list=document.getElementById("marketList");
-
-    list.innerHTML="";
-
-    marketPlayers.forEach(player=>{
-
-        const card=document.createElement("div");
-
-        card.className="market-card";
-
-        card.innerHTML=`
-
-            <div class="market-avatar">
-                ${player.emoji}
-            </div>
-
-            <div class="market-info">
-                <div class="player-name">
-                    ${player.name}
-                </div>
-
-                <div class="market-meta">
-                    ${player.pos} • Рейтинг ${player.rating}
-                </div>
-            </div>
-
-            <div style="text-align:right">
-                <div class="market-price">
-                    ${player.price}
-                </div>
-
-                <button class="buy-button"
-                    onclick="buyPlayer('${player.name}')">
-                    Купить
-                </button>
-            </div>
-
-        `;
-
-        list.appendChild(card);
-    });
-}
-
-
-function buyPlayer(name){
-
     showToast(
-        `${name} добавлен в список переговоров`
+        "Тактика матча: "+style
     );
+
 }
 
 
-/* =========================
-   TABLE
-========================= */
+/* =========================================================
+   TOAST
+========================================================= */
 
-function renderTable(){
+let toastTimer;
 
-    const table=document.getElementById("leagueTable");
+function showToast(text){
 
-    table.innerHTML="";
+    const toast=
+        document.getElementById("toast");
 
-    clubs.forEach(club=>{
+    toast.textContent=text;
 
-        const row=document.createElement("div");
+    toast.classList.add("show");
 
-        row.className=
-            "table-row "+(
-                club[1]==="FC Кавказ"
-                ?"you":""
-            );
+    clearTimeout(toastTimer);
 
-        row.innerHTML=`
+    toastTimer=
+        setTimeout(
+            ()=>{
+                toast.classList.remove("show");
+            },
+            2200
+        );
 
-            <span>${club[0]}</span>
-
-            <span class="club-table">
-                <span class="club-mini">${club[2]}</span>
-                ${club[1]}
-            </span>
-
-            <span>${club[3]}</span>
-            <span>${club[4]}</span>
-            <span>${club[5]}</span>
-
-            <span style="font-size:8px;color:var(--muted)">
-                ${club[6]}
-            </span>
-        `;
-
-        table.appendChild(row);
-    });
 }
 
 
-/* =========================
+/* =========================================================
    INIT
-========================= */
+========================================================= */
 
-document.getElementById("styleText").textContent=
-    tacticStyle;
+renderLeagues();
 
-renderPlayers("all");
-renderPitch();
-renderMarket();
-renderTable();
+if(loadCareer()){
+
+    enterGame();
+
+}
 
 </script>
 
 </body>
 </html>
-```
