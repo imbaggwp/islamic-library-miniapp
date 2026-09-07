@@ -919,11 +919,33 @@ const clubAliases={
   'Udinese':'Udinese',
   'Venezia':'Venezia',
   'Paris Saint-Germain':'Paris Saint-Germain'
+,
+  'FC Barcelona':'Barcelona',
+  'Atlético de Madrid':'Atletico Madrid',
+  'CA Osasuna':'Osasuna',
+  'Celta':'Celta Vigo',
+  'Deportivo Alavés':'Alaves',
+  'Elche CF':'Elche',
+  'Getafe CF':'Getafe',
+  'Levante UD':'Levante',
+  'Málaga CF':'Malaga',
+  'RC Deportivo':'Deportivo La Coruna',
+  'RCD Espanyol':'Espanyol',
+  'Sevilla FC':'Sevilla',
+  'Valencia CF':'Valencia',
+  'AFC Bournemouth':'Bournemouth',
+  'Brighton & Hove Albion':'Brighton',
+  'Newcastle United':'Newcastle',
+  'West Ham United':'West Ham',
+  'Wolverhampton Wanderers':'Wolves',
+  'Paris FC':'Paris FC',
+  'Le Mans FC':'Le Mans'
 };
 
 
 Object.entries(expandedRosters).forEach(([name,players])=>{
-  if(clubs[name]) clubs[name].players=S(players);
+  const target=(clubAliases&&clubAliases[name])||name;
+  if(clubs[target]) clubs[target].players=players.map(x=>S(...x));
 });
 
 function renderClubChoices(){
@@ -985,8 +1007,8 @@ function chooseClub(name){
  if(!c){showToast('Для этого клуба пока нет карточки базы');return;}
  state=JSON.parse(JSON.stringify(initialState));
  state.club=name;state.country=c.country;state.league=c.league;state.rating=c.rating;state.money=c.money;
- state.players=c.players.length?JSON.parse(JSON.stringify(c.players)):generateClubSquad(c,name);
- state.rosterSource=c.players.length?'verified':'pending';
+ state.players=Array.isArray(c.players)?JSON.parse(JSON.stringify(c.players)):[];
+ state.rosterSource=state.players.length?'verified':'pending';
  state.bench=JSON.parse(JSON.stringify(initialState.bench));
  state.opponents=(clubLeagues[c.league]||['Rival FC','City FC','United FC','Dynamo FC','Athletic FC','Sporting FC']).filter(x=>x!==name).slice(0,8);
  state.opponents=[...state.opponents,...state.opponents,...state.opponents].slice(0,18);
@@ -4214,6 +4236,21 @@ let state=savedState&&typeof savedState==='object'?savedState:JSON.parse(JSON.st
 let careerStarted=localStorage.getItem('fm_career_started')==='1';
 if(!state||typeof state!=='object')state=JSON.parse(JSON.stringify(initialState));
 if(!Array.isArray(state.players))state.players=JSON.parse(JSON.stringify(initialState.players));
+function restoreClubSquadFromDatabase(){
+  if(!state?.club)return false;
+  const resolved=(typeof clubAliases!=='undefined'&&clubAliases[state.club])||state.club;
+  const db=(typeof clubs!=='undefined')?clubs[resolved]:null;
+  if(!db || !Array.isArray(db.players) || !db.players.length)return false;
+  if(!Array.isArray(state.players)||state.players.length===0){
+    state.players=JSON.parse(JSON.stringify(db.players));
+    state.rosterSource='verified';
+    state.bench=Array.isArray(state.bench)?state.bench:[];
+    state.bench=state.bench.filter(b=>state.players.some(p=>String(p[0])===String(b[0])));
+    localStorage.setItem('fm_state',JSON.stringify(state));
+    return true;
+  }
+  return false;
+}
 if(!Array.isArray(state.bench))state.bench=JSON.parse(JSON.stringify(initialState.bench));
 if(!Array.isArray(state.market))state.market=JSON.parse(JSON.stringify(initialState.market));
 if(!Array.isArray(state.table))state.table=JSON.parse(JSON.stringify(initialState.table));
@@ -4224,6 +4261,7 @@ if(!Number.isFinite(Number(state.money)))state.money=initialState.money;
 if(!Number.isFinite(Number(state.rating)))state.rating=initialState.rating;
 if(!Number.isFinite(Number(state.round)))state.round=initialState.round;
 state.scheme=state.scheme||'4-3-3';
+restoreClubSquadFromDatabase();
 function save(){localStorage.setItem('fm_state',JSON.stringify(state))}
 function navigate(id){
   const aliases={market:'transfers',players:'squad',tactics:'gameMatch',matches:'calendar',match:'gameMatch'};
