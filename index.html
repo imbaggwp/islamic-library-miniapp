@@ -1099,6 +1099,25 @@ button {
     font-weight: 650;
 }
 
+
+/* TOURNAMENT GROUPS / ENHANCED UI */
+.league-groups{display:flex;flex-direction:column;gap:18px;margin-bottom:18px}
+.league-group{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px}
+.league-group-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.league-group-title{font-size:14px;font-weight:800}
+.league-group-sub{font-size:9px;color:var(--muted);margin-top:3px}
+.league-group-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.tournament-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0}
+.tournament-stat{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:10px;text-align:center}
+.tournament-stat strong{display:block;font-size:15px}.tournament-stat span{display:block;color:var(--muted);font-size:8px;margin-top:3px}
+.tournament-section{margin-top:16px}.tournament-section h3{font-size:12px;margin:0 0 9px}
+.tournament-match{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.tournament-match:last-child{border-bottom:0}.tm-team{display:flex;align-items:center;gap:7px;min-width:0;flex:1;font-size:10px;font-weight:650}.tm-team:last-child{justify-content:flex-end;text-align:right}.tm-team img{width:22px;height:22px;object-fit:contain}.tm-score{min-width:45px;text-align:center;font-size:11px;font-weight:800}
+.profile-quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}.profile-quick button{background:var(--card2);border:1px solid var(--border);border-radius:13px;padding:11px;color:var(--text);font-size:10px;font-weight:750}
+.admin-preview{margin-top:10px;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:var(--card2)}
+.admin-preview img{width:100%;height:120px;object-fit:cover;display:block}.admin-preview-body{padding:10px}.admin-preview-title{font-size:11px;font-weight:800}.admin-preview-text{font-size:9px;color:var(--muted);margin-top:4px}
+@media(max-width:390px){.league-group-grid{grid-template-columns:1fr}.tournament-summary{grid-template-columns:1fr 1fr 1fr}}
+
 /* ADMIN */
 
 .admin-match-info {
@@ -1658,7 +1677,7 @@ button {
 
     </header>
 
-    <div id="league-list" class="grid"></div>
+    <div id="league-list"></div>
 
 </main>
 
@@ -1707,10 +1726,17 @@ button {
             </div>
 
             <div class="stat-box">
-                <strong>2.1</strong>
+                <strong>2.2</strong>
                 <span>Версия</span>
             </div>
 
+        </div>
+
+        <div class="profile-quick">
+            <button onclick="showPage('matches')">⚽ Все матчи</button>
+            <button onclick="showPage('leagues')">🏆 Турниры</button>
+            <button onclick="showPage('live')">🔴 Сейчас LIVE</button>
+            <button onclick="openSearch()">⌕ Найти команду</button>
         </div>
 
     </div>
@@ -3981,16 +4007,29 @@ async function loadLivePage() {
 
 function renderLeagues() {
 
-    const el =
-        document.getElementById(
-            "league-list"
-        );
+    const el = document.getElementById("league-list");
 
+    const groups = [
+        { title:"🏆 Европейские турниры", sub:"Главные клубные соревнования Европы", ids:[2,3,848] },
+        { title:"🇪🇺 Топ-лиги", sub:"Главные национальные чемпионаты", ids:[39,140,135,78,61,88,94,203] },
+        { title:"🇷🇺 Россия и Азия", sub:"Российская и ведущие азиатские лиги", ids:[235,307] },
+        { title:"🌍 Сборные", sub:"Главные турниры национальных команд", ids:[1,4,5,10] }
+    ];
 
-    el.innerHTML =
-        LEAGUES
-            .map(leagueCard)
-            .join("");
+    el.innerHTML = `<div class="league-groups">${groups.map(group => {
+        const leagues = group.ids.map(id => LEAGUES.find(x => x.id === id)).filter(Boolean);
+        return `
+            <section class="league-group">
+                <div class="league-group-head">
+                    <div>
+                        <div class="league-group-title">${group.title}</div>
+                        <div class="league-group-sub">${group.sub}</div>
+                    </div>
+                    <span style="font-size:9px;color:var(--muted)">${leagues.length}</span>
+                </div>
+                <div class="league-group-grid">${leagues.map(leagueCard).join("")}</div>
+            </section>`;
+    }).join("")}</div>`;
 
 }
 
@@ -4055,129 +4094,60 @@ function leagueCard(league) {
    LEAGUE
 ========================================================= */
 
-async function openLeague(
-    leagueId
-) {
+async function openLeague(leagueId) {
 
-    const league =
-        LEAGUES.find(
-            x =>
-                x.id === leagueId
-        );
+    const league = LEAGUES.find(x => x.id === leagueId);
+    if (!league) return;
 
+    state.currentLeague = league;
 
-    if (!league)
-        return;
-
-
-    state.currentLeague =
-        league;
-
-
-    document
-        .getElementById(
-            "league-modal-title"
-        )
-        .textContent =
-        league.name;
-
-
-    document
-        .getElementById(
-            "league-modal-content"
-        )
-        .innerHTML =
-        loadingBlock();
-
-
-    document
-        .getElementById(
-            "league-modal"
-        )
-        .classList
-        .add("active");
-
+    document.getElementById("league-modal-title").textContent = league.name;
+    document.getElementById("league-modal-content").innerHTML = loadingBlock();
+    document.getElementById("league-modal").classList.add("active");
 
     try {
+        const [standingsData, upcomingData, recentData] = await Promise.all([
+            apiRequest("/standings", { league: league.id, season: CURRENT_SEASON }, 900),
+            apiRequest("/fixtures", { league: league.id, season: CURRENT_SEASON, next: 5 }, 900),
+            apiRequest("/fixtures", { league: league.id, season: CURRENT_SEASON, last: 5 }, 900)
+        ]);
 
-        const data =
-            await apiRequest(
-                "/standings",
-                {
-                    league:
-                        league.id,
+        const groups = standingsData.response || [];
+        const standings = groups[0]?.league?.standings?.[0] || [];
+        const upcoming = (upcomingData.response || []).filter(x => x.fixture?.status?.short !== "CANC");
+        const recent = (recentData.response || []).filter(x => ["FT","AET","PEN"].includes(x.fixture?.status?.short));
 
-                    season:
-                        CURRENT_SEASON
-                },
-                900
-            );
-
-
-        const groups =
-            data.response || [];
-
-
-        if (!groups.length) {
-
-            document
-                .getElementById(
-                    "league-modal-content"
-                )
-                .innerHTML = `
-
-                    <div class="empty">
-
-                        <div class="empty-icon">
-                            🏆
-                        </div>
-
-                        <strong>
-                            Таблица пока недоступна
-                        </strong>
-
-                        <span>
-                            API не вернул
-                            турнирную таблицу.
-                        </span>
-
-                    </div>
-
-                `;
-
-            return;
-
-        }
-
-
-        const standings =
-            groups[0]
-                .league
-                .standings?.[0] || [];
-
-
-        document
-            .getElementById(
-                "league-modal-content"
-            )
-            .innerHTML =
-            renderStandings(
-                standings,
-                league
-            );
-
-
+        document.getElementById("league-modal-content").innerHTML = renderTournamentOverview(
+            league, standings, upcoming, recent
+        );
     } catch (error) {
-
-        document
-            .getElementById(
-                "league-modal-content"
-            )
-            .innerHTML =
-            errorBlock(error);
-
+        document.getElementById("league-modal-content").innerHTML = errorBlock(error);
     }
+}
 
+function renderTournamentOverview(league, standings, upcoming, recent) {
+    const fmtDate = date => date ? new Intl.DateTimeFormat("ru-RU", {day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit", timeZone:TIMEZONE}).format(new Date(date)) : "—";
+    const fixtureRow = f => `
+        <div class="tournament-match" onclick="openMatch(${f.fixture.id})">
+            <div class="tm-team"><img src="${f.teams.home.logo}" alt=""><span>${escapeHtml(f.teams.home.name)}</span></div>
+            <div class="tm-score">${f.goals.home ?? "—"} : ${f.goals.away ?? "—"}<small style="display:block;color:var(--muted);font-size:7px;margin-top:2px">${fmtDate(f.fixture.date)}</small></div>
+            <div class="tm-team"><span>${escapeHtml(f.teams.away.name)}</span><img src="${f.teams.away.logo}" alt=""></div>
+        </div>`;
+
+    return `
+        <div style="display:flex;align-items:center;gap:10px">
+            <img src="${league.logo}" style="width:42px;height:42px;object-fit:contain" alt="">
+            <div><strong style="font-size:15px">${escapeHtml(league.name)}</strong><div style="color:var(--muted);font-size:9px;margin-top:3px">${escapeHtml(league.country)} · сезон ${CURRENT_SEASON}/${String(CURRENT_SEASON+1).slice(-2)}</div></div>
+        </div>
+        <div class="tournament-summary">
+            <div class="tournament-stat"><strong>${standings.length || "—"}</strong><span>Команд</span></div>
+            <div class="tournament-stat"><strong>${upcoming.length || "—"}</strong><span>Ближайшие</span></div>
+            <div class="tournament-stat"><strong>${recent.length || "—"}</strong><span>Последние</span></div>
+        </div>
+        ${upcoming.length ? `<div class="tournament-section"><h3>📅 Ближайшие матчи</h3><div>${upcoming.slice(0,5).map(fixtureRow).join("")}</div></div>` : ""}
+        ${recent.length ? `<div class="tournament-section"><h3>↩ Последние результаты</h3><div>${recent.slice(0,5).reverse().map(fixtureRow).join("")}</div></div>` : ""}
+        ${standings.length ? `<div class="tournament-section"><h3>📊 Турнирная таблица</h3>${renderStandings(standings, league)}</div>` : `<div class="empty" style="margin-top:14px"><div class="empty-icon">🏆</div><strong>Таблица недоступна</strong><span>Для этого турнира API не вернул standings, но матчи доступны выше.</span></div>`}
+    `;
 }
 
 
@@ -7451,7 +7421,7 @@ function saveNews() {
     const item = {
 
         id:
-            Date.now(),
+            state.admin.editingNewsId || Date.now(),
 
         title,
 
@@ -7471,9 +7441,13 @@ function saveNews() {
     };
 
 
-    state.content.news.unshift(
-        item
-    );
+    if (state.admin.editingNewsId) {
+        const index = state.content.news.findIndex(x => String(x.id) === String(state.admin.editingNewsId));
+        if (index >= 0) state.content.news[index] = item;
+        else state.content.news.unshift(item);
+    } else {
+        state.content.news.unshift(item);
+    }
 
 
     saveContentToGithub()
@@ -7481,7 +7455,8 @@ function saveNews() {
             success => {
 
                 if (success)
-                    resetNewsForm();
+                    state.admin.editingNewsId = null;
+        resetNewsForm();
 
             }
         );
@@ -7516,6 +7491,8 @@ function deleteNews(id) {
 
 
 function resetNewsForm() {
+
+    state.admin.editingNewsId = null;
 
     document
         .getElementById(
@@ -7596,10 +7573,10 @@ function saveBanner() {
     }
 
 
-    state.content.banners.unshift({
+    const item = {
 
         id:
-            Date.now(),
+            state.admin.editingBannerId || Date.now(),
 
         title,
 
@@ -7612,15 +7589,23 @@ function saveBanner() {
         active:
             true
 
-    });
+    };
 
+    if (state.admin.editingBannerId) {
+        const index = state.content.banners.findIndex(x => String(x.id) === String(state.admin.editingBannerId));
+        if (index >= 0) state.content.banners[index] = item;
+        else state.content.banners.unshift(item);
+    } else {
+        state.content.banners.unshift(item);
+    }
 
     saveContentToGithub()
         .then(
             success => {
 
                 if (success)
-                    resetBannerForm();
+                    state.admin.editingBannerId = null;
+        resetBannerForm();
 
             }
         );
@@ -7655,6 +7640,8 @@ function deleteBanner(id) {
 
 
 function resetBannerForm() {
+
+    state.admin.editingBannerId = null;
 
     document
         .getElementById(
@@ -7936,6 +7923,13 @@ function renderAdminNews() {
                         <div class="admin-item-actions">
 
                             <button
+                                class="small-btn"
+                                onclick="editNews('${escapeJs(String(item.id))}')"
+                            >
+                                ✏️ Изменить
+                            </button>
+
+                            <button
                                 class="small-btn danger"
                                 onclick="
                                     deleteNews(
@@ -8021,6 +8015,13 @@ function renderAdminBanners() {
                         <div class="admin-item-actions">
 
                             <button
+                                class="small-btn"
+                                onclick="editBanner('${escapeJs(String(item.id))}')"
+                            >
+                                ✏️ Изменить
+                            </button>
+
+                            <button
                                 class="small-btn danger"
                                 onclick="
                                     deleteBanner(
@@ -8045,6 +8046,35 @@ function renderAdminBanners() {
 
 }
 
+
+/* =========================================================
+   ADMIN EDIT HELPERS
+========================================================= */
+
+function editNews(id) {
+    if (!requireAdminAccess()) return;
+    const item = (state.content.news || []).find(x => String(x.id) === String(id));
+    if (!item) return;
+    document.getElementById("news-title").value = item.title || "";
+    document.getElementById("news-text").value = item.text || "";
+    document.getElementById("news-url").value = item.url || "";
+    state.admin.editingNewsId = String(id);
+    switchAdminTab("news");
+    showToast("Новость загружена для редактирования.");
+}
+
+function editBanner(id) {
+    if (!requireAdminAccess()) return;
+    const item = (state.content.banners || []).find(x => String(x.id) === String(id));
+    if (!item) return;
+    document.getElementById("banner-title").value = item.title || "";
+    document.getElementById("banner-text").value = item.text || "";
+    document.getElementById("banner-image").value = item.image || "";
+    document.getElementById("banner-url").value = item.url || "";
+    state.admin.editingBannerId = String(id);
+    switchAdminTab("banners");
+    showToast("Баннер загружен для редактирования.");
+}
 
 /* =========================================================
    NAVIGATION
