@@ -7047,7 +7047,7 @@ if(document.readyState==='loading'){
 </script>
 <!-- /FINANCE 2.0 COMPLETE SYSTEM -->
 
-<script>
+
 function mountLiveTacticalPanel(){
   ensureLiveTacticsState();
   const field=document.querySelector('.tactical-field');
@@ -7528,7 +7528,9 @@ function startOpponentLivePulse(){
   opponentLivePulseTimer=setInterval(()=>{
     try{
       if(state.liveMatch && !state.liveMatch.finished){
+        const aiEvent=opponentPlayerAIEvent();
         const ev=opponentLiveEventInjection();
+        if(aiEvent && Array.isArray(state.liveMatch.events)) state.liveMatch.events.push(aiEvent);
         if(ev && Array.isArray(state.liveMatch.events)){
           state.liveMatch.events.push(ev);
           if(typeof renderMatch==='function') renderMatch();
@@ -7540,28 +7542,21 @@ function startOpponentLivePulse(){
 startOpponentLivePulse();
 
 
+<script>
+
 /* === OPPONENT PLAYER AI 7.0 === */
 function ensureOpponentPlayerAI(){
   ensureOpponentLiveState();
-  state.opponentAI.playerAI=state.opponentAI.playerAI||{
-    markedPlayer:null,markedZone:null,lastAction:'Соперник пока не назначил персональную опеку.'
-  };
+  state.opponentAI.playerAI=state.opponentAI.playerAI||{markedPlayer:null,markedZone:null,lastAction:'Соперник пока не назначил персональную опеку.',positions:{}};
 }
 function getBestUserThreat(){
   const ids=(state.startingXI||[]).filter(Boolean);
-  const scored=ids.map(id=>{
-    const p=getPlayerByIdLive(id), pos=pitchCoordForPlayer(id);
-    if(!p||!pos) return null;
+  return ids.map(id=>{
+    const p=getPlayerByIdLive(id),pos=pitchCoordForPlayer(id); if(!p||!pos)return null;
     const ins=state.individualInstructions?.[id]||'hold';
-    let score=50;
-    if(pos.x>55)score+=15;
-    if(pos.y>30&&pos.y<70)score+=12;
-    if(ins==='free')score+=10;
-    if(ins==='attack')score+=8;
-    if(ins==='press')score+=3;
+    let score=50+(pos.x>55?15:0)+(pos.y>30&&pos.y<70?12:0)+(ins==='free'?10:0)+(ins==='attack'?8:0);
     return {id,p,pos,score};
-  }).filter(Boolean).sort((a,b)=>b.score-a.score);
-  return scored[0]||null;
+  }).filter(Boolean).sort((a,b)=>b.score-a.score)[0]||null;
 }
 function getOpponentXIIds(){
   const lm=state.liveMatch||{};
@@ -7569,108 +7564,59 @@ function getOpponentXIIds(){
 }
 function ensureOpponentPositions(){
   ensureOpponentPlayerAI();
-  const ids=getOpponentXIIds().filter(Boolean);
-  state.opponentAI.playerAI.positions=state.opponentAI.playerAI.positions||{};
+  const ids=getOpponentXIIds().filter(Boolean), store=state.opponentAI.playerAI.positions;
   ids.forEach((id,i)=>{
-    if(!state.opponentAI.playerAI.positions[id]){
-      const base=[
-        [12,50],[24,20],[24,40],[24,60],[24,80],
-        [43,30],[43,50],[43,70],
-        [67,25],[67,50],[67,75]
-      ][i%11];
-      state.opponentAI.playerAI.positions[id]={x:base[0],y:base[1]};
+    if(!store[id]){
+      const base=[[12,50],[24,20],[24,40],[24,60],[24,80],[43,30],[43,50],[43,70],[67,25],[67,50],[67,75]][i%11];
+      store[id]={x:base[0],y:base[1]};
     }
   });
-}
-function chooseOpponentMarker(){
-  ensureOpponentPositions();
-  const threat=getBestUserThreat();
-  if(!threat) return null;
-  const ids=getOpponentXIIds().filter(Boolean);
-  let best=null,bestScore=-1e9;
-  ids.forEach(id=>{
-    const pos=state.opponentAI.playerAI.positions[id]; if(!pos)return;
-    const roleScore=100-Math.abs(+pos.x-(+threat.pos.x-8))*2-Math.abs(+pos.y-(+threat.pos.y))*1.2;
-    if(roleScore>bestScore){bestScore=roleScore;best={id,pos};}
-  });
-  return {threat,defender:best};
 }
 function adaptOpponentPlayerPositions(){
   ensureOpponentPositions();
-  const c=liveEventContext(), z=c.z, ai=state.opponentAI.playerAI;
-  const ids=getOpponentXIIds().filter(Boolean);
-  const changes=[];
+  const z=calculateTacticalZoneEffects(),c=liveEventContext(),ai=state.opponentAI.playerAI,changes=[];
   const threat=getBestUserThreat();
   if(threat){
-    const mark=chooseOpponentMarker();
-    if(mark){
-      const old={...mark.defender.pos};
-      mark.defender.pos.x=Math.max(8,Math.min(92,threat.pos.x-7));
-      mark.defender.pos.y=Math.max(7,Math.min(93,threat.pos.y));
+    const ids=getOpponentXIIds().filter(Boolean);
+    let marker=null,score=-1e9;
+    ids.forEach(id=>{
+      const p=ai.positions[id]; if(!p)return;
+      const s=100-Math.abs(p.x-(threat.pos.x-8))*2-Math.abs(p.y-threat.pos.y)*1.2;
+      if(s>score){score=s;marker={id,p};}
+    });
+    if(marker){
+      const ox=marker.p.x,oy=marker.p.y;
+      marker.p.x=Math.max(8,Math.min(92,threat.pos.x-7));
+      marker.p.y=Math.max(7,Math.min(93,threat.pos.y));
       ai.markedPlayer=threat.id;
       ai.markedZone=threat.pos.x>62?'атака':threat.pos.x<38?'оборона':'полузащита';
-      if(Math.abs(old.x-mark.defender.pos.x)>4||Math.abs(old.y-mark.defender.pos.y)>5)
-        changes.push('персональная опека ключевого игрока');
+      if(Math.abs(ox-marker.p.x)>4||Math.abs(oy-marker.p.y)>5)changes.push('назначил персональную опеку');
     }
   }
+  const ids=getOpponentXIIds().filter(Boolean);
   ids.forEach(id=>{
-    const p=ai.positions[id];
-    if(!p)return;
-    if(z.left>=2 && p.y<38){p.y=Math.min(92,p.y+7);changes.push('соперник сместил защитника к левому флангу');}
-    if(z.right>=2 && p.y>62){p.y=Math.max(8,p.y-7);changes.push('соперник сместил защитника к правому флангу');}
-    if(z.center>=5 && p.y>=35&&p.y<=65){p.y += p.y<50?-6:6;changes.push('соперник раздвинул центр');}
-    if(c.style==='allout' && p.x<38){p.x=Math.max(10,p.x-5);}
+    const p=ai.positions[id]; if(!p)return;
+    if(z.left>=2&&p.y<38){p.y=Math.min(92,p.y+7);changes.push('усилил левый фланг');}
+    if(z.right>=2&&p.y>62){p.y=Math.max(8,p.y-7);changes.push('усилил правый фланг');}
+    if(z.center>=5&&p.y>=35&&p.y<=65){p.y+=p.y<50?-6:6;changes.push('раздвинул центр');}
+    if(c.style==='allout'&&p.x<38)p.x=Math.max(10,p.x-5);
   });
-  ai.lastAction=changes.length?changes[changes.length-1]:'Соперник сохраняет позиции.';
+  ai.lastAction=changes.length?'Соперник '+changes[0]+'.':'Соперник сохраняет позиции.';
   return changes;
-}
-function opponentPlayerAIAttackingBonus(){
-  ensureOpponentPositions();
-  const c=liveEventContext(),ai=state.opponentAI.playerAI;
-  let b=0;
-  if(ai.markedPlayer){
-    const p=pitchCoordForPlayer(ai.markedPlayer);
-    if(p && p.x>55) b+=.025;
-  }
-  if(c.z.left>=2||c.z.right>=2)b+=.018;
-  if(c.z.center>=5)b+=.015;
-  return b;
-}
-function opponentPlayerAIDefenseBonus(){
-  ensureOpponentPlayerAI();
-  const ai=state.opponentAI.playerAI;
-  return ai.markedPlayer?.toString()?0.02:0;
 }
 function opponentPlayerAIEvent(){
   const changes=adaptOpponentPlayerPositions();
   saveState();
-  if(changes.length) return {
-    type:'opponent_player_ai',team:'away',
-    text:'🧠 ИИ соперника: '+changes[0]+'.'
-  };
-  return null;
+  return changes.length?{type:'opponent_player_ai',team:'away',text:'🧠 ИИ соперника: '+changes[0]+'.'}:null;
 }
 function renderOpponentPlayerAIPanel(){
   ensureOpponentPlayerAI();
-  const ai=state.opponentAI.playerAI;
-  const threat=getBestUserThreat();
-  const marked=threat&&ai.markedPlayer===threat.id;
-  return `<div class="opponent-player-ai-panel">
-    <div class="opponent-player-ai-head"><b>Персональная адаптация</b><span>${marked?'Опека назначена':'Анализ игроков'}</span></div>
-    <div class="opponent-player-ai-text">${ai.lastAction}</div>
-    ${threat?`<div class="opponent-threat">Главная угроза: <b>${getPlayerDisplayNameLive(threat.p)}</b></div>`:''}
-  </div>`;
+  const ai=state.opponentAI.playerAI,threat=getBestUserThreat();
+  return `<div class="opponent-player-ai-panel"><div class="opponent-player-ai-head"><b>Персональная адаптация</b><span>${threat&&ai.markedPlayer===threat.id?'Опека назначена':'Анализ игроков'}</span></div><div class="opponent-player-ai-text">${ai.lastAction}</div>${threat?`<div class="opponent-threat">Главная угроза: <b>${getPlayerDisplayNameLive(threat.p)}</b></div>`:''}</div>`;
 }
-function getPlayerDisplayNameLive(p){
-  if(!p)return 'Игрок';
-  return p.name||p.fullName||p[1]||'Игрок';
-}
+function getPlayerDisplayNameLive(p){return p?(p.name||p.fullName||p[0]||'Игрок'):'Игрок';}
 ensureOpponentPlayerAI();
 
-
-function getOpponentPlayerAIEventModifier(){
-  return {attack:opponentPlayerAIAttackingBonus(),defense:opponentPlayerAIDefenseBonus()};
-}
 </script>
 </body>
 </html>
