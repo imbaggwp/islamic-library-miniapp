@@ -67,6 +67,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .match-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.match-controls button{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 5px;font-size:11px}.match-controls button.active{border-color:var(--accent);color:var(--accent)}
 .substitution{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 .full-width{grid-column:1/-1}
+.custom-modal{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;z-index:100}.custom-modal.show{display:flex}.custom-box{width:min(430px,100%);background:var(--card);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:0 20px 70px rgba(0,0,0,.45)}.custom-box h2{margin:0 0 7px;font-size:22px}.custom-box p{margin:0 0 18px;color:var(--muted);font-size:12px;line-height:1.5}.custom-field{margin-bottom:12px}.custom-field label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px}.custom-field input,.custom-field select{width:100%;box-sizing:border-box;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:13px;padding:12px;font:inherit;outline:none}.custom-field input:focus,.custom-field select:focus{border-color:var(--accent)}.custom-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.custom-actions button{padding:12px;border-radius:13px;font-weight:700}.custom-cancel{background:var(--card2);border:1px solid var(--line);color:var(--text)}.custom-create{background:var(--accent);border:0;color:#111}
 </style>
 </head>
 <body>
@@ -81,7 +82,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
       <p>Начни карьеру с реальной командой сезона 2026/27. У каждого клуба свой бюджет, рейтинг и уровень сложности.</p>
     </div>
     <div id="clubChoices"></div>
-    <button class="new-career" onclick="chooseClub('Rizvan FC')">⚡ Создать свой клуб</button>
+    <button class="new-career" onclick="openCustomClub()">⚡ Создать свой клуб</button>
   </section>
   <div id="appContent">
   <div class="top">
@@ -289,14 +290,16 @@ function renderClubChoices(){
    </button>`).join('')}</div>`).join('');
 }
 function chooseClub(name){
- if(name==='Rizvan FC'){startCustomClub();return}
  const c=clubs[name];
+ if(!c)return;
  state=JSON.parse(JSON.stringify(initialState));
- state.club=name;state.country=c.country;state.league=c.league;state.rating=c.rating;state.money=c.money;state.players=c.players.length?c.players:initialState.players;
+ state.club=name;state.country=c.country;state.league=c.league;state.rating=c.rating;state.money=c.money;
+ state.players=c.players.length?JSON.parse(JSON.stringify(c.players)):JSON.parse(JSON.stringify(initialState.players));
+ state.bench=JSON.parse(JSON.stringify(initialState.bench));
  state.opponents=(clubLeagues[c.league]||['Rival FC','City FC','United FC','Dynamo FC','Athletic FC','Sporting FC']).filter(x=>x!==name).slice(0,8);
  state.opponents=[...state.opponents,...state.opponents,...state.opponents].slice(0,18);
  state.results=new Array(18).fill(null);state.round=1;state.played=0;state.wins=0;state.draws=0;state.losses=0;
- state.table=(clubLeagues[c.league]||[]).map((x,i)=>[x,0,0]);
+ state.table=(clubLeagues[c.league]||[]).map(x=>[x,0,0]);
  if(!state.table.some(x=>x[0]===name))state.table.push([name,0,0]);
  localStorage.setItem('fm_state',JSON.stringify(state));
  localStorage.setItem('fm_career_started','1');careerStarted=true;
@@ -304,14 +307,67 @@ function chooseClub(name){
  initCareer();updateHome();renderPlayers();renderMarket();renderLeague();renderFixtures();navigate('home');
  showToast('Карьера началась: '+name);
 }
-function startCustomClub(){
- state=JSON.parse(JSON.stringify(initialState));state.club='Rizvan FC';state.country='🇷🇺';state.league='Премьер-лига';state.round=1;state.results=new Array(18).fill(null);
- localStorage.setItem('fm_state',JSON.stringify(state));
- localStorage.setItem('fm_career_started','1');careerStarted=true;
- document.getElementById('clubSelect').classList.add('hidden');document.getElementById('appContent').classList.remove('hidden');
- updateHome();renderPlayers();renderMarket();renderLeague();renderFixtures();navigate('home');
- showToast('Создан Rizvan FC');
+function openCustomClub(){
+ const modal=document.getElementById('customClubModal');
+ const input=document.getElementById('customClubName');
+ modal.classList.add('show');
+ setTimeout(()=>input.focus(),50);
 }
+function closeCustomClub(){
+ document.getElementById('customClubModal').classList.remove('show');
+}
+function createCustomClub(){
+ const input=document.getElementById('customClubName');
+ const name=input.value.trim();
+ if(name.length<2){
+   showToast('Введите название клуба');
+   input.focus();
+   return;
+ }
+ if(Object.keys(clubs).some(x=>x.toLowerCase()===name.toLowerCase())){
+   showToast('Такой клуб уже есть в списке');
+   input.focus();
+   return;
+ }
+
+ const countryData=document.getElementById('customClubCountry').value.split('|');
+ const country=countryData[0];
+ const countryName=countryData[1];
+ const league=document.getElementById('customClubLeague').value;
+
+ state=JSON.parse(JSON.stringify(initialState));
+ state.club=name;
+ state.country=country;
+ state.countryName=countryName;
+ state.league=league;
+ state.rating=64;
+ state.money=4.2;
+ state.place=1;
+ state.round=1;
+ state.played=0;
+ state.wins=0;
+ state.draws=0;
+ state.losses=0;
+ state.players=JSON.parse(JSON.stringify(initialState.players));
+ state.bench=JSON.parse(JSON.stringify(initialState.bench));
+ state.market=JSON.parse(JSON.stringify(initialState.market));
+ state.opponents=(clubLeagues[league]||['Rival FC','City FC','United FC','Dynamo FC','Athletic FC','Sporting FC']).slice(0,8);
+ state.opponents=[...state.opponents,...state.opponents,...state.opponents].slice(0,18);
+ state.results=new Array(18).fill(null);
+ state.table=(clubLeagues[league]||[]).map(x=>[x,0,0]);
+ state.table.push([name,0,0]);
+
+ localStorage.setItem('fm_state',JSON.stringify(state));
+ localStorage.setItem('fm_career_started','1');
+ careerStarted=true;
+
+ closeCustomClub();
+ document.getElementById('clubSelect').classList.add('hidden');
+ document.getElementById('appContent').classList.remove('hidden');
+ initCareer();updateHome();renderPlayers();renderMarket();renderLeague();renderFixtures();navigate('home');
+ showToast('Создан клуб: '+name);
+}
+
 function changeClub(){
   if(confirm('Сменить клуб? Текущий прогресс этой карьеры останется в сохранении только до выбора нового клуба.')){
     localStorage.removeItem('fm_state');
