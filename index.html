@@ -1244,7 +1244,7 @@ function renderPitch(){
     </div>
     ${slots.map((slot,i)=>{
       const p=byName.get(names[i])||['Игрок '+(i+1),slot.pos,0,'','⚽',0];
-      const role=getPlayerRole?p[0]&&getPlayerRole(p[0]):'';
+      const role=(typeof getPlayerRole==='function')?getPlayerRole(p[0]):'';
       return `<button class="pitch-player ${role?'has-role':''}" data-pitch-key="${slot.key}" style="left:${slot.x}%;top:${slot.y}%" onclick="playerDetails(${i})">
         <div class="shirt">${p[4]||'⚽'}</div>
         <b>${p[0]}</b><small>${p[2]||0} · ${slot.pos}</small>${role?`<em>${role}</em>`:''}
