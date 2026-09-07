@@ -349,6 +349,66 @@ S('Chevalier','GK',84,'🇫🇷','🧤',92),S('Safonov','GK',79,'🇷🇺','🧤
 'Inter':[
 S('Josep Martínez','GK',82,'🇪🇸','🧤',87),S('Provedel','GK',78,'🇮🇹','🧤',80),S('Stones','CB',85,'🏴','🛡️',84),S('Akanji','CB',84,'🇨🇭','🛡️',85),S('Pavard','CB',84,'🇫🇷','🧱',85),S('Bastoni','CB',88,'🇮🇹','🛡️',92),S('Dimarco','LWB',86,'🇮🇹','⚡',91),S('Carlos Augusto','LWB',81,'🇧🇷','🏃',87),S('Bisseck','CB',80,'🇩🇪','🧱',91),S('Barella','CM',88,'🇮🇹','⚙️',92),S('Çalhanoğlu','CM',87,'🇹🇷','🎯',90),S('Zieliński','CM',82,'🇵🇱','🧠',82),S('Sučić','CM',80,'🇭🇷','⚙️',91),S('Diouf','CM',79,'🇫🇷','💪',91),S('Curtis Jones','CM',82,'🏴','🧠',87),S('Mkhitaryan','CM',80,'🇦🇲','🎯',78),S('Lautaro Martínez','ST',90,'🇦🇷','⚽',94),S('Marcus Thuram','ST',87,'🇫🇷','🔥',92),S('Bonny','ST',80,'🇨🇮','⚽',89),S('Luis Henrique','RW',79,'🇧🇷','⚡',88)]
 };
+const bundesligaRealSquads={
+'FC Bayern München':{GK:["Manuel Neuer", "Sven Ulreich", "Jonas Urbig"],DF:["Dayot Upamecano", "Minjae Kim", "Jonathan Tah", "Nathaniel Brown", "Alphonso Davies", "Hiroki Ito", "Josip Stanišić"],MF:["Joshua Kimmich", "Tom Bischof", "Jamal Musiala", "Konrad Laimer", "Ismael Saibari", "Bara Sapoko Ndiaye", "Lennart Karl", "Aleksandar Pavlović", "David Santos Daiber", "Maycon Douglas Cardozo"],ST:["Serge Gnabry", "Harry Kane", "Luis Díaz", "Michael Olise"]},
+'Borussia Dortmund':{GK:["Gregor Kobel", "Patrick Drewes", "Silas Ostrzinski", "Alexander Meyer"],DF:["Waldemar Anton", "Nico Schlotterbeck", "Ramy Bensebaini", "Joane Gadou", "Daniel Svensson", "Julian Ryerson", "Kauã Prates", "Filippo Mané", "Luca Reggiani"],MF:["Jobe Bellingham", "Felix Nmecha", "Carney Chukwuemeka", "Ethan Nwaneri", "Konstantinos Karetsas", "Marcel Sabitzer", "Emre Can", "Joey Veerman", "Justin Lerma", "Enzo dos Santos", "Giannis Konstantelias", "Mussa Kaba"],ST:["Serhou Guirassy", "Maximilian Beier", "Fabio Silva", "Samuele Inácio", "Mathis Albert"]},
+'1. FC Union Berlin':{GK:["Frederik Rønnow", "Carl Klaus", "Matheo Raab", "Fritz Gagzow"],DF:["Felix Uduokhai", "Andrik Markgraf", "Zeno van den Bosch", "Marvin Friedrich", "Leopold Querfeld", "Tom Rothe", "Derrick Köhn", "Josip Juranović", "Christopher Trimmel", "Stanley Nsoki"],MF:["Aljoscha Kemlein", "Rani Khedira", "Woo-yeong Jeong", "András Schäfer", "Janik Haberer", "Michel Aebischer", "Tim Skarke", "Robert Skov", "Kastriot Imeri", "Duje Slišković", "Linus Güther"],ST:["Oliver Burke", "Livan Burcu", "Andrej Ilić", "Marin Ljubičić", "Emmanuel Latte Lath", "Mekhi Gray", "Julien Friedrich"]},
+'Borussia Mönchengladbach':{GK:["Moritz Nicolas", "Tobias Sippel", "Jan Olschowsky", "Daniel Batz"],DF:["Fabio Chiarodia", "Kevin Diks", "Jan Leszczyński", "Ko Itakura", "Daiki Hashioka", "David Herold", "Yukhym Konoplya", "Lukas Ullrich", "Joe Scally"],MF:["Kevin Stöger", "Enzo Leopold", "Franck Honorat", "Florian Neuhaus", "Philipp Sander", "Jens Castrop", "Nicolas Kühn", "Robin Hack", "Fritz Fleck", "Mathieu Nguefack", "Wael Mohya", "Hugo Bolin", "Zento Uno"],ST:["Isac Lidberg", "Tim Kleindienst", "Shuto Machino", "Iaia Manco Danfa"]},
+'Hamburger SV':{GK:["Daniel Heuer Fernandes", "Sander Tangvik", "Elias Lahti", "Fernando Dickes"],DF:["David Møller Wolfe", "Zakaria El Ouahdi", "Warmed Omari", "Jordan Torunarigha", "Nicolas Capaldo", "Miro Muheim", "Sebastiaan Bornauw", "Louis Lemke", "Joel Agyekum", "Shafiq Nandja", "Jason Bissi-Mouelle"],MF:["Bilal Nadir", "Martin Adeline", "Albert Sambi Lokonga", "Immanuël Pherai", "Albert Grønbæk", "Fábio Vieira", "Nicolai Remberg", "Kofi Amoako", "Kelvin Ojo"],ST:["Terem Moffi", "Yussuf Poulsen", "Bakery Jatta", "Otto Stange", "Patson Daka", "Alexander Røssing-Lelesiit"]},
+'1. FC Köln':{GK:["Marvin Schwäbe", "Ron-Robert Zieler", "Martin James", "Matthias Köbbing"],DF:["Joël Schmied", "Borna Sosa", "Timo Hübers", "Gideon Mensah", "Jahmai Simpson-Pusey", "Luka Lochoshvili", "Sebastian Sebulonsen", "Ravvan den Berg", "Jonathan Friemel"],MF:["Tom Krauß", "Ellyes Skhiri", "Ísak Jóhannesson", "Saïd El Mala", "Reigan Heskey", "Alessio Castro-Montes", "Paul Okon-Engstler", "Jan Thielmann", "Gil Neves", "Fayssal Harchaoui", "Linton Maina"],ST:["Luca Waldschmidt", "Ragnar Ache", "Imad Rondić", "Malek El Mala", "Thijs Dallinga", "Marius Bülter", "Mikey Moore"]},
+'SV Werder Bremen':{GK:["Karl Hein", "Markus Kolke", "Alexander Schlager", "Stefan Smarkalev"],DF:["Olivier Deman", "Oskar Wójcik", "Niklas Stark", "Amos Pieper", "Mitchell Weiser", "Arthur", "Moussa Ndiaye", "Felix Agu", "Marco Friedl", "Mick Schmetgens", "Luca Höcker", "Mats Heitmann", "Ramiz Hamouda"],MF:["Jens Stage", "Senne Lynen", "Ludovit Reis", "Eren Dinkçi", "Chuki", "Dariusz Stalmach", "Skelly Alvero", "Darwin Soylu", "Arian Römers", "Youri Regeer"],ST:["Keke Topp", "Niclas Füllkrug", "Justin Njinmah", "Marco Grüll", "Kenny Quetant", "Dawid Kownacki", "Cedric Itten", "Salim Musah", "Paul Erevbenagie", "Karlo Mijo"]},
+'FC Schalke 04':{GK:["Loris Karius", "Kevin Müller", "Johannes Siebeking"],DF:["Hasan Kuruçay", "Timo Becker", "Robin Gosens", "Adrian Gantenbein", "Nikola Katić", "Tomáš Kalas", "Anton Donkor", "Vitalie Becker", "Maximilian Wöber", "Mertcan Ayhan"],MF:["Ron Schallenberg", "Satoshi Tanaka", "Janik Bachmann", "Dejan Ljubičić", "Soufiane El-Faouzi", "Adil Aouchiche", "Finn Porath", "Junior Dina Ebimbe", "Max Grüger", "Luca Vozar"],ST:["Hee-chan Hwang", "Moussa Sylla", "Edin Džeko", "Bryan Lasme", "Emil Højlund", "Kenan Karaman", "Junior Adamu", "Zaid Tchibara"]},
+'SV Elversberg':{GK:["Frank Lehmann", "Elias Etringer", "Nicolas Kristof", "Tim Boss"],DF:["Nicholas Mickelson", "Florian Le Joncour", "Luis Seifert", "Lukas Pinckert", "Lasse Günther", "Luca Sirch", "Jan Gyamerah", "Maximilian Rohr", "Felix Keidel"],MF:["Amara Condé", "Maurice Krattenmacher", "Łukasz Poręba", "Noah Darvich", "Raif Adam", "Frederik Schmahl", "Lukas Petkov", "Tom Zimmerschied", "Francis Onyeka"],ST:["Noel Futkeu", "Luca Pfeiffer", "Luca Schnellbacher", "Cole Campbell", "David Mokwa"]},
+'SC Paderborn 07':{GK:["Markus Schubert", "Nahuel Noll", "Florian Pruhs"],DF:["Ruben Müller", "Jonah Sticker", "Nyamekye Awortwie-Grant", "Laurin Curda", "Felix Götze", "Jan oter Horst", "Niklas Mohr", "Tjark Scheller", "Clemens Lippmann", "Marcel Hoffmeier", "Tristan Zobel"],MF:["Santiago Castaneda", "Tom Baack", "Oliver Batista Meier", "Luka Duric", "Mattes Hansen", "Raphael Obermair", "Sebastian Klaas", "Laurin Ulrich", "Gabriel Vidović", "Timur Gayret", "Vigo Wernet"],ST:["Rayan Philippe", "Sven Michel", "Marvin Pieringer", "Albert Millgramm", "Steffen Tigges", "Stefano Marino", "Lasse Eickel", "Deniz Zeitler"]},
+'RB Leipzig':{GK:["Ørjan Nyland", "Leopold Zingerle", "Maarten Vandevoordt"],DF:["Abdoul Koné", "Maxime Estève", "Willi Orbán", "Lukas Klostermann", "David Raum", "Castello Lukeba", "Max Finkgräfe", "Benjamin Henrichs"],MF:["Ezechiel Banzuzi", "Assan Ouédraogo", "Brajan Gruda", "Nicolas Seiwald", "Christoph Baumgartner", "Ridle Baku", "Rocco Reitz", "Neil El Aynaoui", "Andrija Maksimović", "Benno Kaltefleiter", "Viggo Gebel"],ST:["Antonio Nusa", "Marc Guiu", "Johan Bakayoko", "Suleman Sani", "Tidiam Gomis", "Christopher Nkunku", "Rômulo", "Samba Konaté"]},
+'VfB Stuttgart':{GK:["Fabian Bredlow", "Marius Funk", "Dennis Seimen", "Stefan Drljača"],DF:["Ameen Al-Dakhil", "Ramon Hendriks", "Josha Vagnoman", "Maximilian Mittelstädt", "Luca Jaquez", "Leonidas Stergiou", "Lorenz Assignon", "Dan-Axel Zagadou", "Jeff Chabot", "Finn Jeltsch"],MF:["Angelo Stiller", "Chris Führich", "Bilal El Khannouss", "Atakan Karazor", "Grischa Prömel", "Nikolas Nartey", "Ertugrul Yigit", "Jarzinho Malanga", "Yanik Spalt"],ST:["Tiago Tomás", "Ermedin Demirović", "Dženan Pejčinović", "Jamie Leweling", "Deniz Undav", "Justin Diehl", "Leo Sauer"]},
+'TSG Hoffenheim':{GK:["Oliver Baumann", "Lúkas Petersson", "Luca Philipp"],DF:["Robin Hranáč", "Sean Dulic", "Ozan Kabak", "Bernardo", "Valentin Gendrey", "Albian Hajdari", "Koki Machida", "Natnael Abraha", "Vladimir Coufal", "Mats Rots", "Tristan Spranger"],MF:["Leon Avdullahu", "Patrick Wimmer", "Luis Engelns", "Nathan De Cat", "Wouter Burger", "Bambasé Conté", "Alexander Prass", "Andrej Kramarić", "Cajetan Lenz"],ST:["Max Moerstedt", "Adam Hložek", "Fisnik Asllani", "Adam Daghim", "Tim Lemperle"]},
+'Bayer 04 Leverkusen':{GK:["Mark Flekken", "Janis Blaswich", "Niklas Lomb"],DF:["Facundo Medina", "Miguel Gutiérrez", "Jarell Quansah", "Loïc Badé", "Edmond Tapsoba", "Tim Oermann", "Lucas Vázquez", "Guéla Doué"],MF:["Ezequiel Fernández", "Jonas Hofmann", "Robert Andrich", "Malik Tillman", "Kennet Eichhorn", "Aleix García", "Ibrahim Maza"],ST:["Afonso Moreira", "Martin Terrier", "Patrik Schick", "Moussa Diaby", "Victor Boniface", "Nathan Tella", "Eliesse Ben Seghir", "Christian Kofane", "Montrell Culbreath"]},
+'Sport-Club Freiburg':{GK:["Mio Backhaus", "Florian Müller", "Jannik Huth"],DF:["Philipp Lienhart", "Anthony Jung", "Lukas Kübler", "Berkay Yilmaz", "Matthias Ginter", "Philipp Treu", "Christian Günter", "Jordy Makengo", "Max Rosenfelder", "Bruno Ogbus"],MF:["Patrick Osterhage", "Maximilian Eggestein", "Yuito Suzuki", "Yannik Engelhardt", "Niklas Beste", "Rihito Yamamoto", "Florent Muslija", "Vincenzo Grifo", "Rouven Tarnutzer"],ST:["Derry Scherhant", "Lucas Höler", "Cyriaque Irié", "Igor Matanović", "Keisuke Gotō"]},
+'Eintracht Frankfurt':{GK:["Noah Atubolu", "Jens Grahl", "Amil Siljevic", "Kauã Santos"],DF:["Elias Baum", "Lilian Brassier", "Robin Koch", "Otávio", "Keita Kosugi", "Nnamdi Collins", "Julian Etse"],MF:["Oscar Højlund", "Farès Chaïbi", "Noel Aseko", "Ritsu Dōan", "Timothy Chandler", "Raphael Onyedika", "Mario Götze", "Love Arrhov", "Jeremiaha Maluze", "Can Uzun"],ST:["Ansgar Knauff", "Jonathan Burkardt", "Younes Ebnoutalib", "Ayoube Amaimouni-Echghouyab", "Malik Pimpong", "Jessic Ngankam"]},
+'FC Augsburg':{GK:["Finn Dahmen", "Nediljko Labrović", "Tom Wisbereit"],DF:["Calvin Brackelmann", "Chrislain Matsima", "Jeffrey Gouweleeuw", "Youngwoo Seol", "Hennes Behrens", "Marius Wolf", "Juma Bah", "Noahkai Banks"],MF:["Han-Noah Massengo", "Sima Suso", "Mert Kömür", "Yannik Keitel", "Kristijan Jakić", "Tim Breithaupt", "Robin Fellhauer", "Alexis Claude-Maurice", "Arijon Ibrahimović", "Faik Sakar", "Anton Kade", "Fabian Rieder", "Tim Schnitzer", "Mahmut Küçükşahin"],ST:["Rodrigo Ribeiro", "Michael Gregoritsch", "Steve Mounié", "Uchenna Ogundu"]},
+'1. FSV Mainz 05':{GK:["Alexander Schwolow", "Robin Zentner", "Maximilian Kinzig"],DF:["Phillipp Mwene", "Fabio Gruber", "Stefan Posch", "Eric Martel", "Stefan Bell", "Anthony Caci", "Danny da Costa", "Silvan Widmer", "Dominik Kohr", "Rael Nakuzola", "Kacper Potulski"],MF:["Kaishu Sano", "Jae-sung Lee", "Paul Nebel", "Nadiem Amiri", "Lennard Maloney", "Otto Ruoppi", "Sota Kawasaki"],ST:["Phillip Tietz", "Ransford-Yeboah Königsdörffer", "Benedict Hollerbach", "Sheraldo Becker", "Silas Katompa Mvumpa", "Alynho Haidara"]},
+};
+
+const bundesligaClubAliases={
+ 'FC Bayern München':'Bayern München',
+ '1. FC Union Berlin':'Union Berlin',
+ 'SV Werder Bremen':'Werder Bremen',
+ 'Sport-Club Freiburg':'Freiburg',
+ 'TSG Hoffenheim':'Hoffenheim',
+ 'Bayer 04 Leverkusen':'Bayer Leverkusen',
+ '1. FSV Mainz 05':'Mainz',
+ 'FC Schalke 04':'Schalke 04',
+ '1. FC Köln':'Köln',
+ 'SV Elversberg':'Elversberg',
+ 'SC Paderborn 07':'Paderborn',
+ 'RB Leipzig':'RB Leipzig',
+ 'VfB Stuttgart':'Stuttgart',
+ 'Eintracht Frankfurt':'Eintracht Frankfurt',
+ 'FC Augsburg':'Augsburg',
+ 'Borussia Mönchengladbach':'Borussia Mönchengladbach',
+ 'Hamburger SV':'Hamburger SV',
+ 'Borussia Dortmund':'Borussia Dortmund'
+};
+function buildBundesligaPlayers(roster,clubName){
+ const club=clubs[clubName]||{};
+ const base=Number(club.rating||72);
+ const cfg={GK:['GK',base+2,'🧤'],DF:['CB',base,'🛡️'],MF:['CM',base+1,'⚙️'],ST:['ST',base+2,'⚽']};
+ const out=[];
+ Object.entries(roster).forEach(([group,names])=>{
+   const [pos,groupBase,icon]=cfg[group];
+   names.forEach((name,i)=>{
+     const ov=Math.max(62,Math.min(91,Math.round(groupBase-(i%4)+(i<3?2:0))));
+     out.push(S(name,pos,ov,'🌍',icon,Math.min(95,ov+(i%5===0?8:4))));
+   });
+ });
+ return out;
+}
+Object.entries(bundesligaRealSquads).forEach(([officialName,roster])=>{
+ const target=bundesligaClubAliases[officialName]||officialName;
+ if(clubs[target]) clubs[target].players=buildBundesligaPlayers(roster,target);
+});
+
 Object.entries(officialSquads).forEach(([name,players])=>{if(clubs[name])clubs[name].players=players;});
 clubs['PSG']=clubs['Paris Saint-Germain'];
 clubs['Bayern München'].icon='🔴⚪';
@@ -357,6 +417,26 @@ clubs['Bayern München'].icon='🔴⚪';
 
 
 // Aliases for official 2026/27 league naming.
+const expandedRosters={
+"FC Barcelona":[["Joan García", "GK", 82, "🇪🇸", "🧤", 84],["Wojciech Szczęsny", "GK", 83, "🇵🇱", "🧤", 83],["Pau Cubarsí", "CB", 86, "🇪🇸", "🛡️", 93],["Ronald Araújo", "CB", 86, "🇺🇾", "🛡️", 89],["Jules Koundé", "RB", 87, "🇫🇷", "🛡️", 89],["Alejandro Balde", "LB", 83, "🇪🇸", "🛡️", 89],["Frenkie de Jong", "CM", 87, "🇳🇱", "🎯", 88],["Pedri", "CM", 90, "🇪🇸", "🎯", 95],["Gavi", "CM", 86, "🇪🇸", "🎯", 94],["Fermín López", "AM", 83, "🇪🇸", "🎯", 90],["Raphinha", "LW", 88, "🇧🇷", "⚽", 89],["Lamine Yamal", "RW", 91, "🇪🇸", "⚽", 98],["Robert Lewandowski", "ST", 89, "🇵🇱", "⚽", 89],["Gabriel Jesus", "ST", 82, "🇧🇷", "⚽", 84],["Ferran Torres", "LW", 81, "🇪🇸", "⚽", 84]],
+"Real Madrid":[["Thibaut Courtois", "GK", 90, "🇧🇪", "🧤", 90],["Andriy Lunin", "GK", 83, "🇺🇦", "🧤", 86],["Éder Militão", "CB", 87, "🇧🇷", "🛡️", 89],["Antonio Rüdiger", "CB", 87, "🇩🇪", "🛡️", 87],["Dean Huijsen", "CB", 82, "🇪🇸", "🛡️", 92],["Trent Alexander-Arnold", "RB", 87, "🏴", "🛡️", 89],["Ferland Mendy", "LB", 83, "🇫🇷", "🛡️", 83],["Aurélien Tchouaméni", "CDM", 87, "🇫🇷", "🎯", 91],["Federico Valverde", "CM", 89, "🇺🇾", "🎯", 92],["Eduardo Camavinga", "CM", 85, "🇫🇷", "🎯", 93],["Jude Bellingham", "AM", 91, "🏴", "🎯", 96],["Arda Güler", "AM", 84, "🇹🇷", "🎯", 95],["Vinícius Júnior", "LW", 91, "🇧🇷", "⚽", 95],["Rodrygo", "RW", 86, "🇧🇷", "⚽", 91],["Kylian Mbappé", "ST", 93, "🇫🇷", "⚽", 96],["Endrick", "ST", 78, "🇧🇷", "⚽", 94],["Yan Diomandé", "RW", 76, "🇨🇮", "⚽", 91]],
+"Atlético de Madrid":[["Jan Oblak", "GK", 89, "🇸🇮", "🧤", 89],["José María Giménez", "CB", 84, "🇺🇾", "🛡️", 84],["Robin Le Normand", "CB", 84, "🇪🇸", "🛡️", 85],["Nahuel Molina", "RB", 84, "🇦🇷", "🛡️", 86],["Marcos Llorente", "RM", 85, "🇪🇸", "🎯", 86],["Rodrigo De Paul", "CM", 86, "🇦🇷", "🎯", 86],["Koke", "CM", 84, "🇪🇸", "🎯", 84],["Pablo Barrios", "CM", 82, "🇪🇸", "🎯", 91],["Julián Álvarez", "ST", 89, "🇦🇷", "⚽", 94],["Antoine Griezmann", "SS", 88, "🇫🇷", "⚽", 88],["Kang-in Lee", "AM", 84, "🇰🇷", "🎯", 90]],
+"Inter":[["Yann Sommer", "GK", 86, "🇨🇭", "🧤", 86],["Denzel Dumfries", "RB", 85, "🇳🇱", "🛡️", 86],["Alessandro Bastoni", "CB", 88, "🇮🇹", "🛡️", 93],["Benjamin Pavard", "CB", 86, "🇫🇷", "🛡️", 86],["Francesco Acerbi", "CB", 81, "🇮🇹", "🛡️", 81],["Nicolò Barella", "CM", 89, "🇮🇹", "🎯", 92],["Hakan Çalhanoğlu", "CM", 89, "🇹🇷", "🎯", 89],["Henrikh Mkhitaryan", "CM", 82, "🇦🇲", "🎯", 82],["Lautaro Martínez", "ST", 91, "🇦🇷", "⚽", 94],["Marcus Thuram", "ST", 87, "🇫🇷", "⚽", 90],["Federico Dimarco", "LWB", 87, "🇮🇹", "🛡️", 91]],
+"Paris Saint-Germain":[["Gianluigi Donnarumma", "GK", 89, "🇮🇹", "🧤", 91],["Lucas Hernandez", "CB", 84, "🇫🇷", "🛡️", 85],["Marquinhos", "CB", 87, "🇧🇷", "🛡️", 87],["Achraf Hakimi", "RB", 90, "🇲🇦", "🛡️", 94],["Nuno Mendes", "LB", 89, "🇵🇹", "🛡️", 95],["Vitinha", "CM", 90, "🇵🇹", "🎯", 95],["João Neves", "CM", 87, "🇵🇹", "🎯", 95],["Warren Zaïre-Emery", "CM", 85, "🇫🇷", "🎯", 96],["Désiré Doué", "AM", 87, "🇫🇷", "🎯", 97],["Khvicha Kvaratskhelia", "LW", 89, "🇬🇪", "⚽", 94],["Ousmane Dembélé", "RW", 92, "🇫🇷", "⚽", 94],["Gonçalo Ramos", "ST", 84, "🇵🇹", "⚽", 91]],
+"AS Monaco":[["Philipp Köhn", "GK", 77, "🇨🇭", "🧤", 82],["Thilo Kehrer", "CB", 80, "🇩🇪", "🛡️", 80],["Wilfried Singo", "RB", 81, "🇨🇮", "🛡️", 87],["Caio Henrique", "LB", 82, "🇧🇷", "🛡️", 87],["Denis Zakaria", "CDM", 82, "🇨🇭", "🎯", 83],["Lamine Camara", "CM", 81, "🇸🇳", "🎯", 91],["Aleksandr Golovin", "AM", 84, "🇷🇺", "🎯", 85],["Pape Cabral", "CM", 72, "🇸🇳", "🎯", 88],["Folarin Balogun", "ST", 80, "🇺🇸", "⚽", 88],["Takumi Minamino", "AM", 80, "🇯🇵", "🎯", 80]],
+"Marseille":[["Gerónimo Rulli", "GK", 82, "🇦🇷", "🧤", 82],["Jonathan Clauss", "RB", 82, "🇫🇷", "🛡️", 82],["Leonardo Balerdi", "CB", 82, "🇦🇷", "🛡️", 86],["Pierre-Emile Højbjerg", "CM", 84, "🇩🇰", "🎯", 84],["Mason Greenwood", "RW", 84, "🏴", "⚽", 88],["Adrien Rabiot", "CM", 85, "🇫🇷", "🎯", 85],["Amine Harit", "AM", 79, "🇲🇦", "🎯", 80],["Elye Wahi", "ST", 77, "🇫🇷", "⚽", 88]],
+"Juventus":[["Michele Di Gregorio", "GK", 82, "🇮🇹", "🧤", 86],["Bremer", "CB", 87, "🇧🇷", "🛡️", 89],["Federico Gatti", "CB", 81, "🇮🇹", "🛡️", 85],["Andrea Cambiaso", "LB", 84, "🇮🇹", "🛡️", 90],["Manuel Locatelli", "CM", 84, "🇮🇹", "🎯", 84],["Khéphren Thuram", "CM", 82, "🇫🇷", "🎯", 91],["Teun Koopmeiners", "CM", 84, "🇳🇱", "🎯", 88],["Kenan Yıldız", "AM", 84, "🇹🇷", "🎯", 96],["Dušan Vlahović", "ST", 86, "🇷🇸", "⚽", 91],["Francisco Conceição", "RW", 82, "🇵🇹", "⚽", 94],["Jonathan David", "ST", 86, "🇨🇦", "⚽", 90]],
+"AC Milan":[["Mike Maignan", "GK", 88, "🇫🇷", "🧤", 90],["Fikayo Tomori", "CB", 82, "🏴", "🛡️", 84],["Strahinja Pavlović", "CB", 80, "🇷🇸", "🛡️", 87],["Theo Hernández", "LB", 88, "🇫🇷", "🛡️", 91],["Youssouf Fofana", "CM", 81, "🇫🇷", "🎯", 85],["Ruben Loftus-Cheek", "CM", 79, "🏴", "🎯", 80],["Christian Pulisic", "RW", 86, "🇺🇸", "⚽", 89],["Rafael Leão", "LW", 88, "🇵🇹", "⚽", 94],["Santiago Giménez", "ST", 84, "🇲🇽", "⚽", 91],["Luka Modrić", "CM", 82, "🇭🇷", "🎯", 82]],
+"Napoli":[["Alex Meret", "GK", 82, "🇮🇹", "🧤", 84],["Alessandro Buongiorno", "CB", 84, "🇮🇹", "🛡️", 89],["Giovanni Di Lorenzo", "RB", 83, "🇮🇹", "🛡️", 83],["Mathías Olivera", "LB", 81, "🇺🇾", "🛡️", 84],["Stanislav Lobotka", "CM", 87, "🇸🇰", "🎯", 88],["Scott McTominay", "CM", 85, "🏴", "🎯", 87],["Frank Anguissa", "CM", 84, "🇨🇲", "🎯", 84],["Khvicha Kvaratskhelia", "LW", 89, "🇬🇪", "⚽", 94],["Romelu Lukaku", "ST", 84, "🇧🇪", "⚽", 84],["Matteo Politano", "RW", 82, "🇮🇹", "⚽", 82]],
+"Roma":[["Mile Svilar", "GK", 83, "🇷🇸", "🧤", 90],["Gianluca Mancini", "CB", 82, "🇮🇹", "🛡️", 83],["Evan Ndicka", "CB", 83, "🇨🇮", "🛡️", 88],["Angeliño", "LB", 82, "🇪🇸", "🛡️", 84],["Manu Koné", "CM", 84, "🇫🇷", "🎯", 91],["Lorenzo Pellegrini", "AM", 83, "🇮🇹", "🎯", 84],["Paulo Dybala", "AM", 86, "🇦🇷", "🎯", 86],["Artem Dovbyk", "ST", 83, "🇺🇦", "⚽", 87],["Matías Soulé", "RW", 80, "🇦🇷", "⚽", 92]],
+"LOSC Lille":[["Lucas Chevalier", "GK", 84, "🇫🇷", "🧤", 93],["Nabil Bentaleb", "CM", 80, "🇩🇿", "🎯", 80],["Ayase Ueda", "ST", 79, "🇯🇵", "⚽", 84],["Hamza Igamane", "ST", 76, "🇲🇦", "⚽", 89],["Jonathan David", "ST", 86, "🇨🇦", "⚽", 90]],
+"OGC Nice":[["Marcin Bułka", "GK", 82, "🇵🇱", "🧤", 87],["Mohammed Amoura", "ST", 82, "🇩🇿", "⚽", 90],["Youssouf Ndayishimiye", "CB", 80, "🇧🇮", "🛡️", 84],["Dante", "CB", 78, "🇧🇷", "🛡️", 78],["Melvin Bard", "LB", 79, "🇫🇷", "🛡️", 84],["Hicham Boudaoui", "CM", 79, "🇩🇿", "🎯", 84]],
+"RC Lens":[["Régis Gurtner", "GK", 76, "🇫🇷", "🧤", 76],["Odsonne Édouard", "ST", 81, "🇫🇷", "⚽", 84],["Franjo Ivanović", "ST", 77, "🇭🇷", "⚽", 88],["Souleymane Sagnan", "CB", 75, "🇫🇷", "🛡️", 84],["Ismaëlo Ganiou", "CB", 74, "🇫🇷", "🛡️", 86]],
+"Stade Rennais F.C.":[["Estéban Lepaul", "ST", 79, "🇫🇷", "⚽", 85],["Rayan Bamba", "CB", 73, "🇫🇷", "🛡️", 84],["Kenny Assignon", "RB", 75, "🇫🇷", "🛡️", 85],["Amadou Diallo", "ST", 73, "🇫🇷", "⚽", 85]],
+"Toulouse FC":[["Mathys Niflore", "GK", 67, "🇫🇷", "🧤", 82],["Alexis Vossah", "CM", 66, "🇫🇷", "🎯", 82],["Ylies Haradj", "CB", 68, "🇫🇷", "🛡️", 82],["Aymen Sadi", "CB", 67, "🇫🇷", "🛡️", 84],["Aymen Amaaouch", "CM", 65, "🇫🇷", "🎯", 84],["Théo Collin", "GK", 67, "🇫🇷", "🧤", 82]],
+"ESTAC Troyes":[["Renaud Ripart", "ST", 72, "🇫🇷", "⚽", 72],["Junior Diaz", "CB", 71, "🇫🇷", "🛡️", 82],["Yacouba Koné", "ST", 67, "🇫🇷", "⚽", 83],["Idrissa Soukouna", "CM", 63, "🇫🇷", "🎯", 82],["Hillel Konaté", "GK", 70, "🇫🇷", "🧤", 70],["Yvann Titi", "CB", 68, "🇫🇷", "🛡️", 82]],
+};
+
 const clubAliases={
   'Angers SCO':'Angers',
   'AJ Auxerre':'Auxerre',
@@ -393,6 +473,11 @@ const clubAliases={
   'Paris Saint-Germain':'Paris Saint-Germain'
 };
 
+
+Object.entries(expandedRosters).forEach(([name,players])=>{
+  if(clubs[name]) clubs[name].players=S(players);
+});
+
 function renderClubChoices(){
  const host=document.getElementById('clubChoices');
  const leagues=Object.keys(clubLeagues);
@@ -410,7 +495,7 @@ function renderClubChoices(){
     </div>
   </div>
   <div id="selectedClubPreview" class="selected-club-preview"></div>
-  <div class="db-status">📚 <b>База составов 2026/27</b><br>Сейчас вшиты проверенные составы ключевых клубов. Остальные клубы не получают случайных игроков.</div>`;
+  <div class="db-status">📚 <b>База составов 2026/27</b><br>Добавлены проверенные составы ключевых клубов и полный официальный список игроков Bundesliga. Для остальных лиг база будет заполняться тем же способом — без выдуманных футболистов.</div>`;
  updateClubDropdown();
 }
 function updateClubDropdown(){
