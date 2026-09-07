@@ -1131,6 +1131,137 @@ function ensureTacticalState(){
   state.cornerTaker=state.cornerTaker||'';
   state.tacticStyle=state.tacticStyle||'balanced';
   state.pitchPositions=state.pitchPositions&&typeof state.pitchPositions==='object'?state.pitchPositions:{};
+
+/* === LIVE TACTICS 2.0 === */
+const INDIVIDUAL_INSTRUCTION_OPTIONS=[
+  ['back','Оставаться сзади'],
+  ['attack','Подключаться в атаку'],
+  ['free','Свободная роль'],
+  ['hold','Держать позицию'],
+  ['press','Прессинг'],
+  ['cautious','Осторожность']
+];
+const TACTICAL_SWITCHES=[
+  ['defend','Защититься',-9,-12,-5,12],
+  ['balance','Баланс',0,0,0,0],
+  ['attack','Атаковать',9,5,7,-6],
+  ['allout','Все в атаку',16,-7,11,-14]
+];
+function ensureLiveTacticsState(){
+  state.individualInstructions=state.individualInstructions||{};
+  state.tacticalSwitch=state.tacticalSwitch||'balance';
+  state.tacticalImpact=state.tacticalImpact||null;
+  state.pitchPositions=state.pitchPositions||{};
+  if(Array.isArray(state.startingXI)){
+    state.startingXI.forEach(pid=>{
+      if(pid!=null && !state.individualInstructions[pid]) state.individualInstructions[pid]='hold';
+    });
+  }
+}
+function getPitchPlayerId(p){ return Array.isArray(p)?p[0]:(p&&p.id); }
+function getPlayerByIdLive(id){
+  return (state.players||[]).find(p=>String(p.id)===String(id)) ||
+         (state.players||[]).find(p=>String(p[0])===String(id));
+}
+function pitchCoordForPlayer(id){
+  const pos=state.pitchPositions&&state.pitchPositions[id];
+  if(pos && Number.isFinite(+pos.x) && Number.isFinite(+pos.y)) return {x:+pos.x,y:+pos.y};
+  return null;
+}
+function calculateLiveTacticalImpact(){
+  ensureLiveTacticsState();
+setTimeout(mountLiveTacticalPanel,0);
+  const ids=(state.startingXI||[]).filter(Boolean);
+  const coords=ids.map(id=>({id,p:pitchCoordForPlayer(id),player:getPlayerByIdLive(id)})).filter(x=>x.p);
+  let attack=50, defense=50, control=50, press=50, transition=50;
+  const formation=String(state.formation||'4-3-3');
+  const style=String(state.tacticStyle||'balanced').toLowerCase();
+  const sw=TacticalSwitchValue();
+  attack+=sw.a; defense+=sw.d; control+=sw.c; press+=sw.p; transition+=sw.t;
+  if(formation.includes('4-3-3')){ attack+=4; press+=5; control+=2; }
+  if(formation.includes('4-2-3-1')) control+=8;
+  if(formation.includes('3-5-2')){ control+=10; press+=3; }
+  if(formation.includes('5-4-1')){ defense+=11; attack-=4; }
+  const fw=coords.filter(o=>o.p.x>62).length;
+  const mid=coords.filter(o=>o.p.x>=38&&o.p.x<=62).length;
+  const def=coords.filter(o=>o.p.x<38).length;
+  const left=coords.filter(o=>o.p.y<30).length, right=coords.filter(o=>o.p.y>70).length;
+  const center=coords.filter(o=>o.p.y>=35&&o.p.y<=65).length;
+  const avgX=coords.length?coords.reduce((s,o)=>s+o.p.x,0)/coords.length:50;
+  const width=coords.length?Math.max(...coords.map(o=>o.p.y))-Math.min(...coords.map(o=>o.p.y)):0;
+  if(fw>=4) attack+=6;
+  if(mid>=4) control+=5;
+  if(def>=4) defense+=5;
+  if(center>=5) control+=5;
+  if(left+right>=5){ attack+=3; press+=3; }
+  if(width>=55){ attack+=4; press+=2; }
+  if(avgX>60){ attack+=7; defense-=8; transition-=7; }
+  if(avgX<40){ defense+=7; attack-=7; }
+  const warnings=[];
+  if(avgX>60) warnings.push('Слишком высокая линия — возрастает риск контратак.');
+  if(avgX<40) warnings.push('Слишком низкая линия — снижается атакующий потенциал.');
+  if(width<28 && coords.length>=7) warnings.push('Команда слишком узкая — сопернику легче перекрыть центр.');
+  if(center<=3 && coords.length>=7) warnings.push('Мало игроков в центре — можно проиграть подбор и контроль.');
+  ids.forEach(id=>{
+    const ins=state.individualInstructions[id]||'hold';
+    if(ins==='back'){ defense+=1.5; attack-=.5; }
+    if(ins==='attack'){ attack+=1.5; defense-=.7; }
+    if(ins==='press'){ press+=1.8; transition+=.7; }
+    if(ins==='cautious'){ defense+=1.7; attack-=1; }
+    if(ins==='free'){ attack+=.7; control+=.7; }
+  });
+  return {
+    attack:clampTactical(attack), defense:clampTactical(defense),
+    control:clampTactical(control), press:clampTactical(press),
+    transition:clampTactical(transition), warnings
+  };
+}
+function clampTactical(v){ return Math.max(0,Math.min(100,Math.round(v))); }
+function TacticalSwitchValue(){
+  const x=TACTICAL_SWITCHES.find(v=>v[0]===state.tacticalSwitch)||TACTICAL_SWITCHES[1];
+  return {a:x[2],d:x[3],c:x[4],p:x[5],t:x[4]};
+}
+function setLiveTacticalSwitch(id){
+  ensureLiveTacticsState();
+  state.tacticalSwitch=id;
+  state.tacticStyle=id==='defend'?'defensive':id==='attack'||id==='allout'?'attacking':'balanced';
+  const impact=calculateLiveTacticalImpact();
+  state.tacticalImpact=impact;
+  saveState();
+  if(typeof renderSquadTactics==='function') renderSquadTactics();
+  if(typeof renderMatch==='function') renderMatch();
+  if(typeof toast==='function') toast('Тактика изменена: '+(TACTICAL_SWITCHES.find(x=>x[0]===id)||TACTICAL_SWITCHES[1])[1]);
+}
+function renderLiveTacticalPanel(){
+  ensureLiveTacticsState();
+  const impact=calculateLiveTacticalImpact();
+  state.tacticalImpact=impact;
+  const sw=TACTICAL_SWITCHES.find(x=>x[0]===state.tacticalSwitch)||TACTICAL_SWITCHES[1];
+  const bars=[['Атака',impact.attack],['Оборона',impact.defense],['Контроль',impact.control],['Прессинг',impact.press],['Переходы',impact.transition]];
+  return `<div class="live-tactics-panel">
+    <div class="live-tactics-head"><b>Тактический эффект</b><span>${sw[1]}</span></div>
+    <div class="live-tactics-switches">${TACTICAL_SWITCHES.map(x=>`<button class="${x[0]===state.tacticalSwitch?'active':''}" onclick="setLiveTacticalSwitch('${x[0]}')">${x[1]}</button>`).join('')}</div>
+    <div class="live-tactics-bars">${bars.map(b=>`<div class="tactic-stat"><div><span>${b[0]}</span><b>${b[1]}</b></div><div class="tactic-track"><i style="width:${b[1]}%"></i></div></div>`).join('')}</div>
+    ${impact.warnings.length?`<div class="tactic-warnings">${impact.warnings.map(w=>`<div>⚠ ${w}</div>`).join('')}</div>`:''}
+  </div>`;
+}
+function renderIndividualInstruction(pid){
+  ensureLiveTacticsState();
+  const val=state.individualInstructions[pid]||'hold';
+  return `<select class="individual-instruction" onchange="setIndividualInstruction('${String(pid).replace(/'/g,"\\'")}',this.value)">
+    ${INDIVIDUAL_INSTRUCTION_OPTIONS.map(o=>`<option value="${o[0]}" ${o[0]===val?'selected':''}>${o[1]}</option>`).join('')}
+  </select>`;
+}
+function setIndividualInstruction(pid,val){
+  ensureLiveTacticsState();
+  state.individualInstructions[pid]=val;
+  state.tacticalImpact=calculateLiveTacticalImpact();
+  saveState();
+  const panel=document.querySelector('.live-tactics-panel');
+  if(panel){ const holder=document.createElement('div'); holder.innerHTML=renderLiveTacticalPanel(); panel.replaceWith(holder.firstElementChild); }
+  if(typeof renderPitch==='function') renderPitch();
+}
+ensureLiveTacticsState();
 }
 function currentFormation(){
   ensureTacticalState();
@@ -1382,7 +1513,7 @@ function renderTactics(){
     <div class="pitch-wrap tactical-wrap"><div class="pitch tactical-field" id="pitch"></div><div class="pitch-help">Перетаскивай игроков мышью или пальцем. Позиции сохраняются.</div></div>
     <div class="match-card">
       <div class="section-head"><b>Стартовые 11</b><span>${f.name}</span></div>
-      <div class="xi-list">${f.positions.map((pos,i)=>`<div class="xi-row"><span class="xi-pos">${pos}</span><div class="xi-select"><select onchange="setXI(${i},this.value)">${players.map(p=>`<option value="${String(p[0]).replace(/"/g,'&quot;')}" ${p[0]===xi[i]?'selected':''}>${p[0]} · ⭐${p[2]}</option>`).join('')}</select></div><span>${i+1}</span></div>`).join('')}</div>
+      <div class="xi-list">${f.positions.map((pos,i)=>`<div class="xi-row"><span class="xi-pos">${pos}</span><div class="xi-select"><select onchange="setXI(${i},this.value)">${players.map(p=>`<option value="${String(p[0]).replace(/"/g,'&quot;')}" ${p[0]===xi[i]?'selected':''}>${p[0]} · ⭐${p[2]}</option>`).join('')}</select></div><span>${i+1}</span></div>${renderLiveTacticalPanel()}`).join('')}</div>
     </div>
     <div class="match-card">
       <b>Стандарты и лидерство</b>
@@ -1613,6 +1744,22 @@ function calculateTacticalImpact(){
     style:styleId
   };
 }
+/* Live positional layer: existing match engine keeps its original calculation,
+   while actual pitch positions/instructions modify the returned tactical values. */
+const _baseCalculateTacticalImpact=calculateTacticalImpact;
+calculateTacticalImpact=function(){
+  let base={};
+  try{ base=_baseCalculateTacticalImpact()||{}; }catch(e){}
+  const live=calculateLiveTacticalImpact();
+  const out=Object.assign({},base);
+  ['attack','defense','control','press','transition'].forEach(k=>{
+    const b=Number.isFinite(+out[k])?+out[k]:50;
+    out[k]=Math.max(0,Math.min(100,Math.round((b+live[k])/2)));
+  });
+  out.warnings=Array.from(new Set([...(base.warnings||[]),...(live.warnings||[])]));
+  return out;
+};
+
 
 function ensureMatchPsychology(){
   state.teamMorale=Math.max(0,Math.min(100,Number(state.teamMorale??74)));
@@ -6686,6 +6833,16 @@ if(document.readyState==='loading'){
   outline:3px solid rgba(255,255,255,.9)!important;
   transform:scale(1.12)!important;
 }
+
+/* LIVE TACTICS UI */
+.live-tactics-panel{margin-top:14px;padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.035)}
+.live-tactics-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:10px}.live-tactics-head span{opacity:.65;font-size:12px}
+.live-tactics-switches{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:13px}.live-tactics-switches button{border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:inherit;border-radius:10px;padding:9px 7px;font-weight:700;cursor:pointer}.live-tactics-switches button.active{background:#ff7a18;color:#111;border-color:#ff7a18}
+.live-tactics-bars{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.tactic-stat>div:first-child{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px}.tactic-track{height:5px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}.tactic-track i{display:block;height:100%;background:#ff7a18;border-radius:99px}
+.tactic-warnings{margin-top:11px;padding:9px 10px;border-radius:10px;background:rgba(255,170,50,.08);font-size:12px;line-height:1.45;color:#ffc978}
+.individual-instruction{width:100%;margin-top:6px;border:1px solid rgba(255,255,255,.1);background:#181818;color:inherit;border-radius:8px;padding:5px;font-size:11px}
+@media(max-width:700px){.live-tactics-switches{grid-template-columns:repeat(2,1fr)}.live-tactics-bars{grid-template-columns:repeat(2,1fr)}}
+
 </style>
 <script id="finance2-script">
 /* FINANCE 2.0 COMPLETE SYSTEM */
@@ -6857,6 +7014,29 @@ if(document.readyState==='loading'){
 })();
 </script>
 <!-- /FINANCE 2.0 COMPLETE SYSTEM -->
+
+
+function mountLiveTacticalPanel(){
+  ensureLiveTacticsState();
+  const field=document.querySelector('.tactical-field');
+  if(!field) return;
+  const host=field.parentElement;
+  if(!host) return;
+  let panel=host.querySelector('.live-tactics-panel');
+  if(!panel){ field.insertAdjacentHTML('afterend',renderLiveTacticalPanel()); }
+}
+
+
+function getLiveMatchTacticalModifier(){
+  const x=calculateLiveTacticalImpact();
+  return {
+    attack:(x.attack-50)/100,
+    defense:(x.defense-50)/100,
+    control:(x.control-50)/100,
+    press:(x.press-50)/100,
+    transition:(x.transition-50)/100
+  };
+}
 
 </body>
 </html>
