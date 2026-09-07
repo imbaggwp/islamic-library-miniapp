@@ -7503,8 +7503,8 @@ function sectionCardHtml(section) {
     return `
         <div class="hierarchy-card" draggable="${isAdmin}" data-section-id="${escapeAttribute(section.id)}"
              ondragstart="dragSectionStart(event,'${escapeAttribute(section.id)}')"
-             ondragover="dragSectionOver(event)"
-             ondrop="dropSection(event,'${escapeAttribute(section.parent_id ?? '')}')"
+             ondragover="dragCardOver(event)"
+             ondrop="dropCard(event,'${escapeAttribute(section.id)}','${escapeAttribute(section.parent_id ?? '')}')"
              ondragend="dragSectionEnd(event)"
              onclick="openCourse('${escapeAttribute(section.id)}')">
             ${isAdmin ? `<div class="drag-handle" onclick="event.stopPropagation()" title="Перетащить">⠿</div>` : ""}
@@ -7539,6 +7539,57 @@ function dragSectionOver(event) {
 function dragSectionEnd(event) {
     event.currentTarget.classList.remove("dragging");
     draggedSectionId = null;
+}
+function dragCardOver(event) {
+    if (!isAdmin) return;
+    if (draggedLessonId) {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+        event.currentTarget.classList.add("drag-over");
+        return;
+    }
+    dragSectionOver(event);
+}
+function dropCard(event, targetSectionId, parentId) {
+    if (!isAdmin) return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.currentTarget.classList.remove("drag-over");
+
+    // A lesson dropped on a section is moved into that section.
+    if (draggedLessonId) {
+        moveLessonToSection(String(draggedLessonId), String(targetSectionId));
+        draggedLessonId = null;
+        return;
+    }
+
+    dropSection(event, parentId);
+}
+function moveLessonToSection(lessonId, targetSectionId) {
+    const lesson = lessons.find(x => String(x.id) === String(lessonId));
+    const target = getSection(targetSectionId);
+    if (!lesson || !target) return;
+
+    const oldSectionId = String(lesson.section_id ?? lesson.course_id ?? "");
+    const targetLessons = sectionLessons(targetSectionId).filter(x => String(x.id) !== String(lessonId));
+
+    lesson.section_id = targetSectionId;
+    lesson.course_id = targetSectionId;
+    lesson.order = targetLessons.length;
+
+    // Re-number the old section after removing the lesson.
+    if (oldSectionId && oldSectionId !== String(targetSectionId)) {
+        sectionLessons(oldSectionId)
+            .filter(x => String(x.id) !== String(lessonId))
+            .forEach((item, i) => item.order = i);
+    }
+
+    syncLegacyFromSections();
+    renderEverything();
+
+    const sec = currentSectionId ? getSection(currentSectionId) : null;
+    if (sec) renderSectionPage(sec);
+    showToast(`«${lesson.title}» перемещён в «${target.title}»`);
 }
 function dropSection(event, parentId) {
     if (!isAdmin) return;
@@ -7622,9 +7673,14 @@ function dragLessonStart(event, id) {
     event.currentTarget.classList.add("dragging");
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("text/plain", String(id));
+    event.dataTransfer.setData("application/x-lesson-id", String(id));
 }
 function dragLessonOver(event) { if (isAdmin && draggedLessonId) { event.preventDefault(); event.dataTransfer.dropEffect = "move"; } }
-function dragLessonEnd(event) { event.currentTarget.classList.remove("dragging"); draggedLessonId = null; }
+function dragLessonEnd(event) {
+    event.currentTarget.classList.remove("dragging");
+    document.querySelectorAll(".drag-over").forEach(el => el.classList.remove("drag-over"));
+    draggedLessonId = null;
+}
 function dropLesson(event, sectionId) {
     if (!isAdmin) return;
     event.preventDefault();
