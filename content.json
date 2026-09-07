@@ -1,0 +1,74 @@
+{
+  "categories": [
+    {
+      "id": "category-1",
+      "title": "Акыда",
+      "name": "Акыда",
+      "slug": "aqida",
+      "description": "Основы вероубеждения",
+      "published": true
+    },
+    {
+      "id": "category-2",
+      "title": "Фикх",
+      "name": "Фикх",
+      "slug": "fiqh",
+      "description": "Изучение вопросов фикха",
+      "published": true
+    },
+    {
+      "id": "category-3",
+      "title": "Сира",
+      "name": "Сира",
+      "slug": "sira",
+      "description": "Жизнеописание Пророка ﷺ",
+      "published": true
+    }
+  ],
+  "courses": [
+    {
+      "id": "course-1",
+      "title": "Китаб ат-Таухид",
+      "author": "Мухаммад ибн Абдуль-Ваххаб",
+      "category_id": "category-1",
+      "description": "Изучение основ таухида.",
+      "cover_url": "",
+      "published": true
+    }
+  ],
+  "lessons": [
+    {
+      "id": "lesson-1",
+      "course_id": "course-1",
+      "lesson_number": 1,
+      "title": "Введение в курс",
+      "description": "Первый урок.",
+      "audio_url": "",
+      "duration": "00:00",
+      "published": true
+    },
+    {
+      "id": "lesson-2",
+      "course_id": "course-1",
+      "lesson_number": 2,
+      "title": "Единобожие",
+      "description": "Основы таухида.",
+      "audio_url": "",
+      "duration": "00:00",
+      "published": true
+    }
+  ],
+  "books": [
+    {
+      "id": "book-1",
+      "category_id": "category-1",
+      "title": "Китаб ат-Таухид",
+      "author": "Мухаммад ибн Абдуль-Ваххаб",
+      "description": "Книга единобожия.",
+      "cover_url": "",
+      "pdf_url": "",
+      "pages": 120,
+      "published": true
+    }
+  ]
+}
