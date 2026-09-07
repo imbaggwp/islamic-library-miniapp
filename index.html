@@ -398,6 +398,16 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .agent-card b{font-size:13px}
 .negotiation-note{margin-top:10px;padding:10px;border-radius:10px;background:rgba(255,255,255,.045);font-size:12px;line-height:1.4;opacity:.8}
 </style>
+<style>
+.talk-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.live-psychology{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.live-psychology span{padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.05);font-size:10px;opacity:.8}
+.muted{opacity:.6;font-size:12px}
+</style>
+<style>
+.rating-detail{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.rating-detail>span{display:flex;flex-direction:column;gap:3px}.rating-detail small{font-size:10px;opacity:.5}
+</style>
 </head>
 <body>
 <div class="app">
@@ -1489,6 +1499,69 @@ function calculateTacticalImpact(){
     style:styleId
   };
 }
+
+function ensureMatchPsychology(){
+  state.teamMorale=Math.max(0,Math.min(100,Number(state.teamMorale??74)));
+  state.teamChemistry=Math.max(0,Math.min(100,Number(state.teamChemistry??68)));
+  state.pressure=Math.max(0,Math.min(100,Number(state.pressure??35)));
+  state.mediaReputation=Math.max(0,Math.min(100,Number(state.mediaReputation??50)));
+  state.lastManagerTalk=state.lastManagerTalk||null;
+}
+function applyManagerTalk(type,phase='pre'){
+  ensureMatchPsychology();
+  const effects={
+    confidence:{morale:6,pressure:2,chem:1,text:'Ты подчеркнул уверенность команды.'},
+    calm:{morale:3,pressure:-5,chem:2,text:'Команда получила спокойный настрой.'},
+    demand:{morale:-2,pressure:7,chem:1,text:'Ты потребовал максимальной концентрации.'},
+    inspire:{morale:8,pressure:4,chem:3,text:'Эмоциональная речь подняла боевой дух.'},
+    criticize:{morale:-7,pressure:9,chem:-2,text:'Жёсткая критика усилила давление.'},
+    praise:{morale:7,pressure:-2,chem:3,text:'Ты похвалил команду и укрепил доверие.'}
+  };
+  const e=effects[type]||effects.calm;
+  state.teamMorale=Math.max(0,Math.min(100,state.teamMorale+e.morale));
+  state.pressure=Math.max(0,Math.min(100,state.pressure+e.pressure));
+  state.teamChemistry=Math.max(0,Math.min(100,state.teamChemistry+e.chem));
+  state.lastManagerTalk={type,phase,date:Date.now()};
+  save();
+  if(liveMatch)addLiveEvent('🗣️',e.text);
+  showToast(e.text);
+}
+function preMatchTalk(){
+  ensureMatchPsychology();
+  showModal(`<h2>Разговор с командой</h2>
+    <p class="muted">Выбери тон перед выходом на поле. Решение повлияет на мораль и давление.</p>
+    <div class="talk-grid">
+      <button class="secondary" onclick="applyManagerTalk('confidence','pre');closeModal()">💪 Мы фавориты</button>
+      <button class="secondary" onclick="applyManagerTalk('calm','pre');closeModal()">🧘 Спокойно и по плану</button>
+      <button class="secondary" onclick="applyManagerTalk('demand','pre');closeModal()">🎯 Требую максимум</button>
+      <button class="secondary" onclick="applyManagerTalk('inspire','pre');closeModal()">🔥 Зарядить команду</button>
+    </div>`);
+}
+function halftimeTalk(){
+  if(!liveMatch||liveMatch.finished)return;
+  const lead=liveMatch.gf-liveMatch.ga;
+  const options=lead>0
+    ? [['calm','🧘 Не теряем концентрацию'],['demand','🎯 Добиваем соперника'],['praise','👏 Отличная работа']]
+    : lead<0
+      ? [['inspire','🔥 Верим до конца'],['demand','🎯 Добавить интенсивности'],['criticize','⚠️ Это неприемлемо']]
+      : [['confidence','💪 Мы заберём этот матч'],['calm','🧘 Спокойно продолжаем'],['inspire','🔥 Второй тайм — наш']];
+  showModal(`<h2>Раздевалка · перерыв</h2><p>Счёт: <b>${liveMatch.gf}:${liveMatch.ga}</b></p>
+    <div class="talk-grid">${options.map(([id,label])=>`<button class="secondary" onclick="applyManagerTalk('${id}','half');closeModal()">${label}</button>`).join('')}</div>`);
+}
+function postMatchTalk(win,draw){
+  ensureMatchPsychology();
+  const title=win?'Победа':draw?'Ничья':'Поражение';
+  showModal(`<h2>${title}</h2><p>Как ты обратился к команде после матча?</p>
+    <div class="talk-grid">
+      <button class="secondary" onclick="applyManagerTalk('praise','post');closeModal();navigate('home')">👏 Похвалить команду</button>
+      <button class="secondary" onclick="applyManagerTalk('calm','post');closeModal();navigate('home')">🧘 Спокойно разобрать матч</button>
+      <button class="secondary" onclick="applyManagerTalk('criticize','post');closeModal();navigate('home')">⚠️ Жёстко потребовать большего</button>
+    </div>`);
+}
+function matchPsychologyFactor(){
+  ensureMatchPsychology();
+  return 1+(state.teamMorale-70)*.002+(state.teamChemistry-65)*.0015-(state.pressure-40)*.001;
+}
 function startInteractiveMatch(competition='league',euroName=null,knockoutMeta=null){
   ensureSeasonState();ensurePlayerManagement();ensureLeagueSeason();ensureContractState();ensureStaff();
   let fixture=null,opponent='',home=true;
@@ -1525,7 +1598,8 @@ function showPreMatchBriefing(data){
   const tactical=calculateTacticalImpact();
   const board=state.boardObjectives||{};
   const fitnessStaff=staffEffect('fitness'),medicalStaff=staffEffect('medical');
-  const readiness=Math.round(avgFitness*.45+avgForm*.3+avgMorale*.25);
+  const psychology=matchPsychologyFactor();
+  const readiness=Math.max(0,Math.min(100,Math.round((avgFitness*.45+avgForm*.3+avgMorale*.25)*psychology)));
   const predicted=Math.round((state.rating||70)+((readiness-75)*.08)+((tactical.quality-70)*.25)+(fitnessStaff-60)*.04);
   const homeBoost=home?3:-2;
   const strength=Math.max(40,Math.min(95,predicted+homeBoost));
@@ -1542,6 +1616,9 @@ function showPreMatchBriefing(data){
         <div><span>Фитнес</span><b>${avgFitness}%</b></div>
         <div><span>Форма</span><b>${avgForm}%</b></div>
         <div><span>Мораль</span><b>${avgMorale}%</b></div>
+      </div>
+      <div class="pre-match-section"><b>Настрой команды</b>
+        <button class="secondary" style="width:100%" onclick="preMatchTalk()">🗣️ Провести разговор с командой</button>
       </div>
       <div class="pre-match-section"><b>План на матч</b>
         <div class="pre-match-options">
@@ -1570,7 +1647,7 @@ function launchPreparedMatch(data){
   const names=data.names,xi=data.xi;
   const tactic=state.preMatchTactic||state.tacticStyle||'balanced';
   const moraleBoost=Math.round((xi.reduce((a,p)=>a+Number(contractData(p).morale||75),0)/Math.max(1,xi.length)-75)*.03);
-  state.matchReadiness={fitness:data.avgFitness,form:data.avgForm,morale:data.avgMorale,tactic};
+  state.matchReadiness={fitness:data.avgFitness,form:data.avgForm,morale:data.avgMorale,tactic,psychology:matchPsychologyFactor()};
   liveMatch={competition:data.competition,euroName:data.euroName,knockoutMeta:data.knockoutMeta,fixture:data.fixture,opponent:data.opponent,home:data.home,minute:0,gf:0,ga:0,events:[],finished:false,tactic,ball:{x:50,y:50,side:'home'},shots:0,onTarget:0,opponentShots:0,opponentOnTarget:0,substitutions:[],xi:xi.map(p=>p[0]),bench:(state.players||[]).filter(p=>!names.includes(p[0])).map(p=>p[0]),usedSubs:0,maxSubs:5,injured:[],yellow:{},paused:false,elapsedTimer:null,extraTime:false,penalties:null,moraleBoost};
   addLiveEvent('📋',`Предматчевый план: ${TACTIC_STYLES.find(x=>x.id===tactic)?.name||tactic}. Готовность ${data.avgFitness}%, форма ${data.avgForm}%.`);
   navigate('gameMatch');renderLiveMatch();liveMatch.elapsedTimer=setInterval(liveTick,900);
@@ -1637,6 +1714,14 @@ function generateMatchEvent(){
 }
 function liveTick(){
   if(!liveMatch||liveMatch.finished||liveMatch.paused)return;
+  if(liveMatch.minute===45&&!liveMatch.halfTimeShown){
+    liveMatch.halfTimeShown=true;
+    liveMatch.paused=true;
+    addLiveEvent('⏸️','Перерыв. Команда отправляется в раздевалку.');
+    renderLiveMatch();
+    setTimeout(()=>{if(liveMatch&&!liveMatch.finished)halftimeTalk()},120);
+    return;
+  }
   liveMatch.minute++;
   const xi=liveMatch.xi.map(findMyPlayer).filter(Boolean);
   const t=calculateTacticalImpact();
@@ -1650,7 +1735,8 @@ function liveTick(){
   const readinessFactor=Math.max(.78,Math.min(1.08,1+(Number(readiness.fitness)-75)*.0025+(Number(readiness.form)-75)*.002+(Number(readiness.morale)-75)*.0015+(Number(liveMatch.moraleBoost||0)*.001)));
   const fatigueFactor=Math.max(.72,Math.min(1.05,(xi.reduce((a,p)=>a+playerMgmt(p[0]).fitness,0)/(Math.max(1,xi.length)*100))));
   const staffFitness=Math.max(0,staffEffect('fitness')-60)*.0015;
-  const chance=Math.max(.006,Math.min(.18,(strength/100)*.10*attackFactor*transitionFactor*fatigueFactor*readinessFactor*(1+staffFitness)*homePower));
+  const psychology=matchPsychologyFactor();
+  const chance=Math.max(.006,Math.min(.18,(strength/100)*.10*attackFactor*transitionFactor*fatigueFactor*readinessFactor*(1+staffFitness)*psychology*homePower));
   const oppChance=Math.max(.004,Math.min(.15,(opp/100)*.085*(1-(t.defense-70)*.004)*Math.max(.8,1-(t.press-70)*.0015)));
   const phase=liveMatch.minute<15?'opening':liveMatch.minute<35?'first':liveMatch.minute<55?'second':liveMatch.minute<75?'third':'closing';
   const zoneRoll=Math.random();
@@ -1735,6 +1821,7 @@ function renderLiveMatch(){
       <div class="attack-label home">${ball.side==='home'?'АТАКА':''}</div><div class="attack-label away">${ball.side==='away'?'АТАКА':''}</div>
     </div>
 
+    <div class="live-psychology"><span>😎 Мораль ${Math.round(state.teamMorale||0)}</span><span>🤝 Сыгранность ${Math.round(state.teamChemistry||0)}</span><span>⚠️ Давление ${Math.round(state.pressure||0)}</span></div>
     <div class="live-score-strip"><span>⚽ ${m.shots||0} уд.</span><span>🎯 ${m.onTarget||0} в створ</span><span>🟨 ${Object.keys(m.yellow||{}).length}</span><span>🔄 ${m.usedSubsCount||m.usedSubs||0}/5</span></div>
 
     <div class="live-tactical-summary"><b>🧠 ${tactical.formation}</b><span>${style.icon} ${style.name}</span><small>Атака ${Math.round(tactical.attack)} · Оборона ${Math.round(tactical.defense)} · Контроль ${Math.round(tactical.control)} · Прессинг ${Math.round(tactical.press)}</small></div>
@@ -1812,54 +1899,71 @@ function resolveMatchTieWithPenalties(){
 
 function buildMatchReport(){
   if(!liveMatch)return null;
-  const all=state.players||[];
-  const ratings={};
-  liveMatch.xi.forEach(n=>{
-    const p=all.find(x=>x[0]===n),d=playerMgmt(n)||{};
-    let r=6.4+(d.sharpness||50)/250;
-    if((liveMatch.events||[]).some(e=>e.text?.includes(n)&&e.icon==='⚽'))r+=1.1;
-    if((liveMatch.yellow||{})[n])r-=.3;
-    ratings[n]=Math.max(5,Math.min(10,Number(r.toFixed(1))));
+  const all=state.players||[],ratings={},stats={},events=liveMatch.events||[];
+  const goalNames={};
+  events.filter(e=>e.icon==='⚽').forEach(e=>{
+    const found=all.find(p=>e.text?.includes(p[0]));
+    if(found)goalNames[found[0]]=(goalNames[found[0]]||0)+1;
   });
-  const shots=Math.max(liveMatch.gf+liveMatch.ga+4,Math.round(7+Math.random()*12));
-  const onTarget=Math.min(shots,Math.max(liveMatch.gf,Math.round(shots*.42)));
-  const possession=Math.max(32,Math.min(68,Math.round(50+(state.rating-(liveMatch.opponentRating||state.rating))*0.35+(Math.random()*10-5))));
-  const xg=Math.max(.15,Number((liveMatch.gf*.72+Math.random()*1.6).toFixed(2)));
-  const oppXg=Math.max(.1,Number((liveMatch.ga*.65+Math.random()*1.5).toFixed(2)));
-  const scorers=(liveMatch.events||[]).filter(e=>e.icon==='⚽').map(e=>e.text);
+  liveMatch.xi.forEach(n=>{
+    const p=all.find(x=>x[0]===n),d=playerMgmt(n)||{},c=p?contractData(p):{};
+    let r=6.2+(Number(p?.[2]||65)-65)*.045+(Number(d.form||75)-75)*.018+(Number(d.fitness||75)-75)*.012+(Number(c.morale||75)-75)*.008;
+    let actions=0,errors=0;
+    if(goalNames[n]){r+=goalNames[n]*1.05;actions+=goalNames[n]*4}
+    if((liveMatch.yellow||{})[n]){r-=.35;errors+=1}
+    const playerEvents=events.filter(e=>e.text?.includes(n));
+    actions+=playerEvents.filter(e=>['🎯','🚩','✓'].includes(e.icon)).length;
+    errors+=playerEvents.filter(e=>['⚠️','❌','🚑'].includes(e.icon)).length;
+    r+=Math.min(.45,actions*.04)-Math.min(.4,errors*.08);
+    r=Math.max(4.8,Math.min(10,Number(r.toFixed(1))));
+    ratings[n]=r;
+    stats[n]={goals:goalNames[n]||0,assists:0,actions,errors,minutes:Math.min(90,liveMatch.minute)};
+  });
+  const shots=Math.max(liveMatch.shots||0,liveMatch.gf+4+Math.round(Math.random()*5));
+  const oppShots=Math.max(liveMatch.opponentShots||0,liveMatch.ga+3+Math.round(Math.random()*5));
+  const onTarget=Math.min(shots,Math.max(liveMatch.onTarget||0,liveMatch.gf+Math.round(shots*.32)));
+  const oppOnTarget=Math.min(oppShots,Math.max(liveMatch.opponentOnTarget||0,liveMatch.ga+Math.round(oppShots*.31)));
+  const possession=Math.max(32,Math.min(68,Math.round(50+(Number(state.rating||70)-Number(liveMatch.opponentRating||state.rating||70))*.3+(Math.random()*6-3))));
+  const xg=Math.max(.15,Number(((liveMatch.gf*.72)+(Math.max(0,shots-liveMatch.gf)*.055)+Math.random()*.45).toFixed(2)));
+  const oppXg=Math.max(.1,Number(((liveMatch.ga*.68)+(Math.max(0,oppShots-liveMatch.ga)*.05)+Math.random()*.45).toFixed(2)));
   const man=Object.entries(ratings).sort((a,b)=>b[1]-a[1])[0];
-  return {shots,onTarget,possession,xg,oppXg,ratings,scorers,manOfMatch:man?.[0]||liveMatch.xi[0]};
+  return {shots,oppShots,onTarget,oppOnTarget,possession,xg,oppXg,ratings,playerStats:stats,scorers:Object.keys(goalNames),manOfMatch:man?.[0]||liveMatch.xi[0]};
 }
 function renderPostMatchReport(){
   const box=document.getElementById('postMatchReport');if(!box||!liveMatch)return;
   const r=liveMatch.report||buildMatchReport();liveMatch.report=r;
-  const opp=liveMatch.opponent,score=`${liveMatch.gf}:${liveMatch.ga}`;
   const result=liveMatch.gf>liveMatch.ga?'Победа':liveMatch.gf<liveMatch.ga?'Поражение':'Ничья';
-  const myShots=r.shots,oppShots=Math.max(3,Math.round(myShots*(.7+Math.random()*.55)));
-  const myPoss=r.possession;
   box.innerHTML=`
-    <div class="report-result"><span>${result}</span><strong>${score}</strong><small>${state.club} — ${opp}</small></div>
+    <div class="report-result"><span>${result}</span><strong>${liveMatch.gf}:${liveMatch.ga}</strong><small>${state.club} — ${liveMatch.opponent}</small></div>
     <div class="report-stats">
-      <div><span>Владение</span><b>${myPoss}% — ${100-myPoss}%</b></div>
-      <div><span>Удары</span><b>${myShots} — ${oppShots}</b></div>
-      <div><span>В створ</span><b>${r.onTarget} — ${Math.max(1,Math.round(oppShots*.4))}</b></div>
+      <div><span>Владение</span><b>${r.possession}% — ${100-r.possession}%</b></div>
+      <div><span>Удары</span><b>${r.shots} — ${r.oppShots}</b></div>
+      <div><span>В створ</span><b>${r.onTarget} — ${r.oppOnTarget}</b></div>
       <div><span>xG</span><b>${r.xg} — ${r.oppXg}</b></div>
     </div>
-    <div class="report-section"><h4>⭐ Лучший игрок</h4><div class="motm">${r.manOfMatch}<b>${r.ratings[r.manOfMatch]||6.5}</b></div></div>
-    <div class="report-section"><h4>📋 Оценки</h4><div class="ratings-list">${Object.entries(r.ratings).map(([n,v])=>`<div><span>${n}</span><b>${v}</b></div>`).join('')}</div></div>
+    <div class="report-section"><h4>⭐ Игрок матча</h4><div class="motm">${r.manOfMatch}<b>${r.ratings[r.manOfMatch]||6.5}</b></div></div>
+    <div class="report-section"><h4>📋 Индивидуальные оценки</h4><div class="ratings-list">${Object.entries(r.ratings).map(([n,v])=>{const st=r.playerStats[n]||{};return `<div class="rating-detail"><span><b>${n}</b><small>${st.goals?'⚽ '+st.goals+' · ':''}${st.actions||0} полезных действий · ${st.errors||0} ошибок</small></span><b>${v}</b></div>`}).join('')}</div></div>
     <div class="report-section"><h4>🔄 Замены</h4><div class="report-events">${(liveMatch.substitutions||[]).map(x=>`<div>${x.minute}' · ${x.incoming} ← ${x.out}</div>`).join('')||'<div class="muted">Замен не было</div>'}</div></div>
-    <div class="report-section"><h4>📝 События</h4><div class="report-events">${(liveMatch.events||[]).slice(-12).map(e=>`<div>${e.minute||''}' ${e.icon||''} ${e.text||''}</div>`).join('')}</div></div>`;
+    <div class="report-section"><h4>📝 Ключевые события</h4><div class="report-events">${(liveMatch.events||[]).slice(-15).map(e=>`<div>${e.minute||''}' ${e.icon||''} ${e.text||''}</div>`).join('')}</div></div>`;
 }
-
 function finishInteractiveMatch(){
   if(!liveMatch||liveMatch.finished)return;
   liveMatch.finished=true;if(liveMatch.elapsedTimer)clearInterval(liveMatch.elapsedTimer);
   liveMatch.report=buildMatchReport();
   ensurePlayerManagement();
   const playedMinutes=Math.min(90,liveMatch.minute);
+  const fitnessProtection=Math.max(0,staffEffect('fitness')-60)*.035;
   liveMatch.xi.forEach(n=>{
-    const d=playerMgmt(n);d.minutes+=playedMinutes;d.fitness=Math.max(10,d.fitness-18);d.sharpness=Math.min(100,d.sharpness+7);
+    const d=playerMgmt(n),r=liveMatch.report?.ratings?.[n]||6.5;
+    d.minutes+=playedMinutes;
+    d.fitness=Math.max(8,d.fitness-(12+playedMinutes*.07-fitnessProtection));
+    d.sharpness=Math.min(100,d.sharpness+(r>=7.5?8:5));
+    d.form=Math.max(35,Math.min(99,d.form+(r>=7.5?2:r<6?-.8:.3)));
   });
+  ensureMatchPsychology();
+  const resultForMorale=liveMatch.gf>liveMatch.ga?1:liveMatch.gf<liveMatch.ga?-1:0;
+  state.teamMorale=Math.max(0,Math.min(100,state.teamMorale+resultForMorale*4));
+  state.teamChemistry=Math.max(0,Math.min(100,state.teamChemistry+(resultForMorale>=0?1:-1)));
   const gf=liveMatch.home?liveMatch.gf:liveMatch.ga,ga=liveMatch.home?liveMatch.ga:liveMatch.gf;
   matchdayRevenue(liveMatch.competition);
 
@@ -4328,7 +4432,12 @@ function finishMatch(){
  save();updateHome();renderLeague();renderFixtures();
  const title=win?'🏆 ПОБЕДА!':draw?'🤝 НИЧЬЯ':'😔 ПОРАЖЕНИЕ';
  const msg=win?`Отличный матч. Призовые: <b>€250K</b>.`:draw?'Команды забрали по одному очку.':'Сегодня соперник оказался сильнее. Впереди следующий тур.';
- showModal(`<h2>${title}</h2><p style="font-size:30px;text-align:center"><b>${gf} : ${ga}</b></p><p>${state.club} — ${op}<br><br>${msg}</p><button class="primary" onclick="closeModal();navigate('home')">Завершить</button>`);
+ ensureMatchPsychology();
+  if(win){state.teamMorale=Math.min(100,state.teamMorale+5);state.pressure=Math.max(0,state.pressure-3);state.teamChemistry=Math.min(100,state.teamChemistry+2)}
+  else if(draw){state.teamMorale=Math.min(100,state.teamMorale+1)}
+  else {state.teamMorale=Math.max(0,state.teamMorale-5);state.pressure=Math.min(100,state.pressure+5)}
+  save();
+  showModal(`<h2>${title}</h2><p style="font-size:30px;text-align:center"><b>${gf} : ${ga}</b></p><p>${state.club} — ${op}<br><br>${msg}</p><button class="primary" onclick="closeModal();postMatchTalk(${win},${draw})">Разбор в раздевалке</button>`);
 }
 function buy(i){
  const p=state.market[i];
@@ -4405,6 +4514,434 @@ if(document.readyState==='loading'){
     </div>
   </div>
 </div>
+
+
+<!-- WORLD EVENTS & NEWS SYSTEM -->
+<style id="world-events-styles">
+.world-news-panel{margin-top:16px}
+.world-news-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.world-news-head h3{margin:0}
+.world-news-list{display:grid;gap:10px}
+.world-news-card{padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.035)}
+.world-news-card.urgent{border-color:rgba(255,170,80,.35);box-shadow:0 0 0 1px rgba(255,170,80,.06) inset}
+.world-news-top{display:flex;gap:10px;align-items:flex-start}
+.world-news-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:11px;background:rgba(255,170,80,.1);flex:0 0 36px}
+.world-news-icon svg{width:19px;height:19px}
+.world-news-title{font-weight:750;line-height:1.25}
+.world-news-meta{font-size:12px;opacity:.58;margin-top:3px}
+.world-news-text{margin-top:9px;line-height:1.45;opacity:.86}
+.world-news-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+.world-news-actions button{font:inherit}
+.world-news-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:999px;font-size:11px;background:rgba(255,170,80,.1);color:inherit}
+.world-news-empty{padding:18px;text-align:center;opacity:.58}
+.world-news-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.world-news-stat{padding:11px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06)}
+.world-news-stat b{display:block;font-size:18px;margin-top:3px}
+.world-news-stat span{font-size:11px;opacity:.58}
+.world-event-dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:currentColor}
+@media(max-width:700px){.world-news-stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+<script id="world-events-script">
+/* WORLD EVENTS & NEWS SYSTEM */
+(function(){
+  const W_TYPES = {
+    rumor:{icon:'news', label:'Слух'},
+    interest:{icon:'globe', label:'Интерес клуба'},
+    morale:{icon:'users', label:'Раздевалка'},
+    agent:{icon:'handshake', label:'Агент'},
+    board:{icon:'trophy', label:'Совет директоров'},
+    media:{icon:'news', label:'Медиа'},
+    contract:{icon:'book', label:'Контракт'},
+    market:{icon:'money', label:'Рынок'}
+  };
+
+  function ensureWorld(){
+    state.world = state.world || {};
+    state.world.news = Array.isArray(state.world.news) ? state.world.news : [];
+    state.world.events = Array.isArray(state.world.events) ? state.world.events : [];
+    state.world.lastDay = state.world.lastDay || '';
+    state.world.unread = Number(state.world.unread||0);
+    state.world.total = Number(state.world.total||0);
+    state.world.rumors = state.world.rumors || {};
+    state.world.interest = state.world.interest || {};
+    state.world.nextId = Number(state.world.nextId||1);
+  }
+
+  function wIcon(type){
+    const t=W_TYPES[type]||W_TYPES.rumor;
+    try{return svgIcon(t.icon,'18px')}catch(e){return ''}
+  }
+
+  function worldPlayer(){
+    const squad = (state.squad||[]).filter(Boolean);
+    if(!squad.length) return null;
+    return squad[Math.floor(Math.random()*squad.length)];
+  }
+
+  function clubPower(){
+    return Number(state.clubRating || state.club?.rating || 78);
+  }
+
+  function addWorldNews(type,title,text,opts={}){
+    ensureWorld();
+    const n={
+      id:state.world.nextId++,
+      type, title, text,
+      day: state.careerDate || state.world.lastDay || '',
+      time: new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}),
+      unread:true,
+      urgent:!!opts.urgent,
+      playerId:opts.playerId||null,
+      actions:opts.actions||[],
+      expires:opts.expires||0
+    };
+    state.world.news.unshift(n);
+    state.world.events.unshift(n);
+    state.world.news=state.world.news.slice(0,60);
+    state.world.events=state.world.events.slice(0,80);
+    state.world.unread++;
+    state.world.total++;
+    if(state.world.news.length>1) state.world.news[0].unread=true;
+    save();
+    return n;
+  }
+
+  function getSquadPlayers(){
+    return (state.squad||[]).filter(p=>p && p.name);
+  }
+
+  function playerRole(p){
+    const c=state.contracts && state.contracts[p.id];
+    return c?.role || p.role || 'Ротация';
+  }
+
+  function playerMorale(p){
+    const c=state.contracts && state.contracts[p.id];
+    return Number(c?.morale ?? p.morale ?? 70);
+  }
+
+  function playerValue(p){
+    return Number(p.value || p.marketValue || p.price || 10000000);
+  }
+
+  function fmtMoney(v){
+    v=Number(v||0);
+    if(v>=1000000) return (v/1000000).toFixed(v>=10000000?0:1)+' млн';
+    if(v>=1000) return Math.round(v/1000)+' тыс';
+    return Math.round(v).toLocaleString('ru-RU');
+  }
+
+  function generatePlayerRumor(){
+    const players=getSquadPlayers();
+    if(!players.length) return;
+    const p=players[Math.floor(Math.random()*players.length)];
+    const clubs=['Real Madrid','Manchester City','Bayern München','Paris Saint-Germain','Liverpool','Arsenal','Inter','FC Barcelona','Atlético de Madrid','Juventus'];
+    let buyer=clubs[Math.floor(Math.random()*clubs.length)];
+    if(buyer===state.clubName) buyer=clubs[(clubs.indexOf(buyer)+1)%clubs.length];
+
+    const v=playerValue(p);
+    const fee=Math.round(v*(1.05+Math.random()*.75)/100000)*100000;
+    state.world.rumors[p.id]={club:buyer,fee,confidence:Math.round(38+Math.random()*48),day:state.careerDate||''};
+
+    addWorldNews('rumor',
+      buyer+' следит за '+p.name,
+      'По данным прессы, клуб рассматривает '+p.name+' как вариант усиления. Возможное предложение — около '+fmtMoney(fee)+'.',
+      {playerId:p.id,urgent:Math.random()<.25,
+       actions:[
+         {label:'Потребовать больше',fn:'worldRespond("high",'+p.id+')'},
+         {label:'Оставить без комментариев',fn:'worldRespond("quiet",'+p.id+')'}
+       ]});
+  }
+
+  function generateInterest(){
+    const players=getSquadPlayers();
+    if(!players.length) return;
+    const p=players[Math.floor(Math.random()*players.length)];
+    const buyers=['Chelsea','Manchester United','Newcastle United','AC Milan','Borussia Dortmund','Napoli','Tottenham','AS Monaco'];
+    const buyer=buyers[Math.floor(Math.random()*buyers.length)];
+    const fee=Math.round(playerValue(p)*(1.15+Math.random()*1.0)/100000)*100000;
+    state.world.interest[p.id]={club:buyer,fee,day:state.careerDate||''};
+    addWorldNews('interest',
+      'Официальный интерес к '+p.name,
+      buyer+' запросил информацию по условиям трансфера. Это пока не оффер, но клуб готов обсудить сделку.',
+      {playerId:p.id,urgent:true,
+       actions:[
+         {label:'Начать переговоры',fn:'worldOpenOffer('+p.id+')'},
+         {label:'Объявить игрока неприкосновенным',fn:'worldRespond("untouchable",'+p.id+')'}
+       ]});
+  }
+
+  function generateDissatisfaction(){
+    const players=getSquadPlayers().filter(p=>playerMorale(p)<58);
+    if(!players.length) return;
+    const p=players[Math.floor(Math.random()*players.length)];
+    const c=state.contracts?.[p.id];
+    const reason = Number(c?.role==='Ротация') ? 'недостаток игрового времени' :
+      Number(c?.wage||0)>0 && Number(c.wage)<Number(p.salary||c.wage)*.85 ? 'условия контракта' :
+      'недовольство своей ролью';
+    addWorldNews('morale',
+      p.name+' недоволен',
+      'В раздевалке появились разговоры о том, что '+p.name+' обеспокоен: '+reason+'. Если ничего не менять, напряжение может усилиться.',
+      {playerId:p.id,urgent:true,
+       actions:[
+         {label:'Поговорить с игроком',fn:'worldTalkPlayer('+p.id+')'},
+         {label:'Пообещать больше минут',fn:'worldPromiseMinutes('+p.id+')'}
+       ]});
+  }
+
+  function generateAgentDemand(){
+    const players=getSquadPlayers();
+    if(!players.length) return;
+    const p=players[Math.floor(Math.random()*players.length)];
+    const c=state.contracts?.[p.id]||{};
+    const wage=Number(c.wage||p.salary||50000);
+    const demand=Math.round(wage*(1.12+Math.random()*.28));
+    addWorldNews('agent',
+      'Агент '+p.name+' требует встречи',
+      'Представитель игрока считает, что текущие условия больше не соответствуют статусу футболиста. Требование по зарплате — '+Math.round(demand).toLocaleString('ru-RU')+' в год.',
+      {playerId:p.id,actions:[
+        {label:'Обсудить повышение',fn:'worldAgentTalk('+p.id+','+demand+')'},
+        {label:'Отказать',fn:'worldAgentReject('+p.id+')'}
+      ]});
+  }
+
+  function generateBoardMessage(){
+    const pos=Number(state.leaguePosition||state.position||0);
+    const budget=Number(state.budget||state.finance?.balance||0);
+    let text;
+    if(pos && pos<=3) text='Совет доволен прогрессом. Руководство ожидает борьбы за чемпионство и сохранения текущей динамики.';
+    else if(pos && pos>=15) text='Совет обеспокоен результатами. В ближайших матчах команда должна показать реакцию.';
+    else if(budget<0) text='Финансовый отдел просит сократить расходы и внимательно контролировать зарплатную ведомость.';
+    else text='Совет отмечает стабильную работу. Руководство хочет видеть прогресс без резкого увеличения расходов.';
+    addWorldNews('board','Сообщение совета директоров',text,{urgent:pos>=15});
+  }
+
+  function generateMedia(){
+    const rep=Number(state.mediaReputation||50);
+    const texts=rep>=70
+      ? ['Пресса всё чаще называет команду одним из главных претендентов сезона.','Эксперты отмечают влияние тренерского штаба на результаты.']
+      : rep<=35
+      ? ['Критики задаются вопросом, способен ли тренер изменить ситуацию.','В прессе обсуждают давление на тренерский штаб.']
+      : ['Журналисты отмечают неоднозначный старт и ждут стабильности.','В медиа обсуждают перспективы команды после последних матчей.'];
+    addWorldNews('media','Новости вокруг клуба',texts[Math.floor(Math.random()*texts.length)]);
+  }
+
+  function worldDailyEvents(){
+    ensureWorld();
+    const day=String(state.careerDate||'');
+    if(!day || day===state.world.lastDay) return;
+    state.world.lastDay=day;
+
+    const r=Math.random();
+    if(r<.18) generatePlayerRumor();
+    else if(r<.30) generateInterest();
+    else if(r<.42) generateDissatisfaction();
+    else if(r<.52) generateAgentDemand();
+    else if(r<.60) generateBoardMessage();
+    else if(r<.69) generateMedia();
+
+    // Small chance for a second, less important event.
+    if(Math.random()<.14) generateMedia();
+
+    save();
+  }
+
+  function markWorldRead(id){
+    ensureWorld();
+    const n=state.world.news.find(x=>x.id===Number(id));
+    if(n && n.unread){n.unread=false;state.world.unread=Math.max(0,state.world.unread-1);save();}
+    renderWorldNews();
+  }
+
+  window.worldRespond=function(action,id){
+    const p=getSquadPlayers().find(x=>Number(x.id)===Number(id));
+    if(!p) return;
+    ensureWorld();
+    if(action==='high'){
+      state.mediaReputation=Math.min(100,Number(state.mediaReputation||50)+2);
+      addWorldNews('rumor','Клуб поднял цену на '+p.name,'Руководство дало понять, что игрок не будет продан дёшево. Переговорная позиция усилена.');
+    }else if(action==='quiet'){
+      addWorldNews('media','Без комментариев','Клуб отказался публично комментировать слухи вокруг '+p.name+'.');
+    }else if(action==='untouchable'){
+      p.transferListed=false;
+      addWorldNews('contract',p.name+' объявлен неприкосновенным','Игрок получил публичную поддержку тренера. Это немного улучшило его уверенность.',{playerId:p.id});
+      const c=state.contracts?.[p.id]; if(c)c.morale=Math.min(100,Number(c.morale||70)+5);
+    }
+    save(); renderAll();
+  };
+
+  window.worldTalkPlayer=function(id){
+    const p=getSquadPlayers().find(x=>Number(x.id)===Number(id));
+    if(!p) return;
+    const c=state.contracts?.[p.id];
+    if(c)c.morale=Math.min(100,Number(c.morale||70)+8);
+    p.morale=Math.min(100,Number(p.morale||70)+5);
+    state.teamMorale=Math.min(100,Number(state.teamMorale||74)+2);
+    addWorldNews('morale','Разговор с '+p.name,'Личная беседа прошла конструктивно. Игрок согласился сосредоточиться на ближайших матчах.');
+    save();renderAll();
+  };
+
+  window.worldPromiseMinutes=function(id){
+    const p=getSquadPlayers().find(x=>Number(x.id)===Number(id));
+    if(!p) return;
+    const c=state.contracts?.[p.id];
+    if(c)c.role='Ротация+';
+    if(c)c.morale=Math.min(100,Number(c.morale||70)+10);
+    addWorldNews('morale','Обещание дано '+p.name,'Игроку обещана более заметная роль в ближайших матчах. Теперь важно выполнить обещание.');
+    save();renderAll();
+  };
+
+  window.worldAgentTalk=function(id,demand){
+    const p=getSquadPlayers().find(x=>Number(x.id)===Number(id));
+    if(!p)return;
+    const c=state.contracts?.[p.id]||{};
+    c.wage=Math.round(Number(demand));
+    c.morale=Math.min(100,Number(c.morale||70)+6);
+    state.contracts=state.contracts||{};state.contracts[p.id]=c;
+    addWorldNews('contract','Условия по '+p.name+' согласованы','Агент принял новые условия. Зарплата игрока обновлена до '+Math.round(demand).toLocaleString('ru-RU')+' в год.',{playerId:p.id});
+    save();renderAll();
+  };
+
+  window.worldAgentReject=function(id){
+    const p=getSquadPlayers().find(x=>Number(x.id)===Number(id));
+    if(!p)return;
+    const c=state.contracts?.[p.id];
+    if(c)c.morale=Math.max(0,Number(c.morale||70)-4);
+    addWorldNews('agent','Переговоры с агентом прекращены','Клуб отказался от требований по зарплате '+p.name+'. В ближайшее время агент может вернуться с новым предложением.');
+    save();renderAll();
+  };
+
+  window.worldOpenOffer=function(id){
+    const p=getSquadPlayers().find(x=>Number(x.id)===Number(id));
+    if(!p)return;
+    const interest=state.world?.interest?.[p.id];
+    const fee=interest?.fee||Math.round(playerValue(p)*1.5);
+    const answer=prompt('Минимальная сумма продажи '+p.name+' (в евро):',String(fee));
+    if(answer===null)return;
+    const value=Number(String(answer).replace(/\s/g,'').replace(',','.'));
+    if(!value || value<0)return;
+    if(value<playerValue(p)*1.1){
+      addWorldNews('market','Оффер отклонён','Клуб сообщил, что предложение за '+p.name+' слишком низкое.');
+    }else{
+      addWorldNews('market','Сделка по '+p.name+' обсуждается','Потенциальный покупатель получил вашу цену: '+fmtMoney(value)+'. Следующий шаг — официальное предложение.');
+    }
+    save();renderAll();
+  };
+
+  function worldEventActions(n){
+    return (n.actions||[]).map(a=>'<button class="btn secondary" onclick="'+a.fn+';event.stopPropagation()">'+a.label+'</button>').join('');
+  }
+
+  window.renderWorldNews=function(){
+    ensureWorld();
+    const host=document.getElementById('worldNewsBox');
+    if(!host)return;
+    const items=state.world.news.slice(0,10);
+    const unread=state.world.unread;
+    const rep=Math.round(Number(state.mediaReputation||50));
+    const morale=Math.round(Number(state.teamMorale||74));
+    const pressure=Math.round(Number(state.pressure||35));
+    host.innerHTML=
+      '<div class="world-news-panel">'+
+      '<div class="world-news-stats">'+
+        '<div class="world-news-stat"><span>Непрочитано</span><b>'+unread+'</b></div>'+
+        '<div class="world-news-stat"><span>Репутация</span><b>'+rep+'</b></div>'+
+        '<div class="world-news-stat"><span>Мораль</span><b>'+morale+'</b></div>'+
+        '<div class="world-news-stat"><span>Давление</span><b>'+pressure+'</b></div>'+
+      '</div>'+
+      '<div class="world-news-head"><h3>Новости и события</h3><span class="world-news-badge">'+wIcon('news')+' Мир клуба</span></div>'+
+      '<div class="world-news-list">'+
+      (items.length?items.map(n=>{
+        const t=W_TYPES[n.type]||W_TYPES.rumor;
+        return '<div class="world-news-card '+(n.urgent?'urgent':'')+'" onclick="markWorldRead('+n.id+')">'+
+          '<div class="world-news-top"><div class="world-news-icon">'+wIcon(n.type)+'</div><div><div class="world-news-title">'+n.title+'</div><div class="world-news-meta">'+t.label+(n.day?' · '+n.day:'')+(n.unread?' · новое':'')+'</div></div></div>'+
+          '<div class="world-news-text">'+n.text+'</div>'+
+          (n.actions?.length?'<div class="world-news-actions">'+worldEventActions(n)+'</div>':'')+
+        '</div>';
+      }).join(''):'<div class="world-news-empty">Пока спокойно. События появятся по мере продвижения карьеры.</div>')+
+      '</div></div>';
+    replaceEmojiIcons(host);
+  };
+
+  // Add a visible panel to the club page if the page has the usual club container.
+  function injectWorldPanel(){
+    if(document.getElementById('worldNewsBox'))return;
+    const candidates=[
+      document.getElementById('clubPage'),
+      document.getElementById('club'),
+      document.querySelector('[data-page="club"]'),
+      document.querySelector('.page.club-page')
+    ].filter(Boolean);
+    const host=candidates[0];
+    if(!host)return;
+    const box=document.createElement('div');
+    box.id='worldNewsBox';
+    host.appendChild(box);
+  }
+
+  // Hook into the existing career-day function without replacing it.
+  if(typeof window.advanceOneCareerDay==='function' && !window.__worldCareerHook){
+    const oldAdvance=window.advanceOneCareerDay;
+    window.advanceOneCareerDay=function(){
+      const r=oldAdvance.apply(this,arguments);
+      try{worldDailyEvents();renderWorldNews();}catch(e){}
+      return r;
+    };
+    window.__worldCareerHook=true;
+  }
+
+  // Match result can trigger an immediate world reaction.
+  if(typeof window.finishInteractiveMatch==='function' && !window.__worldMatchHook){
+    const oldFinish=window.finishInteractiveMatch;
+    window.finishInteractiveMatch=function(){
+      const r=oldFinish.apply(this,arguments);
+      try{
+        if(Math.random()<.55) generateMedia();
+        if(Math.random()<.25) generatePlayerRumor();
+        renderWorldNews();
+      }catch(e){}
+      return r;
+    };
+    window.__worldMatchHook=true;
+  }
+
+  window.ensureWorld=ensureWorld;
+  window.worldDailyEvents=worldDailyEvents;
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    ensureWorld();
+    setTimeout(()=>{injectWorldPanel();worldDailyEvents();renderWorldNews();},500);
+  });
+
+  // The SPA may rerender the club page later, so keep the panel connected.
+  let worldRendering=false;
+  const mo=new MutationObserver(()=>{
+    // Не перерисовываем панель на каждую DOM-мутацию:
+    // renderWorldNews() сама меняет DOM, что раньше создавало бесконечный цикл
+    // MutationObserver -> render -> MutationObserver и могло зависать приложение.
+    if(!document.getElementById('worldNewsBox')){
+      injectWorldPanel();
+      if(!worldRendering){
+        worldRendering=true;
+        try{renderWorldNews();}catch(e){}
+        worldRendering=false;
+      }
+    }
+  });
+  mo.observe(document.body,{childList:true,subtree:true});
+
+  // SPA может полностью пересоздать страницу клуба — мягко восстанавливаем панель.
+  setInterval(()=>{
+    if(!document.getElementById('worldNewsBox')){
+      try{
+        injectWorldPanel();
+        renderWorldNews();
+      }catch(e){}
+    }
+  },1200);
+})();
+</script>
+<!-- /WORLD EVENTS & NEWS SYSTEM -->
 
 </body>
 </html>
