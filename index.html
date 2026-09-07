@@ -1229,6 +1229,7 @@ function setLiveTacticalSwitch(id){
   state.tacticalImpact=impact;
   saveState();
   if(typeof renderSquadTactics==='function') renderSquadTactics();
+  refreshZoneAnalysisUI();
   if(typeof renderMatch==='function') renderMatch();
   if(typeof toast==='function') toast('Тактика изменена: '+(TACTICAL_SWITCHES.find(x=>x[0]===id)||TACTICAL_SWITCHES[1])[1]);
 }
@@ -1243,7 +1244,7 @@ function renderLiveTacticalPanel(){
     <div class="live-tactics-switches">${TACTICAL_SWITCHES.map(x=>`<button class="${x[0]===state.tacticalSwitch?'active':''}" onclick="setLiveTacticalSwitch('${x[0]}')">${x[1]}</button>`).join('')}</div>
     <div class="live-tactics-bars">${bars.map(b=>`<div class="tactic-stat"><div><span>${b[0]}</span><b>${b[1]}</b></div><div class="tactic-track"><i style="width:${b[1]}%"></i></div></div>`).join('')}</div>
     ${impact.warnings.length?`<div class="tactic-warnings">${impact.warnings.map(w=>`<div>⚠ ${w}</div>`).join('')}</div>`:''}
-  </div>`;
+  </div>${renderZoneAnalysis()}`;
 }
 function renderIndividualInstruction(pid){
   ensureLiveTacticsState();
@@ -1260,6 +1261,7 @@ function setIndividualInstruction(pid,val){
   const panel=document.querySelector('.live-tactics-panel');
   if(panel){ const holder=document.createElement('div'); holder.innerHTML=renderLiveTacticalPanel(); panel.replaceWith(holder.firstElementChild); }
   if(typeof renderPitch==='function') renderPitch();
+  refreshZoneAnalysisUI();
 }
 ensureLiveTacticsState();
 }
@@ -1751,7 +1753,9 @@ calculateTacticalImpact=function(){
   let base={};
   try{ base=_baseCalculateTacticalImpact()||{}; }catch(e){}
   const live=calculateLiveTacticalImpact();
+  const zone=calculateTacticalZoneEffects();
   const out=Object.assign({},base);
+  if(zone){ out.attack=(Number(out.attack)||50)*(1+getZoneEngineModifier().attack); out.defense=(Number(out.defense)||50)*(1+getZoneEngineModifier().defense); out.control=(Number(out.control)||50)*(1+getZoneEngineModifier().control); out.press=(Number(out.press)||50)*(1+getZoneEngineModifier().press); }
   ['attack','defense','control','press','transition'].forEach(k=>{
     const b=Number.isFinite(+out[k])?+out[k]:50;
     out[k]=Math.max(0,Math.min(100,Math.round((b+live[k])/2)));
@@ -6843,6 +6847,12 @@ if(document.readyState==='loading'){
 .individual-instruction{width:100%;margin-top:6px;border:1px solid rgba(255,255,255,.1);background:#181818;color:inherit;border-radius:8px;padding:5px;font-size:11px}
 @media(max-width:700px){.live-tactics-switches{grid-template-columns:repeat(2,1fr)}.live-tactics-bars{grid-template-columns:repeat(2,1fr)}}
 
+
+.zone-analysis{margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.08)}
+.zone-analysis-title{display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px}.zone-analysis-title span{opacity:.6}
+.zone-chips{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.zone-chips span{display:flex;justify-content:space-between;gap:5px;padding:7px 8px;border-radius:9px;background:rgba(255,255,255,.035);font-size:10px}.zone-chips i{font-style:normal;font-weight:800;opacity:.8}
+.zone-messages,.zone-ok{margin-top:8px;font-size:11px;line-height:1.45}.zone-messages{color:#ffc978}.zone-ok{color:#8fd7a3}
+
 </style>
 <script id="finance2-script">
 /* FINANCE 2.0 COMPLETE SYSTEM */
@@ -7027,6 +7037,108 @@ function mountLiveTacticalPanel(){
 }
 
 
+
+/* === TACTICAL ZONES ENGINE 3.0 === */
+const PITCH_ZONE_NAMES=[
+  ['defense','Оборона'],['midfield','Полузащита'],['attack','Атака'],
+  ['left','Левый фланг'],['right','Правый фланг'],['center','Центр']
+];
+function getPlayerZoneLive(pos){
+  if(!pos) return [];
+  const x=+pos.x,y=+pos.y, z=[];
+  z.push(x<38?'defense':x>62?'attack':'midfield');
+  z.push(y<35?'left':y>65?'right':'center');
+  return z;
+}
+function getPlayerTacticalRoleLive(player,pos){
+  const zones=getPlayerZoneLive(pos);
+  const ins=state.individualInstructions?.[getPitchPlayerId(player)]||'hold';
+  return {zones,instruction:ins};
+}
+function calculateZoneMapLive(){
+  ensureLiveTacticsState();
+  const ids=(state.startingXI||[]).filter(Boolean);
+  const cells={};
+  for(let xi=0;xi<5;xi++) for(let yi=0;yi<5;yi++){
+    const x=10+xi*20,y=10+yi*20,key=xi+'-'+yi;
+    let own=0,pressure=0,players=[];
+    ids.forEach(id=>{
+      const p=pitchCoordForPlayer(id); if(!p) return;
+      const dx=p.x-x,dy=p.y-y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<24){ own+=1+(24-d)/24; players.push(id); }
+      const ins=state.individualInstructions?.[id]||'hold';
+      if((ins==='press'||state.tacticalSwitch==='allout')&&d<31) pressure+=1;
+    });
+    cells[key]={x,y,own:+own.toFixed(2),pressure,players};
+  }
+  return cells;
+}
+function calculateTacticalZoneEffects(){
+  const map=calculateZoneMapLive();
+  const vals=Object.values(map);
+  let overloads=[],weak=[];
+  vals.forEach(c=>{
+    if(c.own>=2.25) overloads.push(c);
+    if(c.own<.45 && c.x>=20 && c.x<=80) weak.push(c);
+  });
+  const ids=(state.startingXI||[]).filter(Boolean);
+  const left=ids.map(id=>pitchCoordForPlayer(id)).filter(Boolean).filter(p=>p.y<32).length;
+  const right=ids.map(id=>pitchCoordForPlayer(id)).filter(Boolean).filter(p=>p.y>68).length;
+  const center=ids.map(id=>pitchCoordForPlayer(id)).filter(Boolean).filter(p=>p.y>=32&&p.y<=68).length;
+  const defense=ids.map(id=>pitchCoordForPlayer(id)).filter(Boolean).filter(p=>p.x<38).length;
+  const attack=ids.map(id=>pitchCoordForPlayer(id)).filter(Boolean).filter(p=>p.x>62).length;
+  const transitionRisk=Math.max(0,Math.round((attack-defense-2)*8));
+  return {
+    map,overloads,weak,left,right,center,defense,attack,
+    transitionRisk,
+    flankBalance:Math.abs(left-right),
+    centralAdvantage:Math.max(0,center-3)
+  };
+}
+function getZoneEngineModifier(){
+  const z=calculateTacticalZoneEffects();
+  return {
+    attack:(z.attack>=3?0.045:0)+(z.left>=2||z.right>=2?0.025:0),
+    defense:(z.defense>=4?0.045:0)+(z.weak.length>4?-0.025:0),
+    control:(z.centralAdvantage*.018)+(z.overloads.length>2?0.025:0),
+    press:(z.center>=4?0.02:0)+(z.attack>=4?0.02:0),
+    counterRisk:z.transitionRisk/100
+  };
+}
+function renderZoneAnalysis(){
+  const z=calculateTacticalZoneEffects();
+  const messages=[];
+  if(z.left>=2) messages.push('Перегруз на левом фланге');
+  if(z.right>=2) messages.push('Перегруз на правом фланге');
+  if(z.centralAdvantage>0) messages.push('Численное преимущество в центре');
+  if(z.flankBalance>=3) messages.push('Сильный перекос между флангами');
+  if(z.transitionRisk>=12) messages.push('Высокий риск контратак после потери мяча');
+  if(z.weak.length>=5) messages.push('Есть свободные зоны между линиями');
+  return `<div class="zone-analysis">
+    <div class="zone-analysis-title"><b>Зоны и перегрузы</b><span>${z.overloads.length} перегрузов</span></div>
+    <div class="zone-chips">${PITCH_ZONE_NAMES.map(q=>{
+      const n=q[0]==='defense'?z.defense:q[0]==='midfield'?Math.max(0,(state.startingXI||[]).filter(id=>{const p=pitchCoordForPlayer(id);return p&&p.x>=38&&p.x<=62}).length):q[0]==='attack'?z.attack:q[0]==='left'?z.left:q[0]==='right'?z.right:z.center;
+      return `<span><b>${q[1]}</b><i>${n}</i></span>`;
+    }).join('')}</div>
+    ${messages.length?`<div class="zone-messages">${messages.map(x=>`<div>● ${x}</div>`).join('')}</div>`:'<div class="zone-ok">● Расстановка выглядит сбалансированной</div>'}
+  </div>`;
+}
+function applyZoneEngineToMatchNumbers(numbers){
+  if(!numbers||typeof numbers!=='object') return numbers;
+  const m=getZoneEngineModifier();
+  ['attack','attacking','homeAttack','teamAttack'].forEach(k=>{if(Number.isFinite(+numbers[k]))numbers[k]*=1+m.attack;});
+  ['defense','defending','homeDefense','teamDefense'].forEach(k=>{if(Number.isFinite(+numbers[k]))numbers[k]*=1+m.defense;});
+  ['control','possession','midfield'].forEach(k=>{if(Number.isFinite(+numbers[k]))numbers[k]*=1+m.control;});
+  return numbers;
+}
+function tacticalZoneEventChance(type){
+  const z=calculateTacticalZoneEffects(),m=getZoneEngineModifier();
+  if(type==='counter') return Math.max(.01,Math.min(.5,.08+m.counterRisk));
+  if(type==='flank') return Math.max(.01,Math.min(.5,.05+(z.left>=2||z.right>=2?.08:0)+m.attack));
+  if(type==='central') return Math.max(.01,Math.min(.5,.05+(z.centralAdvantage*.025)));
+  return .05;
+}
+
 function getLiveMatchTacticalModifier(){
   const x=calculateLiveTacticalImpact();
   return {
@@ -7036,6 +7148,27 @@ function getLiveMatchTacticalModifier(){
     press:(x.press-50)/100,
     transition:(x.transition-50)/100
   };
+}
+
+
+let _zoneEngineRefreshTimer=null;
+function refreshZoneAnalysisUI(){
+  clearTimeout(_zoneEngineRefreshTimer);
+  _zoneEngineRefreshTimer=setTimeout(()=>{
+    const field=document.querySelector('.tactical-field');
+    if(!field) return;
+    const host=field.parentElement;
+    if(!host) return;
+    const old=host.querySelector('.zone-analysis');
+    const panel=host.querySelector('.live-tactics-panel');
+    if(panel){
+      const fresh=document.createElement('div');
+      fresh.innerHTML=renderLiveTacticalPanel();
+      panel.replaceWith(fresh.firstElementChild);
+    } else if(old){
+      old.outerHTML=renderZoneAnalysis();
+    }
+  },0);
 }
 
 </body>
