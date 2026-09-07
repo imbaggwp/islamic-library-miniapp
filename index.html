@@ -1246,7 +1246,7 @@ function renderPitch(){
       const p=byName.get(names[i])||['Игрок '+(i+1),slot.pos,0,'','⚽',0];
       const role=(typeof getPlayerRole==='function')?getPlayerRole(p[0]):'';
       return `<button class="pitch-player ${role?'has-role':''}" data-pitch-key="${slot.key}" style="left:${slot.x}%;top:${slot.y}%" onclick="playerDetails(${i})">
-        <div class="shirt">${p[4]||'⚽'}</div>
+        <div class="shirt" aria-label="Игрок ${i+1}"></div>
         <b>${p[0]}</b><small>${p[2]||0} · ${slot.pos}</small>${role?`<em>${role}</em>`:''}
       </button>`;
     }).join('')}
@@ -1257,9 +1257,11 @@ function initPitchDrag(){
   const pitch=document.getElementById('pitch');
   if(!pitch)return;
   pitch.querySelectorAll('.pitch-player').forEach(el=>{
-    if(el.dataset.dragReady==='2')return;
-    el.dataset.dragReady='2';
+    if(el.dataset.dragReady==='3')return;
+    el.dataset.dragReady='3';
+
     let dragging=false,moved=false,startX=0,startY=0;
+    let startLeft=0,startTop=0;
 
     const move=e=>{
       if(!dragging)return;
@@ -1271,20 +1273,62 @@ function initPitchDrag(){
       el.style.top=y+'%';
       moved=true;
     };
+
     const finish=e=>{
       if(!dragging)return;
       if(e)e.preventDefault();
       dragging=false;
       el.classList.remove('dragging');
-      const key=el.dataset.pitchKey;
-      if(key){
-        state.pitchPositions=state.pitchPositions||{};
-        state.pitchPositions[key]={
-          x:parseFloat(el.style.left)||50,
-          y:parseFloat(el.style.top)||50
-        };
-        save();
+
+      // Если игрок отпущен над другим игроком — меняем их местами.
+      if(moved){
+        const r=pitch.getBoundingClientRect();
+        const dropX=e?.clientX??(r.left+r.width*startLeft/100);
+        const dropY=e?.clientY??(r.top+r.height*startTop/100);
+        const target=[...pitch.querySelectorAll('.pitch-player')].find(other=>{
+          if(other===el)return false;
+          const or=other.getBoundingClientRect();
+          const cx=or.left+or.width/2,cy=or.top+or.height/2;
+          const distance=Math.hypot(dropX-cx,dropY-cy);
+          return distance<Math.max(or.width,or.height)*0.8;
+        });
+
+        if(target){
+          const a=el.dataset.pitchKey,b=target.dataset.pitchKey;
+          const pa=state.pitchPositions?.[a];
+          const pb=state.pitchPositions?.[b];
+          if(pa&&pb){
+            const ax=pa.x,ay=pa.y;
+            state.pitchPositions[a]={x:pb.x,y:pb.y};
+            state.pitchPositions[b]={x:ax,y:ay};
+          }else{
+            const tl=target.style.left,tp=target.style.top;
+            target.style.left=el.style.left;
+            target.style.top=el.style.top;
+            el.style.left=tl;
+            el.style.top=tp;
+            state.pitchPositions[a]={x:parseFloat(el.style.left),y:parseFloat(el.style.top)};
+            state.pitchPositions[b]={x:parseFloat(target.style.left),y:parseFloat(target.style.top)};
+          }
+          save();
+          renderPitch();
+          showToast('Игроки поменялись местами');
+          setTimeout(()=>moved=false,100);
+          return;
+        }
+
+        const key=el.dataset.pitchKey;
+        if(key){
+          state.pitchPositions=state.pitchPositions||{};
+          state.pitchPositions[key]={
+            x:parseFloat(el.style.left)||50,
+            y:parseFloat(el.style.top)||50
+          };
+          save();
+        }
       }
+
+      try{if(el.hasPointerCapture?.(e.pointerId))el.releasePointerCapture(e.pointerId)}catch(_){}
       setTimeout(()=>moved=false,100);
     };
 
@@ -1292,6 +1336,9 @@ function initPitchDrag(){
       if(e.button!==undefined&&e.button!==0)return;
       e.preventDefault();
       startX=e.clientX;startY=e.clientY;
+      const r=pitch.getBoundingClientRect();
+      startLeft=((parseFloat(el.style.left)||50)/100);
+      startTop=((parseFloat(el.style.top)||50)/100);
       dragging=true;moved=false;
       el.classList.add('dragging');
       try{el.setPointerCapture(e.pointerId)}catch(_){}
@@ -6541,6 +6588,103 @@ if(document.readyState==='loading'){
     font-size:6.5px!important;
   }
   .tactical-field .pitch-player small{font-size:6px!important}
+}
+
+/* ===== FOOTBALL TOKENS ON TACTICAL PITCH ===== */
+.tactical-field .pitch-player{
+  width:58px!important;
+  min-width:58px!important;
+  padding:0!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  gap:2px!important;
+  color:#fff!important;
+  font-family:inherit!important;
+}
+.tactical-field .pitch-player .shirt{
+  width:36px!important;
+  height:36px!important;
+  min-width:36px!important;
+  min-height:36px!important;
+  border-radius:50%!important;
+  display:grid!important;
+  place-items:center!important;
+  margin:0!important;
+  background:var(--accent,#f3a400)!important;
+  color:#111!important;
+  border:2px solid rgba(255,255,255,.9)!important;
+  box-shadow:0 3px 10px rgba(0,0,0,.28)!important;
+  font-size:0!important;
+  font-weight:900!important;
+  position:relative!important;
+}
+.tactical-field .pitch-player .shirt:after{
+  content:'⚽'!important;
+  font-size:17px!important;
+  line-height:1!important;
+}
+.tactical-field .pitch-player b{
+  max-width:58px!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  margin:0!important;
+  padding:2px 5px!important;
+  border-radius:5px!important;
+  background:rgba(5,12,8,.78)!important;
+  font-size:7px!important;
+  line-height:1.1!important;
+  font-weight:700!important;
+}
+.tactical-field .pitch-player small{
+  display:none!important;
+}
+.tactical-field .pitch-player.dragging{
+  transform:translate(-50%,-50%) scale(1.13)!important;
+  filter:brightness(1.12)!important;
+  z-index:50!important;
+}
+@media(max-width:700px){
+  .tactical-field .pitch-player{
+    width:50px!important;
+    min-width:50px!important;
+  }
+  .tactical-field .pitch-player .shirt{
+    width:32px!important;
+    height:32px!important;
+    min-width:32px!important;
+    min-height:32px!important;
+  }
+  .tactical-field .pitch-player .shirt:after{font-size:15px!important}
+  .tactical-field .pitch-player b{
+    max-width:50px!important;
+    font-size:6.5px!important;
+    padding:2px 4px!important;
+  }
+}
+
+.tactical-field .pitch-player .shirt:before{
+  content:attr(aria-label);
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  font-size:10px;
+  font-weight:900;
+  z-index:2;
+}
+.tactical-field .pitch-player .shirt:after{
+  display:none!important;
+}
+
+.tactical-field .pitch-player.drop-target .shirt{
+  outline:3px solid rgba(255,255,255,.9)!important;
+  transform:scale(1.12)!important;
 }
 </style>
 <script id="finance2-script">
