@@ -384,6 +384,16 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .detail-grid b{font-size:14px}
 .detail-actions{display:flex;gap:8px;margin-top:16px}
 .detail-actions button{flex:1}
+
+.board-performance{margin:12px 0;padding:14px;border:1px solid var(--line,#2b2f36);border-radius:14px;background:rgba(255,255,255,.025)}
+.board-performance>div:first-child{display:flex;align-items:center;gap:10px}
+.board-performance small{display:block;opacity:.65;font-size:10px;letter-spacing:.08em}
+.board-performance b{font-size:22px;margin-left:auto}.board-performance span{font-size:12px;opacity:.65}
+.board-alert{margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(255,80,80,.10);font-size:12px;color:#ffb0b0}
+.board-history{margin:12px 0}.board-history>small{opacity:.6;font-size:10px;letter-spacing:.08em}
+.board-history>div{display:grid;grid-template-columns:55px 60px 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--line,#2b2f36);font-size:12px}
+.board-history b{font-size:13px}.board-history em{font-style:normal;opacity:.6}
+button.danger{border-color:rgba(255,90,90,.35)!important;color:#ff9b9b!important}
 </style>
 </style>
 <style>
@@ -2652,16 +2662,47 @@ function ensureBoardObjectives(){
   b.history=b.history||[];
   return b;
 }
+function boardPerformanceScore(){
+  const b=ensureBoardObjectives();ensureLeagueSeason();
+  const table=leagueSortedTable(),place=table.findIndex(x=>x.name===state.club)+1;
+  if(!place)return {score:50,place:0,label:'Нет данных'};
+  let score=50;
+  if(place<=3)score+=28;
+  else if(place<=b.minLeague)score+=18;
+  else if(place<=10)score+=5;
+  else if(place>=Math.min(table.length,b.minLeague+6))score-=10;
+  else score-=20;
+  const played=Number(state.playedMatches||0);
+  const wins=Number(state.stats?.wins||0),draws=Number(state.stats?.draws||0);
+  if(played)score+=Math.round(((wins*3+draws)/Math.max(1,played*3)-.5)*18);
+  if((state.money||0)<0)score-=12;
+  score=Math.max(0,Math.min(100,Math.round(score)));
+  return {score,place,label:score>=80?'Превосходно':score>=65?'Хорошо':score>=50?'Нормально':score>=35?'Тревожно':'Критично'};
+}
 function updateBoardSatisfaction(){
   const b=ensureBoardObjectives();ensureManagerContract();
-  const table=leagueSortedTable();
-  const me=table.findIndex(x=>x.name===state.club);
-  if(me>=0){
-    if(me<=3)b.satisfaction=Math.min(100,b.satisfaction+2);
-    else if(me>=b.minLeague)b.satisfaction=Math.max(25,b.satisfaction-1);
-    else b.satisfaction=Math.min(100,b.satisfaction+1);
+  const perf=boardPerformanceScore();
+  const targetDelta=perf.score>=75?2:perf.score>=55?0:-2;
+  b.satisfaction=Math.max(0,Math.min(100,b.satisfaction+targetDelta));
+  const c=state.managerContract;
+  const confidenceDelta=perf.score>=80?2:perf.score<40?-3:0;
+  c.confidence=Math.max(0,Math.min(100,c.confidence+confidenceDelta));
+  if(c.confidence<25 && !c.dismissed){
+    c.dismissed=true;
+    showToast('⚠️ Руководство рассматривает вопрос о вашей отставке');
   }
   return b.satisfaction;
+}
+function boardProgressRows(){
+  const b=ensureBoardObjectives(),perf=boardPerformanceScore();
+  const cup=state.domesticCup;
+  const cupStage=cup?.winner===state.club?'Победа':cup?.phase||'Не начат';
+  let euroStage='Не участвуем';
+  Object.keys(state.europe||{}).forEach(n=>{
+    const e=state.europe[n];
+    if(e?.qualified) euroStage=e.knockout?.stage?euroStageLabel(e.knockout.stage):'Лиговая фаза';
+  });
+  return {b,perf,cupStage,euroStage};
 }
 function evaluateSeason(){
   ensureBoardObjectives();ensureFinanceState();ensureLeagueSeason();
@@ -2696,25 +2737,37 @@ function startNextSeason(){
 }
 function renderBoardPanel(){
   const box=document.getElementById('boardPanel');if(!box)return;
-  const b=ensureBoardObjectives(),f=ensureFinanceState(),c=ensureManagerContract(),table=leagueSortedTable(),place=table.findIndex(x=>x.name===state.club)+1;
-  const verdict=b.satisfaction>=70?'Руководство довольно':b.satisfaction>=50?'Руководство ожидает улучшений':'Руководство недовольно';
-  const confidence=c.confidence>=75?'Высокое':c.confidence>=50?'Стабильное':'Низкое';
+  const b=ensureBoardObjectives(),f=ensureFinanceState(),c=ensureManagerContract(),r=boardProgressRows();
+  const verdict=b.satisfaction>=75?'Руководство довольно':b.satisfaction>=50?'Руководство ожидает улучшений':'Руководство недовольно';
+  const confidence=c.confidence>=75?'Высокое':c.confidence>=50?'Стабильное':c.confidence>=35?'Низкое':'Критическое';
   const left=Math.max(0,c.until-(Number(state.season)||2026));
+  const dismissal=c.confidence<35||b.satisfaction<30;
+  const history=(b.history||[]).slice(0,4);
   box.innerHTML=`
     <div class="board-main"><div><small>ДОВОЛЬСТВО РУКОВОДСТВА</small><strong>${b.satisfaction}%</strong></div><span>${verdict}</span></div>
+    <div class="board-performance">
+      <div><small>ОЦЕНКА РАБОТЫ</small><b>${r.perf.score}/100</b><span>${r.perf.label} · ${r.perf.place?`${r.perf.place}-е место`:'нет позиции'}</span></div>
+      <div class="progress"><i style="width:${r.perf.score}%"></i></div>
+    </div>
     <div class="manager-contract">
-      <div class="manager-contract-head"><div class="manager-avatar">${svgIcon('users')}</div><div><b>Главный тренер</b><small>Контракт до ${c.until} · осталось сезонов: ${left}</small></div><strong>€${c.salary.toFixed(2)}M</strong></div>
+      <div class="manager-contract-head"><div class="manager-avatar">${svgIcon('users')}</div><div><b>Главный тренер</b><small>Контракт до ${c.until} · осталось сезонов: ${left}</small></div><strong>€${Number(c.salary||0).toFixed(2)}M</strong></div>
       <div class="manager-confidence"><span>Доверие: <b>${c.confidence}%</b> · ${confidence}</span><div class="progress"><i style="width:${c.confidence}%"></i></div></div>
-      <div class="manager-contract-meta"><span>Бонус: ${c.bonus.toFixed(1)}%</span><span>Продлений: ${c.renewals}</span><span>${c.release?'Отступные €'+c.release+'M':'Без отступных'}</span></div>
-      <div class="staff-actions"><button class="secondary" onclick="managerRequestRenewal()">Продлить контракт</button><button class="secondary" onclick="boardMeeting()">Встреча с руководством</button>${c.confidence<35?'<button class="secondary" onclick="managerResign()">Уйти в отставку</button>':''}</div>
+      <div class="manager-contract-meta"><span>Бонус: ${Number(c.bonus||0).toFixed(1)}%</span><span>Продлений: ${c.renewals||0}</span><span>${c.release?'Отступные €'+c.release+'M':'Без отступных'}</span></div>
+      <div class="staff-actions">
+        <button class="secondary" onclick="managerRequestRenewal()">Продлить контракт</button>
+        <button class="secondary" onclick="boardMeeting()">Встреча с руководством</button>
+        ${dismissal?'<button class="secondary danger" onclick="managerResign()">Подать в отставку</button>':''}
+      </div>
+      ${c.confidence<25?'<div class="board-alert">Критический уровень доверия. Если результаты не улучшатся, руководство может инициировать увольнение.</div>':''}
     </div>
     <div class="board-goals">
-      <div><b>Чемпионат</b><span>цель: топ-${b.minLeague}</span><em>${place?`сейчас ${place}-е место`:'—'}</em></div>
-      <div><b>Кубок</b><span>цель: ${b.cupTarget}</span><em>${state.domesticCup?.phase||'—'}</em></div>
-      <div><b>Европа</b><span>цель: ${b.euroTarget}</span><em>${state.europe?Object.keys(state.europe).length+' турнир(а)':'—'}</em></div>
+      <div><b>Чемпионат</b><span>цель: топ-${b.minLeague}</span><em>${r.perf.place?`сейчас ${r.perf.place}-е место`:'—'}</em></div>
+      <div><b>Кубок</b><span>цель: ${b.cupTarget}</span><em>${r.cupStage}</em></div>
+      <div><b>Европа</b><span>цель: ${b.euroTarget}</span><em>${r.euroStage}</em></div>
     </div>
-    <div class="board-budget">Бюджет: <b>€${f.cash.toFixed(1)} млн</b></div>
-    <div class="staff-actions"><button class="secondary" onclick="evaluateSeason();renderBoardPanel()">Оценить сезон</button><button class="primary" onclick="startNextSeason()">Начать следующий сезон</button></div>`;
+    <div class="board-budget">Бюджет: <b>€${Number(f.cash||0).toFixed(1)} млн</b></div>
+    ${history.length?`<div class="board-history"><small>ПОСЛЕДНИЕ ОЦЕНКИ</small>${history.map(h=>`<div><span>${h.season}</span><b>${h.satisfaction}%</b><em>${h.place||'—'} место · ${h.cup||'—'}</em></div>`).join('')}</div>`:''}
+    <div class="staff-actions"><button class="secondary" onclick="evaluateSeason();renderBoardPanel()">Итоговая оценка сезона</button><button class="primary" onclick="startNextSeason()">Начать следующий сезон</button></div>`;
 }
 function ensureFinanceState(){
   state.finance=state.finance||{};
@@ -6105,6 +6158,405 @@ if(document.readyState==='loading'){
 })();
 </script>
 <!-- /SCOUTING & ACADEMY 2.0 -->
+
+
+<!-- TRANSFER WINDOW 2.0 COMPLETE -->
+<style id="transfer-window2-styles">
+.tw2-wrap{margin-top:14px}
+.tw2-card{padding:15px;border:1px solid rgba(255,255,255,.08);border-radius:17px;background:rgba(255,255,255,.035);margin-bottom:10px}
+.tw2-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tw2-stat{padding:11px;border-radius:13px;background:rgba(255,255,255,.035)}
+.tw2-stat span{display:block;font-size:11px;opacity:.55}.tw2-stat b{display:block;font-size:18px;margin-top:3px}
+.tw2-window{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border-radius:13px;background:rgba(255,170,80,.07);border:1px solid rgba(255,170,80,.16)}
+.tw2-list{display:grid;gap:8px}
+.tw2-player{padding:12px;border-radius:13px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06)}
+.tw2-top{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.tw2-name{font-weight:800}.tw2-meta{font-size:11px;opacity:.56;margin-top:3px}
+.tw2-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.tw2-filters{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:8px;margin-top:10px}
+.tw2-history{font-size:12px;display:grid;gap:6px}
+.tw2-history div{padding:8px;border-radius:10px;background:rgba(255,255,255,.025)}
+.tw2-free{font-size:12px;opacity:.7}
+@media(max-width:700px){.tw2-grid{grid-template-columns:repeat(2,1fr)}.tw2-filters{grid-template-columns:1fr}.tw2-window{align-items:flex-start;flex-direction:column}}
+</style>
+<script id="transfer-window2-script">
+/* TRANSFER WINDOW 2.0 COMPLETE */
+(function(){
+  const FREE_NAMES=['Алексей Морозов','Никита Орлов','Маркос Рейес','Даниэль Коста','Ян Новак','Томас Бергер','Адриан Силва','Лука Вукович','Матео Фернандес','Оскар Линд'];
+  const FREE_POS=['ВР','ЦЗ','ЛЗ','ПЗ','ЦП','ЦАП','ЛВ','ПВ','НП'];
+  function ensureTW2(){
+    state.transferWindow2=state.transferWindow2||{};
+    state.transferWindow2.active=state.transferWindow2.active!==false;
+    state.transferWindow2.day=Number(state.transferWindow2.day||1);
+    state.transferWindow2.freeAgents=Array.isArray(state.transferWindow2.freeAgents)?state.transferWindow2.freeAgents:[];
+    state.transferWindow2.listed=Array.isArray(state.transferWindow2.listed)?state.transferWindow2.listed:[];
+    state.transferWindow2.history=Array.isArray(state.transferWindow2.history)?state.transferWindow2.history:[];
+    state.transferWindow2.loanOffers=Array.isArray(state.transferWindow2.loanOffers)?state.transferWindow2.loanOffers:[];
+    state.transferWindow2.exchangeOffers=Array.isArray(state.transferWindow2.exchangeOffers)?state.transferWindow2.exchangeOffers:[];
+    state.transferWindow2.lastGenerated=state.transferWindow2.lastGenerated||'';
+  }
+  function squad(){return (state.squad||[]).filter(p=>p&&p.name)}
+  function rnd(a,b){return Math.round(a+Math.random()*(b-a))}
+  function money(v){v=Number(v||0);return v>=1000000?(v/1000000).toFixed(1)+' млн €':Math.round(v/1000)+' тыс €'}
+  function value(p){return Number(p.value||p.marketValue||((Number(p.rating||p.ovr||70)**2)*1500))}
+  function date(){
+    const d=new Date(String(state.careerDate||'2026-07-01')+'T12:00:00');
+    return isNaN(d)?new Date('2026-07-01T12:00:00'):d;
+  }
+  function windowInfo(){
+    const d=date(),m=d.getMonth()+1;
+    // European-style simplified summer/winter windows.
+    const summer=m>=7&&m<=8, winter=m===1;
+    let start,end;
+    if(summer){start=new Date(d.getFullYear(),6,1);end=new Date(d.getFullYear(),7,31)}
+    else if(winter){start=new Date(d.getFullYear(),0,1);end=new Date(d.getFullYear(),0,31)}
+    else {start=new Date(d.getFullYear(),6,1);end=new Date(d.getFullYear(),7,31)}
+    const active=d>=start&&d<=end;
+    const total=Math.max(1,Math.round((end-start)/86400000)+1);
+    const left=Math.max(0,Math.ceil((end-d)/86400000));
+    return {active,start,end,left,total};
+  }
+  function seedFreeAgents(){
+    ensureTW2();
+    if(state.transferWindow2.freeAgents.length>=10)return;
+    FREE_NAMES.forEach((name,i)=>{
+      state.transferWindow2.freeAgents.push({
+        id:'fa-'+i+'-'+Date.now(),name,position:FREE_POS[i%FREE_POS.length],
+        age:rnd(18,31),rating:rnd(60,77),potential:rnd(68,88),
+        wage:rnd(15000,90000),signing:rnd(10000,300000),interest:rnd(35,90),status:'free'
+      });
+    });
+  }
+  function listPlayer(id){
+    ensureTW2();const p=squad().find(x=>String(x.id)===String(id));if(!p)return;
+    if(state.transferWindow2.listed.some(x=>String(x.playerId)===String(id))){showToast('Игрок уже выставлен');return}
+    const min=Math.round(value(p)*1.15/100000)*100000;
+    state.transferWindow2.listed.push({playerId:p.id,name:p.name,minFee:min,status:'listed',date:state.careerDate||''});
+    if(typeof addWorldNews==='function')addWorldNews('market',p.name+' выставлен на трансфер',
+      'Клуб готов рассмотреть предложения от '+money(min)+'.');
+    save();renderTW2();
+  }
+  window.listPlayerForTransfer=listPlayer;
+  function unlistPlayer(id){
+    ensureTW2();
+    state.transferWindow2.listed=state.transferWindow2.listed.filter(x=>String(x.playerId)!==String(id));
+    save();renderTW2();
+  }
+  window.unlistPlayerForTransfer=unlistPlayer;
+  function generateOffer(){
+    ensureTW2();const ls=state.transferWindow2.listed.filter(x=>x.status==='listed');
+    if(!ls.length)return;
+    const l=ls[rnd(0,ls.length-1)],p=squad().find(x=>String(x.id)===String(l.playerId));if(!p)return;
+    const clubs=['Chelsea','Napoli','Inter','Atlético de Madrid','Borussia Dortmund','AS Monaco','Newcastle United'];
+    const club=clubs[rnd(0,clubs.length-1)];
+    const fee=Math.round((Number(l.minFee)*(.9+Math.random()*.65))/100000)*100000;
+    state.transferWindow2.loanOffers.unshift({id:'of-'+Date.now(),playerId:p.id,playerName:p.name,club,fee,type:'transfer',status:'pending'});
+    if(typeof addWorldNews==='function')addWorldNews('market','Предложение по выставленному игроку',
+      club+' предложил '+money(fee)+' за '+p.name+'.');
+  }
+  function generateLoanOffer(){
+    ensureTW2();const ps=squad();if(!ps.length)return;
+    const p=ps[rnd(0,ps.length-1)];
+    const clubs=['Feyenoord','PSV','Valencia','Fiorentina','Leeds United','Marseille','RB Leipzig'];
+    const club=clubs[rnd(0,clubs.length-1)];
+    state.transferWindow2.loanOffers.unshift({id:'loan-'+Date.now(),playerId:p.id,playerName:p.name,club,
+      fee:Math.round(value(p)*.03),type:'loan',salaryShare:rnd(40,100),status:'pending'});
+    if(typeof addWorldNews==='function')addWorldNews('market','Запрос на аренду',
+      club+' хочет взять '+p.name+' в аренду. Клуб готов покрыть '+state.transferWindow2.loanOffers[0].salaryShare+'% зарплаты.');
+  }
+  window.respondTW2Offer=function(id,action){
+    ensureTW2();const o=state.transferWindow2.loanOffers.find(x=>x.id===id);if(!o||o.status!=='pending')return;
+    const p=squad().find(x=>String(x.id)===String(o.playerId));
+    if(action==='reject'){o.status='rejected';}
+    if(action==='counter'){o.status='counter';o.fee=Math.round(Number(o.fee)*1.3/100000)*100000;}
+    if(action==='accept'){
+      o.status='accepted';
+      if(o.type==='transfer'&&p){
+        state.budget=Number(state.budget||0)+Number(o.fee);
+        const i=state.squad.findIndex(x=>String(x.id)===String(p.id));if(i>=0)state.squad.splice(i,1);
+        if(state.contracts)delete state.contracts[p.id];
+        state.transferWindow2.history.unshift({date:state.careerDate||'',type:'Продажа',player:p.name,club:o.club,fee:o.fee});
+      }else if(o.type==='loan'&&p){
+        p.loanedTo=o.club;p.loanUntil=Number(state.season||2026)+1;
+        state.transferWindow2.history.unshift({date:state.careerDate||'',type:'Аренда',player:p.name,club:o.club,fee:o.fee});
+      }
+    }
+    if(typeof addWorldNews==='function')addWorldNews('market',
+      action==='accept'?(o.type==='loan'?'Аренда согласована':'Трансфер согласован'):'Ответ по трансферу',
+      action==='counter'?'Клуб запросил улучшенные условия.':action==='reject'?'Предложение отклонено.':'Сделка по '+o.playerName+' завершена.');
+    save();renderTW2();if(typeof renderAll==='function')renderAll();
+  };
+  window.signFreeAgent2=function(id){
+    ensureTW2();const a=state.transferWindow2.freeAgents.find(x=>x.id===id);if(!a)return;
+    if(a.status!=='free')return;
+    const total=Number(a.signing||0)+Number(a.wage||0)*2;
+    if(Number(state.budget||0)<total){showToast('Недостаточно бюджета для подписания');return}
+    a.status='signed';
+    const p={id:'fa-player-'+Date.now(),name:a.name,position:a.position,age:a.age,rating:a.rating,ovr:a.rating,overall:a.rating,potential:a.potential,value:a.signing,wage:a.wage,fitness:82,morale:78,role:'Ротация'};
+    state.squad=state.squad||[];state.squad.push(p);state.contracts=state.contracts||{};
+    state.contracts[p.id]={wage:a.wage,until:Number(state.season||2026)+2,morale:78,role:'Ротация',fitness:82};
+    state.budget=Number(state.budget||0)-Number(a.signing||0);
+    state.transferWindow2.history.unshift({date:state.careerDate||'',type:'Свободный агент',player:a.name,club:state.club||state.clubName,fee:a.signing});
+    if(typeof addWorldNews==='function')addWorldNews('market','Свободный агент подписан',
+      a.name+' присоединился к клубу без трансферной компенсации.');
+    save();renderTW2();if(typeof renderAll==='function')renderAll();
+  };
+  function renderTW2(){
+    const box=document.getElementById('transferWindow2Box');if(!box)return;
+    ensureTransferWindow2();
+    const wi=state.transferWindow2;
+    const offers=wi.loanOffers.filter(x=>x.status==='pending'||x.status==='counter');
+    const listed=wi.listed.filter(x=>x.status==='listed');
+    const free=wi.freeAgents.filter(x=>x.status==='free').slice(0,10);
+    box.innerHTML=`
+      <div class="tw2-wrap">
+        <div class="tw2-card">
+          <div class="tw2-window"><div><b>Трансферное окно</b><div class="tw2-meta">${wi.active?'ОТКРЫТО':'ЗАКРЫТО'} · ${wi.left} дн. до дедлайна</div></div><span class="tw-pill">${wi.active?'Доступны сделки':'Рынок закрыт'}</span></div>
+          <div class="tw2-grid" style="margin-top:10px">
+            <div class="tw2-stat"><span>На продаже</span><b>${listed.length}</b></div>
+            <div class="tw2-stat"><span>Предложения</span><b>${offers.length}</b></div>
+            <div class="tw2-stat"><span>Свободные агенты</span><b>${free.length}</b></div>
+            <div class="tw2-stat"><span>Сделки</span><b>${wi.history.length}</b></div>
+          </div>
+        </div>
+        <div class="tw2-card"><h3>Входящие предложения</h3><div class="tw2-list">
+          ${offers.length?offers.map(o=>`
+            <div class="tw2-player"><div class="tw2-top"><div><div class="tw2-name">${o.playerName}</div><div class="tw2-meta">${o.club} · ${o.type==='loan'?'Аренда':'Трансфер'} · ${money(o.fee)}</div></div><span class="tw-pill">${o.status==='counter'?'Встречное':'Оффер'}</span></div>
+            <div class="tw2-actions"><button class="btn" onclick="respondTW2Offer('${o.id}','accept')">Принять</button><button class="btn secondary" onclick="respondTW2Offer('${o.id}','counter')">Улучшить</button><button class="btn secondary" onclick="respondTW2Offer('${o.id}','reject')">Отклонить</button></div></div>
+          `).join(''):'<div class="tw2-free">Новых предложений нет.</div>'}
+        </div></div>
+        <div class="tw2-card"><h3>Мои игроки на трансфере</h3><div class="tw2-list">
+          ${squad().map(p=>`
+            <div class="tw2-player"><div class="tw2-top"><div><div class="tw2-name">${p.name}</div><div class="tw2-meta">${p.position||p.pos||'—'} · OVR ${p.rating||p.ovr||'—'} · стоимость ${money(value(p))}</div></div><span class="tw-pill">${listed.some(x=>String(x.playerId)===String(p.id))?'На рынке':'В составе'}</span></div>
+            <div class="tw2-actions">${listed.some(x=>String(x.playerId)===String(p.id))?`<button class="btn secondary" onclick="unlistPlayerForTransfer('${p.id}')">Снять с трансфера</button>`:`<button class="btn secondary" onclick="listPlayerForTransfer('${p.id}')">Выставить на трансфер</button>`}</div></div>
+          `).join('')}
+        </div><div class="tw2-actions"><button class="btn" onclick="generateOffer()">Сгенерировать оффер</button><button class="btn secondary" onclick="generateLoanOffer()">Получить запрос на аренду</button></div></div>
+        <div class="tw2-card"><h3>Свободные агенты</h3><div class="tw2-list">
+          ${free.map(a=>`
+            <div class="tw2-player"><div class="tw2-top"><div><div class="tw2-name">${a.name}</div><div class="tw2-meta">${a.position} · ${a.age} лет · OVR ${a.rating} · POT ${a.potential}</div><div class="tw2-meta">Подъёмные ${money(a.signing)} · зарплата ${money(a.wage)}</div></div><button class="btn secondary" onclick="signFreeAgent2('${a.id}')">Подписать</button></div></div>
+          `).join('')}
+        </div></div>
+        <div class="tw2-card"><h3>История сделок</h3><div class="tw2-history">${wi.history.length?wi.history.slice(0,12).map(x=>`<div><b>${x.type}</b> · ${x.player} · ${x.club} · ${money(x.fee||0)} · ${x.date}</div>`).join(''):'<div class="tw2-free">Сделок ещё не было.</div>'}</div></div>
+      </div>`;
+    if(typeof replaceEmojiIcons==='function')replaceEmojiIcons(box);
+  }
+  window.renderTransferWindow2=renderTW2;
+  function inject(){
+    if(document.getElementById('transferWindow2Box'))return;
+    const page=document.getElementById('transfers')||document.getElementById('club');
+    if(!page)return;
+    const box=document.createElement('div');box.id='transferWindow2Box';page.appendChild(box);
+  }
+  function hook(){
+    if(window.__tw2Hook)return;
+    if(typeof window.advanceOneCareerDay==='function'){
+      const old=window.advanceOneCareerDay;
+      window.advanceOneCareerDay=function(){
+        const r=old.apply(this,arguments);
+        try{
+          ensureTW2();const wi=windowInfo();
+          if(wi.active&&Math.random()<.22)generateOffer();
+          if(wi.active&&Math.random()<.12)generateLoanOffer();
+          if(!wi.active)state.transferWindow2.active=false;
+          save();renderTW2();
+        }catch(e){}
+        return r;
+      };
+    }
+    window.__tw2Hook=true;
+  }
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{ensureTW2();seedFreeAgents();inject();hook();renderTW2()},1500));
+  setInterval(()=>{try{ensureTW2();inject();hook();renderTW2()}catch(e){}},2700);
+})();
+</script>
+<!-- /TRANSFER WINDOW 2.0 COMPLETE -->
+
+
+<!-- FINANCE 2.0 COMPLETE SYSTEM -->
+<style id="finance2-styles">
+.fin2-wrap{margin-top:14px}
+.fin2-card{padding:15px;border:1px solid rgba(255,255,255,.08);border-radius:17px;background:rgba(255,255,255,.035);margin-bottom:10px}
+.fin2-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.fin2-stat{padding:11px;border-radius:13px;background:rgba(255,255,255,.035)}
+.fin2-stat span{display:block;font-size:11px;opacity:.55}.fin2-stat b{display:block;font-size:18px;margin-top:3px}
+.fin2-bars{display:grid;gap:9px;margin-top:10px}
+.fin2-line{display:grid;grid-template-columns:120px 1fr 80px;gap:8px;align-items:center;font-size:12px}
+.fin2-bar{height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}.fin2-bar i{display:block;height:100%;background:currentColor}
+.fin2-table{width:100%;border-collapse:collapse;font-size:12px}.fin2-table th,.fin2-table td{padding:8px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left}.fin2-table .num{text-align:right}
+.fin2-log{display:grid;gap:7px}.fin2-log div{padding:8px;border-radius:10px;background:rgba(255,255,255,.025);font-size:12px}
+.fin2-good{font-weight:750}.fin2-bad{font-weight:750}
+@media(max-width:700px){.fin2-grid{grid-template-columns:repeat(2,1fr)}.fin2-line{grid-template-columns:85px 1fr 65px}}
+</style>
+<script id="finance2-script">
+/* FINANCE 2.0 COMPLETE SYSTEM */
+(function(){
+  function ensureFinance2(){
+    state.finance2=state.finance2||{};
+    state.finance2.balance=Number(state.finance2.balance??state.budget??0);
+    state.finance2.seasonIncome=Number(state.finance2.seasonIncome||0);
+    state.finance2.seasonExpenses=Number(state.finance2.seasonExpenses||0);
+    state.finance2.ticketIncome=Number(state.finance2.ticketIncome||0);
+    state.finance2.sponsorIncome=Number(state.finance2.sponsorIncome||0);
+    state.finance2.prizeIncome=Number(state.finance2.prizeIncome||0);
+    state.finance2.transferIncome=Number(state.finance2.transferIncome||0);
+    state.finance2.wages=Number(state.finance2.wages||0);
+    state.finance2.operations=Number(state.finance2.operations||0);
+    state.finance2.debt=Number(state.finance2.debt||0);
+    state.finance2.sponsorLevel=Number(state.finance2.sponsorLevel||1);
+    state.finance2.ticketPrice=Number(state.finance2.ticketPrice||35);
+    state.finance2.attendance=Number(state.finance2.attendance||82);
+    state.finance2.month=state.finance2.month||'';
+    state.finance2.log=Array.isArray(state.finance2.log)?state.finance2.log:[];
+  }
+  function squad(){return (state.squad||[]).filter(p=>p&&p.name)}
+  function wageBill(){
+    return squad().reduce((a,p)=>a+Number(state.contracts?.[p.id]?.wage||p.salary||0),0);
+  }
+  function clubRating(){return Number(state.clubRating||state.club?.rating||78)}
+  function fmt(v){v=Number(v||0);return (v<0?'-':'')+(Math.abs(v)>=1000000?(Math.abs(v)/1000000).toFixed(1)+' млн €':Math.round(Math.abs(v)/1000)+' тыс €')}
+  function addMoney(amount,type,note){
+    ensureFinance2();amount=Number(amount||0);
+    state.finance2.balance+=amount;
+    state.budget=state.finance2.balance;
+    if(amount>=0)state.finance2.seasonIncome+=amount;else state.finance2.seasonExpenses+=Math.abs(amount);
+    const key={ticket:'ticketIncome',sponsor:'sponsorIncome',prize:'prizeIncome',transfer:'transferIncome',wage:'wages',operation:'operations'}[type];
+    if(key)state.finance2[key]+=Math.abs(amount);
+    state.finance2.log.unshift({date:state.careerDate||'',amount,type,note});
+    state.finance2.log=state.finance2.log.slice(0,50);
+  }
+  function monthlyTick2(force){
+    ensureFinance2();
+    const d=String(state.careerDate||'');if(!d)return;
+    const month=d.slice(0,7);
+    if(!force&&state.finance2.month===month)return;
+    state.finance2.month=month;
+    const wages=wageBill();
+    const operations=Math.round(120000+clubRating()*2500);
+    const sponsors=Math.round((250000+clubRating()*9000)*state.finance2.sponsorLevel);
+    const sponsorNet=Math.round(sponsors/2);
+    addMoney(-wages,'wage','Зарплаты команды за месяц');
+    addMoney(-operations,'operation','Операционные расходы клуба');
+    addMoney(sponsorNet,'sponsor','Доход от спонсоров');
+    if(typeof addWorldNews==='function')addWorldNews('board','Финансовый отчёт месяца',
+      'Зарплаты: -'+fmt(wages)+' · расходы: -'+fmt(operations)+' · спонсоры: +'+fmt(sponsorNet)+'.');
+    save();renderFinance2();
+  }
+  function matchRevenue2(){
+    ensureFinance2();
+    const rating=clubRating();
+    const base=45000+rating*1600;
+    const attendance=Math.max(55,Math.min(100,state.finance2.attendance));
+    const ticket=Math.round(base*(attendance/100)*(state.finance2.ticketPrice/35));
+    const commercial=Math.round(ticket*.22);
+    addMoney(ticket+commercial,'ticket','Доход матча: билеты и коммерция');
+    state.finance2.attendance=Math.max(55,Math.min(100,attendance+rnd(-2,3)));
+    save();renderFinance2();
+  }
+  function rnd(a,b){return Math.round(a+Math.random()*(b-a))}
+  function prize2(amount,note){
+    addMoney(amount,'prize',note);save();renderFinance2();
+  }
+  function transferIncome2(amount,note){addMoney(amount,'transfer',note);save();renderFinance2()}
+  window.financePrize2=prize2;
+  window.financeTransferIncome2=transferIncome2;
+  window.financeSponsorUpgrade=function(){
+    ensureFinance2();
+    const cost=900000*state.finance2.sponsorLevel;
+    if(Number(state.finance2.balance)<cost){showToast('Недостаточно денег для переговоров со спонсором');return}
+    addMoney(-cost,'operation','Расходы на повышение коммерческого уровня');
+    state.finance2.sponsorLevel++;
+    if(typeof addWorldNews==='function')addWorldNews('board','Новый уровень спонсорства',
+      'Коммерческий отдел улучшил спонсорский пакет до уровня '+state.finance2.sponsorLevel+'.');
+    save();renderFinance2();
+  };
+  window.financeSetTicketPrice=function(v){
+    ensureFinance2();state.finance2.ticketPrice=Math.max(15,Math.min(120,Number(v)||35));save();renderFinance2();
+  };
+  window.financeBorrow=function(){
+    ensureFinance2();
+    const amount=prompt('Сумма нового кредита в евро:','1000000');if(amount===null)return;
+    const x=Number(String(amount).replace(/\s/g,'').replace(',','.'));
+    if(!x||x<=0)return;
+    state.finance2.balance+=x;state.finance2.debt+=x;state.budget=state.finance2.balance;
+    state.finance2.log.unshift({date:state.careerDate||'',amount:x,type:'loan',note:'Новый кредит'});
+    if(typeof addWorldNews==='function')addWorldNews('board','Клуб оформил кредит',
+      'Финансовый отдел привлёк '+fmt(x)+'. Долг клуба увеличился.');
+    save();renderFinance2();
+  };
+  window.financeRepay=function(){
+    ensureFinance2();
+    if(state.finance2.debt<=0){showToast('Долгов нет');return}
+    const max=Math.min(state.finance2.debt,Number(state.finance2.balance));
+    const amount=prompt('Сколько погасить?',''+Math.round(max));if(amount===null)return;
+    const x=Math.min(max,Math.max(0,Number(String(amount).replace(/\s/g,'').replace(',','.'))));
+    if(!x)return;
+    state.finance2.balance-=x;state.finance2.debt-=x;state.budget=state.finance2.balance;
+    state.finance2.seasonExpenses+=x;
+    state.finance2.log.unshift({date:state.careerDate||'',amount:-x,type:'debt',note:'Погашение долга'});
+    save();renderFinance2();
+  };
+  function renderFinance2(){
+    ensureFinance2();const box=document.getElementById('finance2Box');if(!box)return;
+    const income=state.finance2.seasonIncome,exp=state.finance2.seasonExpenses,net=income-exp,wages=wageBill();
+    const projected=state.finance2.balance+(Math.max(0,12)*((state.finance2.sponsorLevel*350000)-wages*.65-120000));
+    const maxBar=Math.max(1,income,exp);
+    box.innerHTML='<div class="fin2-wrap">'+
+      '<div class="fin2-card"><div class="section" style="margin:0"><h2>Финансы 2.0</h2><span class="tw-pill">Баланс '+fmt(state.finance2.balance)+'</span></div>'+
+      '<div class="fin2-grid" style="margin-top:10px"><div class="fin2-stat"><span>Баланс</span><b>'+fmt(state.finance2.balance)+'</b></div><div class="fin2-stat"><span>Доходы сезона</span><b>'+fmt(income)+'</b></div><div class="fin2-stat"><span>Расходы сезона</span><b>'+fmt(exp)+'</b></div><div class="fin2-stat"><span>Долг</span><b>'+fmt(state.finance2.debt)+'</b></div></div></div>'+
+      '<div class="fin2-card"><h3>Структура бюджета</h3><div class="fin2-bars">'+
+      '<div class="fin2-line"><span>Доходы</span><div class="fin2-bar"><i style="width:'+Math.min(100,income/maxBar*100)+'%"></i></div><b>+'+fmt(income)+'</b></div>'+
+      '<div class="fin2-line"><span>Расходы</span><div class="fin2-bar"><i style="width:'+Math.min(100,exp/maxBar*100)+'%"></i></div><b>-'+fmt(exp)+'</b></div>'+
+      '<div class="fin2-line"><span>Зарплаты</span><div class="fin2-bar"><i style="width:'+Math.min(100,wages/Math.max(1,wages+1000000)*100)+'%"></i></div><b>'+fmt(wages)+'</b></div>'+
+      '</div><div class="tw2-meta" style="margin-top:10px">Прогноз баланса: <b>'+fmt(projected)+'</b></div></div>'+
+      '<div class="fin2-card"><h3>Коммерция</h3><div class="fin2-grid"><div class="fin2-stat"><span>Спонсорский уровень</span><b>'+state.finance2.sponsorLevel+'</b></div><div class="fin2-stat"><span>Посещаемость</span><b>'+Math.round(state.finance2.attendance)+'%</b></div><div class="fin2-stat"><span>Цена билета</span><b>'+state.finance2.ticketPrice+' €</b></div><div class="fin2-stat"><span>Трансферный доход</span><b>'+fmt(state.finance2.transferIncome)+'</b></div></div>'+
+      '<div class="tw2-actions"><button class="btn secondary" onclick="financeSponsorUpgrade()">Улучшить спонсора</button><select onchange="financeSetTicketPrice(this.value)"><option value="">Цена билета</option>'+[25,35,45,60,80,100].map(x=>'<option value="'+x+'" '+(x===state.finance2.ticketPrice?'selected':'')+'>'+x+' €</option>').join('')+'</select></div></div>'+
+      '<div class="fin2-card"><h3>Финансирование</h3><div class="tw2-actions"><button class="btn secondary" onclick="financeBorrow()">Взять кредит</button><button class="btn secondary" onclick="financeRepay()">Погасить долг</button></div><div class="tw2-meta" style="margin-top:8px">Кредит увеличивает баланс сразу, но повышает долговую нагрузку.</div></div>'+
+      '<div class="fin2-card"><h3>Финансовый журнал</h3><div class="fin2-log">'+(state.finance2.log.length?state.finance2.log.slice(0,15).map(x=>'<div><b>'+(x.amount>=0?'+':'')+fmt(x.amount)+'</b> · '+x.note+' · '+x.date+'</div>').join(''):'<div class="tw-muted">Операций пока нет.</div>')+'</div></div>'+
+      '</div>';
+    if(typeof replaceEmojiIcons==='function')replaceEmojiIcons(box);
+  }
+  window.renderFinance2=renderFinance2;
+  function inject(){
+    if(document.getElementById('finance2Box'))return;
+    const page=document.getElementById('club')||document.getElementById('transfers');
+    if(!page)return;
+    const box=document.createElement('div');box.id='finance2Box';page.appendChild(box);
+  }
+  function hook(){
+    if(window.__finance2Hook)return;
+    if(typeof window.advanceOneCareerDay==='function'){
+      const old=window.advanceOneCareerDay;
+      window.advanceOneCareerDay=function(){
+        const r=old.apply(this,arguments);
+        try{ensureFinance2();monthlyTick2(false);renderFinance2()}catch(e){}
+        return r;
+      };
+    }
+    if(typeof window.finishInteractiveMatch==='function'){
+      const old=window.finishInteractiveMatch;
+      window.finishInteractiveMatch=function(){
+        const r=old.apply(this,arguments);
+        try{matchRevenue2();}catch(e){}
+        return r;
+      };
+    }
+    if(typeof window.respondTW2Offer==='function'){
+      const old=window.respondTW2Offer;
+      window.respondTW2Offer=function(id,action){
+        let before=0;
+        try{const o=state.transferWindow2?.loanOffers?.find(x=>x.id===id);before=Number(o?.fee||0)}catch(e){}
+        const r=old.apply(this,arguments);
+        try{if(action==='accept')transferIncome2(before,'Доход от трансфера')}catch(e){}
+        return r;
+      };
+    }
+    window.__finance2Hook=true;
+  }
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{ensureFinance2();inject();hook();monthlyTick2(true);renderFinance2()},1600));
+  setInterval(()=>{try{ensureFinance2();inject();hook();renderFinance2()}catch(e){}},2800);
+})();
+</script>
+<!-- /FINANCE 2.0 COMPLETE SYSTEM -->
 
 </body>
 </html>
