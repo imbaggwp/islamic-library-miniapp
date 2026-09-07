@@ -4,36 +4,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0b0d10">
+<meta name="theme-color" content="#090b0f">
 <title>Football Hub</title>
 
 <style>
-* {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
 }
 
-:root {
-    --bg: #0b0d10;
-    --bg2: #111419;
-    --card: #171a20;
-    --card2: #1d2128;
-    --text: #f5f7fa;
-    --muted: #858c97;
-    --line: rgba(255,255,255,.07);
-    --accent: #b8ff3d;
-    --accent-dark: #89c92b;
-    --danger: #ff4d5e;
-    --blue: #5b8cff;
-    --radius: 20px;
+:root{
+    --bg:#090b0f;
+    --bg-soft:#0f1217;
+    --card:#151920;
+    --card-2:#1b2028;
+    --card-3:#222831;
+    --text:#f5f7fa;
+    --muted:#89919d;
+    --line:rgba(255,255,255,.075);
+    --accent:#baff3d;
+    --accent-soft:rgba(186,255,61,.10);
+    --red:#ff5363;
+    --orange:#ff9f43;
+    --blue:#5c8dff;
+    --radius:20px;
 }
 
-html,
-body {
-    margin: 0;
-    padding: 0;
-    background: var(--bg);
-    color: var(--text);
+html,body{
+    margin:0;
+    padding:0;
+    background:var(--bg);
+    color:var(--text);
     font-family:
         Inter,
         -apple-system,
@@ -44,822 +45,1144 @@ body {
         sans-serif;
 }
 
-body {
-    min-height: 100vh;
-    overflow-x: hidden;
+body{
+    min-height:100vh;
+    overflow-x:hidden;
 }
 
-button {
-    border: 0;
-    outline: 0;
-    font: inherit;
-    cursor: pointer;
+button{
+    font:inherit;
+    border:0;
+    outline:0;
+    cursor:pointer;
 }
 
-.app {
-    width: 100%;
-    max-width: 620px;
-    min-height: 100vh;
-    margin: 0 auto;
-    padding-bottom: 95px;
+button:active{
+    transform:scale(.97);
 }
 
-/* HEADER */
-
-.header {
-    padding: 22px 18px 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.app{
+    width:100%;
+    max-width:650px;
+    margin:auto;
+    min-height:100vh;
+    padding-bottom:100px;
 }
 
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 11px;
+/* =========================
+   HEADER
+========================= */
+
+.header{
+    padding:18px 17px 8px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
-.logo-ball {
-    width: 42px;
-    height: 42px;
-    border-radius: 14px;
-    background: var(--accent);
-    color: #0b0d10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
+.brand{
+    display:flex;
+    align-items:center;
+    gap:11px;
 }
 
-.logo-title {
-    font-size: 19px;
-    font-weight: 800;
-    letter-spacing: -.4px;
+.brand-icon{
+    width:43px;
+    height:43px;
+    border-radius:14px;
+    background:var(--accent);
+    color:#090b0f;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:22px;
+    box-shadow:0 8px 25px rgba(186,255,61,.12);
 }
 
-.logo-subtitle {
-    color: var(--muted);
-    font-size: 11px;
-    margin-top: 2px;
+.brand-name{
+    font-size:18px;
+    font-weight:850;
+    letter-spacing:-.5px;
 }
 
-.header-actions {
-    display: flex;
-    gap: 8px;
+.brand-sub{
+    font-size:10px;
+    color:var(--muted);
+    margin-top:2px;
 }
 
-.icon-button {
-    width: 42px;
-    height: 42px;
-    border-radius: 14px;
-    background: var(--card);
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
+.header-actions{
+    display:flex;
+    gap:8px;
 }
 
-/* PAGES */
-
-.page {
-    display: none;
-    padding: 8px 16px 20px;
-    animation: pageIn .22s ease;
+.header-btn{
+    width:41px;
+    height:41px;
+    border-radius:14px;
+    background:var(--card);
+    color:var(--text);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:18px;
 }
 
-.page.active {
-    display: block;
+/* =========================
+   PAGE
+========================= */
+
+.page{
+    display:none;
+    padding:8px 16px 20px;
+    animation:pageIn .2s ease;
 }
 
-@keyframes pageIn {
-    from {
-        opacity: 0;
-        transform: translateY(5px);
+.page.active{
+    display:block;
+}
+
+@keyframes pageIn{
+    from{
+        opacity:0;
+        transform:translateY(5px);
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    to{
+        opacity:1;
+        transform:translateY(0);
     }
 }
 
-/* TITLES */
-
-.page-title {
-    font-size: 29px;
-    font-weight: 850;
-    letter-spacing: -1px;
-    margin: 13px 2px 5px;
+.page-title{
+    font-size:29px;
+    font-weight:900;
+    letter-spacing:-1px;
+    margin:12px 2px 4px;
 }
 
-.page-description {
-    color: var(--muted);
-    font-size: 13px;
-    margin: 0 2px 20px;
+.page-subtitle{
+    color:var(--muted);
+    font-size:12px;
+    margin:0 2px 18px;
 }
 
-/* SECTION */
+/* =========================
+   SECTIONS
+========================= */
 
-.section {
-    margin-top: 25px;
+.section{
+    margin-top:25px;
 }
 
-.section-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 11px;
+.section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:11px;
 }
 
-.section-title {
-    font-size: 17px;
-    font-weight: 750;
+.section-title{
+    font-size:16px;
+    font-weight:800;
 }
 
-.section-link {
-    color: var(--accent);
-    font-size: 12px;
-    font-weight: 650;
+.section-link{
+    color:var(--accent);
+    font-size:11px;
+    font-weight:750;
 }
 
-/* HERO */
+/* =========================
+   HERO MATCH
+========================= */
 
-.hero {
-    position: relative;
-    overflow: hidden;
-    border-radius: 25px;
-    padding: 20px;
+.hero{
+    position:relative;
+    overflow:hidden;
+    border:1px solid var(--line);
+    border-radius:25px;
+    padding:20px;
     background:
-        radial-gradient(circle at 85% 15%, rgba(184,255,61,.18), transparent 30%),
-        linear-gradient(145deg, #1a1e25, #101217);
-    border: 1px solid var(--line);
+        radial-gradient(
+            circle at 90% 10%,
+            rgba(186,255,61,.16),
+            transparent 30%
+        ),
+        linear-gradient(145deg,#171c23,#0e1116);
 }
 
-.hero-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    color: var(--accent);
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: .7px;
+.hero::after{
+    content:"";
+    position:absolute;
+    width:180px;
+    height:180px;
+    border:1px solid rgba(255,255,255,.025);
+    border-radius:50%;
+    right:-70px;
+    bottom:-90px;
 }
 
-.live-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--danger);
-    box-shadow: 0 0 0 5px rgba(255,77,94,.1);
+.hero-kicker{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    color:var(--accent);
+    font-size:10px;
+    font-weight:850;
+    text-transform:uppercase;
+    letter-spacing:.8px;
 }
 
-.hero-title {
-    font-size: 23px;
-    font-weight: 850;
-    margin-top: 12px;
-    letter-spacing: -.7px;
+.live-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:var(--red);
+    box-shadow:0 0 0 5px rgba(255,83,99,.09);
 }
 
-.hero-teams {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 23px;
+.hero-league{
+    margin-top:10px;
+    color:var(--muted);
+    font-size:11px;
 }
 
-.team {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+.hero-teams{
+    margin-top:22px;
+    display:grid;
+    grid-template-columns:1fr 90px 1fr;
+    align-items:center;
+    gap:5px;
 }
 
-.team-logo {
-    width: 57px;
-    height: 57px;
-    border-radius: 18px;
-    background: var(--card2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 27px;
-    margin-bottom: 8px;
+.hero-team{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
 }
 
-.team-name {
-    font-size: 13px;
-    font-weight: 700;
+.club-logo{
+    width:58px;
+    height:58px;
+    border-radius:18px;
+    background:var(--card-2);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:27px;
+    margin-bottom:8px;
+    border:1px solid var(--line);
 }
 
-.score {
-    font-size: 28px;
-    font-weight: 900;
-    letter-spacing: -1px;
+.club-name{
+    font-size:12px;
+    font-weight:800;
 }
 
-.score-time {
-    color: var(--muted);
-    font-size: 11px;
-    margin-top: 3px;
+.hero-score{
+    text-align:center;
 }
 
-.hero-bottom {
-    margin-top: 21px;
-    display: flex;
-    gap: 8px;
+.hero-score strong{
+    font-size:29px;
+    font-weight:950;
+    letter-spacing:-1px;
 }
 
-.primary-button {
-    flex: 1;
-    height: 45px;
-    border-radius: 14px;
-    background: var(--accent);
-    color: #0b0d10;
-    font-weight: 800;
-    font-size: 13px;
+.hero-minute{
+    color:var(--red);
+    font-size:10px;
+    font-weight:800;
+    margin-top:3px;
 }
 
-.secondary-button {
-    width: 45px;
-    height: 45px;
-    border-radius: 14px;
-    background: var(--card2);
-    color: var(--text);
-    font-size: 17px;
+.hero-actions{
+    display:grid;
+    grid-template-columns:1fr 48px;
+    gap:8px;
+    margin-top:21px;
 }
 
-/* MATCH CARDS */
-
-.match-list {
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
+.primary{
+    height:45px;
+    border-radius:14px;
+    background:var(--accent);
+    color:#090b0f;
+    font-size:12px;
+    font-weight:900;
 }
 
-.match-card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    padding: 14px;
+.square-btn{
+    height:45px;
+    border-radius:14px;
+    background:var(--card-3);
+    color:var(--text);
+    font-size:18px;
 }
 
-.match-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: var(--muted);
-    font-size: 10px;
-    margin-bottom: 13px;
+/* =========================
+   MATCH CARD
+========================= */
+
+.match-list{
+    display:flex;
+    flex-direction:column;
+    gap:9px;
 }
 
-.match-status {
-    color: var(--accent);
-    font-weight: 800;
+.match-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:19px;
+    padding:14px;
 }
 
-.match-body {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.match-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    color:var(--muted);
+    font-size:9px;
+    margin-bottom:13px;
 }
 
-.match-team {
-    width: 35%;
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    font-size: 12px;
-    font-weight: 700;
+.match-live{
+    color:var(--red);
+    font-weight:850;
 }
 
-.match-team.right {
-    justify-content: flex-end;
-    text-align: right;
+.match-body{
+    display:grid;
+    grid-template-columns:1fr 75px 1fr;
+    align-items:center;
+    gap:5px;
 }
 
-.mini-logo {
-    width: 34px;
-    height: 34px;
-    border-radius: 11px;
-    background: var(--card2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 17px;
-    flex-shrink: 0;
+.match-team{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:11px;
+    font-weight:750;
 }
 
-.match-score {
-    text-align: center;
-    min-width: 70px;
+.match-team.right{
+    justify-content:flex-end;
+    text-align:right;
 }
 
-.match-score strong {
-    font-size: 18px;
+.mini-logo{
+    width:35px;
+    height:35px;
+    flex-shrink:0;
+    border-radius:11px;
+    background:var(--card-2);
+    border:1px solid var(--line);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:16px;
 }
 
-.match-score small {
-    display: block;
-    color: var(--muted);
-    font-size: 9px;
-    margin-top: 3px;
+.match-score{
+    text-align:center;
 }
 
-.watch-button {
-    margin-top: 13px;
-    width: 100%;
-    height: 37px;
-    border-radius: 12px;
-    background: var(--card2);
-    color: var(--accent);
-    font-size: 11px;
-    font-weight: 750;
+.match-score strong{
+    font-size:17px;
+    font-weight:900;
 }
 
-/* LIVE */
+.match-score small{
+    display:block;
+    color:var(--muted);
+    font-size:9px;
+    margin-top:3px;
+}
 
-.live-card {
+.match-button{
+    width:100%;
+    height:37px;
+    margin-top:13px;
+    border-radius:12px;
+    background:var(--card-2);
+    color:var(--accent);
+    font-size:10px;
+    font-weight:800;
+}
+
+/* =========================
+   LIVE CARD
+========================= */
+
+.live-card{
     background:
-        linear-gradient(145deg, rgba(184,255,61,.07), transparent),
+        linear-gradient(
+            140deg,
+            rgba(186,255,61,.08),
+            transparent 55%
+        ),
         var(--card);
-    border: 1px solid rgba(184,255,61,.15);
-    border-radius: 20px;
-    padding: 15px;
+    border:1px solid rgba(186,255,61,.13);
+    border-radius:20px;
+    padding:15px;
 }
 
-.live-header {
-    display: flex;
-    justify-content: space-between;
-    color: var(--muted);
-    font-size: 10px;
-    margin-bottom: 16px;
+.live-head{
+    display:flex;
+    justify-content:space-between;
+    color:var(--muted);
+    font-size:10px;
+    margin-bottom:16px;
 }
 
-.live-label {
-    color: var(--danger);
-    font-weight: 800;
+.live-status{
+    color:var(--red);
+    font-weight:850;
 }
 
-/* HORIZONTAL */
+/* =========================
+   HORIZONTAL TEAMS
+========================= */
 
-.horizontal {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 3px;
-    scrollbar-width: none;
+.horizontal{
+    display:flex;
+    gap:9px;
+    overflow-x:auto;
+    scrollbar-width:none;
 }
 
-.horizontal::-webkit-scrollbar {
-    display: none;
+.horizontal::-webkit-scrollbar{
+    display:none;
 }
 
-.team-follow {
-    min-width: 118px;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 17px;
-    padding: 14px;
+.team-card{
+    min-width:125px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:17px;
+    padding:14px;
 }
 
-.team-follow-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 13px;
-    background: var(--card2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    margin-bottom: 10px;
+.team-card-logo{
+    width:42px;
+    height:42px;
+    border-radius:13px;
+    background:var(--card-2);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:20px;
+    margin-bottom:10px;
 }
 
-.team-follow-name {
-    font-size: 12px;
-    font-weight: 750;
+.team-card-name{
+    font-size:11px;
+    font-weight:800;
 }
 
-.team-follow-country {
-    color: var(--muted);
-    font-size: 10px;
-    margin-top: 3px;
+.team-card-country{
+    color:var(--muted);
+    font-size:9px;
+    margin-top:3px;
 }
 
-/* LEAGUES */
+/* =========================
+   NEWS
+========================= */
 
-.league-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+.news-list{
+    display:flex;
+    flex-direction:column;
+    gap:9px;
 }
 
-.league-card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    padding: 16px;
-    min-height: 105px;
+.news-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:14px;
 }
 
-.league-icon {
-    font-size: 25px;
+.news-category{
+    color:var(--accent);
+    font-size:9px;
+    font-weight:850;
+    text-transform:uppercase;
 }
 
-.league-name {
-    font-size: 13px;
-    font-weight: 750;
-    margin-top: 11px;
+.news-title{
+    font-size:13px;
+    font-weight:800;
+    line-height:1.4;
+    margin-top:6px;
 }
 
-.league-country {
-    color: var(--muted);
-    font-size: 10px;
-    margin-top: 3px;
+.news-time{
+    color:var(--muted);
+    font-size:9px;
+    margin-top:8px;
 }
 
-/* NEWS */
+/* =========================
+   FILTERS
+========================= */
 
-.news-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.filters{
+    display:flex;
+    gap:7px;
+    overflow-x:auto;
+    scrollbar-width:none;
+    margin:15px 0 18px;
 }
 
-.news-card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    padding: 15px;
+.filters::-webkit-scrollbar{
+    display:none;
 }
 
-.news-category {
-    color: var(--accent);
-    font-size: 9px;
-    font-weight: 850;
-    text-transform: uppercase;
+.filter{
+    white-space:nowrap;
+    height:34px;
+    padding:0 13px;
+    border-radius:11px;
+    background:var(--card);
+    color:var(--muted);
+    font-size:10px;
+    font-weight:800;
 }
 
-.news-title {
-    font-size: 14px;
-    font-weight: 750;
-    line-height: 1.35;
-    margin-top: 7px;
+.filter.active{
+    background:var(--accent);
+    color:#090b0f;
 }
 
-.news-time {
-    color: var(--muted);
-    font-size: 10px;
-    margin-top: 9px;
+/* =========================
+   LEAGUES
+========================= */
+
+.league-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
 }
 
-/* FILTERS */
-
-.filters {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    margin: 18px 0;
+.league-card{
+    min-height:110px;
+    padding:15px;
+    border-radius:18px;
+    background:var(--card);
+    border:1px solid var(--line);
 }
 
-.filters::-webkit-scrollbar {
-    display: none;
+.league-icon{
+    font-size:24px;
 }
 
-.filter {
-    white-space: nowrap;
-    height: 34px;
-    padding: 0 13px;
-    border-radius: 11px;
-    background: var(--card);
-    color: var(--muted);
-    font-size: 11px;
-    font-weight: 700;
+.league-name{
+    margin-top:10px;
+    font-size:12px;
+    font-weight:800;
 }
 
-.filter.active {
-    background: var(--accent);
-    color: #0b0d10;
+.league-country{
+    margin-top:3px;
+    color:var(--muted);
+    font-size:9px;
 }
 
-/* TOURNAMENT */
+/* =========================
+   TABLE
+========================= */
 
-.tournament-card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 19px;
-    padding: 16px;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 13px;
+.table-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:19px;
+    overflow:hidden;
 }
 
-.tournament-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 15px;
-    background: var(--card2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 23px;
+.table-head,
+.table-row{
+    display:grid;
+    grid-template-columns:30px 1fr 30px 30px 35px;
+    align-items:center;
+    gap:5px;
+    padding:11px 13px;
 }
 
-.tournament-info {
-    flex: 1;
+.table-head{
+    color:var(--muted);
+    font-size:8px;
+    border-bottom:1px solid var(--line);
 }
 
-.tournament-name {
-    font-size: 13px;
-    font-weight: 800;
+.table-row{
+    font-size:10px;
+    border-bottom:1px solid var(--line);
 }
 
-.tournament-country {
-    color: var(--muted);
-    font-size: 10px;
-    margin-top: 4px;
+.table-row:last-child{
+    border-bottom:0;
 }
 
-.arrow {
-    color: var(--muted);
+.position{
+    color:var(--muted);
 }
 
-/* PROFILE */
+.table-team{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-weight:750;
+}
 
-.profile-card {
+.table-team-logo{
+    width:25px;
+    height:25px;
+    border-radius:8px;
+    background:var(--card-2);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+/* =========================
+   TOURNAMENT
+========================= */
+
+.tournament{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:14px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:9px;
+}
+
+.tournament-icon{
+    width:46px;
+    height:46px;
+    border-radius:14px;
+    background:var(--card-2);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:22px;
+}
+
+.tournament-info{
+    flex:1;
+}
+
+.tournament-name{
+    font-size:12px;
+    font-weight:800;
+}
+
+.tournament-country{
+    color:var(--muted);
+    font-size:9px;
+    margin-top:3px;
+}
+
+.arrow{
+    color:var(--muted);
+    font-size:18px;
+}
+
+/* =========================
+   MATCH DETAILS
+========================= */
+
+.match-detail{
     background:
-        radial-gradient(circle at 90% 0%, rgba(184,255,61,.12), transparent 35%),
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(186,255,61,.08),
+            transparent 40%
+        ),
         var(--card);
-    border: 1px solid var(--line);
-    border-radius: 22px;
-    padding: 20px;
+    border:1px solid var(--line);
+    border-radius:24px;
+    padding:20px 14px;
 }
 
-.profile-top {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+.detail-league{
+    text-align:center;
+    color:var(--muted);
+    font-size:10px;
 }
 
-.avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 20px;
-    background: var(--accent);
-    color: #0b0d10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 25px;
-    font-weight: 900;
+.detail-date{
+    text-align:center;
+    color:var(--muted);
+    font-size:9px;
+    margin-top:4px;
 }
 
-.profile-name {
-    font-size: 18px;
-    font-weight: 850;
+.detail-teams{
+    display:grid;
+    grid-template-columns:1fr 80px 1fr;
+    align-items:center;
+    margin-top:24px;
 }
 
-.profile-level {
-    color: var(--muted);
-    font-size: 11px;
-    margin-top: 4px;
+.detail-team{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
 }
 
-.stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-top: 18px;
+.detail-logo{
+    width:70px;
+    height:70px;
+    border-radius:21px;
+    background:var(--card-2);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:32px;
+    margin-bottom:9px;
 }
 
-.stat {
-    background: var(--card2);
-    border-radius: 14px;
-    padding: 12px 5px;
-    text-align: center;
+.detail-team-name{
+    font-size:12px;
+    font-weight:850;
 }
 
-.stat strong {
-    display: block;
-    font-size: 17px;
+.detail-score{
+    text-align:center;
 }
 
-.stat span {
-    color: var(--muted);
-    font-size: 9px;
-    margin-top: 3px;
-    display: block;
+.detail-score strong{
+    font-size:27px;
+    font-weight:950;
 }
 
-/* EMPTY */
-
-.empty {
-    text-align: center;
-    padding: 45px 20px;
-    color: var(--muted);
+.detail-score small{
+    display:block;
+    color:var(--red);
+    font-size:9px;
+    margin-top:3px;
 }
 
-.empty-icon {
-    font-size: 38px;
-    margin-bottom: 12px;
+.detail-tabs{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:5px;
+    margin-top:20px;
 }
 
-.empty-title {
-    color: var(--text);
-    font-size: 16px;
-    font-weight: 750;
+.detail-tab{
+    height:34px;
+    border-radius:10px;
+    background:var(--card-2);
+    color:var(--muted);
+    font-size:9px;
+    font-weight:750;
 }
 
-/* BOTTOM NAV */
-
-.bottom-nav {
-    position: fixed;
-    z-index: 50;
-    left: 50%;
-    bottom: 10px;
-    transform: translateX(-50%);
-    width: min(590px, calc(100% - 20px));
-    height: 67px;
-    border-radius: 21px;
-    background: rgba(22,25,31,.94);
-    border: 1px solid var(--line);
-    backdrop-filter: blur(18px);
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    padding: 6px;
+.detail-tab.active{
+    background:var(--accent);
+    color:#090b0f;
 }
 
-.nav-button {
-    background: transparent;
-    color: var(--muted);
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
+/* EVENTS */
+
+.events{
+    margin-top:15px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:8px 14px;
 }
 
-.nav-icon {
-    font-size: 18px;
-    line-height: 1;
+.event{
+    display:grid;
+    grid-template-columns:45px 1fr 45px;
+    align-items:center;
+    padding:12px 0;
+    border-bottom:1px solid var(--line);
 }
 
-.nav-label {
-    font-size: 9px;
-    font-weight: 700;
+.event:last-child{
+    border-bottom:0;
 }
 
-.nav-button.active {
-    color: var(--accent);
-    background: rgba(184,255,61,.08);
+.event-time{
+    color:var(--muted);
+    font-size:10px;
+    font-weight:750;
 }
 
-/* MODAL */
-
-.modal {
-    position: fixed;
-    z-index: 100;
-    inset: 0;
-    background: rgba(0,0,0,.72);
-    display: none;
-    align-items: flex-end;
-    justify-content: center;
+.event-text{
+    text-align:center;
+    font-size:11px;
+    font-weight:750;
 }
 
-.modal.active {
-    display: flex;
+.event-icon{
+    text-align:right;
+    font-size:17px;
 }
 
-.modal-box {
-    width: min(620px, 100%);
-    background: #15181d;
-    border-radius: 27px 27px 0 0;
-    padding: 19px;
-    border-top: 1px solid var(--line);
-    animation: modalIn .25s ease;
-    max-height: 88vh;
-    overflow-y: auto;
+/* STATS */
+
+.stats-card{
+    margin-top:15px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:15px;
 }
 
-@keyframes modalIn {
-    from {
-        transform: translateY(100%);
-    }
-    to {
-        transform: translateY(0);
-    }
+.stat-line{
+    margin-bottom:17px;
 }
 
-.modal-handle {
-    width: 40px;
-    height: 4px;
-    border-radius: 10px;
-    background: #444a53;
-    margin: 0 auto 20px;
+.stat-line:last-child{
+    margin-bottom:0;
 }
 
-.modal-title {
-    font-size: 20px;
-    font-weight: 850;
+.stat-title{
+    display:flex;
+    justify-content:space-between;
+    font-size:10px;
+    font-weight:750;
+    margin-bottom:7px;
 }
 
-.modal-subtitle {
-    color: var(--muted);
-    font-size: 11px;
-    margin-top: 4px;
+.stat-bar{
+    height:6px;
+    border-radius:10px;
+    background:var(--card-3);
+    overflow:hidden;
 }
 
-.stream-box {
-    height: 210px;
-    border-radius: 19px;
+.stat-fill{
+    height:100%;
+    background:var(--accent);
+    border-radius:10px;
+}
+
+/* =========================
+   STREAM
+========================= */
+
+.stream-card{
     background:
-        radial-gradient(circle, rgba(184,255,61,.08), transparent 45%),
-        #090b0e;
-    margin-top: 17px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--line);
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(186,255,61,.08),
+            transparent 40%
+        ),
+        #080a0d;
+    border:1px solid var(--line);
+    border-radius:21px;
+    min-height:250px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
 }
 
-.play {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: #0b0d10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 25px;
-    padding-left: 4px;
+.stream-live{
+    color:var(--red);
+    font-size:10px;
+    font-weight:850;
+    margin-bottom:16px;
 }
 
-.modal-info {
-    margin-top: 17px;
+.play-button{
+    width:68px;
+    height:68px;
+    border-radius:50%;
+    background:var(--accent);
+    color:#090b0f;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:27px;
+    padding-left:4px;
+    box-shadow:0 12px 35px rgba(186,255,61,.14);
 }
 
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 11px 0;
-    border-bottom: 1px solid var(--line);
-    font-size: 12px;
+.stream-text{
+    margin-top:14px;
+    font-size:12px;
+    font-weight:800;
 }
 
-.info-row span:last-child {
-    color: var(--muted);
+.stream-note{
+    color:var(--muted);
+    font-size:9px;
+    margin-top:5px;
 }
 
-.close-modal {
-    width: 100%;
-    height: 45px;
-    border-radius: 14px;
-    background: var(--card2);
-    color: var(--text);
-    font-weight: 750;
-    margin-top: 15px;
+/* =========================
+   PROFILE
+========================= */
+
+.profile{
+    background:
+        radial-gradient(
+            circle at 90% 0%,
+            rgba(186,255,61,.12),
+            transparent 35%
+        ),
+        var(--card);
+    border:1px solid var(--line);
+    border-radius:23px;
+    padding:20px;
+}
+
+.profile-top{
+    display:flex;
+    align-items:center;
+    gap:13px;
+}
+
+.avatar{
+    width:62px;
+    height:62px;
+    border-radius:20px;
+    background:var(--accent);
+    color:#090b0f;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-weight:950;
+    font-size:21px;
+}
+
+.profile-name{
+    font-size:17px;
+    font-weight:900;
+}
+
+.profile-level{
+    color:var(--muted);
+    font-size:10px;
+    margin-top:4px;
+}
+
+.profile-stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:7px;
+    margin-top:18px;
+}
+
+.profile-stat{
+    background:var(--card-2);
+    border-radius:14px;
+    padding:11px 5px;
+    text-align:center;
+}
+
+.profile-stat strong{
+    display:block;
+    font-size:16px;
+}
+
+.profile-stat span{
+    color:var(--muted);
+    font-size:8px;
+    display:block;
+    margin-top:3px;
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty{
+    padding:45px 15px;
+    text-align:center;
+    color:var(--muted);
+}
+
+.empty-icon{
+    font-size:37px;
+    margin-bottom:10px;
+}
+
+.empty-title{
+    color:var(--text);
+    font-size:15px;
+    font-weight:800;
+}
+
+/* =========================
+   BOTTOM NAV
+========================= */
+
+.bottom-nav{
+    position:fixed;
+    z-index:50;
+    left:50%;
+    bottom:9px;
+    transform:translateX(-50%);
+    width:min(620px,calc(100% - 18px));
+    height:67px;
+    border-radius:22px;
+    background:rgba(20,23,29,.94);
+    backdrop-filter:blur(20px);
+    border:1px solid var(--line);
+    padding:6px;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+}
+
+.nav-button{
+    background:transparent;
+    color:var(--muted);
+    border-radius:16px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:4px;
+}
+
+.nav-button.active{
+    color:var(--accent);
+    background:var(--accent-soft);
+}
+
+.nav-icon{
+    font-size:18px;
+    line-height:1;
+}
+
+.nav-label{
+    font-size:8px;
+    font-weight:800;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    background:rgba(0,0,0,.75);
+}
+
+.modal.active{
+    display:flex;
+}
+
+.modal-box{
+    width:min(650px,100%);
+    max-height:90vh;
+    overflow:auto;
+    background:#15181e;
+    border-top:1px solid var(--line);
+    border-radius:27px 27px 0 0;
+    padding:18px;
+    animation:modalIn .25s ease;
+}
+
+@keyframes modalIn{
+    from{
+        transform:translateY(100%);
+    }
+    to{
+        transform:translateY(0);
+    }
+}
+
+.modal-handle{
+    width:40px;
+    height:4px;
+    border-radius:10px;
+    background:#424851;
+    margin:0 auto 18px;
+}
+
+.modal-title{
+    font-size:20px;
+    font-weight:900;
+}
+
+.modal-sub{
+    color:var(--muted);
+    font-size:10px;
+    margin-top:4px;
+}
+
+.close{
+    width:100%;
+    height:45px;
+    border-radius:14px;
+    background:var(--card-3);
+    color:var(--text);
+    font-size:11px;
+    font-weight:800;
+    margin-top:15px;
 }
 
 /* SEARCH */
 
-.search-box {
-    position: relative;
-    margin-top: 10px;
+.search-input-wrap{
+    position:relative;
+    margin-top:17px;
 }
 
-.search-box input {
-    width: 100%;
-    height: 48px;
-    border-radius: 15px;
-    background: var(--card);
-    border: 1px solid var(--line);
-    color: var(--text);
-    padding: 0 15px 0 42px;
-    outline: none;
-    font-size: 13px;
+.search-input{
+    width:100%;
+    height:47px;
+    border:1px solid var(--line);
+    border-radius:15px;
+    background:var(--card);
+    color:var(--text);
+    outline:0;
+    padding:0 14px 0 42px;
+    font-size:12px;
 }
 
-.search-box span {
-    position: absolute;
-    left: 15px;
-    top: 14px;
+.search-icon{
+    position:absolute;
+    left:15px;
+    top:14px;
 }
 
-/* RESPONSIVE */
+/* =========================
+   SMALL DEVICES
+========================= */
 
-@media (min-width: 600px) {
-    .app {
-        padding-bottom: 100px;
+@media(max-width:360px){
+
+    .page{
+        padding-left:12px;
+        padding-right:12px;
     }
 
-    .page {
-        padding-left: 10px;
-        padding-right: 10px;
+    .hero-teams{
+        grid-template-columns:1fr 70px 1fr;
+    }
+
+    .club-name{
+        font-size:11px;
+    }
+
+    .match-body{
+        grid-template-columns:1fr 65px 1fr;
+    }
+
+    .match-team{
+        font-size:10px;
     }
 }
 </style>
@@ -869,744 +1192,1676 @@ button {
 
 <div class="app">
 
-    <!-- HEADER -->
-    <header class="header">
-        <div class="logo">
-            <div class="logo-ball">⚽</div>
-            <div>
-                <div class="logo-title">Football Hub</div>
-                <div class="logo-subtitle">Весь футбол в одном месте</div>
-            </div>
+<!-- HEADER -->
+
+<header class="header">
+
+    <div class="brand">
+
+        <div class="brand-icon">⚽</div>
+
+        <div>
+            <div class="brand-name">Football Hub</div>
+            <div class="brand-sub">Весь футбол в одном месте</div>
         </div>
 
-        <div class="header-actions">
-            <button class="icon-button" onclick="openSearch()">⌕</button>
-            <button class="icon-button" onclick="showPage('favorites')">☆</button>
-        </div>
-    </header>
+    </div>
+
+    <div class="header-actions">
+
+        <button class="header-btn" onclick="openSearch()">
+            ⌕
+        </button>
+
+        <button class="header-btn" onclick="showPage('favorites')">
+            ☆
+        </button>
+
+    </div>
+
+</header>
 
 
-    <!-- HOME -->
-    <main id="home" class="page active">
+<!-- =========================
+     HOME
+========================= -->
 
-        <div class="hero">
+<main id="home" class="page active">
 
-            <div class="hero-label">
-                <span class="live-dot"></span>
-                Матч дня
-            </div>
+    <div class="hero">
 
-            <div class="hero-title">
-                Champions League
-            </div>
-
-            <div class="hero-teams">
-
-                <div class="team">
-                    <div class="team-logo">⚪</div>
-                    <div class="team-name">Real Madrid</div>
-                </div>
-
-                <div>
-                    <div class="score">2 : 1</div>
-                    <div class="score-time">67' · LIVE</div>
-                </div>
-
-                <div class="team">
-                    <div class="team-logo">🔵</div>
-                    <div class="team-name">Barcelona</div>
-                </div>
-
-            </div>
-
-            <div class="hero-bottom">
-                <button class="primary-button" onclick="openStream('Real Madrid — Barcelona')">
-                    ▶ Смотреть трансляцию
-                </button>
-
-                <button class="secondary-button" onclick="favoriteMatch()">
-                    ☆
-                </button>
-            </div>
-
+        <div class="hero-kicker">
+            <span class="live-dot"></span>
+            Матч дня
         </div>
 
-
-        <section class="section">
-
-            <div class="section-head">
-                <div class="section-title">🔴 Сейчас играют</div>
-                <div class="section-link" onclick="showPage('matches')">Все</div>
-            </div>
-
-            <div class="match-list">
-
-                <div class="match-card">
-
-                    <div class="match-top">
-                        <span>La Liga</span>
-                        <span class="match-status">LIVE · 54'</span>
-                    </div>
-
-                    <div class="match-body">
-
-                        <div class="match-team">
-                            <div class="mini-logo">⚪</div>
-                            Real Madrid
-                        </div>
-
-                        <div class="match-score">
-                            <strong>2 : 0</strong>
-                            <small>54'</small>
-                        </div>
-
-                        <div class="match-team right">
-                            Barcelona
-                            <div class="mini-logo">🔵</div>
-                        </div>
-
-                    </div>
-
-                    <button class="watch-button"
-                            onclick="openStream('Real Madrid — Barcelona')">
-                        📺 Смотреть
-                    </button>
-
-                </div>
-
-
-                <div class="match-card">
-
-                    <div class="match-top">
-                        <span>Premier League</span>
-                        <span class="match-status">LIVE · 31'</span>
-                    </div>
-
-                    <div class="match-body">
-
-                        <div class="match-team">
-                            <div class="mini-logo">🔴</div>
-                            Liverpool
-                        </div>
-
-                        <div class="match-score">
-                            <strong>1 : 1</strong>
-                            <small>31'</small>
-                        </div>
-
-                        <div class="match-team right">
-                            Arsenal
-                            <div class="mini-logo">🔴</div>
-                        </div>
-
-                    </div>
-
-                    <button class="watch-button"
-                            onclick="openStream('Liverpool — Arsenal')">
-                        📺 Смотреть
-                    </button>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <section class="section">
-
-            <div class="section-head">
-                <div class="section-title">⭐ Мои команды</div>
-                <div class="section-link">Изменить</div>
-            </div>
-
-            <div class="horizontal">
-
-                <div class="team-follow">
-                    <div class="team-follow-icon">⚪</div>
-                    <div class="team-follow-name">Real Madrid</div>
-                    <div class="team-follow-country">🇪🇸 Spain</div>
-                </div>
-
-                <div class="team-follow">
-                    <div class="team-follow-icon">🔵</div>
-                    <div class="team-follow-name">PSG</div>
-                    <div class="team-follow-country">🇫🇷 France</div>
-                </div>
-
-                <div class="team-follow">
-                    <div class="team-follow-icon">🔴</div>
-                    <div class="team-follow-name">Liverpool</div>
-                    <div class="team-follow-country">🏴 England</div>
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <section class="section">
-
-            <div class="section-head">
-                <div class="section-title">🏆 Турниры</div>
-                <div class="section-link" onclick="showPage('tournaments')">Все</div>
-            </div>
-
-            <div class="league-grid">
-
-                <div class="league-card">
-                    <div class="league-icon">🏆</div>
-                    <div class="league-name">Champions League</div>
-                    <div class="league-country">Europe</div>
-                </div>
-
-                <div class="league-card">
-                    <div class="league-icon">🏴</div>
-                    <div class="league-name">Premier League</div>
-                    <div class="league-country">England</div>
-                </div>
-
-                <div class="league-card">
-                    <div class="league-icon">🇪🇸</div>
-                    <div class="league-name">La Liga</div>
-                    <div class="league-country">Spain</div>
-                </div>
-
-                <div class="league-card">
-                    <div class="league-icon">🇮🇹</div>
-                    <div class="league-name">Serie A</div>
-                    <div class="league-country">Italy</div>
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <section class="section">
-
-            <div class="section-head">
-                <div class="section-title">📰 Новости</div>
-            </div>
-
-            <div class="news-list">
-
-                <div class="news-card">
-                    <div class="news-category">Трансферы</div>
-                    <div class="news-title">
-                        Последние новости футбольного рынка
-                    </div>
-                    <div class="news-time">15 минут назад</div>
-                </div>
-
-                <div class="news-card">
-                    <div class="news-category">Champions League</div>
-                    <div class="news-title">
-                        Главные матчи европейского футбола сегодня
-                    </div>
-                    <div class="news-time">42 минуты назад</div>
-                </div>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <!-- MATCHES -->
-    <main id="matches" class="page">
-
-        <div class="page-title">Матчи</div>
-        <div class="page-description">
-            Все важные футбольные матчи
+        <div class="hero-league">
+            UEFA Champions League · LIVE
         </div>
 
-        <div class="filters">
-            <button class="filter active">Сегодня</button>
-            <button class="filter">Завтра</button>
-            <button class="filter">Все</button>
-            <button class="filter">⭐ Мои</button>
+        <div class="hero-teams">
+
+            <div class="hero-team">
+
+                <div class="club-logo">⚪</div>
+
+                <div class="club-name">
+                    Real Madrid
+                </div>
+
+            </div>
+
+            <div class="hero-score">
+
+                <strong>2 : 1</strong>
+
+                <div class="hero-minute">
+                    67'
+                </div>
+
+            </div>
+
+            <div class="hero-team">
+
+                <div class="club-logo">🔵</div>
+
+                <div class="club-name">
+                    Barcelona
+                </div>
+
+            </div>
+
         </div>
 
-        <section class="section">
+        <div class="hero-actions">
 
-            <div class="section-head">
-                <div class="section-title">🔴 Live</div>
-            </div>
-
-            <div class="match-list">
-
-                <div class="match-card">
-
-                    <div class="match-top">
-                        <span>La Liga</span>
-                        <span class="match-status">LIVE · 67'</span>
-                    </div>
-
-                    <div class="match-body">
-
-                        <div class="match-team">
-                            <div class="mini-logo">⚪</div>
-                            Real Madrid
-                        </div>
-
-                        <div class="match-score">
-                            <strong>2 : 1</strong>
-                            <small>67'</small>
-                        </div>
-
-                        <div class="match-team right">
-                            Barcelona
-                            <div class="mini-logo">🔵</div>
-                        </div>
-
-                    </div>
-
-                    <button class="watch-button"
-                            onclick="openStream('Real Madrid — Barcelona')">
-                        📺 Смотреть трансляцию
-                    </button>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <section class="section">
-
-            <div class="section-head">
-                <div class="section-title">🕐 Ближайшие</div>
-            </div>
-
-            <div class="match-list">
-
-                <div class="match-card">
-
-                    <div class="match-top">
-                        <span>Champions League</span>
-                        <span>Сегодня · 21:00</span>
-                    </div>
-
-                    <div class="match-body">
-
-                        <div class="match-team">
-                            <div class="mini-logo">🔵</div>
-                            PSG
-                        </div>
-
-                        <div class="match-score">
-                            <strong>21:00</strong>
-                            <small>Сегодня</small>
-                        </div>
-
-                        <div class="match-team right">
-                            Bayern
-                            <div class="mini-logo">🔴</div>
-                        </div>
-
-                    </div>
-
-                    <button class="watch-button"
-                            onclick="openStream('PSG — Bayern')">
-                        🔔 Напомнить
-                    </button>
-
-                </div>
-
-
-                <div class="match-card">
-
-                    <div class="match-top">
-                        <span>Premier League</span>
-                        <span>Завтра · 18:30</span>
-                    </div>
-
-                    <div class="match-body">
-
-                        <div class="match-team">
-                            <div class="mini-logo">🔴</div>
-                            Liverpool
-                        </div>
-
-                        <div class="match-score">
-                            <strong>18:30</strong>
-                            <small>Завтра</small>
-                        </div>
-
-                        <div class="match-team right">
-                            Chelsea
-                            <div class="mini-logo">🔵</div>
-                        </div>
-
-                    </div>
-
-                    <button class="watch-button">
-                        🔔 Напомнить
-                    </button>
-
-                </div>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <!-- LIVE -->
-    <main id="live" class="page">
-
-        <div class="page-title">LIVE</div>
-
-        <div class="page-description">
-            Матчи, которые идут прямо сейчас
-        </div>
-
-        <div class="live-card">
-
-            <div class="live-header">
-                <span class="live-label">🔴 LIVE</span>
-                <span>67'</span>
-            </div>
-
-            <div class="match-body">
-
-                <div class="team">
-                    <div class="team-logo">⚪</div>
-                    <div class="team-name">Real Madrid</div>
-                </div>
-
-                <div class="match-score">
-                    <strong style="font-size:25px;">2 : 1</strong>
-                    <small>La Liga</small>
-                </div>
-
-                <div class="team">
-                    <div class="team-logo">🔵</div>
-                    <div class="team-name">Barcelona</div>
-                </div>
-
-            </div>
-
-            <button class="watch-button"
+            <button class="primary"
                     onclick="openStream('Real Madrid — Barcelona')">
                 ▶ Смотреть трансляцию
             </button>
 
-        </div>
-
-
-        <div style="height:10px;"></div>
-
-
-        <div class="live-card">
-
-            <div class="live-header">
-                <span class="live-label">🔴 LIVE</span>
-                <span>31'</span>
-            </div>
-
-            <div class="match-body">
-
-                <div class="team">
-                    <div class="team-logo">🔴</div>
-                    <div class="team-name">Liverpool</div>
-                </div>
-
-                <div class="match-score">
-                    <strong style="font-size:25px;">1 : 1</strong>
-                    <small>Premier League</small>
-                </div>
-
-                <div class="team">
-                    <div class="team-logo">🔴</div>
-                    <div class="team-name">Arsenal</div>
-                </div>
-
-            </div>
-
-            <button class="watch-button"
-                    onclick="openStream('Liverpool — Arsenal')">
-                ▶ Смотреть трансляцию
+            <button class="square-btn"
+                    onclick="toggleFavorite(this)">
+                ☆
             </button>
 
         </div>
 
-    </main>
+    </div>
 
 
-    <!-- TOURNAMENTS -->
-    <main id="tournaments" class="page">
+    <!-- LIVE -->
 
-        <div class="page-title">Турниры</div>
+    <section class="section">
 
-        <div class="page-description">
-            Главные футбольные чемпионаты
-        </div>
+        <div class="section-head">
 
-        <div class="tournament-card">
-            <div class="tournament-icon">🏆</div>
-            <div class="tournament-info">
-                <div class="tournament-name">UEFA Champions League</div>
-                <div class="tournament-country">Europe</div>
+            <div class="section-title">
+                🔴 Сейчас играют
             </div>
-            <div class="arrow">›</div>
-        </div>
 
-        <div class="tournament-card">
-            <div class="tournament-icon">🏴</div>
-            <div class="tournament-info">
-                <div class="tournament-name">Premier League</div>
-                <div class="tournament-country">England</div>
+            <div class="section-link"
+                 onclick="showPage('live')">
+                Все
             </div>
-            <div class="arrow">›</div>
+
         </div>
 
-        <div class="tournament-card">
-            <div class="tournament-icon">🇪🇸</div>
-            <div class="tournament-info">
-                <div class="tournament-name">La Liga</div>
-                <div class="tournament-country">Spain</div>
+
+        <div class="match-list">
+
+            <div class="match-card">
+
+                <div class="match-top">
+
+                    <span>La Liga</span>
+
+                    <span class="match-live">
+                        LIVE · 67'
+                    </span>
+
+                </div>
+
+                <div class="match-body">
+
+                    <div class="match-team">
+
+                        <div class="mini-logo">⚪</div>
+
+                        Real Madrid
+
+                    </div>
+
+                    <div class="match-score">
+
+                        <strong>2 : 1</strong>
+
+                        <small>67'</small>
+
+                    </div>
+
+                    <div class="match-team right">
+
+                        Barcelona
+
+                        <div class="mini-logo">🔵</div>
+
+                    </div>
+
+                </div>
+
+                <button class="match-button"
+                        onclick="openMatch('Real Madrid — Barcelona')">
+                    📊 Матч · Трансляция
+                </button>
+
             </div>
-            <div class="arrow">›</div>
-        </div>
 
-        <div class="tournament-card">
-            <div class="tournament-icon">🇮🇹</div>
-            <div class="tournament-info">
-                <div class="tournament-name">Serie A</div>
-                <div class="tournament-country">Italy</div>
+
+            <div class="match-card">
+
+                <div class="match-top">
+
+                    <span>Premier League</span>
+
+                    <span class="match-live">
+                        LIVE · 31'
+                    </span>
+
+                </div>
+
+                <div class="match-body">
+
+                    <div class="match-team">
+
+                        <div class="mini-logo">🔴</div>
+
+                        Liverpool
+
+                    </div>
+
+                    <div class="match-score">
+
+                        <strong>1 : 1</strong>
+
+                        <small>31'</small>
+
+                    </div>
+
+                    <div class="match-team right">
+
+                        Arsenal
+
+                        <div class="mini-logo">🔴</div>
+
+                    </div>
+
+                </div>
+
+                <button class="match-button"
+                        onclick="openStream('Liverpool — Arsenal')">
+                    📺 Смотреть
+                </button>
+
             </div>
-            <div class="arrow">›</div>
+
         </div>
 
-        <div class="tournament-card">
-            <div class="tournament-icon">🇩🇪</div>
-            <div class="tournament-info">
-                <div class="tournament-name">Bundesliga</div>
-                <div class="tournament-country">Germany</div>
+    </section>
+
+
+    <!-- MY TEAMS -->
+
+    <section class="section">
+
+        <div class="section-head">
+
+            <div class="section-title">
+                ⭐ Мои команды
             </div>
-            <div class="arrow">›</div>
-        </div>
 
-        <div class="tournament-card">
-            <div class="tournament-icon">🇫🇷</div>
-            <div class="tournament-info">
-                <div class="tournament-name">Ligue 1</div>
-                <div class="tournament-country">France</div>
+            <div class="section-link">
+                Изменить
             </div>
-            <div class="arrow">›</div>
-        </div>
 
-    </main>
-
-
-    <!-- FAVORITES -->
-    <main id="favorites" class="page">
-
-        <div class="page-title">Избранное</div>
-
-        <div class="page-description">
-            Твои команды и матчи
         </div>
 
         <div class="horizontal">
 
-            <div class="team-follow">
-                <div class="team-follow-icon">⚪</div>
-                <div class="team-follow-name">Real Madrid</div>
-                <div class="team-follow-country">🇪🇸 Spain</div>
+            <div class="team-card">
+
+                <div class="team-card-logo">
+                    ⚪
+                </div>
+
+                <div class="team-card-name">
+                    Real Madrid
+                </div>
+
+                <div class="team-card-country">
+                    🇪🇸 Spain
+                </div>
+
             </div>
 
-            <div class="team-follow">
-                <div class="team-follow-icon">🔵</div>
-                <div class="team-follow-name">PSG</div>
-                <div class="team-follow-country">🇫🇷 France</div>
+            <div class="team-card">
+
+                <div class="team-card-logo">
+                    🔵
+                </div>
+
+                <div class="team-card-name">
+                    PSG
+                </div>
+
+                <div class="team-card-country">
+                    🇫🇷 France
+                </div>
+
+            </div>
+
+            <div class="team-card">
+
+                <div class="team-card-logo">
+                    🔴
+                </div>
+
+                <div class="team-card-name">
+                    Liverpool
+                </div>
+
+                <div class="team-card-country">
+                    🏴 England
+                </div>
+
             </div>
 
         </div>
 
-        <section class="section">
+    </section>
 
-            <div class="section-head">
-                <div class="section-title">⭐ Избранные матчи</div>
+
+    <!-- LEAGUES -->
+
+    <section class="section">
+
+        <div class="section-head">
+
+            <div class="section-title">
+                🏆 Турниры
             </div>
 
-            <div class="empty">
-                <div class="empty-icon">⚽</div>
-                <div class="empty-title">Пока ничего нет</div>
-                <div style="font-size:11px;margin-top:6px;">
-                    Добавляй матчи в избранное
+            <div class="section-link"
+                 onclick="showPage('tournaments')">
+                Все
+            </div>
+
+        </div>
+
+        <div class="league-grid">
+
+            <div class="league-card">
+
+                <div class="league-icon">🏆</div>
+
+                <div class="league-name">
+                    Champions League
                 </div>
+
+                <div class="league-country">
+                    Europe
+                </div>
+
             </div>
 
-        </section>
+            <div class="league-card">
 
-    </main>
+                <div class="league-icon">🏴</div>
+
+                <div class="league-name">
+                    Premier League
+                </div>
+
+                <div class="league-country">
+                    England
+                </div>
+
+            </div>
+
+            <div class="league-card">
+
+                <div class="league-icon">🇪🇸</div>
+
+                <div class="league-name">
+                    La Liga
+                </div>
+
+                <div class="league-country">
+                    Spain
+                </div>
+
+            </div>
+
+            <div class="league-card">
+
+                <div class="league-icon">🇮🇹</div>
+
+                <div class="league-name">
+                    Serie A
+                </div>
+
+                <div class="league-country">
+                    Italy
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
 
 
-    <!-- PROFILE -->
-    <main id="profile" class="page">
+    <!-- NEWS -->
 
-        <div class="page-title">Профиль</div>
+    <section class="section">
 
-        <div class="profile-card">
+        <div class="section-head">
 
-            <div class="profile-top">
+            <div class="section-title">
+                📰 Последние новости
+            </div>
 
-                <div class="avatar">FH</div>
+        </div>
 
-                <div>
-                    <div class="profile-name">Football Fan</div>
-                    <div class="profile-level">
-                        Уровень 12 · 2 840 XP
+        <div class="news-list">
+
+            <div class="news-card">
+
+                <div class="news-category">
+                    Трансферы
+                </div>
+
+                <div class="news-title">
+                    Главные события футбольного трансферного рынка
+                </div>
+
+                <div class="news-time">
+                    15 минут назад
+                </div>
+
+            </div>
+
+            <div class="news-card">
+
+                <div class="news-category">
+                    Champions League
+                </div>
+
+                <div class="news-title">
+                    Главные матчи европейского футбола сегодня
+                </div>
+
+                <div class="news-time">
+                    42 минуты назад
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =========================
+     MATCHES
+========================= -->
+
+<main id="matches" class="page">
+
+    <div class="page-title">
+        Матчи
+    </div>
+
+    <div class="page-subtitle">
+        Расписание футбольных матчей
+    </div>
+
+    <div class="filters">
+
+        <button class="filter active">
+            Сегодня
+        </button>
+
+        <button class="filter">
+            Завтра
+        </button>
+
+        <button class="filter">
+            Пн
+        </button>
+
+        <button class="filter">
+            Вт
+        </button>
+
+        <button class="filter">
+            ⭐ Мои
+        </button>
+
+    </div>
+
+
+    <section class="section">
+
+        <div class="section-head">
+
+            <div class="section-title">
+                🔴 LIVE
+            </div>
+
+        </div>
+
+        <div class="match-list">
+
+            <div class="match-card">
+
+                <div class="match-top">
+                    <span>La Liga</span>
+                    <span class="match-live">LIVE · 67'</span>
+                </div>
+
+                <div class="match-body">
+
+                    <div class="match-team">
+
+                        <div class="mini-logo">⚪</div>
+
+                        Real Madrid
+
                     </div>
+
+                    <div class="match-score">
+
+                        <strong>2 : 1</strong>
+
+                        <small>67'</small>
+
+                    </div>
+
+                    <div class="match-team right">
+
+                        Barcelona
+
+                        <div class="mini-logo">🔵</div>
+
+                    </div>
+
+                </div>
+
+                <button class="match-button"
+                        onclick="openMatch('Real Madrid — Barcelona')">
+                    📊 Открыть матч
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="section">
+
+        <div class="section-head">
+
+            <div class="section-title">
+                🕐 Ближайшие
+            </div>
+
+        </div>
+
+        <div class="match-list">
+
+            <div class="match-card">
+
+                <div class="match-top">
+
+                    <span>Champions League</span>
+
+                    <span>21:00</span>
+
+                </div>
+
+                <div class="match-body">
+
+                    <div class="match-team">
+
+                        <div class="mini-logo">🔵</div>
+
+                        PSG
+
+                    </div>
+
+                    <div class="match-score">
+
+                        <strong>21:00</strong>
+
+                        <small>Сегодня</small>
+
+                    </div>
+
+                    <div class="match-team right">
+
+                        Bayern
+
+                        <div class="mini-logo">🔴</div>
+
+                    </div>
+
+                </div>
+
+                <button class="match-button"
+                        onclick="remindMatch(this)">
+                    🔔 Напомнить
+                </button>
+
+            </div>
+
+
+            <div class="match-card">
+
+                <div class="match-top">
+
+                    <span>Premier League</span>
+
+                    <span>18:30</span>
+
+                </div>
+
+                <div class="match-body">
+
+                    <div class="match-team">
+
+                        <div class="mini-logo">🔴</div>
+
+                        Liverpool
+
+                    </div>
+
+                    <div class="match-score">
+
+                        <strong>18:30</strong>
+
+                        <small>Завтра</small>
+
+                    </div>
+
+                    <div class="match-team right">
+
+                        Chelsea
+
+                        <div class="mini-logo">🔵</div>
+
+                        Chelsea
+
+                    </div>
+
+                </div>
+
+                <button class="match-button"
+                        onclick="remindMatch(this)">
+                    🔔 Напомнить
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =========================
+     LIVE
+========================= -->
+
+<main id="live" class="page">
+
+    <div class="page-title">
+        LIVE
+    </div>
+
+    <div class="page-subtitle">
+        Матчи, которые идут прямо сейчас
+    </div>
+
+
+    <div class="live-card">
+
+        <div class="live-head">
+
+            <span class="live-status">
+                🔴 LIVE
+            </span>
+
+            <span>
+                67'
+            </span>
+
+        </div>
+
+        <div class="match-body">
+
+            <div class="hero-team">
+
+                <div class="club-logo">
+                    ⚪
+                </div>
+
+                <div class="club-name">
+                    Real Madrid
                 </div>
 
             </div>
 
-            <div class="stats">
+            <div class="match-score">
 
-                <div class="stat">
-                    <strong>18</strong>
-                    <span>Матчей</span>
+                <strong style="font-size:24px;">
+                    2 : 1
+                </strong>
+
+                <small>
+                    La Liga
+                </small>
+
+            </div>
+
+            <div class="hero-team">
+
+                <div class="club-logo">
+                    🔵
                 </div>
 
-                <div class="stat">
-                    <strong>7</strong>
-                    <span>Команд</span>
-                </div>
-
-                <div class="stat">
-                    <strong>24</strong>
-                    <span>Прогноза</span>
+                <div class="club-name">
+                    Barcelona
                 </div>
 
             </div>
 
         </div>
 
-
-        <section class="section">
-
-            <div class="section-title">⚙️ Настройки</div>
-
-            <div class="tournament-card" style="margin-top:11px;">
-                <div class="tournament-icon">🔔</div>
-                <div class="tournament-info">
-                    <div class="tournament-name">Уведомления</div>
-                    <div class="tournament-country">Голы, матчи, новости</div>
-                </div>
-                <div class="arrow">›</div>
-            </div>
-
-            <div class="tournament-card">
-                <div class="tournament-icon">🌙</div>
-                <div class="tournament-info">
-                    <div class="tournament-name">Тема</div>
-                    <div class="tournament-country">Тёмная</div>
-                </div>
-                <div class="arrow">›</div>
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <!-- BOTTOM NAV -->
-
-    <nav class="bottom-nav">
-
-        <button class="nav-button active"
-                data-page="home"
-                onclick="showPage('home')">
-            <div class="nav-icon">⌂</div>
-            <div class="nav-label">Главная</div>
+        <button class="match-button"
+                onclick="openMatch('Real Madrid — Barcelona')">
+            ▶ Смотреть · 📊 Статистика
         </button>
 
-        <button class="nav-button"
-                data-page="matches"
-                onclick="showPage('matches')">
-            <div class="nav-icon">📅</div>
-            <div class="nav-label">Матчи</div>
-        </button>
-
-        <button class="nav-button"
-                data-page="live"
-                onclick="showPage('live')">
-            <div class="nav-icon">🔴</div>
-            <div class="nav-label">LIVE</div>
-        </button>
-
-        <button class="nav-button"
-                data-page="tournaments"
-                onclick="showPage('tournaments')">
-            <div class="nav-icon">🏆</div>
-            <div class="nav-label">Турниры</div>
-        </button>
-
-        <button class="nav-button"
-                data-page="profile"
-                onclick="showPage('profile')">
-            <div class="nav-icon">👤</div>
-            <div class="nav-label">Профиль</div>
-        </button>
-
-    </nav>
-
-</div>
+    </div>
 
 
-<!-- STREAM MODAL -->
+    <div style="height:10px;"></div>
 
-<div id="streamModal" class="modal" onclick="closeStream(event)">
 
-    <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="live-card">
 
-        <div class="modal-handle"></div>
+        <div class="live-head">
 
-        <div class="modal-title" id="streamTitle">
-            Real Madrid — Barcelona
+            <span class="live-status">
+                🔴 LIVE
+            </span>
+
+            <span>
+                31'
+            </span>
+
         </div>
 
-        <div class="modal-subtitle">
-            📺 Трансляция матча
+        <div class="match-body">
+
+            <div class="hero-team">
+
+                <div class="club-logo">
+                    🔴
+                </div>
+
+                <div class="club-name">
+                    Liverpool
+                </div>
+
+            </div>
+
+            <div class="match-score">
+
+                <strong style="font-size:24px;">
+                    1 : 1
+                </strong>
+
+                <small>
+                    Premier League
+                </small>
+
+            </div>
+
+            <div class="hero-team">
+
+                <div class="club-logo">
+                    🔴
+                </div>
+
+                <div class="club-name">
+                    Arsenal
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="stream-box">
+        <button class="match-button"
+                onclick="openStream('Liverpool — Arsenal')">
+            ▶ Смотреть трансляцию
+        </button>
 
-            <button class="play"
-                    onclick="fakePlay()">
-                ▶
+    </div>
+
+</main>
+
+
+<!-- =========================
+     TOURNAMENTS
+========================= -->
+
+<main id="tournaments" class="page">
+
+    <div class="page-title">
+        Турниры
+    </div>
+
+    <div class="page-subtitle">
+        Главные футбольные соревнования
+    </div>
+
+
+    <div class="tournament">
+
+        <div class="tournament-icon">
+            🏆
+        </div>
+
+        <div class="tournament-info">
+
+            <div class="tournament-name">
+                UEFA Champions League
+            </div>
+
+            <div class="tournament-country">
+                Europe
+            </div>
+
+        </div>
+
+        <div class="arrow">
+            ›
+        </div>
+
+    </div>
+
+
+    <div class="tournament">
+
+        <div class="tournament-icon">
+            🏴
+        </div>
+
+        <div class="tournament-info">
+
+            <div class="tournament-name">
+                Premier League
+            </div>
+
+            <div class="tournament-country">
+                England
+            </div>
+
+        </div>
+
+        <div class="arrow">
+            ›
+        </div>
+
+    </div>
+
+
+    <div class="tournament">
+
+        <div class="tournament-icon">
+            🇪🇸
+        </div>
+
+        <div class="tournament-info">
+
+            <div class="tournament-name">
+                La Liga
+            </div>
+
+            <div class="tournament-country">
+                Spain
+            </div>
+
+        </div>
+
+        <div class="arrow">
+            ›
+        </div>
+
+    </div>
+
+
+    <div class="tournament">
+
+        <div class="tournament-icon">
+            🇮🇹
+        </div>
+
+        <div class="tournament-info">
+
+            <div class="tournament-name">
+                Serie A
+            </div>
+
+            <div class="tournament-country">
+                Italy
+            </div>
+
+        </div>
+
+        <div class="arrow">
+            ›
+        </div>
+
+    </div>
+
+
+    <div class="tournament">
+
+        <div class="tournament-icon">
+            🇩🇪
+        </div>
+
+        <div class="tournament-info">
+
+            <div class="tournament-name">
+                Bundesliga
+            </div>
+
+            <div class="tournament-country">
+                Germany
+            </div>
+
+        </div>
+
+        <div class="arrow">
+            ›
+        </div>
+
+    </div>
+
+
+    <div class="tournament">
+
+        <div class="tournament-icon">
+            🇫🇷
+        </div>
+
+        <div class="tournament-info">
+
+            <div class="tournament-name">
+                Ligue 1
+            </div>
+
+            <div class="tournament-country">
+                France
+            </div>
+
+        </div>
+
+        <div class="arrow">
+            ›
+        </div>
+
+    </div>
+
+
+    <section class="section">
+
+        <div class="section-head">
+
+            <div class="section-title">
+                📊 Пример таблицы
+            </div>
+
+        </div>
+
+
+        <div class="table-card">
+
+            <div class="table-head">
+
+                <span>#</span>
+                <span>Команда</span>
+                <span>И</span>
+                <span>Р</span>
+                <span>О</span>
+
+            </div>
+
+
+            <div class="table-row">
+
+                <span class="position">1</span>
+
+                <div class="table-team">
+                    <div class="table-team-logo">⚪</div>
+                    Real Madrid
+                </div>
+
+                <span>5</span>
+                <span>+8</span>
+                <strong>15</strong>
+
+            </div>
+
+
+            <div class="table-row">
+
+                <span class="position">2</span>
+
+                <div class="table-team">
+                    <div class="table-team-logo">🔵</div>
+                    Barcelona
+                </div>
+
+                <span>5</span>
+                <span>+6</span>
+                <strong>13</strong>
+
+            </div>
+
+
+            <div class="table-row">
+
+                <span class="position">3</span>
+
+                <div class="table-team">
+                    <div class="table-team-logo">🔴</div>
+                    Atlético
+                </div>
+
+                <span>5</span>
+                <span>+4</span>
+                <strong>11</strong>
+
+            </div>
+
+
+            <div class="table-row">
+
+                <span class="position">4</span>
+
+                <div class="table-team">
+                    <div class="table-team-logo">🟡</div>
+                    Villarreal
+                </div>
+
+                <span>5</span>
+                <span>+2</span>
+                <strong>10</strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =========================
+     FAVORITES
+========================= -->
+
+<main id="favorites" class="page">
+
+    <div class="page-title">
+        Избранное
+    </div>
+
+    <div class="page-subtitle">
+        Твои команды и матчи
+    </div>
+
+
+    <div class="horizontal">
+
+        <div class="team-card">
+
+            <div class="team-card-logo">
+                ⚪
+            </div>
+
+            <div class="team-card-name">
+                Real Madrid
+            </div>
+
+            <div class="team-card-country">
+                🇪🇸 Spain
+            </div>
+
+        </div>
+
+
+        <div class="team-card">
+
+            <div class="team-card-logo">
+                🔵
+            </div>
+
+            <div class="team-card-name">
+                PSG
+            </div>
+
+            <div class="team-card-country">
+                🇫🇷 France
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <section class="section">
+
+        <div class="section-head">
+
+            <div class="section-title">
+                ⭐ Избранные матчи
+            </div>
+
+        </div>
+
+
+        <div class="match-card">
+
+            <div class="match-top">
+
+                <span>La Liga</span>
+
+                <span class="match-live">
+                    LIVE · 67'
+                </span>
+
+            </div>
+
+            <div class="match-body">
+
+                <div class="match-team">
+
+                    <div class="mini-logo">⚪</div>
+
+                    Real Madrid
+
+                </div>
+
+                <div class="match-score">
+
+                    <strong>2 : 1</strong>
+
+                    <small>67'</small>
+
+                </div>
+
+                <div class="match-team right">
+
+                    Barcelona
+
+                    <div class="mini-logo">🔵</div>
+
+                </div>
+
+            </div>
+
+            <button class="match-button"
+                    onclick="openMatch('Real Madrid — Barcelona')">
+                📊 Открыть
             </button>
 
         </div>
 
-        <div class="modal-info">
+    </section>
 
-            <div class="info-row">
-                <span>Статус</span>
-                <span style="color:var(--danger);">● LIVE</span>
+</main>
+
+
+<!-- =========================
+     PROFILE
+========================= -->
+
+<main id="profile" class="page">
+
+    <div class="page-title">
+        Профиль
+    </div>
+
+    <div class="page-subtitle">
+        Твой Football Hub
+    </div>
+
+
+    <div class="profile">
+
+        <div class="profile-top">
+
+            <div class="avatar">
+                FH
             </div>
 
-            <div class="info-row">
-                <span>Качество</span>
-                <span>Auto</span>
-            </div>
+            <div>
 
-            <div class="info-row">
-                <span>Звук</span>
-                <span>Русский</span>
+                <div class="profile-name">
+                    Football Fan
+                </div>
+
+                <div class="profile-level">
+                    Уровень 12 · 2 840 XP
+                </div>
+
             </div>
 
         </div>
 
-        <button class="close-modal"
-                onclick="closeStream()">
+
+        <div class="profile-stats">
+
+            <div class="profile-stat">
+
+                <strong>18</strong>
+
+                <span>
+                    Матчей
+                </span>
+
+            </div>
+
+            <div class="profile-stat">
+
+                <strong>7</strong>
+
+                <span>
+                    Команд
+                </span>
+
+            </div>
+
+            <div class="profile-stat">
+
+                <strong>24</strong>
+
+                <span>
+                    Прогноза
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <section class="section">
+
+        <div class="section-title">
+            ⚙️ Настройки
+        </div>
+
+
+        <div class="tournament" style="margin-top:11px;">
+
+            <div class="tournament-icon">
+                🔔
+            </div>
+
+            <div class="tournament-info">
+
+                <div class="tournament-name">
+                    Уведомления
+                </div>
+
+                <div class="tournament-country">
+                    Голы, матчи, новости
+                </div>
+
+            </div>
+
+            <div class="arrow">
+                ›
+            </div>
+
+        </div>
+
+
+        <div class="tournament">
+
+            <div class="tournament-icon">
+                🌙
+            </div>
+
+            <div class="tournament-info">
+
+                <div class="tournament-name">
+                    Тема
+                </div>
+
+                <div class="tournament-country">
+                    Тёмная
+                </div>
+
+            </div>
+
+            <div class="arrow">
+                ›
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =========================
+     BOTTOM NAV
+========================= -->
+
+<nav class="bottom-nav">
+
+    <button class="nav-button active"
+            data-page="home"
+            onclick="showPage('home')">
+
+        <div class="nav-icon">
+            ⌂
+        </div>
+
+        <div class="nav-label">
+            Главная
+        </div>
+
+    </button>
+
+
+    <button class="nav-button"
+            data-page="matches"
+            onclick="showPage('matches')">
+
+        <div class="nav-icon">
+            📅
+        </div>
+
+        <div class="nav-label">
+            Матчи
+        </div>
+
+    </button>
+
+
+    <button class="nav-button"
+            data-page="live"
+            onclick="showPage('live')">
+
+        <div class="nav-icon">
+            🔴
+        </div>
+
+        <div class="nav-label">
+            LIVE
+        </div>
+
+    </button>
+
+
+    <button class="nav-button"
+            data-page="tournaments"
+            onclick="showPage('tournaments')">
+
+        <div class="nav-icon">
+            🏆
+        </div>
+
+        <div class="nav-label">
+            Турниры
+        </div>
+
+    </button>
+
+
+    <button class="nav-button"
+            data-page="profile"
+            onclick="showPage('profile')">
+
+        <div class="nav-icon">
+            👤
+        </div>
+
+        <div class="nav-label">
+            Профиль
+        </div>
+
+    </button>
+
+</nav>
+
+</div>
+
+
+<!-- =========================
+     MATCH MODAL
+========================= -->
+
+<div id="matchModal"
+     class="modal"
+     onclick="closeModalOutside(event,'matchModal')">
+
+    <div class="modal-box"
+         onclick="event.stopPropagation()">
+
+        <div class="modal-handle"></div>
+
+        <div class="modal-title">
+            Real Madrid — Barcelona
+        </div>
+
+        <div class="modal-sub">
+            La Liga · LIVE
+        </div>
+
+
+        <div class="match-detail"
+             style="margin-top:17px;">
+
+            <div class="detail-league">
+                La Liga
+            </div>
+
+            <div class="detail-date">
+                Сегодня · 67'
+            </div>
+
+
+            <div class="detail-teams">
+
+                <div class="detail-team">
+
+                    <div class="detail-logo">
+                        ⚪
+                    </div>
+
+                    <div class="detail-team-name">
+                        Real Madrid
+                    </div>
+
+                </div>
+
+
+                <div class="detail-score">
+
+                    <strong>
+                        2 : 1
+                    </strong>
+
+                    <small>
+                        LIVE
+                    </small>
+
+                </div>
+
+
+                <div class="detail-team">
+
+                    <div class="detail-logo">
+                        🔵
+                    </div>
+
+                    <div class="detail-team-name">
+                        Barcelona
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="detail-tabs">
+
+                <button class="detail-tab active"
+                        onclick="switchDetailTab('events',this)">
+                    События
+                </button>
+
+                <button class="detail-tab"
+                        onclick="switchDetailTab('stats',this)">
+                    Статистика
+                </button>
+
+                <button class="detail-tab"
+                        onclick="switchDetailTab('lineups',this)">
+                    Составы
+                </button>
+
+                <button class="detail-tab"
+                        onclick="openStream('Real Madrid — Barcelona')">
+                    📺 LIVE
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div id="eventsTab">
+
+            <div class="events">
+
+                <div class="event">
+
+                    <div class="event-time">
+                        61'
+                    </div>
+
+                    <div class="event-text">
+                        Mbappé
+                    </div>
+
+                    <div class="event-icon">
+                        ⚽
+                    </div>
+
+                </div>
+
+
+                <div class="event">
+
+                    <div class="event-time">
+                        54'
+                    </div>
+
+                    <div class="event-text">
+                        Lewandowski
+                    </div>
+
+                    <div class="event-icon">
+                        ⚽
+                    </div>
+
+                </div>
+
+
+                <div class="event">
+
+                    <div class="event-time">
+                        48'
+                    </div>
+
+                    <div class="event-text">
+                        Bellingham
+                    </div>
+
+                    <div class="event-icon">
+                        🟨
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div id="statsTab"
+             style="display:none;">
+
+            <div class="stats-card">
+
+                <div class="stat-line">
+
+                    <div class="stat-title">
+                        <span>Владение</span>
+                        <span>57% — 43%</span>
+                    </div>
+
+                    <div class="stat-bar">
+                        <div class="stat-fill"
+                             style="width:57%;">
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-line">
+
+                    <div class="stat-title">
+                        <span>Удары</span>
+                        <span>12 — 7</span>
+                    </div>
+
+                    <div class="stat-bar">
+                        <div class="stat-fill"
+                             style="width:63%;">
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-line">
+
+                    <div class="stat-title">
+                        <span>В створ</span>
+                        <span>6 — 3</span>
+                    </div>
+
+                    <div class="stat-bar">
+                        <div class="stat-fill"
+                             style="width:67%;">
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-line">
+
+                    <div class="stat-title">
+                        <span>Угловые</span>
+                        <span>5 — 4</span>
+                    </div>
+
+                    <div class="stat-bar">
+                        <div class="stat-fill"
+                             style="width:56%;">
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div id="lineupsTab"
+             style="display:none;">
+
+            <div class="events">
+
+                <div class="event">
+
+                    <div class="event-time">
+                        GK
+                    </div>
+
+                    <div class="event-text">
+                        Courtois
+                    </div>
+
+                    <div class="event-icon">
+                        ⚪
+                    </div>
+
+                </div>
+
+
+                <div class="event">
+
+                    <div class="event-time">
+                        10
+                    </div>
+
+                    <div class="event-text">
+                        Mbappé
+                    </div>
+
+                    <div class="event-icon">
+                        ⚪
+                    </div>
+
+                </div>
+
+
+                <div class="event">
+
+                    <div class="event-time">
+                        9
+                    </div>
+
+                    <div class="event-text">
+                        Lewandowski
+                    </div>
+
+                    <div class="event-icon">
+                        🔵
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <button class="close"
+                onclick="closeModal('matchModal')">
             Закрыть
         </button>
 
@@ -1615,11 +2870,95 @@ button {
 </div>
 
 
-<!-- SEARCH MODAL -->
+<!-- =========================
+     STREAM MODAL
+========================= -->
 
-<div id="searchModal" class="modal" onclick="closeSearch(event)">
+<div id="streamModal"
+     class="modal"
+     onclick="closeModalOutside(event,'streamModal')">
 
-    <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-box"
+         onclick="event.stopPropagation()">
+
+        <div class="modal-handle"></div>
+
+        <div class="modal-title"
+             id="streamTitle">
+            Real Madrid — Barcelona
+        </div>
+
+        <div class="modal-sub">
+            📺 Трансляция матча
+        </div>
+
+
+        <div class="stream-card"
+             style="margin-top:17px;">
+
+            <div class="stream-live">
+                🔴 LIVE
+            </div>
+
+            <button class="play-button"
+                    onclick="playStream(this)">
+                ▶
+            </button>
+
+            <div class="stream-text">
+                Нажмите, чтобы начать
+            </div>
+
+            <div class="stream-note">
+                Здесь будет подключён легальный источник трансляции
+            </div>
+
+        </div>
+
+
+        <div class="stats-card">
+
+            <div class="stat-line">
+
+                <div class="stat-title">
+                    <span>Качество</span>
+                    <span>Auto</span>
+                </div>
+
+            </div>
+
+            <div class="stat-line">
+
+                <div class="stat-title">
+                    <span>Язык</span>
+                    <span>Русский</span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <button class="close"
+                onclick="closeModal('streamModal')">
+            Закрыть
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     SEARCH MODAL
+========================= -->
+
+<div id="searchModal"
+     class="modal"
+     onclick="closeModalOutside(event,'searchModal')">
+
+    <div class="modal-box"
+         onclick="event.stopPropagation()">
 
         <div class="modal-handle"></div>
 
@@ -1627,23 +2966,33 @@ button {
             Поиск
         </div>
 
-        <div class="search-box">
+        <div class="modal-sub">
+            Команды, игроки и турниры
+        </div>
 
-            <span>🔎</span>
+
+        <div class="search-input-wrap">
+
+            <span class="search-icon">
+                🔎
+            </span>
 
             <input
                 id="searchInput"
+                class="search-input"
                 type="text"
-                placeholder="Команда, игрок, турнир..."
+                placeholder="Например, Real Madrid"
                 oninput="searchContent()"
             >
 
         </div>
 
-        <div id="searchResults" style="margin-top:18px;"></div>
 
-        <button class="close-modal"
-                onclick="closeSearch()">
+        <div id="searchResults"></div>
+
+
+        <button class="close"
+                onclick="closeModal('searchModal')">
             Закрыть
         </button>
 
@@ -1654,113 +3003,208 @@ button {
 
 <script>
 
-/* TELEGRAM */
+/* =========================
+   TELEGRAM
+========================= */
 
 const tg = window.Telegram?.WebApp;
 
-if (tg) {
+if(tg){
+
     tg.ready();
     tg.expand();
 
-    try {
-        tg.setHeaderColor('#0b0d10');
-        tg.setBackgroundColor('#0b0d10');
-    } catch (e) {}
+    try{
+        tg.setHeaderColor('#090b0f');
+        tg.setBackgroundColor('#090b0f');
+    }catch(error){}
+
 }
 
 
-/* NAVIGATION */
+/* =========================
+   NAVIGATION
+========================= */
 
-function showPage(pageId) {
+function showPage(pageId){
 
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
+    document.querySelectorAll('.page')
+        .forEach(page => {
+            page.classList.remove('active');
+        });
 
     const page = document.getElementById(pageId);
 
-    if (page) {
+    if(page){
         page.classList.add('active');
     }
 
-    document.querySelectorAll('.nav-button').forEach(button => {
-        button.classList.remove('active');
+    document.querySelectorAll('.nav-button')
+        .forEach(button => {
 
-        if (button.dataset.page === pageId) {
-            button.classList.add('active');
-        }
-    });
+            button.classList.remove('active');
+
+            if(button.dataset.page === pageId){
+                button.classList.add('active');
+            }
+
+        });
 
     window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
+        top:0,
+        behavior:'smooth'
     });
+
 }
 
 
-/* STREAM */
+/* =========================
+   STREAM
+========================= */
 
-function openStream(title) {
+function openStream(title){
 
-    document.getElementById('streamTitle').textContent = title;
+    document.getElementById('streamTitle')
+        .textContent = title;
 
     document.getElementById('streamModal')
         .classList.add('active');
 
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow='hidden';
+
 }
 
-function closeStream(event) {
 
-    if (event && event.target !== event.currentTarget) {
-        return;
+function playStream(button){
+
+    button.textContent='⏸';
+
+    const text =
+        button.parentElement.querySelector('.stream-text');
+
+    if(text){
+        text.textContent='Трансляция загружается...';
     }
 
-    document.getElementById('streamModal')
-        .classList.remove('active');
-
-    document.body.style.overflow = '';
-}
-
-function fakePlay() {
-
-    const button = document.querySelector('.play');
-
-    button.innerHTML = '⏸';
-
-    setTimeout(() => {
-        button.innerHTML = '▶';
-    }, 1200);
 }
 
 
-/* SEARCH */
+/* =========================
+   MATCH
+========================= */
 
-function openSearch() {
+function openMatch(){
+
+    document.getElementById('matchModal')
+        .classList.add('active');
+
+    document.body.style.overflow='hidden';
+
+}
+
+
+function switchDetailTab(tab,button){
+
+    document.querySelectorAll('.detail-tab')
+        .forEach(item => {
+            item.classList.remove('active');
+        });
+
+    button.classList.add('active');
+
+    document.getElementById('eventsTab')
+        .style.display='none';
+
+    document.getElementById('statsTab')
+        .style.display='none';
+
+    document.getElementById('lineupsTab')
+        .style.display='none';
+
+    if(tab==='events'){
+        document.getElementById('eventsTab')
+            .style.display='block';
+    }
+
+    if(tab==='stats'){
+        document.getElementById('statsTab')
+            .style.display='block';
+    }
+
+    if(tab==='lineups'){
+        document.getElementById('lineupsTab')
+            .style.display='block';
+    }
+
+}
+
+
+/* =========================
+   MODALS
+========================= */
+
+function closeModal(id){
+
+    const modal=document.getElementById(id);
+
+    if(modal){
+        modal.classList.remove('active');
+    }
+
+    document.body.style.overflow='';
+
+}
+
+
+function closeModalOutside(event,id){
+
+    if(event.target===event.currentTarget){
+        closeModal(id);
+    }
+
+}
+
+
+/* =========================
+   SEARCH
+========================= */
+
+function openSearch(){
 
     document.getElementById('searchModal')
         .classList.add('active');
 
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow='hidden';
+
+    document.getElementById('searchInput').value='';
+
+    document.getElementById('searchResults').innerHTML=`
+
+        <div class="empty">
+
+            <div class="empty-icon">
+                🔎
+            </div>
+
+            <div class="empty-title">
+                Начни поиск
+            </div>
+
+        </div>
+
+    `;
 
     setTimeout(() => {
-        document.getElementById('searchInput').focus();
-    }, 150);
+
+        document.getElementById('searchInput')
+            .focus();
+
+    },150);
+
 }
 
-function closeSearch(event) {
 
-    if (event && event.target !== event.currentTarget) {
-        return;
-    }
-
-    document.getElementById('searchModal')
-        .classList.remove('active');
-
-    document.body.style.overflow = '';
-}
-
-function searchContent() {
+function searchContent(){
 
     const query =
         document.getElementById('searchInput')
@@ -1771,54 +3215,80 @@ function searchContent() {
     const results =
         document.getElementById('searchResults');
 
-    if (!query) {
+    if(!query){
 
-        results.innerHTML = `
-            <div class="empty" style="padding:25px 10px;">
-                <div class="empty-icon">🔎</div>
+        results.innerHTML=`
+
+            <div class="empty">
+
+                <div class="empty-icon">
+                    🔎
+                </div>
+
                 <div class="empty-title">
                     Начни поиск
                 </div>
+
             </div>
+
         `;
 
         return;
     }
 
-    const items = [
-        ['⚪', 'Real Madrid', '🇪🇸 Spain'],
-        ['🔵', 'Barcelona', '🇪🇸 Spain'],
-        ['🔵', 'PSG', '🇫🇷 France'],
-        ['🔴', 'Liverpool', '🏴 England'],
-        ['🔴', 'Arsenal', '🏴 England'],
-        ['🏆', 'Champions League', 'Europe'],
-        ['🏴', 'Premier League', 'England'],
-        ['🇪🇸', 'La Liga', 'Spain'],
-        ['🇮🇹', 'Serie A', 'Italy'],
-        ['🇩🇪', 'Bundesliga', 'Germany']
+
+    const data=[
+
+        ['⚪','Real Madrid','🇪🇸 Spain'],
+        ['🔵','Barcelona','🇪🇸 Spain'],
+        ['🔵','PSG','🇫🇷 France'],
+        ['🔴','Liverpool','🏴 England'],
+        ['🔴','Arsenal','🏴 England'],
+        ['🔴','Bayern Munich','🇩🇪 Germany'],
+        ['🏆','Champions League','Europe'],
+        ['🏴','Premier League','England'],
+        ['🇪🇸','La Liga','Spain'],
+        ['🇮🇹','Serie A','Italy'],
+        ['🇩🇪','Bundesliga','Germany'],
+        ['🇫🇷','Ligue 1','France'],
+        ['⚽','Mbappé','France'],
+        ['⚽','Haaland','Norway'],
+        ['⚽','Bellingham','England']
+
     ];
 
-    const filtered = items.filter(item =>
-        item[1].toLowerCase().includes(query)
-    );
 
-    if (!filtered.length) {
+    const filtered =
+        data.filter(item =>
+            item[1].toLowerCase().includes(query)
+        );
 
-        results.innerHTML = `
-            <div class="empty" style="padding:25px 10px;">
-                <div class="empty-icon">😕</div>
+
+    if(!filtered.length){
+
+        results.innerHTML=`
+
+            <div class="empty">
+
+                <div class="empty-icon">
+                    😕
+                </div>
+
                 <div class="empty-title">
                     Ничего не найдено
                 </div>
+
             </div>
+
         `;
 
         return;
     }
 
-    results.innerHTML = filtered.map(item => `
 
-        <div class="tournament-card" style="margin-bottom:8px;">
+    results.innerHTML=filtered.map(item => `
+
+        <div class="tournament">
 
             <div class="tournament-icon">
                 ${item[0]}
@@ -1836,59 +3306,82 @@ function searchContent() {
 
             </div>
 
-            <div class="arrow">›</div>
+            <div class="arrow">
+                ›
+            </div>
 
         </div>
 
     `).join('');
+
 }
 
 
-/* FAVORITES */
+/* =========================
+   FAVORITES
+========================= */
 
-function favoriteMatch() {
+function toggleFavorite(button){
 
-    const button = document.querySelector('.secondary-button');
+    if(button.textContent.trim()==='☆'){
 
-    if (button.textContent.trim() === '☆') {
-        button.textContent = '★';
-        button.style.color = 'var(--accent)';
-    } else {
-        button.textContent = '☆';
-        button.style.color = '';
+        button.textContent='★';
+        button.style.color='var(--accent)';
+
+    }else{
+
+        button.textContent='☆';
+        button.style.color='';
+
     }
+
 }
 
 
-/* FILTERS */
+function remindMatch(button){
 
-document.querySelectorAll('.filter').forEach(button => {
+    button.textContent='✓ Напоминание включено';
+    button.style.color='var(--accent)';
 
-    button.addEventListener('click', () => {
+}
 
-        document.querySelectorAll('.filter')
-            .forEach(item => item.classList.remove('active'));
 
-        button.classList.add('active');
+/* =========================
+   FILTERS
+========================= */
+
+document.querySelectorAll('.filter')
+    .forEach(button => {
+
+        button.addEventListener('click',function(){
+
+            this.parentElement
+                .querySelectorAll('.filter')
+                .forEach(item =>
+                    item.classList.remove('active')
+                );
+
+            this.classList.add('active');
+
+        });
 
     });
 
-});
 
+/* =========================
+   ESC
+========================= */
 
-/* ESCAPE */
+document.addEventListener('keydown',event => {
 
-document.addEventListener('keydown', event => {
+    if(event.key==='Escape'){
 
-    if (event.key === 'Escape') {
+        document.querySelectorAll('.modal')
+            .forEach(modal =>
+                modal.classList.remove('active')
+            );
 
-        document.getElementById('streamModal')
-            .classList.remove('active');
-
-        document.getElementById('searchModal')
-            .classList.remove('active');
-
-        document.body.style.overflow = '';
+        document.body.style.overflow='';
 
     }
 
@@ -1896,7 +3389,9 @@ document.addEventListener('keydown', event => {
 
 </script>
 
-<!-- Telegram WebApp -->
+
+<!-- Telegram Mini App -->
+
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 </body>
