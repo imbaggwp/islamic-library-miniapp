@@ -1822,87 +1822,13 @@ button {
     </header>
 
 
-    <!-- LOGIN -->
+    <!-- ADMIN ACCESS -->
 
-    <div id="admin-login">
-
+    <div id="admin-login" class="hidden">
         <div class="admin-login-card">
-
-            <div class="section-title">
-                <h2>🔐 Вход</h2>
-            </div>
-
-
-            <div class="form-group">
-
-                <label>
-                    GitHub Owner
-                </label>
-
-                <input
-                    id="github-owner"
-                    class="form-input"
-                    placeholder="например: rizvan123"
-                    autocomplete="off"
-                >
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>
-                    Repository
-                </label>
-
-                <input
-                    id="github-repo"
-                    class="form-input"
-                    placeholder="например: football-hub"
-                    autocomplete="off"
-                >
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>
-                    GitHub Token
-                </label>
-
-                <input
-                    id="github-token"
-                    class="form-input"
-                    type="password"
-                    placeholder="github_pat_..."
-                    autocomplete="off"
-                >
-
-            </div>
-
-
-            <button
-                class="primary-btn"
-                style="width:100%;"
-                onclick="adminLogin()"
-            >
-                ВОЙТИ
-            </button>
-
-
-            <div style="
-                margin-top:12px;
-                color:var(--muted);
-                font-size:9px;
-                line-height:1.5;
-            ">
-                Токен хранится только в текущей сессии
-                браузера и не записывается в index.html.
-            </div>
-
+            <div class="section-title"><h2>🔐 Админка</h2></div>
+            <p style="color:var(--muted);font-size:12px;line-height:1.6;">Доступ определяется автоматически по Telegram ID.</p>
         </div>
-
     </div>
 
 
@@ -2500,10 +2426,9 @@ button {
    CONFIG
 ========================================================= */
 
-const API_KEY = "a7e484c8b00a5f0ce88ae51284e0fe59";
+const WORKER_URL = "https://YOUR-WORKER.workers.dev";
 
-const API_BASE =
-    "https://v3.football.api-sports.io";
+const API_BASE = WORKER_URL + "/api";
 
 const TIMEZONE =
     "Europe/Berlin";
@@ -2615,12 +2540,6 @@ const state = {
     contentLoaded: false,
 
     admin: {
-
-        owner: "",
-
-        repo: "",
-
-        token: "",
 
         sha: null,
 
@@ -2819,6 +2738,8 @@ document.addEventListener(
 
         updateAdminVisibility();
 
+        if (isTelegramAdmin()) state.admin.loggedIn = true;
+
         await loadContent();
 
         loadHome();
@@ -2906,7 +2827,7 @@ async function loadContent() {
 
         const response =
             await fetch(
-                `${CONTENT_FILE}?v=${Date.now()}`,
+                `${WORKER_URL}/content?v=${Date.now()}`,
                 {
                     cache: "no-store"
                 }
@@ -2984,12 +2905,11 @@ async function apiRequest(
 ) {
 
     if (
-        !API_KEY ||
-        API_KEY === "ВСТАВЬ_СЮДА_API_KEY"
+        !WORKER_URL || WORKER_URL.includes("YOUR-WORKER")
     ) {
 
         throw new Error(
-            "API_KEY_NOT_SET"
+            "WORKER_NOT_SET"
         );
 
     }
@@ -3049,15 +2969,7 @@ async function apiRequest(
 
                 method: "GET",
 
-                headers: {
-
-                    "x-apisports-key":
-                        API_KEY,
-
-                    "Accept":
-                        "application/json"
-
-                }
+                headers: workerHeaders()
 
             }
         );
@@ -3067,7 +2979,7 @@ async function apiRequest(
 
         if (response.status === 401)
             throw new Error(
-                "API_KEY_INVALID"
+                "API_ACCESS_ERROR"
             );
 
         if (response.status === 429)
@@ -6167,615 +6079,99 @@ function renderFavoriteTeams() {
 ========================================================= */
 
 function openAdmin() {
-
-    if (!requireAdminAccess())
-        return;
-
-    state.previousPage =
-        state.currentPage;
-
-
-    showPage(
-        "admin",
-        false
-    );
-
-
-    if (
-        state.admin.loggedIn
-    ) {
-
-        showAdminPanel();
-
-    } else {
-
-        showAdminLogin();
-
-    }
-
+    if (!requireAdminAccess()) return;
+    state.previousPage = state.currentPage;
+    showPage("admin", false);
+    state.admin.loggedIn = true;
+    showAdminPanel();
 }
-
 
 function showAdminLogin() {
-
-    document
-        .getElementById(
-            "admin-login"
-        )
-        .classList
-        .remove("hidden");
-
-
-    document
-        .getElementById(
-            "admin-panel"
-        )
-        .classList
-        .add("hidden");
-
-
-    const savedOwner =
-        sessionStorage.getItem(
-            "footballHubGithubOwner"
-        );
-
-
-    const savedRepo =
-        sessionStorage.getItem(
-            "footballHubGithubRepo"
-        );
-
-
-    if (savedOwner)
-        document
-            .getElementById(
-                "github-owner"
-            )
-            .value =
-            savedOwner;
-
-
-    if (savedRepo)
-        document
-            .getElementById(
-                "github-repo"
-            )
-            .value =
-            savedRepo;
-
+    document.getElementById("admin-login")?.classList.add("hidden");
+    document.getElementById("admin-panel")?.classList.add("hidden");
 }
-
 
 function adminLogin() {
-
-    if (!requireAdminAccess())
-        return;
-
-    const owner =
-        document
-            .getElementById(
-                "github-owner"
-            )
-            .value
-            .trim();
-
-
-    const repo =
-        document
-            .getElementById(
-                "github-repo"
-            )
-            .value
-            .trim();
-
-
-    const token =
-        document
-            .getElementById(
-                "github-token"
-            )
-            .value
-            .trim();
-
-
-    if (!owner) {
-
-        showToast(
-            "Укажи GitHub Owner."
-        );
-
-        return;
-
-    }
-
-
-    if (!repo) {
-
-        showToast(
-            "Укажи Repository."
-        );
-
-        return;
-
-    }
-
-
-    if (!token) {
-
-        showToast(
-            "Вставь GitHub Token."
-        );
-
-        return;
-
-    }
-
-
-    state.admin.owner =
-        owner;
-
-
-    state.admin.repo =
-        repo;
-
-
-    state.admin.token =
-        token;
-
-
-    state.admin.loggedIn =
-        true;
-
-
-    sessionStorage.setItem(
-        "footballHubGithubOwner",
-        owner
-    );
-
-
-    sessionStorage.setItem(
-        "footballHubGithubRepo",
-        repo
-    );
-
-
-    sessionStorage.setItem(
-        "footballHubGithubToken",
-        token
-    );
-
-
+    if (!requireAdminAccess()) return;
+    state.admin.loggedIn = true;
     showAdminPanel();
-
-
     loadGithubContent();
-
 }
-
 
 function restoreAdminSession() {
-
-    const owner =
-        sessionStorage.getItem(
-            "footballHubGithubOwner"
-        );
-
-
-    const repo =
-        sessionStorage.getItem(
-            "footballHubGithubRepo"
-        );
-
-
-    const token =
-        sessionStorage.getItem(
-            "footballHubGithubToken"
-        );
-
-
-    if (
-        owner &&
-        repo &&
-        token
-    ) {
-
-        state.admin.owner =
-            owner;
-
-        state.admin.repo =
-            repo;
-
-        state.admin.token =
-            token;
-
-        state.admin.loggedIn =
-            true;
-
-    }
-
+    state.admin.loggedIn = isTelegramAdmin();
 }
-
 
 restoreAdminSession();
 
-
 function showAdminPanel() {
-
-    document
-        .getElementById(
-            "admin-login"
-        )
-        .classList
-        .add("hidden");
-
-
-    document
-        .getElementById(
-            "admin-panel"
-        )
-        .classList
-        .remove("hidden");
-
-
+    if (!requireAdminAccess()) return;
+    document.getElementById("admin-login")?.classList.add("hidden");
+    document.getElementById("admin-panel")?.classList.remove("hidden");
     renderAdminLists();
-
     prepareAdminStreams();
-
 }
-
 
 function adminLogout() {
-
-    state.admin.owner =
-        "";
-
-    state.admin.repo =
-        "";
-
-    state.admin.token =
-        "";
-
-    state.admin.sha =
-        null;
-
-    state.admin.loggedIn =
-        false;
-
-
-    sessionStorage.removeItem(
-        "footballHubGithubOwner"
-    );
-
-
-    sessionStorage.removeItem(
-        "footballHubGithubRepo"
-    );
-
-
-    sessionStorage.removeItem(
-        "footballHubGithubToken"
-    );
-
-
-    showAdminLogin();
-
-
-    showToast(
-        "Вы вышли из админки."
-    );
-
+    state.admin.loggedIn = false;
+    state.admin.sha = null;
+    showPage(state.previousPage || "home");
 }
 
 
 /* =========================================================
-   GITHUB API
+   CONTENT API — CLOUDFLARE WORKER
 ========================================================= */
 
-function githubHeaders() {
-
+function workerHeaders() {
     return {
-
-        "Authorization":
-            `Bearer ${state.admin.token}`,
-
-        "Accept":
-            "application/vnd.github+json",
-
-        "Content-Type":
-            "application/json",
-
-        "X-GitHub-Api-Version":
-            "2022-11-28"
-
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "X-Telegram-Init-Data": tg?.initData || ""
     };
-
 }
-
-
-function githubContentUrl() {
-
-    return (
-        "https://api.github.com/repos/" +
-        encodeURIComponent(
-            state.admin.owner
-        ) +
-        "/" +
-        encodeURIComponent(
-            state.admin.repo
-        ) +
-        "/contents/" +
-        CONTENT_FILE
-    );
-
-}
-
 
 async function loadGithubContent() {
-
-    if (
-        !state.admin.loggedIn
-    )
-        return;
-
-
     try {
-
-        const response =
-            await fetch(
-                githubContentUrl(),
-                {
-                    method: "GET",
-                    headers:
-                        githubHeaders()
-                }
-            );
-
-
-        if (!response.ok) {
-
-            const text =
-                await response.text();
-
-
-            throw new Error(
-                "GitHub " +
-                response.status +
-                ": " +
-                text
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        state.admin.sha =
-            data.sha;
-
-
-        const decoded =
-            decodeBase64Unicode(
-                data.content
-            );
-
-
-        const content =
-            JSON.parse(
-                decoded
-            );
-
-
+        const response = await fetch(`${WORKER_URL}/content?v=${Date.now()}`, {
+            method: "GET", headers: workerHeaders(), cache: "no-store"
+        });
+        if (!response.ok) throw new Error("Worker " + response.status + ": " + await response.text());
+        const content = await response.json();
         state.content = {
-
-            streams:
-                content.streams || {},
-
-            news:
-                Array.isArray(
-                    content.news
-                )
-                    ? content.news
-                    : [],
-
-            banners:
-                Array.isArray(
-                    content.banners
-                )
-                    ? content.banners
-                    : []
-
+            streams: content.streams || {},
+            news: Array.isArray(content.news) ? content.news : [],
+            banners: Array.isArray(content.banners) ? content.banners : []
         };
-
-
         renderAdminLists();
-
         renderHomeContent();
-
-
-        showToast(
-            "content.json загружен."
-        );
-
-
+        showToast("✅ Контент загружен.");
+        return true;
     } catch (error) {
-
         console.error(error);
-
-
-        showToast(
-            "Ошибка GitHub: " +
-            error.message
-        );
-
+        showToast("Ошибка загрузки: " + error.message);
+        return false;
     }
-
 }
 
-
-/* =========================================================
-   SAVE CONTENT TO GITHUB
-========================================================= */
-
 async function saveContentToGithub() {
-
-    if (
-        !state.admin.loggedIn
-    ) {
-
-        showToast(
-            "Сначала войди в админку."
-        );
-
-        return false;
-
-    }
-
-
+    if (!requireAdminAccess()) return false;
     try {
-
-        /*
-           Сначала получаем свежий SHA.
-           Это предотвращает ошибку,
-           если файл изменился после
-           предыдущей загрузки.
-        */
-
-        const current =
-            await fetch(
-                githubContentUrl(),
-                {
-                    method: "GET",
-                    headers:
-                        githubHeaders()
-                }
-            );
-
-
-        let sha =
-            state.admin.sha;
-
-
-        if (current.ok) {
-
-            const currentData =
-                await current.json();
-
-            sha =
-                currentData.sha;
-
-        }
-
-
-        const json =
-            JSON.stringify(
-                state.content,
-                null,
-                2
-            );
-
-
-        const encoded =
-            encodeBase64Unicode(
-                json
-            );
-
-
-        const body = {
-
-            message:
-                "Update Football Hub content",
-
-            content:
-                encoded,
-
-            branch:
-                "main"
-
-        };
-
-
-        if (sha) {
-
-            body.sha =
-                sha;
-
-        }
-
-
-        const response =
-            await fetch(
-                githubContentUrl(),
-                {
-
-                    method: "PUT",
-
-                    headers:
-                        githubHeaders(),
-
-                    body:
-                        JSON.stringify(
-                            body
-                        )
-
-                }
-            );
-
-
-        if (!response.ok) {
-
-            const text =
-                await response.text();
-
-
-            throw new Error(
-                "GitHub " +
-                response.status +
-                ": " +
-                text
-            );
-
-        }
-
-
-        const result =
-            await response.json();
-
-
-        state.admin.sha =
-            result.content?.sha ||
-            null;
-
-
-        showToast(
-            "✅ Сохранено в GitHub."
-        );
-
-
+        const response = await fetch(`${WORKER_URL}/content`, {
+            method: "PUT", headers: workerHeaders(), body: JSON.stringify(state.content)
+        });
+        if (!response.ok) throw new Error("Worker " + response.status + ": " + await response.text());
+        const result = await response.json();
+        state.admin.sha = result.sha || null;
+        showToast("✅ Сохранено.");
         renderHomeContent();
-
         renderAdminLists();
-
-
         return true;
-
-
     } catch (error) {
-
         console.error(error);
-
-
-        showToast(
-            "Ошибка сохранения: " +
-            error.message
-        );
-
-
+        showToast("Ошибка сохранения: " + error.message);
         return false;
-
     }
-
 }
 
 
@@ -8400,7 +7796,7 @@ function apiErrorMessage(
 
     if (
         error.message ===
-        "API_KEY_NOT_SET"
+        "WORKER_NOT_SET"
     )
         return (
             "Добавь API-ключ API-Football в index.html."
@@ -8409,7 +7805,7 @@ function apiErrorMessage(
 
     if (
         error.message ===
-        "API_KEY_INVALID"
+        "API_ACCESS_ERROR"
     )
         return (
             "API-ключ недействителен или заблокирован."
