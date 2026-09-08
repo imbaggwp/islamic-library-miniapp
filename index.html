@@ -4877,5 +4877,122 @@ function seasonPlayUserMatch(fid){
 })();
 </script>
 
+
+<script>
+/* =========================================================
+   FOM v2.2 — FIX: SQUAD IS NOW VISIBLE IN THE MAIN GAME
+   ========================================================= */
+(function(){
+  const esc2=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+  const POS2={GK:"Вратарь",CB:"Центральный защитник",LB:"Левый защитник",RB:"Правый защитник",LWB:"Левый латераль",RWB:"Правый латераль",DM:"Опорный полузащитник",CM:"Центральный полузащитник",AM:"Атакующий полузащитник",LM:"Левый полузащитник",RM:"Правый полузащитник",LW:"Левый вингер",RW:"Правый вингер",ST:"Нападающий",CF:"Центральный нападающий"};
+
+  function realSquad(){
+    const name=state.club;
+    if(!name)return [];
+    // Primary source: the real SQUADS database already embedded in the game.
+    if(typeof SQUADS!=="undefined" && Array.isArray(SQUADS[name])) return SQUADS[name];
+    // Secondary source: CLUB_META, which points to SQUADS.
+    if(typeof CLUB_META!=="undefined" && CLUB_META[name] && Array.isArray(CLUB_META[name].squad)) return CLUB_META[name].squad;
+    return [];
+  }
+
+  function ensureCareer(p){
+    state.playerCareer=state.playerCareer||{};
+    const name=Array.isArray(p)?p[0]:p.name;
+    if(!state.playerCareer[name]){
+      const rating=Number(Array.isArray(p)?p[2]:p.rating||70);
+      state.playerCareer[name]={age:20,potential:Math.min(99,rating+10),rating,form:80,morale:80,fitness:90,minutes:0,appearances:0,starts:0,goals:0,assists:0,value:Math.max(1,Math.round(rating*rating/180)),wage:.15,contractYears:3,shirt:1,instruction:"balanced",injury:null,suspension:0};
+    }
+    return state.playerCareer[name];
+  }
+
+  function renderMainSquad(){
+    const box=document.getElementById("squadContent");
+    const c=state.club;
+    if(!box)return;
+
+    if(!c){
+      box.innerHTML='<div class="empty">Сначала выбери клуб.</div>';
+      return;
+    }
+
+    const raw=realSquad();
+    if(!raw.length){
+      box.innerHTML=`<div class="card">
+        <div class="sub">СОСТАВ ${esc2(c.toUpperCase())}</div>
+        <div class="notice">Для этого клуба пока нет загруженного реального состава.</div>
+        <p class="sub" style="line-height:1.5">Чтобы не придумывать футболистов, игра показывает состав только из проверенной базы. Сейчас полноценные реальные составы доступны для Real Madrid, Barcelona, Manchester City, Liverpool, Bayern Munich и Paris Saint-Germain.</p>
+      </div>`;
+      return;
+    }
+
+    const players=raw.map((p,i)=>{
+      const a=Array.isArray(p)?p:{name:p.name,position:p.position,rating:p.rating};
+      const career=ensureCareer(p);
+      const initials=a.name.split(/\s+/).map(x=>x[0]).slice(0,2).join("").toUpperCase();
+      const status=state.squadState?.[a.name]?.status==="starting"?"ОСНОВА":"РЕЗЕРВ";
+      const injury=career.injury?"🩹":career.suspension?"🟥":"";
+      return `<button class="fom-main-player" data-name="${esc2(a.name)}">
+        <span class="fom-main-avatar">${initials}</span>
+        <span class="fom-main-info"><b>${esc2(a.name)}</b><small>${esc2(POS2[a.position]||a.position)} · №${state.squadState?.[a.name]?.shirt||i+1} ${injury}</small></span>
+        <span class="fom-main-status ${status==="ОСНОВА"?"on":""}">${status}</span>
+        <strong>${Number(career.rating).toFixed(1)}</strong>
+      </button>`;
+    }).join("");
+
+    const groups=[
+      ["🧤 Вратари",raw.filter(p=>(Array.isArray(p)?p[1]:p.position)==="GK")],
+      ["🛡️ Защитники",raw.filter(p=>["CB","LB","RB","LWB","RWB"].includes(Array.isArray(p)?p[1]:p.position))],
+      ["🎯 Полузащитники",raw.filter(p=>["DM","CM","AM","LM","RM"].includes(Array.isArray(p)?p[1]:p.position))],
+      ["⚡ Нападающие",raw.filter(p=>["LW","RW","ST","CF"].includes(Array.isArray(p)?p[1]:p.position))]
+    ];
+
+    let groupedHTML="";
+    groups.forEach(([title,list])=>{
+      if(!list.length)return;
+      const names=new Set(list.map(p=>Array.isArray(p)?p[0]:p.name));
+      groupedHTML+=`<div class="fom-main-group"><h3>${title}<span>${list.length}</span></h3>${players.split("</button>").filter(x=>x).filter(x=>{
+        const m=x.match(/data-name="([^"]+)"/);return m&&names.has(m[1]);
+      }).map(x=>x+"</button>").join("")}</div>`;
+    });
+
+    box.innerHTML=`<div class="fom-main-squad">
+      <div class="fom-main-squad-head">
+        <div><small>ПОЛНЫЙ СОСТАВ</small><h2>${esc2(c)}</h2><span>${raw.length} игроков · реальные данные</span></div>
+        <button id="fomOpenLineup">⚽ Стартовый состав</button>
+      </div>
+      ${groupedHTML}
+      <div class="fom-main-note">Нажми на игрока, чтобы открыть подробную карточку. Изменения состава сохраняются в игре.</div>
+    </div>`;
+
+    box.querySelector("#fomOpenLineup").onclick=()=>window.FOMSquad?.lineup?.();
+    box.querySelectorAll(".fom-main-player").forEach(b=>b.onclick=()=>window.FOMSquad?.player?.(b.dataset.name));
+  }
+
+  // Replace the old simple renderer. This is the key fix.
+  window.renderSquad=renderMainSquad;
+
+  // The main render() calls renderSquad(), so the new roster appears automatically.
+  try{renderMainSquad();}catch(e){console.warn("FOM v2.2 squad render",e)}
+
+  const s=document.createElement("style");s.id="fom-v22-css";
+  s.textContent=`
+    .fom-main-squad{display:grid;gap:10px}
+    .fom-main-squad-head{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:17px;border:1px solid var(--line);border-radius:18px;background:var(--panel)}
+    .fom-main-squad-head small{font-size:9px;letter-spacing:1.4px;opacity:.4}.fom-main-squad-head h2{margin:4px 0;font-size:20px}.fom-main-squad-head span{font-size:9px;opacity:.45}
+    .fom-main-squad-head button{white-space:nowrap;font-size:10px;padding:9px 11px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:inherit}
+    .fom-main-group{padding:11px;border:1px solid var(--line);border-radius:17px;background:var(--panel)}
+    .fom-main-group h3{font-size:13px;margin:0 0 6px}.fom-main-group h3 span{float:right;opacity:.4}
+    .fom-main-player{width:100%;display:grid;grid-template-columns:35px minmax(0,1fr) auto 40px;gap:8px;align-items:center;text-align:left;padding:9px 2px;border:0;border-top:1px solid rgba(255,255,255,.05);background:transparent;color:inherit}
+    .fom-main-player:first-of-type{border-top:0}.fom-main-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--panel2);border:1px solid var(--line);font-size:9px;font-weight:800}
+    .fom-main-info{display:flex;flex-direction:column;min-width:0;gap:3px}.fom-main-info b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fom-main-info small{font-size:8px;opacity:.45}
+    .fom-main-status{font-size:8px;padding:4px 6px;border-radius:7px;background:rgba(255,255,255,.05);opacity:.5}.fom-main-status.on{background:rgba(255,122,24,.12);color:#ff9f4a;opacity:1}.fom-main-player>strong{font-size:13px;text-align:center}
+    .fom-main-note{text-align:center;font-size:9px;opacity:.4;padding:7px}
+    @media(max-width:500px){.fom-main-squad-head{align-items:flex-start;flex-direction:column}.fom-main-squad-head button{width:100%}}
+  `;
+  document.head.appendChild(s);
+})();
+</script>
+
 </body>
 </html>
