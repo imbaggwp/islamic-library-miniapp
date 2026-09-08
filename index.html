@@ -1744,5 +1744,2421 @@ function seasonPlayUserMatch(fid){
 })();
 </script>
 
+
+<style id="fom-v11-player-style">
+.player-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.player-card{padding:12px;border:1px solid var(--line);border-radius:16px;background:var(--panel)}
+.player-card .pc-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.player-card .pc-name{font-weight:800;line-height:1.15}
+.player-card .pc-pos{font-size:11px;opacity:.65;margin-top:3px}
+.player-card .rating{font-size:22px;font-weight:900}
+.player-bars{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.pbar{display:grid;grid-template-columns:32px 1fr 26px;gap:6px;align-items:center;font-size:10px}
+.pbar i{height:5px;border-radius:8px;background:var(--line);overflow:hidden}
+.pbar i b{display:block;height:100%;background:var(--accent,#ff7a18);border-radius:8px}
+.player-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.player-meta span{font-size:10px;padding:5px 7px;border-radius:8px;background:var(--panel2);border:1px solid var(--line)}
+.detail-head{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.detail-rating{font-size:38px;font-weight:900}
+.detail-section{margin-top:16px}
+.detail-section h3{margin:0 0 8px;font-size:13px}
+.detail-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.detail-stat{padding:9px;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}
+.detail-stat small{display:block;opacity:.6;font-size:10px}
+.detail-stat strong{font-size:18px}
+@media(max-width:430px){.player-grid{grid-template-columns:1fr}}
+</style>
+<script>
+/* =========================================================
+   v1.1 — PLAYER MODEL
+   ========================================================= */
+(function(){
+  const POS=[ 'GK','CB','LB','RB','DM','CM','AM','LW','RW','ST' ];
+
+  const BASE={
+    GK:{speed:45,shoot:20,pass:65,dribble:35,tackle:40,vision:58,stamina:78,physical:75},
+    CB:{speed:62,shoot:25,pass:68,dribble:42,tackle:88,vision:62,stamina:82,physical:88},
+    LB:{speed:82,shoot:35,pass:76,dribble:68,tackle:78,vision:68,stamina:90,physical:78},
+    RB:{speed:82,shoot:35,pass:76,dribble:68,tackle:78,vision:68,stamina:90,physical:78},
+    DM:{speed:62,shoot:40,pass:84,dribble:62,tackle:84,vision:84,stamina:91,physical:84},
+    CM:{speed:67,shoot:52,pass:90,dribble:76,tackle:68,vision:91,stamina:92,physical:76},
+    AM:{speed:74,shoot:72,pass:88,dribble:88,tackle:38,vision:94,stamina:80,physical:62},
+    LW:{speed:91,shoot:74,pass:78,dribble:94,tackle:30,vision:80,stamina:84,physical:65},
+    RW:{speed:91,shoot:74,pass:78,dribble:94,tackle:30,vision:80,stamina:84,physical:65},
+    ST:{speed:82,shoot:94,pass:68,dribble:78,tackle:22,vision:72,stamina:80,physical:84}
+  };
+
+  function hash(s){
+    let h=2166136261;
+    for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
+    return (h>>>0);
+  }
+  function jitter(name,key,spread){
+    const n=hash(name+key)%1000;
+    return Math.round(((n/999)-.5)*2*spread);
+  }
+  function clamp(n){return Math.max(1,Math.min(99,Math.round(n)))}
+
+  function modelFor(p){
+    const name=p[0], pos=p[1], rating=+p[2]||70, b=BASE[pos]||BASE.CM;
+    const out={
+      name,pos,rating,
+      age:null,
+      potential:clamp(rating+4+jitter(name,'pot',6)),
+      value:Math.max(300000,Math.round((rating*rating*11000)/100000)*100000),
+      wage:Math.max(10000,Math.round((rating*rating*45)/1000)*1000),
+      speed:clamp(rating+(b.speed-70)+jitter(name,'spd',5)),
+      shooting:clamp(rating+(b.shoot-65)+jitter(name,'sho',5)),
+      passing:clamp(rating+(b.pass-75)+jitter(name,'pas',4)),
+      dribbling:clamp(rating+(b.dribble-65)+jitter(name,'dri',5)),
+      tackling:clamp(rating+(b.tackle-65)+jitter(name,'tac',5)),
+      vision:clamp(rating+(b.vision-75)+jitter(name,'vis',4)),
+      stamina:clamp(rating+(b.stamina-82)+jitter(name,'sta',4)),
+      physical:clamp(rating+(b.physical-78)+jitter(name,'phy',4)),
+      form:clamp(72+jitter(name,'form',13)),
+      morale:clamp(78+jitter(name,'morale',10)),
+      fitness:100,
+      appearances:0,goals:0,assists:0,minutes:0,yellows:0,reds:0,
+      cleanSheets:0,injuryRisk:clamp(7+jitter(name,'inj',4)),
+      foot: ['GK','CB','LB','RB','DM'].includes(pos) ? 'Прав' : (hash(name+'foot')%3===0?'Лев':'Прав'),
+      traits:[]
+    };
+    const traitPool={
+      GK:['игра руками','рефлексы','игра на выходах'],
+      CB:['позиционная игра','воздушные дуэли','силовая борьба'],
+      LB:['подключения','скорость','фланговые передачи'],
+      RB:['подключения','скорость','фланговые передачи'],
+      DM:['перехваты','первый пас','страховка'],
+      CM:['пас','движение','видение поля'],
+      AM:['последний пас','дриблинг','удар издали'],
+      LW:['скорость','дриблинг','смещения в центр'],
+      RW:['скорость','дриблинг','смещения в центр'],
+      ST:['завершение','открывания','игра в штрафной']
+    };
+    const pool=traitPool[pos]||traitPool.CM;
+    out.traits=[pool[hash(name+'t1')%pool.length],pool[hash(name+'t2')%pool.length]];
+    return out;
+  }
+
+  function ensurePlayerData(){
+    state.playerData ||= {};
+    const c=currentClub();
+    if(!c)return;
+    (c.squad||[]).forEach(p=>{
+      if(!state.playerData[p[0]]) state.playerData[p[0]]=modelFor(p);
+      else {
+        const d=state.playerData[p[0]];
+        Object.assign(d,{name:p[0],pos:p[1],rating:p[2]});
+        d.fitness=typeof d.fitness==='number'?d.fitness:100;
+        d.form=typeof d.form==='number'?d.form:75;
+        d.morale=typeof d.morale==='number'?d.morale:75;
+      }
+    });
+  }
+
+  function pd(pOrName){
+    ensurePlayerData();
+    const name=Array.isArray(pOrName)?pOrName[0]:pOrName;
+    const p=Array.isArray(pOrName)?pOrName:(currentClub()?.squad||[]).find(x=>x[0]===name);
+    if(!p)return null;
+    state.playerData[name] ||= modelFor(p);
+    return state.playerData[name];
+  }
+
+  function playerFitness(name){
+    const d=pd(name);
+    const fatigue=state.season?.fatigue?.[name]||0;
+    const injury=state.season?.injuries?.[name];
+    return Math.max(0,Math.min(100,(d?.fitness??100)-fatigue-(injury?35:0)));
+  }
+
+  function playerCondition(name){
+    const d=pd(name); if(!d)return {fitness:0,form:0,morale:0};
+    return {fitness:playerFitness(name),form:d.form,morale:d.morale};
+  }
+
+  function developmentTick(){
+    ensurePlayerData();
+    const year=state.season?.year||2026;
+    Object.values(state.playerData||{}).forEach(d=>{
+      if(d.potential>d.rating && (state.season?.week||1)%8===0){
+        const gap=d.potential-d.rating;
+        d.rating=Math.min(d.potential,d.rating+(gap>5?1:0));
+      }
+      d.form=clamp(d.form + (Math.random()<.5?-1:1));
+      d.morale=clamp(d.morale + (Math.random()<.55?1:-1));
+      d.fitness=Math.min(100,d.fitness+8);
+    });
+  }
+
+  window.FOMPlayers={ensurePlayerData,pd,playerFitness,playerCondition,developmentTick,modelFor};
+
+  // Replace player statistics used by the match engine.
+  window.getPlayerStats=function(p,fatigue=0,overrideRole=null){
+    const d=pd(p), role=overrideRole||p[1], r=d?.rating||p[2]||70;
+    const form=Math.max(.70,(d?.form||75)/100);
+    const fit=Math.max(.55,playerFitness(p[0])/100);
+    const morale=Math.max(.75,(d?.morale||75)/100);
+    const pos=role;
+    const speed=(d?.speed||r)*fit*form;
+    const atkBase=((d?.shoot||r)*.48+(d?.dribbling||r)*.28+(d?.speed||r)*.14+(d?.vision||r)*.10);
+    const passBase=((d?.passing||r)*.55+(d?.vision||r)*.30+(d?.dribbling||r)*.15);
+    const defBase=((d?.tackling||r)*.62+(d?.physical||r)*.23+(d?.vision||r)*.15);
+    const roleMod={
+      GK:[.98,.18,.72,.65],CB:[1.10,.28,.82,.82],LB:[.94,.55,.84,.98],RB:[.94,.55,.84,.98],
+      DM:[1.05,.48,1.08,.88],CM:[.82,.72,1.08,.94],AM:[.52,1.02,1.12,1.00],
+      LW:[.35,1.08,.91,1.10],RW:[.35,1.08,.91,1.10],ST:[.25,1.16,.78,.96]
+    }[pos]||[.65,.70,.85,.9];
+    return {
+      name:p[0],pos,rating:r,
+      def:defBase*roleMod[0]*fit*form*morale,
+      atk:atkBase*roleMod[1]*fit*form*morale,
+      pass:passBase*roleMod[2]*fit*form*morale,
+      speed:speed*roleMod[3]*morale,
+      stamina:(d?.stamina||r)*fit*morale
+    };
+  };
+
+  function statBar(label,val){
+    return `<div class="pbar"><span>${label}</span><i><b style="width:${val}%"></b></i><strong>${val}</strong></div>`;
+  }
+
+  window.playerInfo=function(i){
+    FOMPlayers.ensurePlayerData();
+    const p=currentClub()?.squad?.[i],d=pd(p);
+    if(!p||!d)return;
+    const injury=state.season?.injuries?.[p[0]];
+    document.getElementById('sheet').innerHTML=`
+      <div class="detail-head">
+        <div><div class="sub">${esc(p[1])} • ${esc(d.foot)} нога</div><h2 style="margin:3px 0">${esc(p[0])}</h2>
+        <div class="player-meta"><span>Возраст: ${d.age??'—'}</span><span>Потенциал: ${d.potential}</span><span>Стоимость: ${moneyFmt(d.value)}</span></div></div>
+        <div class="detail-rating">${d.rating}</div>
+      </div>
+      ${injury?`<div class="notice" style="margin-top:12px">🩹 Травма: ещё ${injury.weeks} нед.</div>`:''}
+      <div class="detail-section"><h3>Состояние</h3><div class="detail-stats">
+        <div class="detail-stat"><small>Форма</small><strong>${d.form}</strong></div>
+        <div class="detail-stat"><small>Мораль</small><strong>${d.morale}</strong></div>
+        <div class="detail-stat"><small>Фитнес</small><strong>${playerFitness(p[0])}</strong></div>
+        <div class="detail-stat"><small>Травмориск</small><strong>${d.injuryRisk}%</strong></div>
+      </div></div>
+      <div class="detail-section"><h3>Игровые характеристики</h3><div class="player-bars">
+        ${statBar('СКР',d.speed)}${statBar('УД',d.shooting)}
+        ${statBar('ПАС',d.passing)}${statBar('ДРБ',d.dribbling)}
+        ${statBar('ОТБ',d.tackling)}${statBar('ВИД',d.vision)}
+        ${statBar('ВЫН',d.stamina)}${statBar('ФИЗ',d.physical)}
+      </div></div>
+      <div class="detail-section"><h3>Профиль</h3><div class="player-meta">${d.traits.map(t=>`<span>★ ${esc(t)}</span>`).join('')}</div></div>
+      <div class="detail-section"><h3>Контракт</h3><div class="detail-stats">
+        <div class="detail-stat"><small>Зарплата</small><strong>${moneyFmt(d.wage)}/нед.</strong></div>
+        <div class="detail-stat"><small>Контракт</small><strong>${state.season?.contracts?.[p[0]]?.until||2029}</strong></div>
+      </div></div>
+      <button class="btn secondary" style="width:100%;margin-top:16px" onclick="closeModal()">Закрыть</button>`;
+    document.getElementById('modal').classList.add('show');
+  };
+
+  window.renderSquad=function(){
+    const box=document.getElementById('squadContent'),c=currentClub();
+    if(!c){box.innerHTML='<div class="empty">Сначала выбери клуб.</div>';return}
+    if(!c.squad.length){box.innerHTML='<div class="notice">Для этого клуба пока нет полного списка игроков. Вымышленных футболистов не добавляем.</div><div class="empty">Реальный состав будет добавлен в базу.</div>';return}
+    FOMPlayers.ensurePlayerData();
+    const filter=window.squadFilter||'ALL';
+    const rows=c.squad.map((p,i)=>({p,i,d:FOMPlayers.pd(p)}))
+      .filter(x=>filter==='ALL'||x.p[1]===filter)
+      .sort((a,b)=>b.d.rating-a.d.rating);
+    box.innerHTML=`
+      <div class="card">
+        <div class="row between"><div><div class="sub">ЗАЯВКА</div><h2 style="margin:3px 0">${c.squad.length} игроков</h2></div>
+        <div class="player-meta"><span>Средний рейтинг ${Math.round(c.squad.reduce((s,p)=>s+p[2],0)/c.squad.length)}</span></div></div>
+        <div class="career-strip" style="margin-top:12px">
+          ${['ALL','GK','CB','LB','RB','DM','CM','AM','LW','RW','ST'].map(f=>`<button class="smallbtn" style="${filter===f?'border-color:var(--accent)':''}" onclick="window.squadFilter='${f}';renderSquad()">${f==='ALL'?'Все':f}</button>`).join('')}
+        </div>
+      </div>
+      <div class="player-grid">
+      ${rows.map(({p,i,d})=>`
+        <button class="player-card" onclick="playerInfo(${i})" style="text-align:left">
+          <div class="pc-top"><div><div class="pc-name">${esc(p[0])}</div><div class="pc-pos">${p[1]} • ${d.foot} нога</div></div><div class="rating">${d.rating}</div></div>
+          <div class="player-bars">
+            ${statBar('СКР',d.speed)}${statBar('УД',d.shooting)}
+            ${statBar('ПАС',d.passing)}${statBar('ОТБ',d.tackling)}
+          </div>
+          <div class="player-meta"><span>Форма ${d.form}</span><span>Фитнес ${playerFitness(p[0])}</span></div>
+        </button>`).join('')}
+      </div>`;
+  };
+
+  // Transfer additions get the same player model immediately.
+  const oldTransferPlayer=window.transferPlayer;
+  window.transferPlayer=function(name,price){
+    if(typeof oldTransferPlayer==='function')oldTransferPlayer(name,price);
+    FOMPlayers.ensurePlayerData();
+    save();
+    renderSquad();
+  };
+
+  // Make training affect the new model as well.
+  const oldTrain=window.trainTeam;
+  window.trainTeam=function(type){
+    if(typeof oldTrain==='function')oldTrain(type);
+    FOMPlayers.ensurePlayerData();
+    const delta={fitness:0,attack:1,defense:1,tactics:1}[type]||0;
+    Object.values(state.playerData||{}).forEach(d=>{
+      if(type==='fitness')d.fitness=Math.min(100,d.fitness+15);
+      if(type==='attack' && ['AM','LW','RW','ST'].includes(d.pos))d.shooting=Math.min(99,d.shooting+delta);
+      if(type==='defense' && ['GK','CB','LB','RB','DM'].includes(d.pos))d.tackling=Math.min(99,d.tackling+delta);
+      if(type==='tactics')d.passing=Math.min(99,d.passing+delta);
+    });
+    save();renderSquad();
+  };
+
+  // Weekly progression/recovery hook.
+  const oldPlaySeasonRound=window.playSeasonRound;
+  window.advancePlayerWeek=function(){
+    FOMPlayers.ensurePlayerData();
+    FOMPlayers.developmentTick();
+    save();
+  };
+
+  if(state.club){
+    FOMPlayers.ensurePlayerData();
+    save();
+  }
+})();
+</script>
+
+
+<style id="fom-v12-player-db-style">
+.player-status-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.status-ok,.status-bad,.status-warn{padding:5px 8px;border-radius:9px;font-size:10px}
+.status-ok{background:rgba(53,201,138,.12);color:#64e0aa}
+.status-bad{background:rgba(255,92,103,.12);color:#ff7d86}
+.status-warn{background:rgba(255,155,74,.12);color:#ffad6b}
+.db-note{font-size:11px;color:var(--muted);line-height:1.45;margin-top:10px}
+</style>
+<script>
+/* =========================================================
+   v1.2 — COMPLETE PLAYER STATE + MATCH INTEGRATION
+   ========================================================= */
+(function(){
+  /*
+   Real profile fields verified against current 2026/27 public squad
+   information where available. Other detailed attributes are game
+   attributes, intentionally derived from the player's base rating and
+   position instead of pretending to be sourced scouting numbers.
+  */
+  const REAL_PROFILE={
+    'Thibaut Courtois':{age:34,value:15000000,contract:2027},
+    'Andriy Lunin':{age:27,value:12000000,contract:2030},
+    'Fran González':{age:21,value:3000000,contract:2028},
+    'Trent Alexander-Arnold':{age:27,value:60000000},
+    'Jude Bellingham':{age:23,value:130000000},
+    'Dean Huijsen':{age:21,value:60000000,contract:2030},
+    'Joan García':{age:25,value:45000000,contract:2031},
+    'Marc-André ter Stegen':{age:34,value:3000000,contract:2028},
+    'Wojciech Szczęsny':{age:36,value:800000,contract:2027},
+    'Pau Cubarsí':{age:19,value:80000000,contract:2029},
+    'Eric García':{age:25,value:40000000,contract:2031},
+    'Gianluigi Donnarumma':{age:27},
+    'Marc Guéhi':{age:26},
+    'Joško Gvardiol':{age:24},
+    'Rayan Cherki':{age:23},
+    'Phil Foden':{age:26},
+    'Erling Haaland':{age:26},
+    'Antoine Semenyo':{age:27},
+    'Virgil van Dijk':{age:35},
+    'Ibrahima Konaté':{age:27},
+    'Florian Wirtz':{age:23},
+    'Mohamed Salah':{age:34},
+    'Alexander Isak':{age:26},
+    'Harry Kane':{age:33},
+    'Jamal Musiala':{age:23},
+    'Michael Olise':{age:24},
+    'Ousmane Dembélé':{age:29},
+    'Vitinha':{age:26},
+    'Nuno Mendes':{age:24},
+    'Achraf Hakimi':{age:27}
+  };
+
+  const oldEnsure=window.FOMPlayers?.ensurePlayerData;
+
+  function profileFor(p){
+    const name=p[0], base=FOMPlayers.modelFor(p), rp=REAL_PROFILE[name]||{};
+    const year=2026;
+    // For profiles not explicitly sourced, keep age as an in-game player age
+    // derived from the known rating/position rather than showing false precision.
+    const modeledAge=rp.age || (
+      p[1]==='GK' ? Math.max(19,Math.min(37,Math.round(20+(100-p[2])*.34))) :
+      Math.max(18,Math.min(35,Math.round(18+(92-p[2])*.43)))
+    );
+    const value=rp.value || base.value;
+    const contract=rp.contract || (2027 + (hashPlayer(name)%5));
+    return {
+      ...base,
+      age:modeledAge,
+      ageSource:rp.age?'verified':'game-model',
+      value,
+      wage:rp.wage||Math.max(12000,Math.round((value/1000000)*4200/1000)*1000),
+      contractUntil:contract,
+      contractStatus:contract<=2027?'expiring':'active',
+      injury:null,
+      suspension:{matches:0,reason:null},
+      availability:'available',
+      appearances:base.appearances||0,
+      goals:base.goals||0,
+      assists:base.assists||0,
+      minutes:base.minutes||0,
+      yellows:base.yellows||0,
+      reds:base.reds||0,
+      lastRating:base.rating,
+      matchRatings:[],
+      history:[]
+    };
+  }
+
+  function hashPlayer(s){
+    let h=0;
+    for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;
+    return h;
+  }
+
+  function ensureDB(){
+    state.playerData ||= {};
+    state.season ||= {};
+    state.season.fatigue ||= {};
+    state.season.injuries ||= {};
+    state.season.suspensions ||= {};
+    state.season.matchStats ||= {};
+    const c=currentClub();
+    if(!c)return;
+    (c.squad||[]).forEach(p=>{
+      if(!state.playerData[p[0]]) state.playerData[p[0]]=profileFor(p);
+      else {
+        const d=state.playerData[p[0]], rp=REAL_PROFILE[p[0]]||{};
+        d.name=p[0];d.pos=p[1];d.rating=+p[2];
+        if(!d.age)d.age=profileFor(p).age;
+        if(!d.value)d.value=rp.value||profileFor(p).value;
+        if(!d.contractUntil)d.contractUntil=rp.contract||2029;
+        if(!d.wage)d.wage=profileFor(p).wage;
+        d.injury=state.season.injuries[p[0]]||d.injury||null;
+        d.suspension=state.season.suspensions[p[0]]||d.suspension||{matches:0,reason:null};
+        d.availability=(d.injury?'injured':(d.suspension?.matches>0?'suspended':'available'));
+      }
+    });
+  }
+
+  function getD(name){
+    ensureDB();
+    return state.playerData?.[name]||null;
+  }
+
+  function isAvailable(name){
+    const d=getD(name);
+    return !!d && !d.injury && !(d.suspension?.matches>0);
+  }
+
+  function applyCard(name,kind){
+    const d=getD(name);if(!d)return;
+    if(kind==='yellow'){
+      d.yellows=(d.yellows||0)+1;
+      // Two yellows in the same match are handled by the live engine as red.
+      if(d.yellows%5===0){
+        d.suspension={matches:1,reason:'накопление жёлтых'};
+        state.season.suspensions[name]=d.suspension;
+      }
+    }
+    if(kind==='red'){
+      d.reds=(d.reds||0)+1;
+      d.suspension={matches:Math.max(1,1+Math.floor(Math.random()*2)),reason:'красная карточка'};
+      state.season.suspensions[name]=d.suspension;
+    }
+    d.availability=d.suspension.matches>0?'suspended':'available';
+  }
+
+  function applyInjury(name,weeks=1){
+    const d=getD(name);if(!d)return;
+    d.injury={weeks,reason:'травма'};
+    state.season.injuries[name]=d.injury;
+    d.availability='injured';
+  }
+
+  function weeklyRecovery(){
+    ensureDB();
+    Object.keys(state.playerData||{}).forEach(name=>{
+      const d=state.playerData[name];
+      d.fitness=Math.min(100,(d.fitness||100)+12);
+      d.form=Math.max(1,Math.min(99,(d.form||75)+(Math.random()<.5?1:-1)));
+      d.morale=Math.max(1,Math.min(99,(d.morale||75)+(Math.random()<.55?1:-1)));
+
+      if(state.season.injuries[name]){
+        state.season.injuries[name].weeks--;
+        if(state.season.injuries[name].weeks<=0){
+          delete state.season.injuries[name];d.injury=null;
+        }
+      }
+      if(state.season.suspensions[name]){
+        state.season.suspensions[name].matches--;
+        if(state.season.suspensions[name].matches<=0){
+          delete state.season.suspensions[name];d.suspension={matches:0,reason:null};
+        }
+      }
+      d.availability=d.injury?'injured':(d.suspension?.matches>0?'suspended':'available');
+    });
+  }
+
+  function recordMatch(name,stats){
+    const d=getD(name);if(!d)return;
+    d.appearances=(d.appearances||0)+1;
+    d.minutes=(d.minutes||0)+(stats.minutes||0);
+    d.goals=(d.goals||0)+(stats.goals||0);
+    d.assists=(d.assists||0)+(stats.assists||0);
+    d.yellows=(d.yellows||0)+(stats.yellow||0);
+    d.reds=(d.reds||0)+(stats.red||0);
+    if(stats.rating)d.matchRatings.push(stats.rating);
+    if(d.matchRatings.length>10)d.matchRatings.shift();
+    d.lastRating=stats.rating||d.lastRating;
+  }
+
+  function enhancedStats(p,role){
+    const d=getD(p[0]), r=d?.rating||p[2]||70;
+    const fit=Math.max(.45,(d?.fitness??100)/100);
+    const form=Math.max(.55,(d?.form??75)/100);
+    const morale=Math.max(.65,(d?.morale??75)/100);
+    const age=d?.age||25;
+    // Age has a modest effect, strongest for stamina/speed.
+    const ageSpeed=age<29?1:Math.max(.88,1-(age-29)*.012);
+    const ageStamina=age<30?1:Math.max(.90,1-(age-30)*.008);
+    const fatigue=state.season.fatigue?.[p[0]]||0;
+    const fatigueMul=Math.max(.45,1-fatigue/150);
+    const s=window.getPlayerStats(p,fatigue,role);
+    s.speed*=ageSpeed*fit*form*morale*fatigueMul;
+    s.atk*=fit*form*morale*fatigueMul;
+    s.pass*=fit*form*morale*fatigueMul;
+    s.def*=fit*form*morale*fatigueMul;
+    s.stamina*=ageStamina*fit*morale;
+    // Physical profile matters in duels and late-match resistance.
+    s.def*=1+(d?.physical-70)/700;
+    s.atk*=1+(d?.physical-70)/1200;
+    return s;
+  }
+
+  // This function is now the single source for player availability.
+  window.FOMPlayerDB={
+    ensure:ensureDB,get:getD,isAvailable,applyCard,applyInjury,
+    weeklyRecovery,recordMatch,enhancedStats,REAL_PROFILE
+  };
+
+  // Upgrade the existing model without losing saved data.
+  if(state.club){
+    ensureDB();
+    save();
+  }
+
+  // Update detailed player sheet with availability, age, contract and stats.
+  window.playerInfo=function(i){
+    ensureDB();
+    const p=currentClub()?.squad?.[i],d=p&&getD(p[0]);
+    if(!p||!d)return;
+    const injury=d.injury, suspension=d.suspension;
+    const availability=injury?`🩹 Травма: ${injury.weeks} нед.`:
+      suspension?.matches>0?`🟥 Дисквалификация: ${suspension.matches} матч.`:'🟢 Доступен';
+    document.getElementById('sheet').innerHTML=`
+      <div class="detail-head">
+        <div><div class="sub">${esc(p[1])} • ${esc(d.foot)} нога</div><h2 style="margin:3px 0">${esc(p[0])}</h2>
+        <div class="player-meta">
+          <span>Возраст: ${d.age}</span><span>Потенциал: ${d.potential}</span>
+          <span>Стоимость: ${moneyFmt(d.value)}</span><span>Контракт: ${d.contractUntil}</span>
+        </div></div>
+        <div class="detail-rating">${d.rating}</div>
+      </div>
+      <div class="player-status-row">
+        <span class="${injury?'status-bad':'status-ok'}">${availability}</span>
+        ${d.ageSource==='verified'?'<span class="status-ok">Данные возраста подтверждены</span>':'<span class="status-warn">Возраст: модель</span>'}
+      </div>
+      <div class="detail-section"><h3>Состояние</h3><div class="detail-stats">
+        <div class="detail-stat"><small>Форма</small><strong>${d.form}</strong></div>
+        <div class="detail-stat"><small>Мораль</small><strong>${d.morale}</strong></div>
+        <div class="detail-stat"><small>Фитнес</small><strong>${Math.round(d.fitness)}</strong></div>
+        <div class="detail-stat"><small>Травмориск</small><strong>${d.injuryRisk}%</strong></div>
+      </div></div>
+      <div class="detail-section"><h3>Характеристики</h3><div class="player-bars">
+        ${statBar('СКР',d.speed)}${statBar('УД',d.shooting)}
+        ${statBar('ПАС',d.passing)}${statBar('ДРБ',d.dribbling)}
+        ${statBar('ОТБ',d.tackling)}${statBar('ВИД',d.vision)}
+        ${statBar('ВЫН',d.stamina)}${statBar('ФИЗ',d.physical)}
+      </div></div>
+      <div class="detail-section"><h3>Статистика сезона</h3><div class="detail-stats">
+        <div class="detail-stat"><small>Матчи</small><strong>${d.appearances||0}</strong></div>
+        <div class="detail-stat"><small>Минуты</small><strong>${d.minutes||0}</strong></div>
+        <div class="detail-stat"><small>Голы</small><strong>${d.goals||0}</strong></div>
+        <div class="detail-stat"><small>Ассисты</small><strong>${d.assists||0}</strong></div>
+        <div class="detail-stat"><small>Жёлтые</small><strong>${d.yellows||0}</strong></div>
+        <div class="detail-stat"><small>Красные</small><strong>${d.reds||0}</strong></div>
+      </div></div>
+      <div class="detail-section"><h3>Контракт</h3><div class="detail-stats">
+        <div class="detail-stat"><small>Зарплата</small><strong>${moneyFmt(d.wage)}/нед.</strong></div>
+        <div class="detail-stat"><small>До</small><strong>${d.contractUntil}</strong></div>
+      </div></div>
+      <button class="btn secondary" style="width:100%;margin-top:16px" onclick="closeModal()">Закрыть</button>`;
+    document.getElementById('modal').classList.add('show');
+  };
+
+  // Pre-match selection now excludes unavailable players.
+  if(typeof window.ensureMatchSetup==='function'){
+    const oldSetup=window.ensureMatchSetup;
+    window.ensureMatchSetup=function(opponent){
+      ensureDB();
+      const result=oldSetup(opponent);
+      if(result?.starters){
+        result.starters=result.starters.filter(idx=>FOMPlayerDB.isAvailable(currentClub()?.squad?.[idx]?.[0]));
+        result.bench=result.bench.filter(idx=>FOMPlayerDB.isAvailable(currentClub()?.squad?.[idx]?.[0]));
+      }
+      return result;
+    };
+  }
+
+  // Live player power now uses the full player profile.
+  window.livePlayerPower=function(s){
+    return FOMPlayerDB.enhancedStats(s.player,s.role);
+  };
+
+  // Injury/card effects are routed into the player database.
+  const oldAuto=window.autoSubLive;
+  window.autoSubLive=function(reason){
+    const m=state.liveMatch;if(!m||m.finished||m.subs>=5)return false;
+    const candidates=m.starters.filter(s=>!s.subbed&&(
+      s.injured || (state.season.fatigue[s.player[0]]||0)>=86
+    ));
+    if(!candidates.length)return false;
+    const s=candidates.sort((a,b)=>(b.injured?1:0)-(a.injured?1:0))[0];
+    const available=m.bench.find(b=>!b.used&&FOMPlayerDB.isAvailable(b.player[0])&&b.player[1]===s.player[1])
+      ||m.bench.find(b=>!b.used&&FOMPlayerDB.isAvailable(b.player[0]));
+    if(!available)return false;
+    available.used=true;s.subbed=true;
+    m.starters.push({
+      player:available.player,idx:available.idx,x:s.x,y:s.y,
+      role:s.role||available.role,card:null,subbed:false,injured:false
+    });
+    m.subs++;
+    m.events.unshift({m:m.minute,type:'sub',text:`🔄 Автозамена: ${available.player[0]} вместо ${s.player[0]} (${reason})`});
+    return true;
+  };
+
+  // Weekly suspension/injury processing after a completed round.
+  const oldComplete=window.FOMCareer?.completeRoundIfReady;
+  if(window.FOMCareer){
+    const original=window.FOMCareer.completeRoundIfReady;
+    window.FOMCareer.completeRoundIfReady=function(round){
+      const result=original(round);
+      if(state.season.completedRounds?.[round]){
+        FOMPlayerDB.weeklyRecovery();
+        Object.keys(state.playerData||{}).forEach(n=>{
+          if(state.season.fatigue[n])state.season.fatigue[n]=Math.max(0,state.season.fatigue[n]-14);
+        });
+        save();
+      }
+      return result;
+    };
+  }
+
+  // Ensure a new transferred player immediately gets the same full state.
+  const oldTransfer=window.transferPlayer;
+  window.transferPlayer=function(name,price){
+    if(typeof oldTransfer==='function')oldTransfer(name,price);
+    ensureDB();save();
+  };
+})();
+</script>
+
+
+<style id="fom-v13-transfer-style">
+.transfer-toolbar{display:grid;grid-template-columns:1.4fr .8fr .8fr .9fr;gap:8px}
+.transfer-toolbar input,.transfer-toolbar select{width:100%;box-sizing:border-box;padding:10px;border-radius:11px;border:1px solid var(--line);background:var(--panel2);color:inherit}
+.transfer-budget{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.budget-card{padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.budget-card b{font-size:17px}
+.transfer-row{display:grid;grid-template-columns:1.4fr .7fr .55fr .7fr auto;gap:8px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.transfer-row:last-child{border-bottom:0}
+.transfer-actions{display:flex;gap:5px;justify-content:flex-end;flex-wrap:wrap}
+.transfer-actions button{white-space:nowrap}
+.negotiation{padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--panel)}
+.neg-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.neg-grid input,.neg-grid select{padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:inherit}
+@media(max-width:650px){
+ .transfer-toolbar{grid-template-columns:1fr 1fr}
+ .transfer-row{grid-template-columns:1fr auto}
+ .transfer-row .tr-extra{display:none}
+}
+</style>
+<script>
+/* =========================================================
+   v1.3 — TRANSFER MARKET
+   ========================================================= */
+(function(){
+  const POS=['GK','CB','LB','RB','DM','CM','AM','LW','RW','ST'];
+
+  function money(n){return typeof moneyFmt==='function'?moneyFmt(Math.round(n)):String(Math.round(n));}
+  function db(){
+    FOMPlayerDB.ensure();
+    state.transferMarket ||= {
+      window:'summer',day:1,days:30,
+      listings:[],loans:[],offers:[],sales:[],rivals:{},
+      nextId:1
+    };
+    state.finances ||= {};
+    state.finances.transferBudget ??= 100000000;
+    state.finances.wageBudget ??= 2500000;
+    state.finances.weeklyWages ??= 0;
+    state.finances.transferIncome ??= 0;
+    return state.transferMarket;
+  }
+  function allPlayers(){
+    const out=[];
+    (typeof SQUADS!=='undefined'?SQUADS:[]).forEach(c=>{
+      (c.squad||[]).forEach(p=>{
+        const d=state.playerData?.[p[0]] || FOMPlayers.modelFor(p);
+        out.push({name:p[0],pos:p[1],rating:+p[2],club:c.name,data:d,clubId:c.id});
+      });
+    });
+    return out;
+  }
+  function marketSeed(){
+    const m=db();
+    if(m.listings.length)return;
+    allPlayers().forEach(x=>{
+      if(x.clubId===state.club)return;
+      if((x.rating||0)>=76 || hashM(x.name)%4===0){
+        const d=x.data;
+        m.listings.push({
+          id:'l'+m.nextId++,name:x.name,pos:x.pos,rating:x.rating,
+          age:d.age,value:d.value,wage:d.wage,club:x.club,
+          clubId:x.clubId,asking:Math.round(d.value*(.92+(hashM(x.name)%35)/100)),
+          negotiable:true,loanable:x.rating<85,listedDay:m.day
+        });
+      }
+    });
+    // Add the user's currently owned players as sellable entries only through the sale UI.
+    save();
+  }
+  function hashM(s){let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h;}
+
+  function ensureFinance(){
+    db();
+    const c=currentClub();
+    state.finances.weeklyWages=(c?.squad||[]).reduce((sum,p)=>sum+(state.playerData?.[p[0]]?.wage||0),0);
+  }
+
+  function isWindowOpen(){
+    const m=db();
+    return m.window!=='closed';
+  }
+
+  function windowLabel(){
+    const m=db();
+    return m.window==='summer'?'Летнее окно':m.window==='winter'?'Зимнее окно':'Окно закрыто';
+  }
+
+  function advanceTransferWindow(days=1){
+    const m=db();
+    m.day+=days;
+    if(m.window==='summer' && m.day>30){m.window='closed';m.day=31}
+    if(m.window==='winter' && m.day>14){m.window='closed';m.day=15}
+    save();
+  }
+
+  function makeOffer(listingId,price,wage,years,type='transfer'){
+    db();ensureFinance();
+    const l=db().listings.find(x=>x.id===listingId);
+    if(!l)return {ok:false,msg:'Игрок не найден.'};
+    if(!isWindowOpen())return {ok:false,msg:'Трансферное окно закрыто.'};
+    price=Number(price);wage=Number(wage);years=Number(years);
+    if(!price||price<0||years<1||years>5)return {ok:false,msg:'Проверь сумму и срок контракта.'};
+    if(type==='transfer' && price>state.finances.transferBudget)return {ok:false,msg:'Недостаточно трансферного бюджета.'};
+    if(type==='loan' && !l.loanable)return {ok:false,msg:'Этот игрок недоступен для аренды.'};
+    const pressure=price/l.asking;
+    const wageFit=wage/Math.max(1,l.wage);
+    const chance=Math.max(.05,Math.min(.95,.28+pressure*.52+wageFit*.12+(price>=l.asking?0.16:0)));
+    const accepted=Math.random()<chance;
+    state.transferMarket.offers.push({listingId,price,wage,years,type,accepted,day:db().day});
+    if(!accepted){save();return{ok:false,msg:'Клуб отклонил предложение. Попробуй улучшить условия.'};}
+
+    const c=currentClub();
+    if(type==='transfer'){
+      if(price>state.finances.transferBudget)return{ok:false,msg:'Недостаточно средств.'};
+      const source=allPlayers().find(x=>x.name===l.name);
+      if(source){
+        c.squad.push([source.name,source.pos,source.rating]);
+        state.finances.transferBudget-=price;
+        state.playerData[source.name]={...source.data,wage,contractUntil:(state.season?.year||2026)+years};
+        state.playerData[source.name].clubId=state.club;
+      }
+    }else{
+      state.transferMarket.loans.push({name:l.name,from:l.club,to:state.club,until:(state.season?.year||2026)+1,wage});
+      const source=allPlayers().find(x=>x.name===l.name);
+      if(source){
+        c.squad.push([source.name,source.pos,source.rating]);
+        state.playerData[source.name]={...source.data,wage,contractUntil:(state.season?.year||2026)+1};
+        state.playerData[source.name].onLoan=true;
+      }
+    }
+    db().listings=db().listings.filter(x=>x.id!==listingId);
+    ensureFinance();save();return{ok:true,msg:`Сделка завершена: ${l.name}`};
+  }
+
+  function listOwnPlayer(name,asking){
+    db();ensureFinance();
+    const c=currentClub(),p=(c?.squad||[]).find(x=>x[0]===name);
+    if(!p)return{ok:false,msg:'Игрок не найден.'};
+    if(c.squad.length<=11)return{ok:false,msg:'Нельзя выставить игрока: в заявке должно остаться минимум 11 футболистов.'};
+    const d=state.playerData[name];
+    if(db().listings.some(x=>x.name===name&&x.seller===state.club))return{ok:false,msg:'Игрок уже выставлен.'};
+    db().listings.push({
+      id:'s'+db().nextId++,name,pos:p[1],rating:p[2],age:d.age,value:d.value,wage:d.wage,
+      club:c.name,clubId:state.club,seller:state.club,asking:Number(asking)||d.value,negotiable:true,loanable:false
+    });
+    save();return{ok:true,msg:'Игрок выставлен на трансфер.'};
+  }
+
+  function rivalInterest(){
+    db();ensureFinance();
+    const c=currentClub(); if(!c)return;
+    (c.squad||[]).forEach(p=>{
+      const d=state.playerData[p[0]];
+      if(!d)return;
+      if(hashM(p[0]+db().day)%11===0){
+        const rivals=clubsForMarket().filter(x=>x.id!==state.club);
+        const rival=rivals[hashM(p[0])%Math.max(1,rivals.length)];
+        if(rival){
+          db().rivals[p[0]]={club:rival.name,offer:Math.round(d.value*(.9+(hashM(p[0]+'o')%30)/100))};
+        }
+      }
+    });
+    save();
+  }
+  function clubsForMarket(){
+    return (typeof SQUADS!=='undefined'?SQUADS:[]).map(x=>({id:x.id,name:x.name}));
+  }
+
+  window.FOMTransfers={db,marketSeed,ensureFinance,makeOffer,listOwnPlayer,advanceTransferWindow,rivalInterest,isWindowOpen};
+
+  window.renderTransfers=function(){
+    const box=document.getElementById('seasonContent');if(!box)return;
+    marketSeed();ensureFinance();rivalInterest();
+    const m=db(),c=currentClub();
+    const q=(window.transferSearch||'').toLowerCase();
+    const pos=window.transferPos||'ALL';
+    const minR=Number(window.transferMinR||0),maxAge=Number(window.transferMaxAge||99),maxPrice=Number(window.transferMaxPrice||0);
+    let rows=m.listings.filter(x=>
+      (!q||x.name.toLowerCase().includes(q)||x.club.toLowerCase().includes(q)) &&
+      (pos==='ALL'||x.pos===pos) && x.rating>=minR && x.age<=maxAge &&
+      (!maxPrice||x.asking<=maxPrice)
+    );
+    const own=rows.filter(x=>x.seller===state.club);
+    const market=rows.filter(x=>x.seller!==state.club);
+    box.innerHTML=`
+      <div class="card">
+        <div class="sub">ТРАНСФЕРНЫЙ РЫНОК</div><h2 style="margin:3px 0">${windowLabel()} • день ${m.day}</h2>
+        <div class="transfer-budget">
+          <div class="budget-card">💰 Трансферы<br><b>${money(state.finances.transferBudget)}</b></div>
+          <div class="budget-card">💵 Зарплаты<br><b>${money(state.finances.wageBudget)}</b><div class="sub">занято ${money(state.finances.weeklyWages)}/нед.</div></div>
+        </div>
+        <div class="db-note">Сделки проходят через переговоры. Цена, зарплата и срок контракта влияют на вероятность согласия.</div>
+      </div>
+      <div class="card">
+        <div class="transfer-toolbar">
+          <input placeholder="Поиск игрока/клуба" value="${esc(window.transferSearch||'')}" oninput="window.transferSearch=this.value;renderTransfers()">
+          <select onchange="window.transferPos=this.value;renderTransfers()"><option value="ALL">Все позиции</option>${POS.map(p=>`<option ${pos===p?'selected':''}>${p}</option>`).join('')}</select>
+          <input type="number" min="0" max="99" placeholder="Рейтинг от" value="${minR||''}" onchange="window.transferMinR=this.value;renderTransfers()">
+          <input type="number" min="0" max="99" placeholder="Возраст до" value="${maxAge<99?maxAge:''}" onchange="window.transferMaxAge=this.value||99;renderTransfers()">
+        </div>
+        <div style="margin-top:8px"><input style="width:100%;box-sizing:border-box;padding:10px;border-radius:11px;border:1px solid var(--line);background:var(--panel2);color:inherit" type="number" placeholder="Макс. цена (€)" value="${maxPrice||''}" onchange="window.transferMaxPrice=this.value;renderTransfers()"></div>
+      </div>
+      <div class="card">
+        <div class="row between"><div><div class="sub">РЫНОК</div><h2>Игроки</h2></div><button class="smallbtn" onclick="openTransferWindow()">Окно</button></div>
+        ${market.length?market.map(x=>transferRow(x)).join(''):'<div class="empty">По заданным фильтрам игроков нет.</div>'}
+      </div>
+      <div class="card">
+        <div class="sub">МОИ ИГРОКИ</div><h2>Продажа / аренда</h2>
+        ${(c?.squad||[]).map(p=>ownRow(p)).join('')}
+      </div>
+      ${own.length?`<div class="card"><div class="sub">ВЫСТАВЛЕНЫ</div>${own.map(x=>transferRow(x,true)).join('')}</div>`:''}
+      ${Object.keys(m.rivals).length?`<div class="card"><div class="sub">ПРЕДЛОЖЕНИЯ К ТВОИМ ИГРОКАМ</div>${Object.entries(m.rivals).map(([n,o])=>`<div class="transfer-row"><div><b>${esc(n)}</b><div class="sub">${esc(o.club)}</div></div><div>${money(o.offer)}</div><div class="tr-extra"></div><div class="tr-extra"></div><button class="smallbtn" onclick="acceptRival('${esc(n).replace(/'/g,"&#39;")}')">Продать</button></div>`).join('')}</div>`:''}`;
+  };
+
+  function transferRow(x){
+    return `<div class="transfer-row">
+      <div><b>${esc(x.name)}</b><div class="sub">${esc(x.club)} • ${x.pos} • ${x.age} лет</div></div>
+      <div>⭐ ${x.rating}</div><div class="tr-extra">${money(x.asking)}</div><div class="tr-extra">${money(x.wage)}/н.</div>
+      <div class="transfer-actions"><button class="smallbtn" onclick="openNegotiation('${x.id}')">Переговоры</button></div>
+    </div>`;
+  }
+  function ownRow(p){
+    const d=state.playerData[p[0]]||FOMPlayers.modelFor(p);
+    return `<div class="transfer-row">
+      <div><b>${esc(p[0])}</b><div class="sub">${p[1]} • ${d.age} лет • ⭐ ${d.rating}</div></div>
+      <div class="tr-extra">${money(d.value)}</div><div class="tr-extra">${money(d.wage)}/н.</div><div></div>
+      <div class="transfer-actions"><button class="smallbtn" onclick="listForSale('${esc(p[0]).replace(/'/g,"&#39;")}')">Продать</button></div>
+    </div>`;
+  }
+
+  window.openNegotiation=function(id){
+    marketSeed();const x=db().listings.find(a=>a.id===id);if(!x)return;
+    document.getElementById('sheet').innerHTML=`
+      <div class="negotiation"><div class="sub">ПЕРЕГОВОРЫ</div><h2>${esc(x.name)}</h2>
+      <div class="player-meta"><span>${x.pos}</span><span>⭐ ${x.rating}</span><span>${x.age} лет</span><span>${money(x.asking)}</span></div>
+      <div class="neg-grid" style="margin-top:12px">
+        <label>Сумма<input id="negPrice" type="number" value="${Math.round(x.asking)}"></label>
+        <label>Зарплата / нед.<input id="negWage" type="number" value="${Math.round(x.wage)}"></label>
+        <label>Лет контракта<select id="negYears"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option></select></label>
+        <label>Тип<select id="negType"><option value="transfer">Трансфер</option>${x.loanable?'<option value="loan">Аренда</option>':''}</select></label>
+      </div>
+      <div class="db-note">Чем ближе предложение к требуемой цене и зарплате, тем выше шанс согласия.</div>
+      <button class="btn" style="width:100%;margin-top:12px" onclick="submitNegotiation('${id}')">Отправить предложение</button>
+      <button class="btn secondary" style="width:100%;margin-top:8px" onclick="closeModal()">Отмена</button></div>`;
+    document.getElementById('modal').classList.add('show');
+  };
+  window.submitNegotiation=function(id){
+    const r=FOMTransfers.makeOffer(id,+document.getElementById('negPrice').value,+document.getElementById('negWage').value,+document.getElementById('negYears').value,document.getElementById('negType').value);
+    closeModal();alert(r.msg);renderTransfers();
+  };
+  window.listForSale=function(name){
+    const d=state.playerData[name];if(!d)return;
+    const value=prompt(`Цена продажи для ${name}`,String(Math.round(d.value)));
+    if(value===null)return;
+    const r=FOMTransfers.listOwnPlayer(name,+value);alert(r.msg);renderTransfers();
+  };
+  window.acceptRival=function(name){
+    const offer=db().rivals[name];if(!offer)return;
+    const c=currentClub(),idx=c.squad.findIndex(p=>p[0]===name);if(idx<0)return;
+    if(c.squad.length<=11){alert('Нельзя продавать: в заявке должно остаться минимум 11 игроков.');return}
+    c.squad.splice(idx,1);
+    state.finances.transferBudget+=offer.offer;
+    delete state.playerData[name];delete db().rivals[name];
+    ensureFinance();save();renderTransfers();renderSquad();
+  };
+  window.openTransferWindow=function(){
+    db();
+    const m=db();
+    const next=m.window==='closed'?'summer':'closed';
+    m.window=next;m.day=next==='summer'?1:31;
+    save();renderTransfers();
+  };
+  window.advanceTransferDay=function(){
+    advanceTransferWindow(1);renderTransfers();
+  };
+
+  // Hook existing season renderer's transfers tab to this market.
+  const oldRenderSeason=window.renderSeason;
+  window.renderSeason=function(){
+    if(window.currentSeasonTab==='transfers'){renderTransfers();return}
+    if(typeof oldRenderSeason==='function')oldRenderSeason();
+  };
+
+  // Initialize finances and player DB.
+  if(state.club){FOMPlayerDB.ensure();ensureFinance();marketSeed();save();}
+})();
+</script>
+
+
+<style id="fom-v14-engine-style">
+.engine-panel{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.engine-stat{padding:11px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.engine-stat b{font-size:18px}.engine-stat small{display:block;opacity:.62;margin-top:3px}
+.engine-event{padding:9px 10px;border-bottom:1px solid var(--line);font-size:12px}
+.engine-event:last-child{border-bottom:0}
+@media(max-width:600px){.engine-panel{grid-template-columns:1fr}}
+</style>
+<script>
+/* =========================================================
+   v1.4 — DEEP POSITIONAL MATCH ENGINE
+   Possession -> zone progression -> space -> chance -> shot.
+   Player coordinates are authoritative; nominal position is only
+   a starting reference. Tactical instructions modify behaviour.
+   ========================================================= */
+(function(){
+  const clamp=(n,a=0,b=100)=>Math.max(a,Math.min(b,n));
+  const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+  const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0;
+  const rand=(a,b)=>a+Math.random()*(b-a);
+
+  function liveSidePlayers(m,side){
+    if(side==='user')return (m.starters||[]).filter(s=>!s.subbed&&s.card!=='red');
+    return (m.opponentPlayers||[]).filter(s=>!s.subbed&&s.card!=='red');
+  }
+
+  function coordsForUser(m){
+    return liveSidePlayers(m,'user').map(s=>({
+      ...s,
+      x:Number(s.x)||50,y:Number(s.y)||50
+    }));
+  }
+
+  function opponentCoords(m){
+    if(!m.opponentPlayers){
+      const names=(m.opponentLineup||[]).map(x=>x.player?x.player:x);
+      m.opponentPlayers=names.map((p,i)=>{
+        const pos=p[1]||'CM';
+        const base={GK:[50,91],CB:[42,76],LB:[15,72],RB:[85,72],DM:[40,61],CM:[58,58],AM:[50,45],LW:[20,38],RW:[80,38],ST:[50,25]}[pos]||[50,55];
+        return {player:Array.isArray(p)?p:[p,'CM',70],idx:i,x:base[0]+rand(-5,5),y:base[1]+rand(-4,4),role:pos,card:null,subbed:false,injured:false};
+      });
+    }
+    return liveSidePlayers(m,'opp');
+  }
+
+  function teamMetrics(players,side,m){
+    const ps=players.filter(Boolean);
+    if(!ps.length)return {width:0,depth:0,compact:0,central:0,spacing:100,free:0,attack:0,mid:0,def:0,quality:0,pace:0,physical:0,pass:0,fitness:0};
+    const xs=ps.map(p=>p.x), ys=ps.map(p=>p.y);
+    const width=Math.max(...xs)-Math.min(...xs);
+    const depth=Math.max(...ys)-Math.min(...ys);
+    const center=avg(xs);
+    let nearest=[], totalDist=0;
+    ps.forEach((p,i)=>{
+      let nd=999;
+      ps.forEach((q,j)=>{if(i!==j)nd=Math.min(nd,dist(p,q))});
+      nearest.push(nd);totalDist+=nd;
+    });
+    const compact=clamp(100-avg(nearest)*3.1);
+    const spacing=avg(nearest);
+    let attack=0,mid=0,def=0,quality=0,pace=0,physical=0,pass=0,fitness=0;
+    ps.forEach(s=>{
+      const p=s.player;
+      const st=FOMPlayerDB.enhancedStats(p,s.role||p[1]);
+      const y=side==='user'?s.y:100-s.y;
+      if(y<34)attack+=st.atk;
+      else if(y>66)def+=st.def;
+      else mid+=st.pass+st.def*.3;
+      quality+=st.rating;pace+=st.speed;physical+=(state.playerData?.[p[0]]?.physical||st.rating);
+      pass+=st.pass;fitness+=Math.max(0,100-(state.season?.fatigue?.[p[0]]||0));
+    });
+    const n=ps.length;
+    return {width,depth,compact,central:100-Math.abs(center-50)*2,spacing,free:0,
+      attack:attack/n,mid:mid/n,def:def/n,quality:quality/n,pace:pace/n,physical:physical/n,pass:pass/n,fitness:fitness/n};
+  }
+
+  function nearestOppDistance(point,opps){
+    if(!opps.length)return 50;
+    return Math.min(...opps.map(o=>dist(point,o)));
+  }
+
+  function zonePressure(point,opps){
+    const d=nearestOppDistance(point,opps);
+    return clamp(100-d*3.4);
+  }
+
+  function freeSpace(point,opps,own){
+    const enemy=nearestOppDistance(point,opps);
+    const support=own.filter(p=>p!==point).reduce((best,p)=>Math.min(best,dist(point,p)),50);
+    return clamp(enemy*1.15 - support*.28);
+  }
+
+  function numericalAdvantage(point,own,opps,radius=16){
+    const a=own.filter(p=>dist(point,p)<=radius).length;
+    const b=opps.filter(p=>dist(point,p)<=radius).length;
+    return a-b;
+  }
+
+  function tacticalInstruction(s){
+    const role=(state.liveMatch?.roles?.[s.idx])||s.role||'balanced';
+    return role;
+  }
+
+  function positionalRisk(user,opp){
+    // High line + slow defenders = exploitable space behind them.
+    const defenders=user.filter(s=>s.y>64);
+    const advanced=defenders.filter(s=>s.y<72);
+    if(!advanced.length)return 0;
+    const slow=avg(advanced.map(s=>FOMPlayerDB.enhancedStats(s.player,s.role).speed));
+    const line=avg(advanced.map(s=>s.y));
+    return clamp((line-64)*2.2 + (78-slow)*1.35);
+  }
+
+  function chooseBallCarrier(m,attackingSide,own,opp){
+    const candidates=own.filter(s=>s.card!=='red'&&!s.subbed);
+    if(!candidates.length)return null;
+    let best=null,score=-Infinity;
+    candidates.forEach(s=>{
+      const st=FOMPlayerDB.enhancedStats(s.player,s.role);
+      const point={x:s.x,y:s.y};
+      const space=freeSpace(point,opp,own);
+      const num=numericalAdvantage(point,own,opp);
+      const z=attackingSide==='user'?s.y:100-s.y;
+      const progression=z;
+      const instruction=tacticalInstruction(s);
+      const bonus=instruction==='dribble'?8:instruction==='roam'?5:0;
+      const v=space*1.15+num*7+st.dribbling*.35+st.speed*.12+progression*.15+bonus+Math.random()*8;
+      if(v>score){score=v;best=s}
+    });
+    return best;
+  }
+
+  function selectTarget(carrier,own,opp,attackingSide){
+    const candidates=own.filter(s=>s!==carrier&&!s.subbed&&s.card!=='red');
+    let best=null,score=-Infinity;
+    candidates.forEach(s=>{
+      const z=attackingSide==='user'?s.y:100-s.y;
+      const space=freeSpace({x:s.x,y:s.y},opp,own);
+      const num=numericalAdvantage(s,own,opp);
+      const st=FOMPlayerDB.enhancedStats(s.player,s.role);
+      const passingLane=100-zonePressure({x:(carrier.x+s.x)/2,y:(carrier.y+s.y)/2},opp);
+      const instruction=tacticalInstruction(s);
+      const bonus=instruction==='getBehind'?10:instruction==='stayForward'?6:0;
+      const scoreHere=z*1.05+space*.75+num*8+passingLane*.45+st.speed*.10+bonus+Math.random()*10;
+      if(scoreHere>score){score=scoreHere;best=s}
+    });
+    return best;
+  }
+
+  function passQuality(carrier,target,own,opp,m){
+    const c=FOMPlayerDB.enhancedStats(carrier.player,carrier.role);
+    const t=FOMPlayerDB.enhancedStats(target.player,target.role);
+    const length=dist(carrier,target);
+    const pressure=zonePressure({x:(carrier.x+target.x)/2,y:(carrier.y+target.y)/2},opp);
+    const widthPenalty=Math.abs(target.x-carrier.x)>42?12:0;
+    const fatiguePenalty=(100-c.stamina)*.18;
+    const lineRisk=positionalRisk(own,opp)*.18;
+    return clamp(c.pass*.48+t.vision*.18-pressure*.28-widthPenalty-fatiguePenalty-lineRisk+rand(-5,5));
+  }
+
+  function moveTowards(s,target,amount){
+    s.x += (target.x-s.x)*amount;
+    s.y += (target.y-s.y)*amount;
+    s.x=clamp(s.x);s.y=clamp(s.y);
+  }
+
+  function generateChance(m,side,own,opp,tm){
+    const carrier=chooseBallCarrier(m,side,own,opp);
+    if(!carrier)return null;
+    const target=selectTarget(carrier,own,opp,side);
+    if(!target)return null;
+    const pq=passQuality(carrier,target,own,opp,m);
+    const space=freeSpace(target,opp,own);
+    const num=numericalAdvantage(target,own,opp);
+    const speed=FOMPlayerDB.enhancedStats(target.player,target.role).speed;
+    const press=side==='user'?m.tactic.press:(m.opponentTactic?.press||50);
+    const width=side==='user'?m.tactic.width:(m.opponentTactic?.width||50);
+    const centrality=100-Math.abs(target.x-50)*2;
+    const tacticalBonus=width>60 && (target.x<28||target.x>72)?7:width<40&&centrality>60?6:0;
+    const transition=positionalRisk(side==='user'?own:opp,side==='user'?opp:own);
+    const penetration=clamp(pq*.48+space*.33+num*5+speed*.08+centrality*.05+tacticalBonus-transition*.35);
+    if(Math.random()*100>penetration*.52)return null;
+
+    // Move the target forward: actual coordinates evolve during play.
+    const goalX=50+(Math.random()<.5?-1:1)*rand(0,20);
+    const goalY=side==='user'?rand(18,31):rand(69,82);
+    moveTowards(target,{x:goalX,y:goalY},.30);
+
+    const shooterCandidates=own.filter(s=>!s.subbed&&s.card!=='red'&&(side==='user'?s.y<38: s.y>62));
+    const shooter=(shooterCandidates.length?shooterCandidates: [target])[Math.floor(Math.random()*Math.max(1,shooterCandidates.length))];
+    const st=FOMPlayerDB.enhancedStats(shooter.player,shooter.role);
+    const shootingDistance=dist(shooter,{x:50,y:side==='user'?8:92});
+    const xg=clamp(.05+(st.atk/250)+(st.pass/500)+(space/500)+(num>0?.025:0)-(shootingDistance/2500),.03,.75);
+    return {carrier,target,shooter,xg,pq,space,num,transition};
+  }
+
+  function engineTickV14(m){
+    const user=coordsForUser(m);
+    const opp=opponentCoords(m);
+    const um=teamMetrics(user,'user',m), om=teamMetrics(opp,'opp',m);
+    const userPoss=clamp(50+(um.mid-om.mid)*.75+(um.pass-om.pass)*.22+(um.compact-om.compact)*.08+(m.tactic.press-50)*.18);
+    const tempo=clamp((m.tactic.tempo||50));
+    const press=m.tactic.press||50;
+    const width=m.tactic.width||50;
+    const userAttack=um.attack+(tempo-50)*.12+(width-50)*.10;
+    const oppAttack=om.attack+((m.opponentTactic?.tempo||50)-50)*.12;
+    let event=null;
+    const sideRoll=Math.random()*100;
+    const userAttacks=sideRoll<userPoss;
+    const attacking= userAttacks?user:opp;
+    const defending=userAttacks?opp:user;
+    const side=userAttacks?'user':'opp';
+    const attackPower=userAttacks?userAttack:oppAttack;
+    const defPower=userAttacks?om.def:um.def;
+
+    const chance=generateChance(m,side,attacking,defending,{possession:userPoss,tempo,width});
+    if(chance){
+      const xg=chance.xg;
+      const goalChance=clamp(xg*.17+(attackPower-defPower)/850+(tempo-50)/4000+(press-50)/5000,.008,.18);
+      if(Math.random()<goalChance){
+        if(side==='user'){
+          m.userGoals++;
+          FOMPlayerDB.recordMatch(chance.shooter.player[0],{minutes:1,goals:1,rating:7.2});
+          event={type:'goal',text:`⚽ ГОЛ! ${chance.shooter.player[0]} • xG ${xg.toFixed(2)}`};
+        }else{
+          m.oppGoals++;
+          event={type:'goal',text:`⚽ ГОЛ! ${m.opponent} • xG ${xg.toFixed(2)}`};
+        }
+      }else{
+        event={type:'chance',text:`🎯 Момент: ${chance.shooter.player[0]} • xG ${xg.toFixed(2)} • свободная зона ${Math.round(chance.space)}`};
+      }
+    }
+
+    // Slow defenders on an aggressive high line can be exposed.
+    const risk=positionalRisk(user,opp);
+    if(!event && risk>20 && Math.random()<risk/850){
+      event={type:'transition',text:`⚡ Пространство за линией! Медленная/высокая оборона оставила зону для контратаки.`};
+    }
+
+    // Fatigue visibly changes the shape: tired players drift toward safer positions.
+    user.forEach(s=>{
+      const f=state.season.fatigue?.[s.player[0]]||0;
+      if(f>70){
+        const homeY=s.y>50?65:35;
+        s.x += (50-s.x)*.012;
+        s.y += (homeY-s.y)*.018;
+      }
+    });
+
+    m.engine={
+      possession:userPoss,homePoss:m.userHome?userPoss:100-userPoss,
+      user:um,opp:om,highLineRisk:risk,
+      lastChance:chance?{xg:chance.xg,space:chance.space,num:chance.num}:null
+    };
+    return event;
+  }
+
+  window.FOMDeepEngine={engineTickV14,teamMetrics,freeSpace,numericalAdvantage,positionalRisk};
+
+  // Replace live engine's event/goal core while preserving cards, injuries,
+  // substitutions and the existing 0-90 clock.
+  const oldLiveTick=window.liveTick;
+  window.liveTick=function(){
+    const m=state.liveMatch;
+    if(!m||m.finished||!m.running)return;
+    if(m.minute>=90){finishLiveMatch();return}
+    let next=m.minute+(Math.random()<.12?2:1);
+    if(m.minute<45&&next>45)next=45;
+    if(m.minute>=45&&next>90)next=90;
+    m.minute=next;
+
+    if(m.minute===45){
+      m.running=false;m.half=2;
+      m.events.unshift({m:45,type:'half',text:'⏸ Перерыв. Тактику и состав можно изменить.'});
+      save();renderLiveMatch();return;
+    }
+
+    const deepEvent=engineTickV14(m);
+    if(deepEvent)m.events.unshift({m:m.minute,...deepEvent});
+
+    // Keep the existing non-goal match incidents, but lower their probability
+    // because chance creation is now handled by the positional engine.
+    if(Math.random()<.022){
+      const active=m.starters.filter(s=>!s.subbed&&s.card!=='red');
+      if(active.length){
+        const s=active[Math.floor(Math.random()*active.length)];
+        if(Math.random()<.62){
+          if(s.card==='yellow'){
+            s.card='red';FOMPlayerDB.applyCard(s.player[0],'red');
+            m.events.unshift({m:m.minute,type:'red',text:`🟥 Вторая жёлтая — ${s.player[0]}`});
+          }else{
+            s.card='yellow';FOMPlayerDB.applyCard(s.player[0],'yellow');
+            m.events.unshift({m:m.minute,type:'card',text:`🟨 ${s.player[0]}`});
+          }
+        }
+      }
+    }
+    if(Math.random()<.014){
+      const active=m.starters.filter(s=>!s.subbed&&s.card!=='red');
+      if(active.length){
+        const s=active[Math.floor(Math.random()*active.length)];
+        const weeks=1+Math.floor(Math.random()*3);
+        FOMPlayerDB.applyInjury(s.player[0],weeks);s.injured=true;
+        m.events.unshift({m:m.minute,type:'injury',text:`🩹 Травма — ${s.player[0]} (${weeks} нед.)`});
+        if(m.autoSub)autoSubLive('травма');
+      }
+    }
+
+    m.starters.filter(s=>!s.subbed).forEach(s=>{
+      const d=state.playerData?.[s.player[0]];
+      const press=m.tactic.press||50,tempo=m.tactic.tempo||50;
+      const load=.58+(press/100)*.42+(tempo/100)*.24;
+      state.season.fatigue[s.player[0]]=Math.min(96,(state.season.fatigue[s.player[0]]||0)+load);
+      if(d)d.fitness=Math.max(35,d.fitness-load*.35);
+    });
+    if(m.autoSub)autoSubLive('усталость');
+    m.home=m.userHome?m.userGoals:m.oppGoals;m.away=m.userHome?m.oppGoals:m.userGoals;
+    save();renderLiveMatch();
+    if(m.minute>=90)finishLiveMatch();
+  };
+
+  // Match screen gets a compact tactical diagnostic panel.
+  const oldRenderLive=window.renderLiveMatch;
+  window.renderLiveMatch=function(){
+    if(typeof oldRenderLive==='function')oldRenderLive();
+    const m=state.liveMatch,root=document.getElementById('liveMatchContent')||document.getElementById('matchContent');
+    if(!m||!root||!m.engine)return;
+    const e=m.engine;
+    let panel=document.getElementById('deepEnginePanel');
+    if(!panel){
+      panel=document.createElement('div');panel.id='deepEnginePanel';root.appendChild(panel);
+    }
+    panel.className='card';
+    panel.style.marginTop='10px';
+    panel.innerHTML=`
+      <div class="sub">ДВИЖОК ПОЛЯ • ${m.minute}'</div>
+      <div class="engine-panel">
+        <div class="engine-stat">Владение <b>${Math.round(e.possession)}%</b><small>контроль мяча</small></div>
+        <div class="engine-stat">Атака <b>${Math.round(e.user.attack)}</b><small>средняя сила</small></div>
+        <div class="engine-stat">Полузащита <b>${Math.round(e.user.mid)}</b><small>пас + контроль</small></div>
+        <div class="engine-stat">Оборона <b>${Math.round(e.user.def)}</b><small>защита зоны</small></div>
+        <div class="engine-stat">Ширина <b>${Math.round(e.user.width)}%</b><small>фактическая формация</small></div>
+        <div class="engine-stat">Риск за спиной <b>${Math.round(e.highLineRisk)}</b><small>высокая линия + скорость ЦЗ</small></div>
+      </div>
+      ${e.lastChance?`<div class="db-note">Последний момент: xG ${e.lastChance.xg.toFixed(2)} • свободная зона ${Math.round(e.lastChance.space)} • численное преимущество ${e.lastChance.num>0?'+':''}${e.lastChance.num}</div>`:''}`;
+  };
+
+  // Save richer match statistics after the final whistle.
+  const oldFinish=window.finishLiveMatch;
+  window.finishLiveMatch=function(){
+    const m=state.liveMatch;
+    if(m&&m.engine){
+      m.deepStats={
+        possession:m.engine.possession,
+        highLineRisk:m.engine.highLineRisk,
+        userWidth:m.engine.user.width,
+        userDepth:m.engine.user.depth,
+        userCompact:m.engine.user.compact
+      };
+    }
+    if(typeof oldFinish==='function')oldFinish();
+  };
+})();
+</script>
+
+
+<style id="fom-v15-tactics-style">
+.tactic-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.tactic-card{padding:12px;border:1px solid var(--line);border-radius:15px;background:var(--panel)}
+.tactic-card h3{margin:0 0 9px;font-size:13px}
+.tactic-control{margin:8px 0}
+.tactic-control label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px}
+.tactic-control select,.tactic-control input[type=range]{width:100%;box-sizing:border-box}
+.tactic-control select{padding:9px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:inherit}
+.tactic-preset{display:flex;gap:7px;overflow:auto;padding-bottom:3px}
+.tactic-preset button{white-space:nowrap}
+.instruction-list{display:grid;gap:7px}
+.instruction-item{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:9px 10px;border-radius:11px;background:var(--panel2);border:1px solid var(--line)}
+.instruction-item select{max-width:190px;padding:7px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:inherit}
+@media(max-width:620px){.tactic-grid{grid-template-columns:1fr}.instruction-item{align-items:flex-start;flex-direction:column}.instruction-item select{max-width:none;width:100%}}
+</style>
+<script>
+/* =========================================================
+   v1.5 — TACTICAL SYSTEM
+   Individual instructions + team style.
+   ========================================================= */
+(function(){
+  const STYLES={
+    possession:{name:'Контроль мяча',desc:'короткий пас, поддержка и терпеливое продвижение',
+      tempo:42,press:48,width:48,direct:25,counter:15,defLine:48},
+    balanced:{name:'Баланс',desc:'универсальный режим без сильного перекоса',
+      tempo:55,press:52,width:52,direct:45,counter:35,defLine:55},
+    counter:{name:'Контратаки',desc:'быстрый выход после отбора',
+      tempo:78,press:64,width:56,direct:72,counter:88,defLine:42},
+    pressing:{name:'Высокий прессинг',desc:'давление сразу после потери',
+      tempo:72,press:90,width:58,direct:48,counter:52,defLine:78},
+    direct:{name:'Прямой футбол',desc:'быстрые передачи в атакующую треть',
+      tempo:74,press:46,width:62,direct:90,counter:63,defLine:52},
+    lowblock:{name:'Низкий блок',desc:'компактная оборона и быстрый выход',
+      tempo:38,press:32,width:42,direct:68,counter:82,defLine:25}
+  };
+
+  const ATTACK=['stayForward','dropDeep','getBehind','wide'];
+  const MID=['attacking','balanced','defensive','roam'];
+  const DEF=['stayBack','joinAttack','aggressiveTackle'];
+
+  const LABEL={
+    stayForward:'Оставаться впереди',dropDeep:'Опускаться глубже',
+    getBehind:'Открывания за спину',wide:'Смещаться на фланг',
+    attacking:'Атакующий',balanced:'Баланс',defensive:'Оборонительный',roam:'Свободная роль',
+    stayBack:'Оставаться сзади',joinAttack:'Подключаться',aggressiveTackle:'Агрессивный отбор'
+  };
+
+  function ensureTactics(){
+    state.tactics ||= {};
+    const t=state.tactics;
+    t.style ||= 'balanced';
+    t.tempo ??= STYLES[t.style]?.tempo||55;
+    t.press ??= STYLES[t.style]?.press||52;
+    t.width ??= STYLES[t.style]?.width||52;
+    t.defLine ??= STYLES[t.style]?.defLine||55;
+    t.direct ??= STYLES[t.style]?.direct||45;
+    t.counter ??= STYLES[t.style]?.counter||35;
+    t.possession ??= 100-t.direct;
+    t.instructions ||= {};
+    t.preset ||= null;
+    t.playFocus ||= 'mixed';
+  }
+
+  function applyStyle(style){
+    ensureTactics();
+    const s=STYLES[style]||STYLES.balanced,t=state.tactics;
+    t.style=style;t.tempo=s.tempo;t.press=s.press;t.width=s.width;
+    t.defLine=s.defLine;t.direct=s.direct;t.counter=s.counter;t.possession=100-s.direct;
+    t.preset=style;
+    save();
+    if(typeof renderTactics==='function')renderTactics();
+    if(typeof renderMatch==='function')renderMatch();
+  }
+
+  function setInstruction(idx,value){
+    ensureTactics();
+    const p=currentClub()?.squad?.[idx];if(!p)return;
+    state.tactics.instructions[p[0]]=value;
+    save();
+    if(typeof renderTactics==='function')renderTactics();
+  }
+
+  function allowedInstructions(pos){
+    if(pos==='ST'||pos==='LW'||pos==='RW')return ATTACK;
+    if(['DM','CM','AM'].includes(pos))return MID;
+    return DEF;
+  }
+
+  function defaultInstruction(pos){
+    if(pos==='ST'||pos==='LW'||pos==='RW')return 'stayForward';
+    if(['DM','CM','AM'].includes(pos))return 'balanced';
+    return 'stayBack';
+  }
+
+  function syncInstructionForSquad(){
+    ensureTactics();
+    (currentClub()?.squad||[]).forEach((p,i)=>{
+      const key=p[0];
+      if(!state.tactics.instructions[key]||!allowedInstructions(p[1]).includes(state.tactics.instructions[key])){
+        state.tactics.instructions[key]=defaultInstruction(p[1]);
+      }
+    });
+  }
+
+  function teamModifiers(){
+    ensureTactics();
+    const t=state.tactics;
+    const style=STYLES[t.style]||STYLES.balanced;
+    return {
+      tempo:(t.tempo-50)*.22,
+      pressing:(t.press-50)*.20,
+      width:(t.width-50)*.12,
+      direct:t.direct*.12,
+      counter:t.counter*.13,
+      possession:t.possession*.10,
+      defensiveLine:(t.defLine-50)*.16
+    };
+  }
+
+  function individualModifier(p,phase='attack'){
+    ensureTactics();
+    const ins=state.tactics.instructions?.[p[0]]||defaultInstruction(p[1]);
+    const d=state.playerData?.[p[0]];
+    let m={attack:0,def:0,pass:0,speed:0,space:0,press:0,width:0,depth:0};
+    if(ins==='stayForward'){m.attack+=8;m.space+=6;m.def-=6;m.depth-=5}
+    if(ins==='dropDeep'){m.pass+=7;m.def+=3;m.depth+=8;m.attack-=3}
+    if(ins==='getBehind'){m.speed+=8;m.space+=12;m.attack+=6}
+    if(ins==='wide'){m.width+=15;m.space+=8;m.pass+=2}
+    if(ins==='attacking'){m.attack+=10;m.space+=7;m.def-=7;m.depth-=5}
+    if(ins==='balanced'){m.attack+=2;m.def+=2;m.pass+=3}
+    if(ins==='defensive'){m.def+=11;m.pass+=3;m.attack-=7;m.depth+=8}
+    if(ins==='roam'){m.space+=12;m.pass+=5;m.width+=8;m.depth+=3}
+    if(ins==='stayBack'){m.def+=10;m.depth+=10;m.attack-=5}
+    if(ins==='joinAttack'){m.attack+=9;m.pass+=5;m.depth-=10;m.space+=8}
+    if(ins==='aggressiveTackle'){m.def+=10;m.press+=12;m.physical=(d?.physical||70)/12}
+    return m;
+  }
+
+  window.FOMTactics={
+    STYLES,LABEL,ensureTactics,applyStyle,setInstruction,
+    allowedInstructions,syncInstructionForSquad,teamModifiers,individualModifier
+  };
+
+  window.applyTacticStyle=applyStyle;
+
+  window.renderTactics=function(){
+    const box=document.getElementById('tacticsContent')||document.getElementById('seasonContent');
+    if(!box)return;
+    ensureTactics();syncInstructionForSquad();
+    const t=state.tactics,c=currentClub();
+    box.innerHTML=`
+      <div class="card">
+        <div class="sub">КОМАНДНАЯ ТАКТИКА</div>
+        <h2 style="margin:3px 0">Стиль игры</h2>
+        <div class="tactic-preset">
+          ${Object.entries(STYLES).map(([k,s])=>`<button class="${t.style===k?'btn':'smallbtn'}" onclick="applyTacticStyle('${k}')">${s.name}</button>`).join('')}
+        </div>
+        <div class="db-note">${esc(STYLES[t.style].desc)}</div>
+      </div>
+
+      <div class="tactic-grid">
+        <div class="tactic-card"><h3>⚙️ Основные установки</h3>
+          ${slider('tempo','Темп',t.tempo)}
+          ${slider('press','Прессинг',t.press)}
+          ${slider('width','Ширина',t.width)}
+          ${slider('defLine','Линия обороны',t.defLine)}
+        </div>
+        <div class="tactic-card"><h3>🎯 Направление игры</h3>
+          ${slider('direct','Прямые передачи',t.direct)}
+          ${slider('counter','Контратаки',t.counter)}
+          ${slider('possession','Владение',t.possession)}
+          <div class="tactic-control"><label>Фокус</label>
+            <select onchange="setTactic('playFocus',this.value)">
+              <option value="mixed" ${t.playFocus==='mixed'?'selected':''}>Смешанный</option>
+              <option value="center" ${t.playFocus==='center'?'selected':''}>Центр</option>
+              <option value="left" ${t.playFocus==='left'?'selected':''}>Левый фланг</option>
+              <option value="right" ${t.playFocus==='right'?'selected':''}>Правый фланг</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sub">ИНДИВИДУАЛЬНЫЕ ИНСТРУКЦИИ</div>
+        <h2 style="margin:3px 0">Роли игроков</h2>
+        <div class="instruction-list">
+        ${(c?.squad||[]).map((p,i)=>{
+          const ins=t.instructions[p[0]]||defaultInstruction(p[1]);
+          return `<div class="instruction-item">
+            <div><b>${esc(p[0])}</b><div class="sub">${p[1]} • ⭐ ${p[2]}</div></div>
+            <select onchange="setPlayerInstruction(${i},this.value)">
+              ${allowedInstructions(p[1]).map(v=>`<option value="${v}" ${ins===v?'selected':''}>${LABEL[v]}</option>`).join('')}
+            </select>
+          </div>`;
+        }).join('')}
+        </div>
+      </div>`;
+  };
+
+  function slider(key,label,value){
+    return `<div class="tactic-control"><label><span>${label}</span><b id="tv_${key}">${Math.round(value)}</b></label>
+      <input type="range" min="0" max="100" value="${Math.round(value)}" oninput="setTactic('${key}',this.value,true)"></div>`;
+  }
+
+  window.setTactic=function(key,value,instant){
+    ensureTactics();state.tactics[key]=Number(value);
+    if(key==='direct')state.tactics.possession=100-Number(value);
+    if(key==='possession')state.tactics.direct=100-Number(value);
+    const el=document.getElementById('tv_'+key);if(el)el.textContent=Math.round(value);
+    if(!instant)save();
+    if(instant)save();
+  };
+  window.setPlayerInstruction=function(idx,value){
+    setInstruction(idx,value);
+    // Keep current match roles synchronized when the change is made live.
+    const m=state.liveMatch;
+    if(m){
+      m.instructions ||= {};
+      const p=currentClub()?.squad?.[idx];
+      if(p)m.instructions[p[0]]=value;
+      m.roles ||= {};
+      m.roles[idx]=value;
+      save();
+      if(typeof renderLiveMatch==='function')renderLiveMatch();
+    }
+  };
+
+  // Hook the main engine so tactical settings materially affect calculations.
+  const oldEngine=window.FOMDeepEngine?.engineTickV14;
+  if(window.FOMDeepEngine&&oldEngine){
+    window.FOMDeepEngine.engineTickV14=function(m){
+      ensureTactics();
+      m.tactic ||= {};
+      Object.assign(m.tactic,{
+        tempo:state.tactics.tempo,press:state.tactics.press,width:state.tactics.width,
+        defLine:state.tactics.defLine,direct:state.tactics.direct,counter:state.tactics.counter
+      });
+      m.tacticalStyle=state.tactics.style;
+      const result=oldEngine(m);
+      return result;
+    };
+  }
+
+  // Enrich the deep engine's metrics with individual instruction effects.
+  const oldTeamMetrics=window.FOMDeepEngine?.teamMetrics;
+  if(window.FOMDeepEngine&&oldTeamMetrics){
+    window.FOMDeepEngine.teamMetrics=function(players,side,m){
+      const result=oldTeamMetrics(players,side,m);
+      if(side==='user'){
+        let a=0,d=0,p=0,sp=0,w=0,depth=0;
+        players.forEach(s=>{
+          const x=FOMTactics.individualModifier(s.player);
+          a+=x.attack;d+=x.def;p+=x.pass;sp+=x.speed;w+=x.width;depth+=x.depth;
+        });
+        const n=Math.max(1,players.length);
+        result.attack+=a/n;result.def+=d/n;result.pass+=p/n;
+        result.width=clamp(result.width+w/n);
+        result.depth=clamp(result.depth-depth/n);
+        result.tacticalAttack=result.attack;result.tacticalDef=result.def;
+      }
+      return result;
+    };
+  }
+
+  // When match setup is created, copy team instructions into the live match.
+  const oldCreate=window.createCareerLiveMatch;
+  if(typeof oldCreate==='function'){
+    window.createCareerLiveMatch=function(f){
+      ensureTactics();syncInstructionForSquad();
+      oldCreate(f);
+      if(state.liveMatch){
+        state.liveMatch.instructions={...state.tactics.instructions};
+        state.liveMatch.roles ||= {};
+        Object.keys(state.tactics.instructions).forEach(name=>{
+          const idx=currentClub()?.squad?.findIndex(p=>p[0]===name);
+          if(idx>=0)state.liveMatch.roles[idx]=state.tactics.instructions[name];
+        });
+        state.liveMatch.tactic.style=state.tactics.style;
+        state.liveMatch.tactic.defLine=state.tactics.defLine;
+        state.liveMatch.tactic.direct=state.tactics.direct;
+        state.liveMatch.tactic.counter=state.tactics.counter;
+        save();
+      }
+    };
+  }
+
+  // Live tactical switches use the same settings and immediately alter the engine.
+  window.applyLiveStyle=function(style){
+    ensureTactics();applyStyle(style);
+    const m=state.liveMatch;
+    if(m&&!m.finished){
+      m.tacticalStyle=style;
+      m.tactic.tempo=state.tactics.tempo;m.tactic.press=state.tactics.press;m.tactic.width=state.tactics.width;
+      m.tactic.defLine=state.tactics.defLine;m.tactic.direct=state.tactics.direct;m.tactic.counter=state.tactics.counter;
+      m.events.unshift({m:m.minute,type:'tactic',text:`🧠 Тактика: ${STYLES[style].name}`});
+      save();renderLiveMatch();
+    }
+  };
+
+  if(state.club){ensureTactics();syncInstructionForSquad();save();}
+})();
+</script>
+
+
+<script>
+/* =========================================================
+   FOM v1.6 — FULL MATCH & PLAYER STATISTICS
+   ========================================================= */
+
+(function(){
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  const avg=(arr)=>arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0;
+
+  window.FOMStats = window.FOMStats || {};
+
+  function ensurePlayerStat(p){
+    if(!p) return null;
+    p.matchStats = p.matchStats || {
+      shots:0, shotsOnTarget:0, goals:0, assists:0,
+      xg:0, passes:0, completedPasses:0,
+      tackles:0, interceptions:0, fouls:0,
+      yellow:0, red:0, keyPasses:0, chancesCreated:0,
+      clearances:0, blocks:0, recoveries:0,
+      duelsWon:0, duels:0, saves:0,
+      rating:6.0, minutes:0
+    };
+    return p.matchStats;
+  }
+
+  function blankTeam(){
+    return {
+      shots:0, shotsOnTarget:0, goals:0, xg:0,
+      passes:0, completedPasses:0, tackles:0,
+      interceptions:0, fouls:0, yellow:0, red:0,
+      keyPasses:0, chancesCreated:0, clearances:0,
+      blocks:0, recoveries:0, duelsWon:0, duels:0,
+      possession:50, corners:0, offsides:0,
+      saves:0, bigChances:0, bigChancesMissed:0,
+      dangerousAttacks:0, finalThirdEntries:0
+    };
+  }
+
+  function getPlayerName(p, fallback){
+    return p?.name || p?.fullName || p?.playerName || fallback || "Игрок";
+  }
+
+  function teamPlayers(side){
+    const lm=state?.liveMatch;
+    const arr = side==="user" ? (lm?.players||[]) : (lm?.opponents||[]);
+    return Array.isArray(arr)?arr:[];
+  }
+
+  function roleOf(p){
+    return String(p?.role || p?.position || "").toUpperCase();
+  }
+
+  function isGK(p){ return ["GK","ВР","GOALKEEPER"].includes(roleOf(p)); }
+  function isDef(p){ return ["CB","LB","RB","LWB","RWB","DF"].includes(roleOf(p)); }
+  function isMid(p){ return ["DM","CM","AM","LM","RM","MF"].includes(roleOf(p)); }
+
+  function baseAbility(p){
+    return clamp(
+      Number(p?.rating ?? p?.overall ?? p?.ovr ?? 70) +
+      Number(p?.form ?? 0)*0.25 +
+      Number(p?.morale ?? 0)*0.08 -
+      Number(p?.fatigue ?? 0)*0.12, 45, 99
+    );
+  }
+
+  function addPass(p, successful){
+    const s=ensurePlayerStat(p);
+    s.passes++;
+    if(successful) s.completedPasses++;
+  }
+
+  function registerEventStats(ev){
+    const lm=state?.liveMatch;
+    if(!lm) return;
+    const side = ev.side==="user" ? "user" : "opp";
+    const players=teamPlayers(side);
+    if(!players.length) return;
+
+    let p=null;
+    if(Number.isInteger(ev.playerIndex)) p=players[ev.playerIndex];
+    if(!p) p=players[Math.floor(Math.random()*players.length)];
+
+    const s=ensurePlayerStat(p);
+    const type=ev.type || ev.event || "";
+
+    if(type==="goal"){
+      s.goals++;
+      if(ev.xg) s.xg+=ev.xg;
+    } else if(type==="shot"){
+      s.shots++;
+      if(ev.onTarget) s.shotsOnTarget++;
+      s.xg+=Number(ev.xg||0);
+    } else if(type==="pass"){
+      addPass(p, ev.success!==false);
+    } else if(type==="tackle"){
+      s.tackles++;
+    } else if(type==="interception"){
+      s.interceptions++;
+    } else if(type==="foul"){
+      s.fouls++;
+    } else if(type==="yellow"){
+      s.yellow++;
+    } else if(type==="red"){
+      s.red++;
+    } else if(type==="keyPass"){
+      s.keyPasses++;
+      s.chancesCreated++;
+    }
+  }
+
+  function initMatchStats(){
+    const lm=state?.liveMatch;
+    if(!lm) return;
+
+    lm.teamStats=lm.teamStats||{user:blankTeam(),opp:blankTeam()};
+    lm.teamStats.user=Object.assign(blankTeam(),lm.teamStats.user||{});
+    lm.teamStats.opp=Object.assign(blankTeam(),lm.teamStats.opp||{});
+    lm.playerStats=lm.playerStats||{user:[],opp:[]};
+
+    ["user","opp"].forEach(side=>{
+      const ps=teamPlayers(side);
+      lm.playerStats[side]=ps.map((p,i)=>{
+        ensurePlayerStat(p);
+        return {idx:i,name:getPlayerName(p,"Игрок "+(i+1)),role:roleOf(p),stats:p.matchStats};
+      });
+    });
+    lm.statTimeline=lm.statTimeline||[];
+    lm.matchReasons=lm.matchReasons||[];
+  }
+
+  function deriveFromEngine(){
+    const lm=state?.liveMatch;
+    if(!lm) return;
+    initMatchStats();
+
+    const minute=Number(lm.minute||0);
+    const t=lm.tactics||{};
+    const homeSide=lm.userHome?"user":"opp";
+    const awaySide=homeSide==="user"?"opp":"user";
+
+    const u=lm.engineState?.user || lm.engine?.user || {};
+    const o=lm.engineState?.opp || lm.engine?.opp || {};
+
+    const possessionU=clamp(
+      Number(u.possession ?? u.possessionPct ?? lm.possession ?? 50), 5,95
+    );
+    lm.teamStats.user.possession=possessionU;
+    lm.teamStats.opp.possession=100-possessionU;
+
+    // Each engine tick is translated into realistic aggregate actions.
+    const intensity=clamp(minute/90,0,1);
+    const pace=clamp(Number(t.tempo||60),20,100);
+    const press=clamp(Number(t.pressing||50),0,100);
+    const width=clamp(Number(t.width||50),0,100);
+
+    const attackU=Number(u.attack||u.attacking||0);
+    const attackO=Number(o.attack||o.attacking||0);
+
+    const expectedU = clamp(
+      0.045 + (possessionU-50)*0.0010 + (pace-50)*0.0008 +
+      attackU*0.002 + (press-50)*0.00025, 0.025, 0.19
+    );
+    const expectedO = clamp(
+      0.045 + ((100-possessionU)-50)*0.0010 +
+      (Number(lm.oppTempo||50)-50)*0.0006 + attackO*0.002, 0.025, 0.19
+    );
+
+    // Don't overwrite already generated event totals. Increment gently.
+    const us=lm.teamStats.user, os=lm.teamStats.opp;
+    const targetShotsU=Math.max(us.shots,Math.round(minute/90*(7+pace/22+Math.max(0,attackU)/5)));
+    const targetShotsO=Math.max(os.shots,Math.round(minute/90*(6+Math.max(0,attackO)/5)));
+
+    us.shots=targetShotsU; os.shots=targetShotsO;
+    us.shotsOnTarget=Math.max(us.shotsOnTarget,Math.min(us.shots,Math.round(us.shots*(0.34+expectedU))));
+    os.shotsOnTarget=Math.max(os.shotsOnTarget,Math.min(os.shots,Math.round(os.shots*(0.33+expectedO))));
+    us.xg=Math.max(us.xg, +(us.shots*(0.045+expectedU*0.22)).toFixed(2));
+    os.xg=Math.max(os.xg, +(os.shots*(0.045+expectedO*0.22)).toFixed(2));
+
+    const targetPassU=Math.max(us.passes,Math.round(minute*(7.0+possessionU*0.055)));
+    const targetPassO=Math.max(os.passes,Math.round(minute*(7.0+(100-possessionU)*0.055)));
+    us.passes=targetPassU; os.passes=targetPassO;
+    us.completedPasses=Math.max(us.completedPasses,Math.round(us.passes*(0.78+possessionU/1000)));
+    os.completedPasses=Math.max(os.completedPasses,Math.round(os.passes*(0.77+(100-possessionU)/1000)));
+
+    us.tackles=Math.max(us.tackles,Math.round(minute*(0.035+(100-possessionU)*0.001)));
+    os.tackles=Math.max(os.tackles,Math.round(minute*(0.035+possessionU*0.001)));
+    us.interceptions=Math.max(us.interceptions,Math.round(minute*(0.018+(100-possessionU)*0.0006)));
+    os.interceptions=Math.max(os.interceptions,Math.round(minute*(0.018+possessionU*0.0006)));
+    us.fouls=Math.max(us.fouls,Math.round(minute*(0.010+press*0.00018)));
+    os.fouls=Math.max(os.fouls,Math.round(minute*(0.010+press*0.00015)));
+
+    us.corners=Math.max(us.corners,Math.round(minute/90*(1.5+width/55+us.shots/10)));
+    os.corners=Math.max(os.corners,Math.round(minute/90*(1.4+(100-width)/60+os.shots/11)));
+    us.dangerousAttacks=Math.max(us.dangerousAttacks,Math.round(minute*(0.30+expectedU)));
+    os.dangerousAttacks=Math.max(os.dangerousAttacks,Math.round(minute*(0.30+expectedO)));
+
+    distributePlayerStats("user");
+    distributePlayerStats("opp");
+    updatePlayerRatings();
+  }
+
+  function distributePlayerStats(side){
+    const lm=state?.liveMatch;
+    const players=teamPlayers(side);
+    const ts=lm.teamStats[side];
+    if(!players.length) return;
+
+    const active=players.filter(p=>p && p.available!==false);
+    const weights=active.map(p=>{
+      const r=roleOf(p);
+      let w=isGK(p)?0.6:isDef(p)?1.0:isMid(p)?1.15:1.05;
+      if(r==="ST"||r==="CF")w=1.2;
+      return w;
+    });
+    const sw=Math.max(1,weights.reduce((a,b)=>a+b,0));
+
+    active.forEach((p,i)=>{
+      const s=ensurePlayerStat(p);
+      const w=weights[i]/sw;
+      const minutes=Number(lm.minute||0);
+      s.minutes=Math.max(s.minutes,Math.min(90,minutes));
+      s.passes=Math.max(s.passes,Math.round(ts.passes*w));
+      s.completedPasses=Math.max(s.completedPasses,Math.round(ts.completedPasses*w));
+      s.tackles=Math.max(s.tackles,Math.round(ts.tackles*w));
+      s.interceptions=Math.max(s.interceptions,Math.round(ts.interceptions*w));
+      s.fouls=Math.max(s.fouls,Math.round(ts.fouls*w));
+      s.recoveries=Math.max(s.recoveries,Math.round((ts.recoveries||ts.interceptions*1.8)*w));
+      s.duels=Math.max(s.duels,Math.round((ts.tackles*1.7+ts.fouls)*w));
+      s.duelsWon=Math.max(s.duelsWon,Math.round(s.duels*(0.45+baseAbility(p)/250)));
+      s.clearances=Math.max(s.clearances,Math.round((ts.clearances||ts.interceptions*0.8)*w));
+      s.blocks=Math.max(s.blocks,Math.round((ts.blocks||0)*w));
+    });
+
+    // Shot/xG distribution favors attacking roles.
+    const attackers=active.filter(p=>!isGK(p)&&!isDef(p));
+    if(attackers.length){
+      let remShots=ts.shots;
+      let remXg=ts.xg;
+      attackers.forEach((p,i)=>{
+        const s=ensurePlayerStat(p);
+        const role=roleOf(p);
+        const factor=role==="ST"?2.1:role==="AM"||role==="RW"||role==="LW"?1.45:1.0;
+        const share=factor/attackers.reduce((a,x)=>{
+          const rr=roleOf(x); return a+(rr==="ST"?2.1:rr==="AM"||rr==="RW"||rr==="LW"?1.45:1);
+        },0);
+        const shots=i===attackers.length-1?Math.max(0,remShots):Math.max(0,Math.round(ts.shots*share));
+        const xg=i===attackers.length-1?Math.max(0,remXg):+(ts.xg*share).toFixed(2);
+        s.shots=Math.max(s.shots,shots);
+        s.shotsOnTarget=Math.max(s.shotsOnTarget,Math.min(s.shots,Math.round(s.shots*0.36)));
+        s.xg=Math.max(s.xg,xg);
+        remShots-=shots; remXg-=xg;
+      });
+    }
+
+    const gk=active.find(isGK);
+    if(gk){
+      const s=ensurePlayerStat(gk);
+      s.saves=Math.max(s.saves,Math.max(0,ts.shotsOnTarget-ts.goals));
+    }
+  }
+
+  function updatePlayerRatings(){
+    const lm=state?.liveMatch;
+    if(!lm) return;
+    ["user","opp"].forEach(side=>{
+      teamPlayers(side).forEach(p=>{
+        const s=ensurePlayerStat(p);
+        const role=roleOf(p);
+        let r=6.25;
+        r += s.goals*1.25 + s.assists*0.8;
+        r += s.xg>0 ? Math.min(0.45,s.xg*0.25) : 0;
+        r += s.keyPasses*0.12 + s.chancesCreated*0.08;
+        r += s.tackles*0.035 + s.interceptions*0.04 + s.saves*0.10;
+        r += s.completedPasses>=20 ? Math.min(0.35,(s.completedPasses-20)*0.012):0;
+        r -= s.fouls*0.035 + s.yellow*0.28 + s.red*1.25;
+        if(isGK(p)) r += s.saves*0.05;
+        if(isDef(p)) r += (s.clearances+s.blocks)*0.025;
+        if((role==="ST"||role==="CF") && s.shots===0 && s.minutes>45) r-=0.25;
+        s.rating=+clamp(r,4.0,10.0).toFixed(1);
+      });
+    });
+  }
+
+  function finalizeStats(){
+    const lm=state?.liveMatch;
+    if(!lm) return;
+    initMatchStats();
+    deriveFromEngine();
+    ["user","opp"].forEach(side=>{
+      const ts=lm.teamStats[side];
+      ts.goals=side==="user"?Number(lm.userGoals||0):Number(lm.oppGoals||0);
+      ts.bigChances=Math.max(ts.bigChances,Math.round(ts.xg*0.9));
+      ts.bigChancesMissed=Math.max(0,ts.bigChances-ts.goals);
+    });
+    updatePlayerRatings();
+
+    const winner = lm.userGoals>lm.oppGoals?"user":lm.userGoals<lm.oppGoals?"opp":"draw";
+    lm.matchReasons=buildReasons(winner);
+    lm.finalStats=true;
+
+    // Persist season/match history without breaking older saves.
+    state.matchHistory=state.matchHistory||[];
+    const summary={
+      date:new Date().toISOString(),
+      userGoals:Number(lm.userGoals||0),
+      oppGoals:Number(lm.oppGoals||0),
+      teamStats:JSON.parse(JSON.stringify(lm.teamStats)),
+      playerStats:JSON.parse(JSON.stringify(lm.playerStats)),
+      reasons:lm.matchReasons
+    };
+    state.matchHistory.push(summary);
+    if(state.matchHistory.length>30) state.matchHistory.shift();
+    saveState();
+  }
+
+  function buildReasons(winner){
+    const lm=state.liveMatch, u=lm.teamStats.user, o=lm.teamStats.opp;
+    const reasons=[];
+    const diff=(a,b)=>+(a-b).toFixed(2);
+
+    if(winner==="draw"){
+      if(Math.abs(u.xg-o.xg)<0.25) reasons.push("Команды создали сопоставимый объём моментов: разница xG была небольшой.");
+      else reasons.push((u.xg>o.xg?"Ваша команда":"Соперник")+" создавал(а) более качественные моменты, но реализация не позволила получить победу.");
+    }else{
+      const w=winner==="user"?u:o, l=winner==="user"?o:u;
+      if(w.xg>l.xg+0.30) reasons.push("Победа по качеству моментов: xG заметно выше.");
+      if(w.shots>l.shots+2) reasons.push("Преимущество по объёму атак и ударам.");
+      if(w.shotsOnTarget>l.shotsOnTarget+1) reasons.push("Больше ударов дошло до створа — вратарь соперника испытывал больше давления.");
+      const wp=w.completedPasses/Math.max(1,w.passes), lp=l.completedPasses/Math.max(1,l.passes);
+      if(wp>lp+0.06) reasons.push("Лучшее качество розыгрыша мяча и точность передач.");
+      if(w.possession>l.possession+6) reasons.push("Контроль мяча помог дольше удерживать инициативу.");
+      if(w.tackles+l.interceptions>w.tackles+l.interceptions+1) reasons.push("Команда лучше возвращала мяч после потерь.");
+      if(w.interceptions>l.interceptions+2) reasons.push("Сильная работа без мяча: больше перехватов.");
+      if(w.corners>l.corners+2) reasons.push("Постоянное давление создавало больше стандартов у чужих ворот.");
+      if(reasons.length===0) reasons.push("Результат определила реализация немногочисленных эпизодов и индивидуальные действия.");
+    }
+    if(u.fouls>o.fouls+4) reasons.push("При этом команда чаще нарушала правила, что могло снижать контроль.");
+    if(u.yellow+u.red>o.yellow+o.red+1) reasons.push("Дисциплина была хуже, чем у соперника.");
+    return reasons.slice(0,5);
+  }
+
+  function fmtPct(a,b){
+    return b?Math.round(a/b*100)+"%":"0%";
+  }
+
+  function statRow(label,a,b,format=(x)=>x){
+    return `<div class="fom-stat-row"><span>${label}</span><b>${format(a)}</b><i></i><b>${format(b)}</b></div>`;
+  }
+
+  function renderStatsHTML(){
+    const lm=state?.liveMatch;
+    if(!lm?.teamStats) return "";
+    const u=lm.teamStats.user,o=lm.teamStats.opp;
+    const us=lm.playerStats?.user||[], os=lm.playerStats?.opp||[];
+    const userName=lm.userHome?(state.club?.name||"Ваша команда"):(lm.opponentName||"Соперник");
+    const oppName=lm.userHome?(lm.opponentName||"Соперник"):(state.club?.name||"Ваша команда");
+
+    const top=(arr)=>[...arr].sort((a,b)=>b.stats.rating-a.stats.rating);
+    const playerTable=(arr)=>{
+      return top(arr).map(x=>`<div class="fom-player-stat">
+        <div class="fps-name"><b>${x.name}</b><small>${x.role||""}</small></div>
+        <span>${x.stats.minutes}'</span><span>${x.stats.goals}</span><span>${x.stats.assists}</span>
+        <span>${x.stats.xg.toFixed(2)}</span><span>${x.stats.shots}</span>
+        <strong>${x.stats.rating.toFixed(1)}</strong>
+      </div>`).join("");
+    };
+
+    return `<section class="fom-match-stats">
+      <div class="fom-score-head">
+        <div><small>${userName}</small><strong>${lm.userGoals||0}</strong></div>
+        <div class="fom-vs">МАТЧ</div>
+        <div><small>${oppName}</small><strong>${lm.oppGoals||0}</strong></div>
+      </div>
+      <div class="fom-stat-card">
+        <h3>Статистика матча</h3>
+        ${statRow("Удары",u.shots,o.shots)}
+        ${statRow("Удары в створ",u.shotsOnTarget,o.shotsOnTarget)}
+        ${statRow("xG",u.xg,o.xg,x=>Number(x).toFixed(2))}
+        ${statRow("Владение",u.possession,o.possession,x=>Math.round(x)+"%")}
+        ${statRow("Передачи",u.passes,o.passes)}
+        ${statRow("Точность передач",fmtPct(u.completedPasses,u.passes),fmtPct(o.completedPasses,o.passes),x=>x)}
+        ${statRow("Отборы",u.tackles,o.tackles)}
+        ${statRow("Перехваты",u.interceptions,o.interceptions)}
+        ${statRow("Фолы",u.fouls,o.fouls)}
+        ${statRow("Угловые",u.corners,o.corners)}
+        ${statRow("Жёлтые",u.yellow,o.yellow)}
+        ${statRow("Красные",u.red,o.red)}
+      </div>
+      <div class="fom-stat-card">
+        <h3>Почему получился такой результат</h3>
+        ${(lm.matchReasons||[]).map(x=>`<div class="fom-reason">• ${x}</div>`).join("")}
+      </div>
+      <div class="fom-stat-card">
+        <h3>Рейтинги игроков</h3>
+        <div class="fom-player-head"><span>Игрок</span><span>Мин</span><span>Г</span><span>А</span><span>xG</span><span>У</span><span>Рейтинг</span></div>
+        <h4>${userName}</h4>${playerTable(us)}
+        <h4>${oppName}</h4>${playerTable(os)}
+      </div>
+    </section>`;
+  }
+
+  function injectStyles(){
+    if(document.getElementById("fom-v16-css"))return;
+    const s=document.createElement("style");s.id="fom-v16-css";
+    s.textContent=`
+      .fom-match-stats{display:grid;gap:12px;margin:14px 0 90px}
+      .fom-score-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:18px;border:1px solid var(--border,#2b2f36);border-radius:20px;background:var(--card,#171a1f)}
+      .fom-score-head>div:not(.fom-vs){display:flex;flex-direction:column;gap:6px;text-align:center}
+      .fom-score-head strong{font-size:38px;line-height:1}
+      .fom-score-head small{opacity:.7;font-size:11px}
+      .fom-vs{font-size:10px;letter-spacing:2px;opacity:.5}
+      .fom-stat-card{padding:15px;border:1px solid var(--border,#2b2f36);border-radius:18px;background:var(--card,#171a1f)}
+      .fom-stat-card h3{margin:0 0 12px;font-size:15px}
+      .fom-stat-card h4{margin:16px 0 8px;font-size:13px}
+      .fom-stat-row{display:grid;grid-template-columns:1fr 45px 1fr 45px;gap:8px;align-items:center;min-height:34px;border-bottom:1px solid rgba(255,255,255,.05)}
+      .fom-stat-row span{grid-column:1/-1;text-align:center;grid-row:1;font-size:11px;opacity:.65}
+      .fom-stat-row b:first-of-type{grid-column:1;grid-row:1;text-align:right}
+      .fom-stat-row b:last-of-type{grid-column:4;grid-row:1;text-align:left}
+      .fom-stat-row i{display:none}
+      .fom-reason{font-size:12px;line-height:1.55;padding:7px 0;opacity:.9}
+      .fom-player-head,.fom-player-stat{display:grid;grid-template-columns:minmax(100px,1fr) 28px 22px 22px 35px 22px 45px;gap:4px;align-items:center;font-size:10px}
+      .fom-player-head{opacity:.45;padding:6px 4px}
+      .fom-player-stat{padding:8px 4px;border-top:1px solid rgba(255,255,255,.05)}
+      .fps-name{min-width:0;display:flex;flex-direction:column}
+      .fps-name b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .fps-name small{font-size:9px;opacity:.5}
+      .fom-player-stat>span,.fom-player-stat>strong{text-align:center}
+      .fom-player-stat strong{font-size:12px}
+    `;
+    document.head.appendChild(s);
+  }
+
+  function openStats(){
+    const lm=state?.liveMatch;
+    if(!lm)return;
+    finalizeStats();
+    injectStyles();
+
+    let host=document.getElementById("fomV16StatsOverlay");
+    if(!host){
+      host=document.createElement("div");
+      host.id="fomV16StatsOverlay";
+      host.style.cssText="position:fixed;inset:0;z-index:9999;overflow:auto;background:var(--bg,#0e1013);padding:12px";
+      document.body.appendChild(host);
+    }
+    host.innerHTML=`<div style="max-width:760px;margin:auto">
+      <button id="fomV16Close" style="margin:4px 0 10px">← Назад</button>
+      ${renderStatsHTML()}
+    </div>`;
+    host.querySelector("#fomV16Close").onclick=()=>host.remove();
+  }
+
+  // Hook common finish buttons/functions without requiring changes to the old engine.
+  const oldFinish=window.finishLiveMatch;
+  if(typeof oldFinish==="function"){
+    window.finishLiveMatch=function(){
+      const r=oldFinish.apply(this,arguments);
+      try{finalizeStats();}catch(e){console.warn("FOM v1.6 stats finalize",e)}
+      return r;
+    };
+  }
+
+  // Keep aggregate statistics alive during the match.
+  const oldTick=window.engineTickV14;
+  if(typeof oldTick==="function"){
+    window.engineTickV14=function(){
+      const r=oldTick.apply(this,arguments);
+      try{deriveFromEngine();}catch(e){console.warn("FOM v1.6 stats tick",e)}
+      return r;
+    };
+  }
+
+  window.FOMStats.initMatchStats=initMatchStats;
+  window.FOMStats.derive=deriveFromEngine;
+  window.FOMStats.finalize=finalizeStats;
+  window.FOMStats.open=openStats;
+  window.FOMStats.render=renderStatsHTML;
+
+  // Add a statistics button to the live screen when possible.
+  function addButton(){
+    if(!state?.liveMatch)return;
+    const existing=document.getElementById("fomV16StatBtn");
+    if(existing)return;
+    const candidates=[...document.querySelectorAll("button")];
+    const target=candidates.find(b=>/заверш|finish|матч|match/i.test(b.textContent||""));
+    if(!target || !target.parentElement)return;
+    const b=document.createElement("button");
+    b.id="fomV16StatBtn";
+    b.textContent="📊 Статистика";
+    b.className=target.className;
+    b.onclick=openStats;
+    target.parentElement.appendChild(b);
+  }
+
+  const observer=new MutationObserver(()=>{try{addButton()}catch(e){}});
+  observer.observe(document.body,{childList:true,subtree:true});
+
+  // Expose a global fallback button function.
+  window.openMatchStats=openStats;
+})();
+</script>
+
+
+<script>
+(function(){
+  const oldStart = window.startPreparedMatch;
+  if(typeof oldStart==="function"){
+    window.startPreparedMatch=function(){
+      const r=oldStart.apply(this,arguments);
+      try{window.FOMStats?.initMatchStats?.();}catch(e){}
+      return r;
+    };
+  }
+})();
+</script>
+
+
+<script>
+/* =========================================================
+   FOM v1.7 — VISUAL POST-MATCH CENTER
+   ========================================================= */
+(function(){
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+  function ensure(){
+    const lm=state?.liveMatch;
+    if(!lm) return null;
+    lm.visualStats=lm.visualStats||{
+      xgTimeline:{user:[],opp:[]},
+      shots:[],
+      passes:[],
+      keyEvents:[]
+    };
+    lm.visualStats.xgTimeline=lm.visualStats.xgTimeline||{user:[],opp:[]};
+    lm.visualStats.shots=lm.visualStats.shots||[];
+    lm.visualStats.passes=lm.visualStats.passes||[];
+    lm.visualStats.keyEvents=lm.visualStats.keyEvents||[];
+    return lm;
+  }
+
+  function sideName(side){
+    const lm=state.liveMatch;
+    return side==="user"?(state.club?.name||"Ваша команда"):(lm.opponentName||"Соперник");
+  }
+
+  function player(side,idx){
+    const lm=state.liveMatch;
+    const a=side==="user"?lm.players:lm.opponents;
+    return a?.[idx]||a?.[0]||{};
+  }
+
+  function addTimelinePoint(){
+    const lm=ensure(); if(!lm)return;
+    const minute=Number(lm.minute||0);
+    const u=Number(lm.teamStats?.user?.xg||0);
+    const o=Number(lm.teamStats?.opp?.xg||0);
+    const arr=lm.visualStats.xgTimeline;
+    const last=arr.user[arr.user.length-1];
+    if(!last || minute-last.m>=1){
+      arr.user.push({m:minute,xg:+u.toFixed(2)});
+      arr.opp.push({m:minute,xg:+o.toFixed(2)});
+    }
+  }
+
+  function addShot(side,idx,x,y,xg,onTarget,goal){
+    const lm=ensure(); if(!lm)return;
+    lm.visualStats.shots.push({
+      side,idx,minute:Number(lm.minute||0),
+      x:clamp(Number(x)||50,3,97),y:clamp(Number(y)||50,3,97),
+      xg:+Number(xg||0).toFixed(2),onTarget:!!onTarget,goal:!!goal
+    });
+  }
+
+  function addPass(side,from,to,x1,y1,x2,y2,successful){
+    const lm=ensure(); if(!lm)return;
+    lm.visualStats.passes.push({
+      side,from,to,
+      x1:clamp(Number(x1)||50,3,97),y1:clamp(Number(y1)||50,3,97),
+      x2:clamp(Number(x2)||50,3,97),y2:clamp(Number(y2)||50,3,97),
+      successful:successful!==false
+    });
+  }
+
+  function addKeyEvent(type,side,idx,text){
+    const lm=ensure(); if(!lm)return;
+    lm.visualStats.keyEvents.push({
+      minute:Number(lm.minute||0),type,side,idx,text
+    });
+    if(lm.visualStats.keyEvents.length>80)lm.visualStats.keyEvents.shift();
+  }
+
+  function seedVisualData(){
+    const lm=ensure(); if(!lm)return;
+    if(lm.visualStats._seeded)return;
+    lm.visualStats._seeded=true;
+    const us=lm.teamStats?.user||{}, os=lm.teamStats?.opp||{};
+    const makeShots=(side,n)=>{
+      for(let i=0;i<n;i++){
+        const x=side==="user"?Math.random()*48+48:Math.random()*48+4;
+        const y=Math.random()*76+12;
+        const nearGoal=side==="user"?x>75:x<25;
+        const xx=nearGoal?x:(side==="user"?Math.random()*35+55:Math.random()*35+10);
+        const yy=nearGoal?y:Math.random()*70+15;
+        const xg=+(0.02+Math.random()*0.16*(nearGoal?1.5:.65)).toFixed(2);
+        addShot(side,Math.floor(Math.random()*11),xx,yy,xg,Math.random()<.38,Math.random()<.07);
+      }
+    };
+    makeShots("user",us.shots||0);
+    makeShots("opp",os.shots||0);
+
+    const makePasses=(side,n)=>{
+      for(let i=0;i<Math.min(n,90);i++){
+        const x1=side==="user"?Math.random()*46+4:Math.random()*46+50;
+        const y1=Math.random()*72+14;
+        const len=5+Math.random()*18;
+        const dir=side==="user"?1:-1;
+        addPass(side,Math.floor(Math.random()*11),Math.floor(Math.random()*11),
+          x1,y1,clamp(x1+dir*len,3,97),clamp(y1+(Math.random()-.5)*18,3,97),Math.random()<.86);
+      }
+    };
+    makePasses("user",us.completedPasses||0);
+    makePasses("opp",os.completedPasses||0);
+
+    const total=Number(lm.minute||90);
+    if(!lm.visualStats.xgTimeline.user.length){
+      const u=us.xg||0,o=os.xg||0;
+      for(let m=5;m<=Math.max(5,total);m+=5){
+        const k=m/Math.max(1,total);
+        lm.visualStats.xgTimeline.user.push({m,xg:+(u*k).toFixed(2)});
+        lm.visualStats.xgTimeline.opp.push({m,xg:+(o*k).toFixed(2)});
+      }
+    }
+  }
+
+  function bestPlayers(){
+    const lm=state.liveMatch;
+    const all=[
+      ...(lm.playerStats?.user||[]).map(x=>({...x,side:"user"})),
+      ...(lm.playerStats?.opp||[]).map(x=>({...x,side:"opp"}))
+    ];
+    return all.sort((a,b)=>b.stats.rating-a.stats.rating).slice(0,5);
+  }
+
+  function svgPitchShots(){
+    const lm=state.liveMatch, shots=lm.visualStats.shots||[];
+    const dots=shots.map(s=>{
+      const cx=s.x,cy=s.y;
+      const r=s.goal?7:s.onTarget?5:3.5;
+      return `<g><circle cx="${cx}" cy="${cy}" r="${r}" class="shot-dot ${s.side} ${s.goal?'goal':''}"></circle><title>${s.minute}' • xG ${s.xg}${s.goal?' • ГОЛ':''}</title></g>`;
+    }).join("");
+    return `<div class="v17-pitch-wrap"><svg viewBox="0 0 100 100" class="v17-pitch">
+      <rect x="2" y="2" width="96" height="96" rx="2" class="pitch-bg"/>
+      <line x1="50" y1="2" x2="50" y2="98" class="pitch-line"/>
+      <circle cx="50" cy="50" r="11" class="pitch-line"/>
+      <rect x="2" y="30" width="16" height="40" class="pitch-line"/>
+      <rect x="82" y="30" width="16" height="40" class="pitch-line"/>
+      <rect x="2" y="40" width="6" height="20" class="pitch-line"/>
+      <rect x="92" y="40" width="6" height="20" class="pitch-line"/>
+      ${dots}
+    </svg></div>`;
+  }
+
+  function svgPassMap(){
+    const lm=state.liveMatch, passes=lm.visualStats.passes||[];
+    const lines=passes.map(p=>`<line x1="${p.x1}" y1="${p.y1}" x2="${p.x2}" y2="${p.y2}" class="pass-line ${p.side} ${p.successful?'ok':'bad'}"/>`).join("");
+    return `<div class="v17-pitch-wrap"><svg viewBox="0 0 100 100" class="v17-pitch">
+      <rect x="2" y="2" width="96" height="96" rx="2" class="pitch-bg"/>
+      <line x1="50" y1="2" x2="50" y2="98" class="pitch-line"/>
+      <circle cx="50" cy="50" r="11" class="pitch-line"/>
+      ${lines}
+    </svg></div>`;
+  }
+
+  function timeline(){
+    const lm=state.liveMatch, t=lm.visualStats.xgTimeline;
+    const max=Math.max(1,...t.user.map(x=>x.xg),...t.opp.map(x=>x.xg));
+    const width=640,height=190,pad=28;
+    const makePath=a=>a.map((p,i)=>{
+      const x=pad+(p.m/Math.max(90,lm.minute||90))*(width-pad*2);
+      const y=height-pad-(p.xg/max)*(height-pad*2);
+      return (i?"L":"M")+x.toFixed(1)+" "+y.toFixed(1);
+    }).join(" ");
+    return `<svg class="v17-chart" viewBox="0 0 ${width} ${height}">
+      <line x1="${pad}" y1="${height-pad}" x2="${width-pad}" y2="${height-pad}" class="chart-axis"/>
+      <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${height-pad}" class="chart-axis"/>
+      <path d="${makePath(t.user)}" class="xg-line user"/>
+      <path d="${makePath(t.opp)}" class="xg-line opp"/>
+      <text x="${pad}" y="16">xG</text>
+      <text x="${width-pad}" y="${height-5}" text-anchor="end">90'</text>
+    </svg>`;
+  }
+
+  function eventIcon(type){
+    return type==="goal"?"⚽":type==="yellow"?"🟨":type==="red"?"🟥":type==="sub"?"🔄":type==="injury"?"🩹":"•";
+  }
+
+  function keyEvents(){
+    const lm=state.liveMatch;
+    const ev=(lm.visualStats.keyEvents||[]).slice().sort((a,b)=>a.minute-b.minute);
+    if(!ev.length){
+      return `<div class="v17-empty">Ключевые эпизоды появятся здесь по мере развития матча.</div>`;
+    }
+    return ev.map(e=>`<div class="v17-event">
+      <b>${e.minute}'</b><span>${eventIcon(e.type)}</span><div><strong>${e.text||e.type}</strong><small>${sideName(e.side)}</small></div>
+    </div>`).join("");
+  }
+
+  function playerRows(){
+    return bestPlayers().map((p,i)=>`<div class="v17-best-row">
+      <b>${i+1}</b><div><strong>${p.name}</strong><small>${sideName(p.side)} · ${p.role||""}</small></div>
+      <span>${p.stats.goals}</span><span>${p.stats.assists}</span><span>${p.stats.xg.toFixed(2)}</span><strong>${p.stats.rating.toFixed(1)}</strong>
+    </div>`).join("");
+  }
+
+  function openPostMatch(){
+    const lm=ensure(); if(!lm)return;
+    if(window.FOMStats?.finalize)window.FOMStats.finalize();
+    seedVisualData();
+
+    let old=document.getElementById("fomV17Overlay");
+    if(old)old.remove();
+    old=document.createElement("div");
+    old.id="fomV17Overlay";
+    old.innerHTML=`<div class="v17-shell">
+      <div class="v17-top"><button id="v17back">← Назад</button><span>ПОСЛЕМАТЧЕВЫЙ ЦЕНТР</span></div>
+      <div class="v17-score">
+        <div><small>${sideName("user")}</small><b>${lm.userGoals||0}</b></div>
+        <div class="v17-vs">FINAL</div>
+        <div><small>${sideName("opp")}</small><b>${lm.oppGoals||0}</b></div>
+      </div>
+
+      <section class="v17-card">
+        <div class="v17-card-title"><h3>Динамика xG</h3><span>Накопительный xG</span></div>
+        ${timeline()}
+        <div class="v17-legend"><i class="user"></i>${sideName("user")} <i class="opp"></i>${sideName("opp")}</div>
+      </section>
+
+      <section class="v17-card">
+        <div class="v17-card-title"><h3>Карта ударов</h3><span>Все удары матча</span></div>
+        ${svgPitchShots()}
+      </section>
+
+      <section class="v17-card">
+        <div class="v17-card-title"><h3>Карта передач</h3><span>Розыгрыш мяча</span></div>
+        ${svgPassMap()}
+      </section>
+
+      <section class="v17-card">
+        <div class="v17-card-title"><h3>Лучшие игроки</h3><span>По рейтингу</span></div>
+        <div class="v17-best-head"><span>#</span><span>Игрок</span><span>Г</span><span>А</span><span>xG</span><span>Оц.</span></div>
+        ${playerRows()}
+      </section>
+
+      <section class="v17-card">
+        <div class="v17-card-title"><h3>Ключевые эпизоды</h3><span>Таймлайн</span></div>
+        <div class="v17-events">${keyEvents()}</div>
+      </section>
+
+      <button class="v17-fullstats" id="v17full">📊 Полная статистика матча</button>
+    </div>`;
+    document.body.appendChild(old);
+    old.querySelector("#v17back").onclick=()=>old.remove();
+    old.querySelector("#v17full").onclick=()=>{
+      old.remove();
+      window.openMatchStats?.();
+    };
+  }
+
+  function css(){
+    if(document.getElementById("fom-v17-css"))return;
+    const s=document.createElement("style");s.id="fom-v17-css";
+    s.textContent=`
+      #fomV17Overlay{position:fixed;inset:0;z-index:10000;overflow:auto;background:var(--bg,#0e1013);color:var(--text,#fff)}
+      .v17-shell{max-width:760px;margin:auto;padding:12px 12px 90px}
+      .v17-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+      .v17-top span{font-size:10px;letter-spacing:1.7px;opacity:.45}
+      .v17-score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:20px;border:1px solid var(--border,#2b2f36);border-radius:22px;background:var(--card,#171a1f);margin-bottom:12px}
+      .v17-score>div:not(.v17-vs){display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center}
+      .v17-score small{font-size:11px;opacity:.65;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .v17-score b{font-size:42px;line-height:1}
+      .v17-vs{font-size:9px;letter-spacing:2px;opacity:.4}
+      .v17-card{padding:15px;border:1px solid var(--border,#2b2f36);border-radius:19px;background:var(--card,#171a1f);margin-bottom:12px}
+      .v17-card-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+      .v17-card-title h3{font-size:15px;margin:0}.v17-card-title span{font-size:10px;opacity:.45}
+      .v17-chart{width:100%;height:auto;display:block}
+      .chart-axis{stroke:currentColor;opacity:.18;stroke-width:.5}.v17-chart text{fill:currentColor;opacity:.45;font-size:8px}
+      .xg-line{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}.xg-line.user{stroke:#ff9f43}.xg-line.opp{stroke:#7d8795}
+      .v17-legend{display:flex;justify-content:center;gap:6px;align-items:center;font-size:10px;opacity:.65}
+      .v17-legend i{width:8px;height:8px;border-radius:50%;display:inline-block;margin-left:8px}.v17-legend i:first-child{margin-left:0;background:#ff9f43}.v17-legend i.opp{background:#7d8795}
+      .v17-pitch-wrap{width:100%;max-width:520px;margin:auto;aspect-ratio:1.35;display:flex;align-items:center;justify-content:center}
+      .v17-pitch{width:100%;height:100%;background:#18221c;border-radius:12px}
+      .pitch-bg{fill:#19301f}.pitch-line{fill:none;stroke:rgba(255,255,255,.55);stroke-width:.55}
+      .shot-dot{stroke:#fff;stroke-width:.7;fill:#7d8795}.shot-dot.user{fill:#ff9f43}.shot-dot.opp{fill:#8c96a5}.shot-dot.goal{stroke-width:1.4}
+      .pass-line{stroke-width:.55;opacity:.27}.pass-line.user{stroke:#ff9f43}.pass-line.opp{stroke:#8c96a5}.pass-line.bad{stroke-dasharray:2 2;opacity:.12}
+      .v17-best-head,.v17-best-row{display:grid;grid-template-columns:22px minmax(120px,1fr) 20px 20px 40px 38px;gap:5px;align-items:center}
+      .v17-best-head{font-size:9px;opacity:.4;padding:5px 3px}.v17-best-row{padding:9px 3px;border-top:1px solid rgba(255,255,255,.05);font-size:11px}
+      .v17-best-row>span,.v17-best-row>strong{text-align:center}.v17-best-row div{min-width:0;display:flex;flex-direction:column}.v17-best-row strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v17-best-row small{font-size:9px;opacity:.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .v17-events{display:grid;gap:0}.v17-event{display:grid;grid-template-columns:30px 24px 1fr;gap:8px;align-items:center;min-height:52px;border-bottom:1px solid rgba(255,255,255,.05)}
+      .v17-event>b{font-size:11px}.v17-event span{font-size:16px}.v17-event div{display:flex;flex-direction:column;gap:3px}.v17-event strong{font-size:11px}.v17-event small{font-size:9px;opacity:.45}.v17-empty{font-size:11px;opacity:.5;padding:15px 0}
+      .v17-fullstats{width:100%;border:1px solid var(--border,#2b2f36);background:var(--card,#171a1f);color:inherit;border-radius:15px;padding:13px;font-weight:700}
+      @media(max-width:420px){.v17-shell{padding-left:9px;padding-right:9px}.v17-card{padding:12px}.v17-score b{font-size:36px}.v17-best-head,.v17-best-row{grid-template-columns:18px minmax(95px,1fr) 18px 18px 34px 34px}}
+    `;
+    document.head.appendChild(s);
+  }
+
+  const oldFinish=window.finishLiveMatch;
+  if(typeof oldFinish==="function"){
+    window.finishLiveMatch=function(){
+      const r=oldFinish.apply(this,arguments);
+      try{ensure();seedVisualData();setTimeout(openPostMatch,100);}catch(e){console.warn(e)}
+      return r;
+    };
+  }
+
+  const oldTick=window.engineTickV14;
+  if(typeof oldTick==="function"){
+    window.engineTickV14=function(){
+      const r=oldTick.apply(this,arguments);
+      try{addTimelinePoint()}catch(e){}
+      return r;
+    };
+  }
+
+  // Make visual data available to future event hooks.
+  window.FOMVisualStats={
+    ensure,addTimelinePoint,addShot,addPass,addKeyEvent,open:openPostMatch
+  };
+  css();
+})();
+</script>
+
 </body>
 </html>
