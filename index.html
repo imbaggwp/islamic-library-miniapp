@@ -69,6 +69,20 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 5px;b
 .calendar{display:grid;gap:8px}.match{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
 .team{text-align:center;font-weight:800}.score{font-weight:900;font-size:18px}.statline{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
 .svg-logo{width:42px;height:42px;display:block;margin:auto}.smallbtn{padding:7px 9px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;color:var(--text)}
+
+.match-live{background:#0e1317;border:1px solid var(--line);border-radius:18px;padding:14px;margin-top:12px}
+.event{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.event b{color:var(--accent2)}.svg-logo{width:42px;height:42px;display:block;margin:auto}
+
+.live-score{font-size:42px;font-weight:950;letter-spacing:-.06em;text-align:center}
+.match-clock{text-align:center;color:var(--accent2);font-weight:900;font-size:16px}
+.live-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.live-log{max-height:310px;overflow:auto}
+.lineup-mini{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.sub-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
+.player-select{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:9px;width:100%}
+.pitch-live{height:330px;margin-top:12px}
+@media(min-width:760px){.pitch-live{height:430px}}
 </style>
 </head>
 <body>
@@ -263,7 +277,8 @@ Object.assign(CLUB_META,{
 
 let state=JSON.parse(localStorage.getItem('fom_state')||'null')||{
  club:null,money:100000000,positions:{},lastMatch:null,tactics:{tempo:55,press:50,width:55},
-season:{week:1,played:[],standings:{},fatigue:{},injuries:{},contracts:{},transferList:[],trainingLog:[]}
+season:{week:1,played:[],standings:{},fatigue:{},injuries:{},contracts:{},transferList:[],trainingLog:[]},
+liveMatch:null
 };
 
 function save(){localStorage.setItem('fom_state',JSON.stringify(state));}
@@ -354,33 +369,7 @@ function autoFormation(f){
  state.positions[state.club]=p;save();renderTactics();
 }
 
-function renderMatch(){
- const box=document.getElementById('matchContent');const c=currentClub();
- if(!c){box.innerHTML='<div class="empty">Сначала выбери клуб.</div>';return}
- let opponent=Object.keys(CLUB_META).find(x=>x!==state.club && CLUB_META[x].league===c.league);
- if(!opponent)opponent='Real Madrid';
- const last=state.lastMatch;
- loadTacticSetting();
- box.innerHTML=`<div class="card">
-   <div class="sub">ТАКТИЧЕСКИЙ МАТЧ</div>
-   <div class="row between" style="margin:18px 0">
-    <div style="text-align:center;flex:1"><div class="logo" style="margin:auto">${initials(state.club)}</div><b>${esc(state.club)}</b></div>
-    <div style="font-size:25px;font-weight:900">VS</div>
-    <div style="text-align:center;flex:1"><div class="logo" style="margin:auto">${initials(opponent)}</div><b>${esc(opponent)}</b></div>
-   </div>
-   <button class="btn" style="width:100%" onclick="playMatch('${opponent}')">Начать матч</button>
- </div>
- ${last?`<div class="card" style="margin-top:12px">
-   <div class="sub">ОТЧЁТ</div>
-   <h2 style="font-size:26px">${esc(last.score)}</h2>
-   <div class="grid3">
-    <div><div class="sub">xG</div><b>${last.xg}</b></div>
-    <div><div class="sub">ВЛАДЕНИЕ</div><b>${last.possession}</b></div>
-    <div><div class="sub">УДАРЫ</div><b>${last.shots}</b></div>
-   </div>
-   <div style="margin-top:15px">${last.events.map(e=>`<div class="player-row"><span>${esc(e)}</span><span class="badge">MATCH</span></div>`).join('')}</div>
- </div>`:''}`;
-}
+function renderMatch(){ renderLiveMatch(); }
 
 function initials(n){return n.split(' ').map(x=>x[0]).join('').slice(0,3).toUpperCase()}
 function saveTacticSetting(){
@@ -447,71 +436,75 @@ function matchEvent(attacker, defender, minute, type){
  return `${minute}' ${p[0]} — ${type==='attack'?'опасная атака':'перехват'}`;
 }
 
+
+function getPlayerStats(p,fatigue=0){
+ const r=p[2],pos=p[1],form=Math.max(.70,1-fatigue/180);
+ const role={
+  GK:[.95,.20,.75,.65,1],CB:[1.05,.30,.78,.72,.92],LB:[.90,.62,.82,.92,.94],RB:[.90,.62,.82,.92,.94],
+  DM:[.88,.58,1.02,.78,1],CM:[.70,.78,1.06,.82,.98],AM:[.42,1.05,1.08,.88,.90],
+  LW:[.34,1.12,.88,1.02,.88],RW:[.34,1.12,.88,1.02,.88],ST:[.25,1.18,.78,.92,.86]
+ }[pos]||[.6,.7,.8,.8,.9];
+ return {name:p[0],pos,rating:r,def:r*role[0]*form,atk:r*role[1]*form,pass:r*role[2]*form,speed:r*role[3]*form,stamina:r*role[4]*form};
+}
+function lineupFor(name,isUser){
+ const c=CLUB_META[name],sq=(c?.squad||[]).slice(0,11);if(!sq.length)return [];
+ const pos=isUser&&state.positions[name]?state.positions[name]:defaultPositions(11);
+ return sq.map((p,i)=>({...getPlayerStats(p,isUser?(state.season?.fatigue?.[p[0]]||0):0),x:pos[i]?.x||50,y:pos[i]?.y||50,number:i+1}));
+}
+function tacticalTeamPower(name,isUser){
+ const c=CLUB_META[name],line=lineupFor(name,isUser);
+ if(!line.length)return {attack:c.rating,mid:c.rating,def:c.rating,overall:c.rating,width:50,central:50,press:50,tempo:50};
+ const t=isUser?(state.tactics||{tempo:55,press:50,width:55}):{tempo:50,press:48,width:52};
+ let attack=0,mid=0,def=0,wide=0,central=0,depth=0;
+ line.forEach(p=>{
+  if(p.y<35)attack+=p.atk;else if(p.y>65)def+=p.def;else mid+=p.pass+p.atk*.35+p.def*.25;
+  wide+=Math.abs(p.x-50);central+=50-Math.abs(p.x-50);depth+=p.y;
+ });
+ return {attack:attack/Math.max(1,line.filter(p=>p.y<35).length),mid:mid/Math.max(1,line.filter(p=>p.y>=35&&p.y<=65).length),def:def/Math.max(1,line.filter(p=>p.y>65).length),overall:line.reduce((s,p)=>s+p.rating,0)/line.length,width:wide/line.length,central:central/line.length,depth:depth/line.length,press:t.press,tempo:t.tempo};
+}
+function simulateUnifiedMatch(homeName,awayName){
+ const userHome=homeName===state.club,userAway=awayName===state.club;
+ const H=tacticalTeamPower(homeName,userHome),A=tacticalTeamPower(awayName,userAway);
+ let home=0,away=0,shotsH=0,shotsA=0,xgH=.25,xgA=.25,posH=50,events=[];
+ for(let minute=5;minute<=90;minute+=5){
+  const fatigue=1-(minute/90)*.08;
+  const hAtk=H.attack*(1+(H.press-50)/550+(H.tempo-50)/500)*fatigue;
+  const aAtk=A.attack*(1+(A.press-50)/550+(A.tempo-50)/500)*fatigue;
+  const hDef=H.def*(1-(H.press>75?minute/250:0)),aDef=A.def*(1-(A.press>75?minute/250:0));
+  const shapeH=(H.central-A.central)/180+(H.width-A.width)/220+(H.depth-A.depth)/400;
+  const shapeA=-shapeH;
+  const chanceH=Math.max(.06,Math.min(.92,.50+(hAtk-aDef)/75+shapeH));
+  const chanceA=Math.max(.06,Math.min(.92,.50+(aAtk-hDef)/75+shapeA));
+  posH=Math.max(25,Math.min(75,50+(H.mid-A.mid)/2+(H.central-A.central)/3));
+  if(Math.random()<.42*posH/100+.58*chanceH){
+   shotsH++;xgH+=.035+Math.max(0,(H.attack-A.def))/330;
+   if(Math.random()<Math.min(.18,.045+(H.attack-A.def)/700)){home++;events.push({m:minute,text:`ГОЛ — ${homeName}`})}
+  }
+  if(Math.random()<.42*(1-posH/100)+.58*chanceA){
+   shotsA++;xgA+=.033+Math.max(0,(A.attack-H.def))/330;
+   if(Math.random()<Math.min(.18,.045+(A.attack-H.def)/700)){away++;events.push({m:minute,text:`ГОЛ — ${awayName}`})}
+  }
+  if(H.press>65&&Math.random()<.045)events.push({m:minute,text:`Прессинг ${homeName} создал потерю`});
+  if(A.press>65&&Math.random()<.045)events.push({m:minute,text:`Прессинг ${awayName} создал потерю`});
+ }
+ return {home,away,xgH:+xgH.toFixed(2),xgA:+xgA.toFixed(2),shotsH,shotsA,posH:Math.round(posH),events:events.slice(-16),homePower:H,awayPower:A};
+}
+function renderLiveResult(r,home,away){
+ const box=document.getElementById('matchContent');
+ box.innerHTML=`<div class="card"><div class="sub">ФИНАЛЬНЫЙ СВИСТОК</div>
+ <div class="row between" style="margin:16px 0"><div class="team">${svgCrest(home)}${esc(home)}</div><h1 style="margin:0">${r.home}:${r.away}</h1><div class="team">${svgCrest(away)}${esc(away)}</div></div>
+ <div class="grid3"><div><div class="sub">xG</div><b>${r.xgH} : ${r.xgA}</b></div><div><div class="sub">ВЛАДЕНИЕ</div><b>${r.posH}% : ${100-r.posH}%</b></div><div><div class="sub">УДАРЫ</div><b>${r.shotsH} : ${r.shotsA}</b></div></div>
+ <div class="match-live"><div class="sub">СОБЫТИЯ</div>${r.events.map(e=>`<div class="event"><b>${e.m}'</b><span>${esc(e.text)}</span></div>`).join('')}</div></div>`;
+}
 function playMatch(opponent){
  const c=currentClub();if(!c)return;
- const opp=CLUB_META[opponent];
- const a=tacticalProfile(c), b=tacticalProfile(opp);
- const e=tacticalEffects(c);
-
- // Реальные координаты игроков влияют на контроль зон.
- const pos=state.positions[state.club]||defaultPositions(11);
- let attackWidth=0, centrality=0, defensiveDepth=0;
- pos.forEach(p=>{
-   if(!p)return;
-   attackWidth += Math.abs(p.x-50);
-   centrality += 50-Math.abs(p.x-50);
-   defensiveDepth += p.y;
+ const r=simulateUnifiedMatch(state.club,opponent);
+ state.lastMatch={score:`${state.club} ${r.home}:${r.away} ${opponent}`,xg:`${r.xgH} : ${r.xgA}`,possession:`${r.posH}% : ${100-r.posH}%`,shots:`${r.shotsH} : ${r.shotsA}`,events:r.events};
+ (c.squad||[]).slice(0,11).forEach(p=>{
+  state.season.fatigue[p[0]]=Math.min(85,(state.season.fatigue[p[0]]||0)+8+Math.floor(Math.random()*7));
+  if(Math.random()<.025)state.season.injuries[p[0]]={weeks:1+Math.floor(Math.random()*4)};
  });
- attackWidth/=Math.max(1,pos.length);
- centrality/=Math.max(1,pos.length);
- defensiveDepth/=Math.max(1,pos.length);
-
- // Тактические модификаторы.
- const attackingShape =
-   (a.attack-b.def)*0.055 +
-   (e.tempoBonus*0.045) +
-   (e.widthBonus*0.035) +
-   ((attackWidth-22)/30)*0.10 -
-   (e.press>78 ? 0.08 : 0);
-
- const pressing =
-   e.pressBonus*0.06 +
-   ((a.mid-b.mid)*0.025);
-
- const baseA=Math.max(.18,1.18+(a.power-b.power)*.045+attackingShape+pressing);
- const baseB=Math.max(.18,1.08+(b.power-a.power)*.04-(pressing*.55));
-
- const xgA=baseA+Math.random()*.65;
- const xgB=baseB+Math.random()*.65;
- const ga=poisson(xgA),gb=poisson(xgB);
-
- const events=[];
- for(let i=0;i<4;i++){
-   const minute=8+Math.floor(Math.random()*83);
-   if(Math.random()<(xgA/(xgA+xgB))){
-     events.push(matchEvent(c,opp,minute,'attack'));
-   }else{
-     events.push(matchEvent(opp,c,minute,'attack'));
-   }
- }
- events.sort((x,y)=>parseInt(x)-parseInt(y));
-
- const possession=Math.max(32,Math.min(68,
-   50+(a.mid-b.mid)*0.7+(centrality-28)*0.18+(e.press-50)*0.08
- ));
- const shots=Math.max(4,Math.round(xgA*3.8+Math.random()*5));
- const oppShots=Math.max(4,Math.round(xgB*3.8+Math.random()*5));
-
- state.lastMatch={
-   score:`${state.club} ${ga}:${gb} ${opponent}`,
-   xg:`${xgA.toFixed(2)} : ${xgB.toFixed(2)}`,
-   possession:`${Math.round(possession)}% : ${Math.round(100-possession)}%`,
-   shots:`${shots} : ${oppShots}`,
-   events,
-   minute:90
- };
- save();
- renderMatch();
+ save();renderLiveResult(r,state.club,opponent);
 }
 
 function teamPower(c){
@@ -541,10 +534,7 @@ function seasonRound(){
  for(let i=0;i<n/2;i++){let a=list[i],b=list[n-1-i];if((round+i)%2)[a,b]=[b,a];pairs.push([a,b])}
  return pairs;
 }
-function seededScore(a,b){
- const pa=CLUB_META[a]?.rating||75,pb=CLUB_META[b]?.rating||75;
- return [poisson(Math.max(.2,1.15+(pa-pb)/25)+Math.random()*.8),poisson(Math.max(.2,1.05+(pb-pa)/25)+Math.random()*.8)]
-}
+function seededScore(a,b){const r=simulateUnifiedMatch(a,b);return [r.home,r.away]}
 function playSeasonRound(){
  initStandings();const s=state.season,games=seasonRound();
  games.forEach(([home,away])=>{const [hg,ag]=seededScore(home,away),H=s.standings[home],A=s.standings[away];
@@ -552,7 +542,10 @@ function playSeasonRound(){
  if(hg>ag){H.w++;H.pts+=3;A.l++}else if(hg<ag){A.w++;A.pts+=3;H.l++}else{H.d++;A.d++;H.pts++;A.pts++}});
  const fx=games.find(x=>x.includes(state.club));if(fx)s.lastRoundNote=`Тур ${s.week}: ${fx[0]} — ${fx[1]}`;
  s.played.push(s.week);s.week++;
- (currentClub()?.squad||[]).forEach(p=>s.fatigue[p[0]]=Math.max(0,(s.fatigue[p[0]]||0)-12));
+ (currentClub()?.squad||[]).forEach(p=>{
+ s.fatigue[p[0]]=Math.max(0,(s.fatigue[p[0]]||0)-12);
+ if(s.injuries[p[0]]){s.injuries[p[0]].weeks--;if(s.injuries[p[0]].weeks<=0)delete s.injuries[p[0]];}
+});
  save();render();
 }
 function trainTeam(type){
@@ -597,6 +590,162 @@ function renderSeason(){
   const games=seasonRound();box.innerHTML=`<div class="card"><div class="row between"><div><div class="sub">ТЕКУЩИЙ ТУР</div><h2>Тур ${s.week}</h2></div><button class="btn" onclick="playSeasonRound()">Сыграть тур</button></div><div class="calendar">${games.map(([a,b])=>`<div class="match"><div class="team">${svgCrest(a)}${esc(a)}</div><div class="score">—</div><div class="team">${svgCrest(b)}${esc(b)}</div></div>`).join('')}</div></div>${s.lastRoundNote?`<div class="notice" style="margin-top:12px">${esc(s.lastRoundNote)}</div>`:''}`;
  }
 }
+
+function createLiveMatch(opponent){
+ const c=currentClub();if(!c||!c.squad.length)return;
+ const starters=c.squad.slice(0,11).map((p,i)=>({
+   player:p,idx:i,x:(state.positions[state.club]?.[i]?.x||defaultPositions(11)[i].x),
+   y:(state.positions[state.club]?.[i]?.y||defaultPositions(11)[i].y),
+   card:null,subbed:false
+ }));
+ const bench=c.squad.slice(11).map((p,i)=>({player:p,idx:i+11,used:false}));
+ state.liveMatch={
+   opponent,minute:0,running:true,finished:false,home:0,away:0,
+   events:[],starters,bench,subs:0,homeCards:0,awayCards:0,
+   tactic:{tempo:(state.tactics||{}).tempo||55,press:(state.tactics||{}).press||50,width:(state.tactics||{}).width||55},
+   opponentLineup:lineupFor(opponent,false)
+ };
+ save();renderLiveMatch();
+}
+function livePlayerPower(s){
+ return getPlayerStats(s.player,state.season?.fatigue?.[s.player[0]]||0);
+}
+function liveTick(){
+ const m=state.liveMatch;if(!m||!m.running)return;
+ if(m.minute>=90){finishLiveMatch();return}
+ m.minute+=Math.random()<.12?2:1;
+ const userTeam={attack:0,mid:0,def:0,press:m.tactic.press,tempo:m.tactic.tempo,width:m.tactic.width};
+ m.starters.forEach(s=>{
+   if(s.subbed)return;
+   const p=livePlayerPower(s);
+   if(s.y<35)userTeam.attack+=p.atk;
+   else if(s.y>65)userTeam.def+=p.def;
+   else userTeam.mid+=p.pass+p.atk*.3+p.def*.2;
+ });
+ const active=m.starters.filter(s=>!s.subbed).length;
+ userTeam.attack/=Math.max(1,m.starters.filter(s=>!s.subbed&&s.y<35).length);
+ userTeam.mid/=Math.max(1,m.starters.filter(s=>!s.subbed&&s.y>=35&&s.y<=65).length);
+ userTeam.def/=Math.max(1,m.starters.filter(s=>!s.subbed&&s.y>65).length);
+ const opp=tacticalTeamPower(m.opponent,false);
+ const fatiguePenalty=m.minute>65?Math.max(0,(m.minute-65)/150):0;
+ const chanceH=Math.max(.015,Math.min(.16,.035+(userTeam.attack-opp.def)/1500+(userTeam.mid-opp.mid)/2500+(userTeam.press-50)/2500-fatiguePenalty));
+ const chanceA=Math.max(.015,Math.min(.14,.030+(opp.attack-userTeam.def)/1500+(opp.mid-userTeam.mid)/2800-fatiguePenalty*.4));
+ const roll=Math.random();
+ if(roll<chanceH){
+   m.home++;m.events.unshift({m:m.minute,type:'goal',text:`⚽ ГОЛ! ${state.club}`});
+ }else if(roll<chanceH+chanceA){
+   m.away++;m.events.unshift({m:m.minute,type:'goal',text:`⚽ ГОЛ! ${m.opponent}`});
+ }else if(Math.random()<.055){
+   const team=Math.random()<.5?state.club:m.opponent;
+   m.events.unshift({m:m.minute,type:'shot',text:`Удар — ${team}`});
+ }else if(Math.random()<.025){
+   const user=Math.random()<.7;
+   const team=user?state.club:m.opponent;
+   if(user)m.homeCards++;else m.awayCards++;
+   m.events.unshift({m:m.minute,type:'card',text:`🟨 Карточка — ${team}`});
+ }else if(Math.random()<.018){
+   const activePlayers=m.starters.filter(s=>!s.subbed);
+   if(activePlayers.length){
+     const s=activePlayers[Math.floor(Math.random()*activePlayers.length)];
+     const p=s.player[0];
+     if(!state.season.injuries[p]){
+       state.season.injuries[p]={weeks:1+Math.floor(Math.random()*3)};
+       m.events.unshift({m:m.minute,type:'injury',text:`🩹 Травма — ${p}`});
+       m.starters.find(x=>x.idx===s.idx).injured=true;
+     }
+   }
+ }
+ m.starters.filter(s=>!s.subbed).forEach(s=>{
+   const p=s.player[0];state.season.fatigue[p]=Math.min(95,(state.season.fatigue[p]||0)+.9);
+ });
+ save();renderLiveMatch();
+ if(m.minute>=90)finishLiveMatch();
+}
+function startLive(){
+ if(state.liveMatch)state.liveMatch.running=true;
+ save();renderLiveMatch();
+}
+function pauseLive(){
+ if(state.liveMatch)state.liveMatch.running=false;
+ save();renderLiveMatch();
+}
+function finishLiveMatch(){
+ const m=state.liveMatch;if(!m)return;
+ m.minute=90;m.running=false;m.finished=true;
+ updateStandingsResult(state.club,m.opponent,m.home,m.away);
+ state.lastMatch={score:`${state.club} ${m.home}:${m.away} ${m.opponent}`,xg:'—',possession:'—',shots:'—',events:m.events};
+ save();renderLiveMatch();
+}
+function makeSub(starterIdx,benchIdx){
+ const m=state.liveMatch;if(!m||m.finished||m.subs>=5)return;
+ const s=m.starters.find(x=>x.idx===starterIdx),b=m.bench.find(x=>x.idx===benchIdx);
+ if(!s||!b||s.subbed||b.used||s.injured)return;
+ b.used=true;s.subbed=true;
+ const newPos={player:b.player,idx:b.idx,x:s.x,y:s.y,card:null,subbed:false};
+ m.starters.push(newPos);m.subs++;
+ m.events.unshift({m:m.minute,type:'sub',text:`🔄 Замена: ${b.player[0]} вместо ${s.player[0]}`});
+ save();renderLiveMatch();
+}
+function moveLivePlayer(idx,x,y){
+ const m=state.liveMatch;if(!m||m.finished)return;
+ const s=m.starters.find(x=>x.idx===idx);if(!s||s.subbed)return;
+ s.x=Math.max(3,Math.min(97,x));s.y=Math.max(4,Math.min(96,y));
+ save();renderLiveMatch();
+}
+function changeLiveTactic(key,val){
+ const m=state.liveMatch;if(!m||m.finished)return;
+ m.tactic[key]=+val;state.tactics[key]=+val;save();renderLiveMatch();
+}
+function liveCrest(name){
+ return svgCrest(name);
+}
+function renderLiveMatch(){
+ const box=document.getElementById('matchContent');if(!box)return;
+ const m=state.liveMatch;
+ if(!m){
+   const c=currentClub();
+   if(!c){box.innerHTML='<div class="empty">Сначала выбери клуб.</div>';return}
+   let opponent=Object.keys(CLUB_META).find(x=>x!==state.club&&CLUB_META[x].league===c.league)||'Real Madrid';
+   box.innerHTML=`<div class="card"><div class="sub">МАТЧДЭЙ</div><h2>Готовы к игре?</h2><div class="row between" style="margin:18px 0"><div class="team">${liveCrest(state.club)}${esc(state.club)}</div><b>VS</b><div class="team">${liveCrest(opponent)}${esc(opponent)}</div></div><button class="btn" style="width:100%" onclick="createLiveMatch('${esc(opponent).replace(/'/g,"&#39;")}')">Выйти на поле</button></div>`;
+   return;
+ }
+ const active=m.starters.filter(s=>!s.subbed);
+ const bench=m.bench.filter(b=>!b.used);
+ box.innerHTML=`<div class="card">
+   <div class="match-clock">${m.finished?'ФИНАЛ':m.running?m.minute+"' ИГРА ИДЁТ":m.minute+"' ПАУЗА"}</div>
+   <div class="row between" style="margin:6px 0 12px"><div class="team">${liveCrest(state.club)}<div>${esc(state.club)}</div></div><div class="live-score">${m.home}:${m.away}</div><div class="team">${liveCrest(m.opponent)}<div>${esc(m.opponent)}</div></div></div>
+   <div class="livebar"><span style="width:${Math.max(8,Math.min(92,50+(m.home-m.away)*12))}%"></span></div>
+   ${!m.finished?`<div class="live-controls"><button class="btn" onclick="${m.running?'pauseLive()':'startLive()'}">${m.running?'Пауза':'Продолжить'}</button><button class="btn secondary" onclick="liveTick()">+1 мин</button><button class="btn secondary" onclick="finishLiveMatch()">Завершить</button></div>`:''}
+ </div>
+ <div class="card" style="margin-top:12px"><div class="sub">ТАКТИКА ПО ХОДУ МАТЧА</div>
+   <div class="grid3">
+    <label class="sub">Темп<input type="range" min="20" max="90" value="${m.tactic.tempo}" oninput="changeLiveTactic('tempo',this.value)"></label>
+    <label class="sub">Прессинг<input type="range" min="10" max="90" value="${m.tactic.press}" oninput="changeLiveTactic('press',this.value)"></label>
+    <label class="sub">Ширина<input type="range" min="20" max="90" value="${m.tactic.width}" oninput="changeLiveTactic('width',this.value)"></label>
+   </div>
+ </div>
+ <div class="card" style="margin-top:12px"><div class="sub">РАССТАНОВКА — ИЗМЕНЯЙ ПРЯМО ВО ВРЕМЯ МАТЧА</div>
+   <div class="pitch pitch-live" id="livePitch"><div class="zone z1">АТАКА</div><div class="zone z2">ПОЛУЗАЩИТА</div><div class="zone z3">ПОЛУЗАЩИТА</div><div class="zone z4">ОБОРОНА</div><div class="centerline"></div><div class="circle"></div><div class="goalbox"></div><div class="goalbox r"></div>
+   ${active.map(s=>`<div class="player" style="left:${s.x}%;top:${s.y}%" onmousedown="startLiveDrag(event,${s.idx})"><div class="dot">${s.player[1]==='GK'?'GK':s.player[2]}</div><div class="pname">${esc(s.player[0])}</div></div>`).join('')}</div>
+ </div>
+ <div class="card" style="margin-top:12px"><div class="sub">СКАМЕЙКА • ЗАМЕНЫ ${m.subs}/5</div>
+ ${active.filter(s=>!s.injured).map(s=>`<div class="sub-row"><span>${esc(s.player[0])}</span><select class="player-select" onchange="if(this.value)makeSub(${s.idx},+this.value);this.value=''"><option value="">Заменить на...</option>${bench.map(b=>`<option value="${b.idx}">${esc(b.player[0])} • ${b.player[1]}</option>`).join('')}</select></div>`).join('')}
+ </div>
+ <div class="card" style="margin-top:12px"><div class="sub">ЛЕНТА МАТЧА</div><div class="live-log">${m.events.length?m.events.map(e=>`<div class="event"><b>${e.m}'</b><span>${esc(e.text)}</span></div>`).join(''):'<div class="empty">Матч только начался.</div>'}</div></div>`;
+}
+let liveDrag=null;
+function startLiveDrag(e,idx){
+ const pitch=e.currentTarget?.closest?.('#livePitch');if(!pitch)return;
+ e.preventDefault();liveDrag={idx,pitch};
+ const move=ev=>{
+   if(!liveDrag)return;const r=pitch.getBoundingClientRect();
+   const x=Math.max(3,Math.min(97,((ev.clientX-r.left)/r.width)*100));
+   const y=Math.max(4,Math.min(96,((ev.clientY-r.top)/r.height)*100));
+   const s=state.liveMatch.starters.find(z=>z.idx===idx);if(s){s.x=x;s.y=y;save();const el=[...pitch.querySelectorAll('.player')].find(z=>z.getAttribute('onmousedown')?.includes(','+idx+')'));if(el){el.style.left=x+'%';el.style.top=y+'%';}}
+ };
+ const up=()=>{liveDrag=null;document.removeEventListener('mousemove',move);document.removeEventListener('mouseup',up)};
+ document.addEventListener('mousemove',move);document.addEventListener('mouseup',up);
+}
 function renderClubs(){
  const box=document.getElementById('clubContent');
  box.innerHTML=LEAGUES.map(l=>`<div class="card" style="margin-bottom:10px"><div class="row between"><div><h2>${l.flag} ${esc(l.name)}</h2><div class="sub">${l.clubs.length} клубов</div></div><button class="btn secondary" onclick="openLeague('${l.id}')">Открыть</button></div></div>`).join('');
@@ -612,6 +761,7 @@ function selectClub(name){
 }
 
 document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+setInterval(()=>{if(state.liveMatch?.running)liveTick()},1500);
 render();
 </script>
 </body>
