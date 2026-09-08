@@ -82,10 +82,57 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 5px;b
 .sub-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
 .player-select{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:9px;width:100%}
 .pitch-live{height:330px;margin-top:12px}
+.prep-head{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center}
+.prep-team{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center}
+.prep-team .svg-logo{width:52px;height:52px}
+.prep-section{margin-top:12px}
+.choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.choice{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;cursor:pointer;text-align:left}
+.choice.active{border-color:var(--accent);background:#2b1d14}
+.choice .mini{font-size:11px;color:var(--muted);margin-top:3px}
+.formation-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.formation-btn{border:1px solid var(--line);background:var(--panel2);border-radius:11px;padding:9px 4px;font-weight:800;cursor:pointer}
+.formation-btn.active{background:#2b1d14;border-color:var(--accent);color:#fff}
+.role-select{width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:8px}
+.setup-row{display:grid;grid-template-columns:1fr 110px;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px}
+.status-dot.warn{background:#ffd166}.status-dot.bad{background:var(--red)}
+@media(max-width:500px){.setup-row{grid-template-columns:1fr 96px}.formation-grid{grid-template-columns:repeat(2,1fr)}}
+
 @media(min-width:760px){.pitch-live{height:430px}}
 </style>
+
+<style id="fom-v09-season-style">
+.season-hub{position:fixed;inset:0;z-index:1000;display:none;background:rgba(0,0,0,.72);backdrop-filter:blur(8px)}
+.season-hub.open{display:block}
+.season-sheet{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:min(760px,100%);max-height:88vh;overflow:auto;background:var(--bg,#111);border-radius:24px 24px 0 0;padding:18px}
+.season-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.season-round{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:16px;margin-bottom:10px}
+.season-match{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:12px;border:1px solid rgba(255,255,255,.06);border-radius:14px;margin-top:8px}
+.season-match .home{text-align:right}.season-match .away{text-align:left}.season-score{font-weight:800;min-width:60px;text-align:center}
+.season-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.season-actions button{flex:1;min-width:120px}
+.season-empty{opacity:.65;padding:18px;text-align:center}
+</style>
+<div id="seasonHub" class="season-hub" onclick="if(event.target.id==='seasonHub') closeSeasonHub()">
+  <div class="season-sheet">
+    <div class="season-head">
+      <div>
+        <div class="eyebrow">СЕЗОН</div>
+        <h2 style="margin:3px 0 0">Календарь и туры</h2>
+      </div>
+      <button class="icon-btn" onclick="closeSeasonHub()">✕</button>
+    </div>
+    <div class="season-actions">
+      <button class="primary" onclick="seasonPrevRound()">← Предыдущий</button>
+      <button class="secondary" onclick="seasonNextRound()">Следующий →</button>
+      <button class="secondary" onclick="seasonOpenTable()">Таблица</button>
+    </div>
+    <div id="seasonHubBody"></div>
+  </div>
+</div>
 </head>
-<body>
+<body><button id="seasonCalendarBtn" class="secondary" onclick="openSeasonHub()" style="position:fixed;right:16px;top:16px;z-index:90;border-radius:14px;padding:10px 12px">📅 Календарь</button>
 <div class="app">
 <header>
   <div class="top">
@@ -278,7 +325,8 @@ Object.assign(CLUB_META,{
 let state=JSON.parse(localStorage.getItem('fom_state')||'null')||{
  club:null,money:100000000,positions:{},lastMatch:null,tactics:{tempo:55,press:50,width:55},
 season:{week:1,played:[],standings:{},fatigue:{},injuries:{},contracts:{},transferList:[],trainingLog:[]},
-liveMatch:null
+liveMatch:null,
+matchSetup:null
 };
 
 function save(){localStorage.setItem('fom_state',JSON.stringify(state));}
@@ -437,8 +485,8 @@ function matchEvent(attacker, defender, minute, type){
 }
 
 
-function getPlayerStats(p,fatigue=0){
- const r=p[2],pos=p[1],form=Math.max(.70,1-fatigue/180);
+function getPlayerStats(p,fatigue=0,overrideRole=null){
+ const r=p[2],pos=overrideRole||p[1],form=Math.max(.70,1-fatigue/180);
  const role={
   GK:[.95,.20,.75,.65,1],CB:[1.05,.30,.78,.72,.92],LB:[.90,.62,.82,.92,.94],RB:[.90,.62,.82,.92,.94],
   DM:[.88,.58,1.02,.78,1],CM:[.70,.78,1.06,.82,.98],AM:[.42,1.05,1.08,.88,.90],
@@ -447,21 +495,40 @@ function getPlayerStats(p,fatigue=0){
  return {name:p[0],pos,rating:r,def:r*role[0]*form,atk:r*role[1]*form,pass:r*role[2]*form,speed:r*role[3]*form,stamina:r*role[4]*form};
 }
 function lineupFor(name,isUser){
- const c=CLUB_META[name],sq=(c?.squad||[]).slice(0,11);if(!sq.length)return [];
+ const c=CLUB_META[name];
+ if(!c)return [];
+ if(isUser&&state.matchSetup&&state.matchSetup.opponent===name){
+   return (state.matchSetup.starters||[]).map((idx,i)=>{
+     const p=c.squad[idx]; if(!p)return null;
+     const pos=state.positions[name]?.[idx]||defaultPositions(11)[i];
+     const role=state.matchSetup.roles?.[idx]||p[1];
+     return {...getPlayerStats(p,state.season?.fatigue?.[p[0]]||0,role),x:pos?.x||50,y:pos?.y||50,number:i+1,idx,role};
+   }).filter(Boolean);
+ }
+ const sq=(c.squad||[]).slice(0,11);if(!sq.length)return [];
  const pos=isUser&&state.positions[name]?state.positions[name]:defaultPositions(11);
- return sq.map((p,i)=>({...getPlayerStats(p,isUser?(state.season?.fatigue?.[p[0]]||0):0),x:pos[i]?.x||50,y:pos[i]?.y||50,number:i+1}));
+ return sq.map((p,i)=>({...getPlayerStats(p,isUser?(state.season?.fatigue?.[p[0]]||0):0),x:pos[i]?.x||50,y:pos[i]?.y||50,number:i+1,idx:i,role:p[1]}));
 }
+
 function tacticalTeamPower(name,isUser){
  const c=CLUB_META[name],line=lineupFor(name,isUser);
- if(!line.length)return {attack:c.rating,mid:c.rating,def:c.rating,overall:c.rating,width:50,central:50,press:50,tempo:50};
+ if(!line.length)return {attack:c?.rating||72,mid:c?.rating||72,def:c?.rating||72,overall:c?.rating||72,width:50,central:50,press:50,tempo:50};
  const t=isUser?(state.tactics||{tempo:55,press:50,width:55}):{tempo:50,press:48,width:52};
  let attack=0,mid=0,def=0,wide=0,central=0,depth=0;
  line.forEach(p=>{
-  if(p.y<35)attack+=p.atk;else if(p.y>65)def+=p.def;else mid+=p.pass+p.atk*.35+p.def*.25;
+  if(p.y<35)attack+=p.atk;else if(p.y>65)def+=p.def;else mid+=p.pass+p.atk*.3+p.def*.2;
   wide+=Math.abs(p.x-50);central+=50-Math.abs(p.x-50);depth+=p.y;
  });
- return {attack:attack/Math.max(1,line.filter(p=>p.y<35).length),mid:mid/Math.max(1,line.filter(p=>p.y>=35&&p.y<=65).length),def:def/Math.max(1,line.filter(p=>p.y>65).length),overall:line.reduce((s,p)=>s+p.rating,0)/line.length,width:wide/line.length,central:central/line.length,depth:depth/line.length,press:t.press,tempo:t.tempo};
+ return {
+   attack:attack/Math.max(1,line.filter(p=>p.y<35).length),
+   mid:mid/Math.max(1,line.filter(p=>p.y>=35&&p.y<=65).length),
+   def:def/Math.max(1,line.filter(p=>p.y>65).length),
+   overall:line.reduce((s,p)=>s+p.rating,0)/line.length,
+   width:wide/line.length,central:central/line.length,depth:depth/line.length,
+   press:t.press,tempo:t.tempo
+ };
 }
+
 function simulateUnifiedMatch(homeName,awayName){
  const userHome=homeName===state.club,userAway=awayName===state.club;
  const H=tacticalTeamPower(homeName,userHome),A=tacticalTeamPower(awayName,userAway);
@@ -591,84 +658,241 @@ function renderSeason(){
  }
 }
 
+const FORMATIONS={
+ '433':{
+   name:'4–3–3',
+   slots:[
+    [8,50,'GK'],[25,18,'LB'],[25,40,'CB'],[25,60,'CB'],[25,82,'RB'],
+    [48,25,'CM'],[45,50,'CM'],[48,75,'CM'],[68,22,'LW'],[70,50,'ST'],[68,78,'RW']
+   ]
+ },
+ '4231':{
+   name:'4–2–3–1',
+   slots:[
+    [8,50,'GK'],[25,18,'LB'],[25,40,'CB'],[25,60,'CB'],[25,82,'RB'],
+    [43,38,'DM'],[43,62,'DM'],[63,20,'LW'],[62,50,'AM'],[63,80,'RW'],[82,50,'ST']
+   ]
+ },
+ '442':{
+   name:'4–4–2',
+   slots:[
+    [8,50,'GK'],[25,18,'LB'],[25,40,'CB'],[25,60,'CB'],[25,82,'RB'],
+    [48,18,'LM'],[48,40,'CM'],[48,60,'CM'],[48,82,'RM'],[78,38,'ST'],[78,62,'ST']
+   ]
+ },
+ '352':{
+   name:'3–5–2',
+   slots:[
+    [8,50,'GK'],[25,25,'CB'],[25,50,'CB'],[25,75,'CB'],
+    [45,12,'LM'],[45,32,'DM'],[45,50,'CM'],[45,68,'AM'],[45,88,'RM'],[78,38,'ST'],[78,62,'ST']
+   ]
+ }
+};
+const ROLE_OPTIONS=['GK','CB','LB','RB','DM','CM','AM','LW','RW','ST'];
+
+function ensureMatchSetup(opponent){
+ const c=currentClub();if(!c||!c.squad.length)return null;
+ const validOpp=opponent||state.matchSetup?.opponent||Object.keys(CLUB_META).find(x=>x!==state.club&&CLUB_META[x].league===c.league)||'Real Madrid';
+ const ms=state.matchSetup;
+ if(!ms||ms.club!==state.club||ms.opponent!==validOpp){
+   const starters=c.squad.map((_,i)=>i).slice(0,Math.min(11,c.squad.length));
+   const bench=c.squad.map((_,i)=>i).filter(i=>!starters.includes(i)).slice(0,7);
+   state.matchSetup={
+     club:state.club,opponent:validOpp,formation:'433',
+     starters,bench,roles:{},captain:starters[0]??null,
+     penalty:starters.find(i=>['ST','AM','RW','LW'].includes(c.squad[i][1]))??starters[0]??null,
+     freeKick:starters.find(i=>['AM','CM','RW','LW'].includes(c.squad[i][1]))??starters[0]??null,
+     corner:starters.find(i=>['AM','CM','RW','LW'].includes(c.squad[i][1]))??starters[0]??null,
+     autoSub:true
+   };
+   starters.forEach(i=>state.matchSetup.roles[i]=c.squad[i][1]);
+   assignMatchPositions();
+   save();
+ }
+ return state.matchSetup;
+}
+function assignMatchPositions(){
+ const c=currentClub(),ms=state.matchSetup;if(!c||!ms)return;
+ const slots=FORMATIONS[ms.formation]?.slots||FORMATIONS['433'].slots;
+ state.positions[state.club] ||= [];
+ ms.starters.forEach((idx,i)=>{
+   const slot=slots[i]||slots[slots.length-1];
+   state.positions[state.club][idx]={x:slot[0],y:slot[1]};
+   if(!ms.roles[idx]||ms.roles[idx]==='LM'||ms.roles[idx]==='RM')ms.roles[idx]=slot[2];
+ });
+}
+function setMatchOpponent(name){
+ const c=currentClub();if(!c||name===state.club)return;
+ state.matchSetup=null;ensureMatchSetup(name);save();renderMatch();
+}
+function toggleStarter(idx){
+ const c=currentClub(),ms=ensureMatchSetup();if(!c||!ms)return;
+ const at=ms.starters.indexOf(idx);
+ if(at>=0){
+   if(ms.starters.length<=1){alert('В составе должен остаться хотя бы один игрок.');return}
+   ms.starters.splice(at,1);
+   if(ms.captain===idx)ms.captain=ms.starters[0]??null;
+   if(ms.penalty===idx)ms.penalty=ms.starters[0]??null;
+   if(ms.freeKick===idx)ms.freeKick=ms.starters[0]??null;
+   if(ms.corner===idx)ms.corner=ms.starters[0]??null;
+ }else{
+   if(ms.starters.length>=11){alert('Стартовый состав уже содержит 11 игроков.');return}
+   ms.starters.push(idx);ms.bench=ms.bench.filter(x=>x!==idx);ms.roles[idx]=c.squad[idx][1];
+ }
+ if(!ms.bench.includes(idx)&&!ms.starters.includes(idx))ms.bench.push(idx);
+ if(ms.bench.length>7)ms.bench=ms.bench.slice(0,7);
+ assignMatchPositions();save();renderMatch();
+}
+function toggleBench(idx){
+ const ms=ensureMatchSetup();if(!ms||ms.starters.includes(idx))return;
+ const at=ms.bench.indexOf(idx);
+ if(at>=0)ms.bench.splice(at,1);
+ else if(ms.bench.length<7)ms.bench.push(idx);
+ else {alert('Максимум 7 игроков на скамейке.');return}
+ save();renderMatch();
+}
+function setMatchFormation(f){
+ const ms=ensureMatchSetup();if(!ms)return;
+ ms.formation=f;assignMatchPositions();save();renderMatch();
+}
+function setMatchRole(idx,role){
+ const ms=ensureMatchSetup();if(!ms)return;
+ ms.roles[idx]=role;save();
+}
+function setMatchSpecial(key,val){
+ const ms=ensureMatchSetup();if(!ms)return;
+ ms[key]=+val;save();renderMatch();
+}
+function toggleAutoSub(){
+ const ms=ensureMatchSetup();if(!ms)return;
+ ms.autoSub=!ms.autoSub;save();renderMatch();
+}
+function prepReady(){
+ const ms=ensureMatchSetup();
+ return !!ms&&ms.starters.length===11&&ms.starters.every(i=>Number.isInteger(i));
+}
+function startPreparedMatch(){
+ const ms=ensureMatchSetup();
+ if(!prepReady()){alert('Выбери ровно 11 игроков в стартовый состав.');return}
+ if(ms.bench.length>7){alert('На скамейке максимум 7 игроков.');return}
+ createLiveMatch(ms.opponent);
+}
 function createLiveMatch(opponent){
  const c=currentClub();if(!c||!c.squad.length)return;
- const starters=c.squad.slice(0,11).map((p,i)=>({
-   player:p,idx:i,x:(state.positions[state.club]?.[i]?.x||defaultPositions(11)[i].x),
-   y:(state.positions[state.club]?.[i]?.y||defaultPositions(11)[i].y),
-   card:null,subbed:false
- }));
- const bench=c.squad.slice(11).map((p,i)=>({player:p,idx:i+11,used:false}));
+ const ms=ensureMatchSetup(opponent);
+ if(!prepReady()){alert('Сначала собери стартовые 11.');return}
+ assignMatchPositions();
+ const slots=FORMATIONS[ms.formation].slots;
+ const starters=ms.starters.map((idx,i)=>{
+   const p=c.squad[idx],xy=state.positions[state.club]?.[idx]||{x:slots[i][0],y:slots[i][1]};
+   return {
+     player:p,idx,x:xy.x,y:xy.y,role:ms.roles[idx]||slots[i][2],
+     card:null,subbed:false,injured:false
+   };
+ });
+ const bench=ms.bench.map(idx=>({player:c.squad[idx],idx,used:false,role:ms.roles[idx]||c.squad[idx][1]}));
  state.liveMatch={
-   opponent,minute:0,running:true,finished:false,home:0,away:0,
-   events:[],starters,bench,subs:0,homeCards:0,awayCards:0,
+   opponent:ms.opponent,minute:0,running:true,finished:false,half:1,home:0,away:0,
+   events:[{m:0,type:'info',text:`Стартовый состав готов • ${FORMATIONS[ms.formation].name}`}],
+   starters,bench,subs:0,homeCards:0,awayCards:0,
    tactic:{tempo:(state.tactics||{}).tempo||55,press:(state.tactics||{}).press||50,width:(state.tactics||{}).width||55},
-   opponentLineup:lineupFor(opponent,false)
+   opponentLineup:lineupFor(ms.opponent,false),
+   captain:ms.captain,penalty:ms.penalty,freeKick:ms.freeKick,corner:ms.corner,
+   autoSub:ms.autoSub
  };
  save();renderLiveMatch();
 }
 function livePlayerPower(s){
- return getPlayerStats(s.player,state.season?.fatigue?.[s.player[0]]||0);
+ return getPlayerStats(s.player,state.season?.fatigue?.[s.player[0]]||0,s.role);
+}
+function autoSubLive(reason){
+ const m=state.liveMatch;if(!m||m.finished||m.subs>=5)return false;
+ const candidates=m.starters.filter(s=>!s.subbed&&(s.injured||((state.season.fatigue[s.player[0]]||0)>=86)));
+ if(!candidates.length)return false;
+ const s=candidates.sort((a,b)=>(b.injured?1:0)-(a.injured?1:0))[0];
+ const available=m.bench.find(b=>!b.used&&b.player[1]===s.player[1])||m.bench.find(b=>!b.used);
+ if(!available)return false;
+ available.used=true;s.subbed=true;
+ m.starters.push({player:available.player,idx:available.idx,x:s.x,y:s.y,role:s.role||available.role,card:null,subbed:false,injured:false});
+ m.subs++;
+ m.events.unshift({m:m.minute,type:'sub',text:`🔄 Автозамена: ${available.player[0]} вместо ${s.player[0]}${reason?' • '+reason:''}`});
+ return true;
 }
 function liveTick(){
  const m=state.liveMatch;if(!m||!m.running)return;
  if(m.minute>=90){finishLiveMatch();return}
- m.minute+=Math.random()<.12?2:1;
+ let next=m.minute+(Math.random()<.10?2:1);
+ if(m.minute<45&&next>45)next=45;
+ if(m.minute>=45&&m.minute<90&&next>90)next=90;
+ m.minute=next;
+
+ if(m.minute===45){
+   m.running=false;m.half=2;
+   m.events.unshift({m:45,type:'half',text:'⏸ Перерыв. Можно изменить тактику и сделать замены.'});
+   save();renderLiveMatch();return;
+ }
+ const active=m.starters.filter(s=>!s.subbed);
  const userTeam={attack:0,mid:0,def:0,press:m.tactic.press,tempo:m.tactic.tempo,width:m.tactic.width};
- m.starters.forEach(s=>{
-   if(s.subbed)return;
+ active.forEach(s=>{
    const p=livePlayerPower(s);
    if(s.y<35)userTeam.attack+=p.atk;
    else if(s.y>65)userTeam.def+=p.def;
    else userTeam.mid+=p.pass+p.atk*.3+p.def*.2;
  });
- const active=m.starters.filter(s=>!s.subbed).length;
- userTeam.attack/=Math.max(1,m.starters.filter(s=>!s.subbed&&s.y<35).length);
- userTeam.mid/=Math.max(1,m.starters.filter(s=>!s.subbed&&s.y>=35&&s.y<=65).length);
- userTeam.def/=Math.max(1,m.starters.filter(s=>!s.subbed&&s.y>65).length);
+ const acA=active.filter(s=>s.y<35).length,acM=active.filter(s=>s.y>=35&&s.y<=65).length,acD=active.filter(s=>s.y>65).length;
+ userTeam.attack/=Math.max(1,acA);userTeam.mid/=Math.max(1,acM);userTeam.def/=Math.max(1,acD);
  const opp=tacticalTeamPower(m.opponent,false);
  const fatiguePenalty=m.minute>65?Math.max(0,(m.minute-65)/150):0;
- const chanceH=Math.max(.015,Math.min(.16,.035+(userTeam.attack-opp.def)/1500+(userTeam.mid-opp.mid)/2500+(userTeam.press-50)/2500-fatiguePenalty));
- const chanceA=Math.max(.015,Math.min(.14,.030+(opp.attack-userTeam.def)/1500+(opp.mid-userTeam.mid)/2800-fatiguePenalty*.4));
+ const redPenalty=active.filter(s=>s.card==='red').length*.12;
+ const chanceH=Math.max(.012,Math.min(.17,.032+(userTeam.attack-opp.def)/1450+(userTeam.mid-opp.mid)/2500+(userTeam.press-50)/2500-fatiguePenalty-redPenalty));
+ const chanceA=Math.max(.012,Math.min(.15,.029+(opp.attack-userTeam.def)/1450+(opp.mid-userTeam.mid)/2800-fatiguePenalty*.35));
  const roll=Math.random();
  if(roll<chanceH){
-   m.home++;m.events.unshift({m:m.minute,type:'goal',text:`⚽ ГОЛ! ${state.club}`});
+   m.home++;
+   const taker=m.starters.find(s=>!s.subbed&&s.idx===m.penalty)||active[Math.floor(Math.random()*active.length)];
+   m.events.unshift({m:m.minute,type:'goal',text:`⚽ ГОЛ! ${state.club} • ${taker?.player[0]||'Атака'}`});
  }else if(roll<chanceH+chanceA){
    m.away++;m.events.unshift({m:m.minute,type:'goal',text:`⚽ ГОЛ! ${m.opponent}`});
- }else if(Math.random()<.055){
+ }else if(Math.random()<.065){
    const team=Math.random()<.5?state.club:m.opponent;
-   m.events.unshift({m:m.minute,type:'shot',text:`Удар — ${team}`});
- }else if(Math.random()<.025){
-   const user=Math.random()<.7;
+   m.events.unshift({m:m.minute,type:'shot',text:`🥅 Удар — ${team}`});
+ }else if(Math.random()<.035){
+   const user=Math.random()<.62;
    const team=user?state.club:m.opponent;
-   if(user)m.homeCards++;else m.awayCards++;
-   m.events.unshift({m:m.minute,type:'card',text:`🟨 Карточка — ${team}`});
- }else if(Math.random()<.018){
+   if(user){
+     const cardable=active.filter(s=>!s.card||s.card==='yellow');
+     const s=cardable[Math.floor(Math.random()*Math.max(1,cardable.length))];
+     if(s){
+       if(s.card==='yellow'){s.card='red';m.events.unshift({m:m.minute,type:'red',text:`🟥 Вторая жёлтая — ${s.player[0]}`});}
+       else{s.card='yellow';m.events.unshift({m:m.minute,type:'card',text:`🟨 ${s.player[0]}`});}
+     }
+   }else{m.awayCards++;m.events.unshift({m:m.minute,type:'card',text:`🟨 Карточка — ${team}`});}
+ }else if(Math.random()<.022){
    const activePlayers=m.starters.filter(s=>!s.subbed);
    if(activePlayers.length){
-     const s=activePlayers[Math.floor(Math.random()*activePlayers.length)];
-     const p=s.player[0];
+     const s=activePlayers[Math.floor(Math.random()*activePlayers.length)],p=s.player[0];
      if(!state.season.injuries[p]){
        state.season.injuries[p]={weeks:1+Math.floor(Math.random()*3)};
+       s.injured=true;
        m.events.unshift({m:m.minute,type:'injury',text:`🩹 Травма — ${p}`});
-       m.starters.find(x=>x.idx===s.idx).injured=true;
+       if(m.autoSub)autoSubLive('травма');
      }
    }
  }
  m.starters.filter(s=>!s.subbed).forEach(s=>{
-   const p=s.player[0];state.season.fatigue[p]=Math.min(95,(state.season.fatigue[p]||0)+.9);
+   const p=s.player[0],gain=.72+(m.tactic.press/100)*.38+(m.tactic.tempo/100)*.20;
+   state.season.fatigue[p]=Math.min(95,(state.season.fatigue[p]||0)+gain);
  });
+ if(m.autoSub)autoSubLive('усталость');
  save();renderLiveMatch();
  if(m.minute>=90)finishLiveMatch();
 }
 function startLive(){
- if(state.liveMatch)state.liveMatch.running=true;
- save();renderLiveMatch();
+ const m=state.liveMatch;if(!m)return;
+ if(m.minute===45&&m.half===2)m.minute=46;
+ m.running=true;save();renderLiveMatch();
 }
-function pauseLive(){
- if(state.liveMatch)state.liveMatch.running=false;
- save();renderLiveMatch();
-}
+function pauseLive(){if(state.liveMatch)state.liveMatch.running=false;save();renderLiveMatch()}
 function finishLiveMatch(){
  const m=state.liveMatch;if(!m)return;
  m.minute=90;m.running=false;m.finished=true;
@@ -681,8 +905,8 @@ function makeSub(starterIdx,benchIdx){
  const s=m.starters.find(x=>x.idx===starterIdx),b=m.bench.find(x=>x.idx===benchIdx);
  if(!s||!b||s.subbed||b.used||s.injured)return;
  b.used=true;s.subbed=true;
- const newPos={player:b.player,idx:b.idx,x:s.x,y:s.y,card:null,subbed:false};
- m.starters.push(newPos);m.subs++;
+ m.starters.push({player:b.player,idx:b.idx,x:s.x,y:s.y,role:s.role||b.role,card:null,subbed:false,injured:false});
+ m.subs++;
  m.events.unshift({m:m.minute,type:'sub',text:`🔄 Замена: ${b.player[0]} вместо ${s.player[0]}`});
  save();renderLiveMatch();
 }
@@ -696,26 +920,94 @@ function changeLiveTactic(key,val){
  const m=state.liveMatch;if(!m||m.finished)return;
  m.tactic[key]=+val;state.tactics[key]=+val;save();renderLiveMatch();
 }
-function liveCrest(name){
- return svgCrest(name);
+function liveCrest(name){return svgCrest(name)}
+
+function renderMatchPrep(){
+ const c=currentClub();if(!c){document.getElementById('matchContent').innerHTML='<div class="empty">Сначала выбери клуб.</div>';return}
+ if(!c.squad.length){document.getElementById('matchContent').innerHTML='<div class="notice">У выбранного клуба пока нет заполненного реального состава. Система предматчевого состава станет доступна после добавления игроков.</div>';return}
+ const opps=leagueClubs().filter(n=>n!==state.club);
+ const ms=ensureMatchSetup();
+ const fatigue=i=>Math.round(state.season.fatigue[c.squad[i][0]]||0);
+ const selected=new Set(ms.starters),benched=new Set(ms.bench);
+ const roleOptions=ROLE_OPTIONS.map(r=>`<option value="${r}">${r}</option>`).join('');
+ const playerCard=(i,type)=>{
+   const p=c.squad[i],isS=selected.has(i),isB=benched.has(i),f=fatigue(i);
+   const cls=isS?'active':isB?'active':'';
+   return `<button class="choice ${cls}" onclick="${type==='starter'?'toggleStarter':'toggleBench'}(${i})">
+     <div class="row between"><b>${esc(p[0])}</b><span class="badge">${p[1]} • ${p[2]}</span></div>
+     <div class="mini">${isS?'СТАРТ':isB?'СКАМЕЙКА':'ЗАЯВКА'} • форма ${Math.max(5,100-f)}%</div>
+   </button>`;
+ };
+ const selectFor=(key)=>{
+   return `<select class="role-select" onchange="setMatchSpecial('${key}',this.value)">${ms.starters.map(i=>`<option value="${i}" ${ms[key]===i?'selected':''}>${esc(c.squad[i][0])}</option>`).join('')}</select>`;
+ };
+ document.getElementById('matchContent').innerHTML=`
+ <div class="card">
+   <div class="sub">ПРЕДМАТЧЕВАЯ ПОДГОТОВКА</div>
+   <div class="prep-head" style="margin-top:12px">
+    <div class="prep-team">${svgCrest(state.club)}<b>${esc(state.club)}</b></div>
+    <b style="font-size:18px">VS</b>
+    <div class="prep-team">${svgCrest(ms.opponent)}<b>${esc(ms.opponent)}</b></div>
+   </div>
+   <div class="prep-section"><label class="sub">СОПЕРНИК</label>
+    <select class="player-select" style="margin-top:5px" onchange="setMatchOpponent(this.value)">
+      ${opps.map(n=>`<option value="${esc(n)}" ${n===ms.opponent?'selected':''}>${esc(n)}</option>`).join('')}
+    </select>
+   </div>
+ </div>
+ <div class="card prep-section">
+   <div class="row between"><div><div class="sub">СХЕМА</div><h2>${FORMATIONS[ms.formation].name}</h2></div><span class="badge">${ms.starters.length}/11</span></div>
+   <div class="formation-grid">${Object.entries(FORMATIONS).map(([k,f])=>`<button class="formation-btn ${ms.formation===k?'active':''}" onclick="setMatchFormation('${k}')">${f.name}</button>`).join('')}</div>
+ </div>
+ <div class="card prep-section">
+   <div class="row between"><div><div class="sub">СТАРТОВЫЕ 11</div><h2>Выбор игроков</h2></div><span class="badge">${ms.starters.length}/11</span></div>
+   <div class="choice-grid">${c.squad.map((_,i)=>playerCard(i,'starter')).join('')}</div>
+ </div>
+ <div class="card prep-section">
+   <div class="row between"><div><div class="sub">СКАМЕЙКА</div><h2>Запасные</h2></div><span class="badge">${ms.bench.length}/7</span></div>
+   <div class="choice-grid">${c.squad.map((_,i)=>playerCard(i,'bench')).join('')}</div>
+ </div>
+ <div class="card prep-section">
+   <div class="sub">РОЛИ ИГРОКОВ</div>
+   ${ms.starters.map((i,n)=>{const p=c.squad[i];return `<div class="setup-row"><div><b>${n+1}. ${esc(p[0])}</b><div class="sub">${p[1]} • ${p[2]}</div></div><select class="role-select" onchange="setMatchRole(${i},this.value)">${ROLE_OPTIONS.map(r=>`<option value="${r}" ${(ms.roles[i]||p[1])===r?'selected':''}>${r}</option>`).join('')}</select></div>`}).join('')}
+ </div>
+ <div class="card prep-section">
+   <div class="sub">КАПИТАН И СТАНДАРТЫ</div>
+   <div class="setup-row"><b>Капитан</b>${selectFor('captain')}</div>
+   <div class="setup-row"><b>Пенальти</b>${selectFor('penalty')}</div>
+   <div class="setup-row"><b>Штрафные</b>${selectFor('freeKick')}</div>
+   <div class="setup-row"><b>Угловые</b>${selectFor('corner')}</div>
+ </div>
+ <div class="card prep-section">
+   <div class="row between"><div><b>Автозамены</b><div class="sub">Травмированный или сильно уставший игрок будет автоматически заменён подходящим запасным.</div></div>
+   <button class="btn ${ms.autoSub?'':'secondary'}" onclick="toggleAutoSub()">${ms.autoSub?'ВКЛ':'ВЫКЛ'}</button></div>
+ </div>
+ <div class="card prep-section">
+   <div class="notice" style="margin:0">После старта матча можно будет менять позиции, темп, прессинг и ширину, делать до 5 замен и вручную управлять игрой.</div>
+   <button class="btn" style="width:100%;margin-top:10px" onclick="startPreparedMatch()" ${ms.starters.length===11?'':'disabled'}>⚽ Начать матч</button>
+ </div>`;
 }
+
 function renderLiveMatch(){
  const box=document.getElementById('matchContent');if(!box)return;
  const m=state.liveMatch;
- if(!m){
-   const c=currentClub();
-   if(!c){box.innerHTML='<div class="empty">Сначала выбери клуб.</div>';return}
-   let opponent=Object.keys(CLUB_META).find(x=>x!==state.club&&CLUB_META[x].league===c.league)||'Real Madrid';
-   box.innerHTML=`<div class="card"><div class="sub">МАТЧДЭЙ</div><h2>Готовы к игре?</h2><div class="row between" style="margin:18px 0"><div class="team">${liveCrest(state.club)}${esc(state.club)}</div><b>VS</b><div class="team">${liveCrest(opponent)}${esc(opponent)}</div></div><button class="btn" style="width:100%" onclick="createLiveMatch('${esc(opponent).replace(/'/g,"&#39;")}')">Выйти на поле</button></div>`;
-   return;
- }
+ if(!m){renderMatchPrep();return}
  const active=m.starters.filter(s=>!s.subbed);
  const bench=m.bench.filter(b=>!b.used);
+ const cards=active.filter(s=>s.card).map(s=>`${s.player[0]} ${s.card==='red'?'🟥':'🟨'}`).join(', ');
  box.innerHTML=`<div class="card">
-   <div class="match-clock">${m.finished?'ФИНАЛ':m.running?m.minute+"' ИГРА ИДЁТ":m.minute+"' ПАУЗА"}</div>
+   <div class="match-clock">${m.finished?'ФИНАЛ':m.minute===45?'ПЕРЕРЫВ':m.running?m.minute+"' ИГРА ИДЁТ":m.minute+"' ПАУЗА"}</div>
    <div class="row between" style="margin:6px 0 12px"><div class="team">${liveCrest(state.club)}<div>${esc(state.club)}</div></div><div class="live-score">${m.home}:${m.away}</div><div class="team">${liveCrest(m.opponent)}<div>${esc(m.opponent)}</div></div></div>
    <div class="livebar"><span style="width:${Math.max(8,Math.min(92,50+(m.home-m.away)*12))}%"></span></div>
-   ${!m.finished?`<div class="live-controls"><button class="btn" onclick="${m.running?'pauseLive()':'startLive()'}">${m.running?'Пауза':'Продолжить'}</button><button class="btn secondary" onclick="liveTick()">+1 мин</button><button class="btn secondary" onclick="finishLiveMatch()">Завершить</button></div>`:''}
+   ${!m.finished?`<div class="live-controls"><button class="btn" onclick="${m.running?'pauseLive()':'startLive()'}">${m.running?'Пауза':m.minute===45?'Начать 2-й тайм':'Продолжить'}</button><button class="btn secondary" onclick="liveTick()">+1 мин</button><button class="btn secondary" onclick="finishLiveMatch()">Завершить</button></div>`:''}
+ </div>
+ <div class="card" style="margin-top:12px">
+   <div class="sub">СОСТАВ • ${m.subs}/5 ЗАМЕН</div>
+   <div class="grid3">
+    <div><div class="sub">КАПИТАН</div><b>${esc((m.starters.find(s=>s.idx===m.captain)||m.starters[0])?.player[0]||'—')}</b></div>
+    <div><div class="sub">КАРТОЧКИ</div><b>${cards||'Нет'}</b></div>
+    <div><div class="sub">АВТОЗАМЕНЫ</div><b>${m.autoSub?'Вкл':'Выкл'}</b></div>
+   </div>
  </div>
  <div class="card" style="margin-top:12px"><div class="sub">ТАКТИКА ПО ХОДУ МАТЧА</div>
    <div class="grid3">
@@ -726,10 +1018,11 @@ function renderLiveMatch(){
  </div>
  <div class="card" style="margin-top:12px"><div class="sub">РАССТАНОВКА — ИЗМЕНЯЙ ПРЯМО ВО ВРЕМЯ МАТЧА</div>
    <div class="pitch pitch-live" id="livePitch"><div class="zone z1">АТАКА</div><div class="zone z2">ПОЛУЗАЩИТА</div><div class="zone z3">ПОЛУЗАЩИТА</div><div class="zone z4">ОБОРОНА</div><div class="centerline"></div><div class="circle"></div><div class="goalbox"></div><div class="goalbox r"></div>
-   ${active.map(s=>`<div class="player" style="left:${s.x}%;top:${s.y}%" onmousedown="startLiveDrag(event,${s.idx})"><div class="dot">${s.player[1]==='GK'?'GK':s.player[2]}</div><div class="pname">${esc(s.player[0])}</div></div>`).join('')}</div>
+   ${active.map(s=>`<div class="player" data-live-idx="${s.idx}" style="left:${s.x}%;top:${s.y}%" onmousedown="startLiveDrag(event,${s.idx})"><div class="dot">${s.role||s.player[1]}</div><div class="pname">${esc(s.player[0])}${s.injured?' 🩹':''}${s.card==='yellow'?' 🟨':''}${s.card==='red'?' 🟥':''}</div></div>`).join('')}</div>
  </div>
- <div class="card" style="margin-top:12px"><div class="sub">СКАМЕЙКА • ЗАМЕНЫ ${m.subs}/5</div>
- ${active.filter(s=>!s.injured).map(s=>`<div class="sub-row"><span>${esc(s.player[0])}</span><select class="player-select" onchange="if(this.value)makeSub(${s.idx},+this.value);this.value=''"><option value="">Заменить на...</option>${bench.map(b=>`<option value="${b.idx}">${esc(b.player[0])} • ${b.player[1]}</option>`).join('')}</select></div>`).join('')}
+ <div class="card" style="margin-top:12px"><div class="sub">СКАМЕЙКА • ЗАМЕНЫ</div>
+ ${active.filter(s=>!s.injured&&s.card!=='red').map(s=>`<div class="sub-row"><span>${esc(s.player[0])}</span><select class="player-select" onchange="if(this.value)makeSub(${s.idx},+this.value);this.value=''"><option value="">Заменить на...</option>${bench.map(b=>`<option value="${b.idx}">${esc(b.player[0])} • ${b.role||b.player[1]}</option>`).join('')}</select></div>`).join('')}
+ ${bench.length?'':'<div class="empty" style="margin-top:8px">Свободных запасных больше нет.</div>'}
  </div>
  <div class="card" style="margin-top:12px"><div class="sub">ЛЕНТА МАТЧА</div><div class="live-log">${m.events.length?m.events.map(e=>`<div class="event"><b>${e.m}'</b><span>${esc(e.text)}</span></div>`).join(''):'<div class="empty">Матч только начался.</div>'}</div></div>`;
 }
@@ -738,13 +1031,13 @@ function startLiveDrag(e,idx){
  const pitch=e.currentTarget?.closest?.('#livePitch');if(!pitch)return;
  e.preventDefault();liveDrag={idx,pitch};
  const move=ev=>{
-   if(!liveDrag)return;const r=pitch.getBoundingClientRect();
-   const x=Math.max(3,Math.min(97,((ev.clientX-r.left)/r.width)*100));
-   const y=Math.max(4,Math.min(96,((ev.clientY-r.top)/r.height)*100));
-   const s=state.liveMatch.starters.find(z=>z.idx===idx);if(s){s.x=x;s.y=y;save();const el=[...pitch.querySelectorAll('.player')].find(z=>z.getAttribute('onmousedown')?.includes(','+idx+')'));if(el){el.style.left=x+'%';el.style.top=y+'%';}}
+   if(!liveDrag)return;const point=ev.touches?ev.touches[0]:ev;const r=pitch.getBoundingClientRect();
+   const x=Math.max(3,Math.min(97,((point.clientX-r.left)/r.width)*100));
+   const y=Math.max(4,Math.min(96,((point.clientY-r.top)/r.height)*100));
+   const s=state.liveMatch?.starters.find(z=>z.idx===idx);if(s){s.x=x;s.y=y;const el=pitch.querySelector(`[data-live-idx="${idx}"]`);if(el){el.style.left=x+'%';el.style.top=y+'%';}}
  };
- const up=()=>{liveDrag=null;document.removeEventListener('mousemove',move);document.removeEventListener('mouseup',up)};
- document.addEventListener('mousemove',move);document.addEventListener('mouseup',up);
+ const up=()=>{liveDrag=null;document.removeEventListener('mousemove',move);document.removeEventListener('mouseup',up);document.removeEventListener('touchmove',move);document.removeEventListener('touchend',up)};
+ document.addEventListener('mousemove',move);document.addEventListener('mouseup',up);document.addEventListener('touchmove',move,{passive:false});document.addEventListener('touchend',up);
 }
 function renderClubs(){
  const box=document.getElementById('clubContent');
@@ -763,6 +1056,693 @@ function selectClub(name){
 document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
 setInterval(()=>{if(state.liveMatch?.running)liveTick()},1500);
 render();
+
+/* =========================
+   v0.9 — REAL SEASON FIXTURES
+   ========================= */
+(function(){
+  const oldStateInit = window.state;
+
+  // Keep a separate fixture ledger so a user's match can never be scored twice.
+  function ensureSeasonLedger(){
+    if(!state.season) return;
+    if(!state.season.fixtures) state.season.fixtures = [];
+    if(!state.season.playedFixtures) state.season.playedFixtures = {};
+    if(!state.season.currentRound) state.season.currentRound = 1;
+    if(!state.season.completedRounds) state.season.completedRounds = {};
+  }
+
+  function fixtureKey(round, homeId, awayId){
+    return `${round}|${homeId}|${awayId}`;
+  }
+
+  function makeDoubleRoundRobin(teamIds){
+    const ids = [...teamIds];
+    if(ids.length % 2) ids.push("__BYE__");
+    const n = ids.length;
+    const half = n / 2;
+    const rounds = [];
+
+    for(let r=0;r<n-1;r++){
+      const pairs=[];
+      for(let i=0;i<half;i++){
+        const a=ids[i], b=ids[n-1-i];
+        if(a==="__BYE__" || b==="__BYE__") continue;
+        // Alternate home side to distribute home/away over the first half.
+        const home = ((r+i)%2===0) ? a : b;
+        const away = home===a ? b : a;
+        pairs.push({homeId:home, awayId:away});
+      }
+      rounds.push(pairs);
+      ids.splice(1,0,ids.pop());
+    }
+
+    const second = rounds.map(pairs => pairs.map(f => ({
+      homeId:f.awayId, awayId:f.homeId
+    })));
+    return [...rounds, ...second];
+  }
+
+  function clubNameById(id){
+    const c=(state.clubs||[]).find(x=>x.id===id);
+    return c ? c.name : id;
+  }
+
+  function buildSeasonFixtures(){
+    ensureSeasonLedger();
+    const ids=(state.clubs||[]).map(c=>c.id);
+    const rounds=makeDoubleRoundRobin(ids);
+    state.season.fixtures=[];
+    rounds.forEach((matches,idx)=>{
+      matches.forEach(f=>{
+        state.season.fixtures.push({
+          id: fixtureKey(idx+1,f.homeId,f.awayId),
+          round:idx+1,
+          homeId:f.homeId,
+          awayId:f.awayId,
+          homeScore:null,
+          awayScore:null,
+          played:false,
+          userMatch:(f.homeId===state.userClubId || f.awayId===state.userClubId)
+        });
+      });
+    });
+    state.season.currentRound=1;
+    state.season.playedFixtures={};
+    state.season.completedRounds={};
+  }
+
+  function getRoundFixtures(round){
+    ensureSeasonLedger();
+    return state.season.fixtures.filter(f=>f.round===round);
+  }
+
+  function getUserFixture(round){
+    return getRoundFixtures(round).find(f=>f.userMatch);
+  }
+
+  function saveFixtureResult(f, hs, as){
+    if(!f || f.played) return false;
+    f.homeScore=hs;
+    f.awayScore=as;
+    f.played=true;
+    state.season.playedFixtures[f.id]=true;
+    return true;
+  }
+
+  function applyTableResult(f){
+    const h=state.table.find(x=>x.clubId===f.homeId);
+    const a=state.table.find(x=>x.clubId===f.awayId);
+    if(!h || !a) return;
+    h.played++; a.played++;
+    h.gf+=f.homeScore; h.ga+=f.awayScore;
+    a.gf+=f.awayScore; a.ga+=f.homeScore;
+    if(f.homeScore>f.awayScore){ h.won++; h.points+=3; a.lost++; }
+    else if(f.homeScore<f.awayScore){ a.won++; a.points+=3; h.lost++; }
+    else { h.drawn++; a.drawn++; h.points++; a.points++; }
+    h.gd=h.gf-h.ga; a.gd=a.gf-a.ga;
+  }
+
+  function rebuildTable(){
+    const old=state.table||[];
+    const base=(state.clubs||[]).map(c=>({
+      clubId:c.id,name:c.name,played:0,won:0,drawn:0,lost:0,
+      gf:0,ga:0,gd:0,points:0
+    }));
+    const map=new Map(base.map(x=>[x.clubId,x]));
+    (state.season.fixtures||[]).forEach(f=>{
+      if(!f.played) return;
+      const h=map.get(f.homeId), a=map.get(f.awayId);
+      if(!h||!a) return;
+      h.played++; a.played++;
+      h.gf+=Number(f.homeScore)||0; h.ga+=Number(f.awayScore)||0;
+      a.gf+=Number(f.awayScore)||0; a.ga+=Number(f.homeScore)||0;
+      if(f.homeScore>f.awayScore){h.won++;h.points+=3;a.lost++}
+      else if(f.homeScore<f.awayScore){a.won++;a.points+=3;h.lost++}
+      else {h.drawn++;a.drawn++;h.points++;a.points++}
+      h.gd=h.gf-h.ga;a.gd=a.gf-a.ga;
+    });
+    state.table=base.sort((x,y)=>y.points-x.points || y.gd-x.gd || y.gf-x.gf);
+  }
+
+  function resultLine(f){
+    if(!f.played) return "—";
+    return `${f.homeScore} : ${f.awayScore}`;
+  }
+
+  // Expose for UI hooks.
+  window.FOMSeason={
+    ensureSeasonLedger,
+    buildSeasonFixtures,
+    getRoundFixtures,
+    getUserFixture,
+    saveFixtureResult,
+    applyTableResult,
+    rebuildTable,
+    resultLine,
+    clubNameById
+  };
+
+  // Patch season creation / legacy initialization.
+  const oldStartSeason = window.startSeason;
+  window.startSeason=function(){
+    if(typeof oldStartSeason==="function") oldStartSeason();
+    ensureSeasonLedger();
+    if(!state.season.fixtures || !state.season.fixtures.length) buildSeasonFixtures();
+    rebuildTable();
+    saveState();
+    render();
+  };
+
+  // If an existing v0.8 save has no real fixtures, upgrade it.
+  if(state && state.season){
+    ensureSeasonLedger();
+    if(!state.season.fixtures || !state.season.fixtures.length){
+      buildSeasonFixtures();
+      rebuildTable();
+      saveState();
+    }
+  }
+})();
+
 </script>
+
+<script>
+function openSeasonHub(round){
+  ensureSeasonRuntime();
+  const hub=document.getElementById("seasonHub");
+  if(!hub)return;
+  hub.classList.add("open");
+  if(Number.isFinite(round)) state.season.currentRound=Math.max(1,Math.min(totalSeasonRounds(),round));
+  renderSeasonHub();
+}
+function closeSeasonHub(){
+  const hub=document.getElementById("seasonHub");
+  if(hub)hub.classList.remove("open");
+}
+function ensureSeasonRuntime(){
+  if(!state.season) state.season={year:2026,currentRound:1,fixtures:[],playedFixtures:{},completedRounds:{}};
+  if(!state.season.fixtures||!state.season.fixtures.length) FOMSeason.buildSeasonFixtures();
+  FOMSeason.rebuildTable();
+  saveState();
+}
+function totalSeasonRounds(){
+  const ids=(state.clubs||[]).length;
+  return ids>1 ? (ids%2===0 ? (ids-1)*2 : ids*2) : 1;
+}
+function seasonPrevRound(){ensureSeasonRuntime();state.season.currentRound=Math.max(1,(state.season.currentRound||1)-1);renderSeasonHub()}
+function seasonNextRound(){ensureSeasonRuntime();state.season.currentRound=Math.min(totalSeasonRounds(),(state.season.currentRound||1)+1);renderSeasonHub()}
+function seasonOpenTable(){
+  closeSeasonHub();
+  if(typeof showPage==="function") showPage("table");
+  else if(typeof render==="function") render();
+}
+function renderSeasonHub(){
+  ensureSeasonRuntime();
+  const round=state.season.currentRound||1;
+  const fs=FOMSeason.getRoundFixtures(round);
+  const user=FOMSeason.getUserFixture(round);
+  const body=document.getElementById("seasonHubBody");
+  if(!body)return;
+  let html=`<div class="season-round"><strong>Тур ${round} / ${totalSeasonRounds()}</strong><span>${user&&user.played?"Завершён":"Предстоящий"}</span></div>`;
+  if(user){
+    const isHome=user.homeId===state.userClubId;
+    html+=`<div class="card" style="padding:14px;margin-bottom:12px">
+      <div class="eyebrow">ВАШ МАТЧ</div>
+      <div class="season-match">
+        <div class="home"><b>${FOMSeason.clubNameById(user.homeId)}</b></div>
+        <div class="season-score">${FOMSeason.resultLine(user)}</div>
+        <div class="away"><b>${FOMSeason.clubNameById(user.awayId)}</b></div>
+      </div>
+      ${!user.played?`<div class="season-actions"><button class="primary" onclick="seasonPlayUserMatch('${user.id}')">Открыть матч</button></div>`:""}
+    </div>`;
+  }
+  html+=`<div class="eyebrow" style="margin:12px 0 8px">ВСЕ МАТЧИ ТУРА</div>`;
+  fs.forEach(f=>{
+    const mine=f.id===user?.id;
+    html+=`<div class="season-match" style="${mine?'border-color:rgba(255,170,0,.35)':''}">
+      <div class="home">${f.homeId===state.userClubId?"★ ":""}${FOMSeason.clubNameById(f.homeId)}</div>
+      <div class="season-score">${FOMSeason.resultLine(f)}</div>
+      <div class="away">${FOMSeason.clubNameById(f.awayId)}${f.awayId===state.userClubId?" ★":""}</div>
+    </div>`;
+  });
+  if(!fs.length) html+=`<div class="season-empty">Для этой лиги ещё не сформирован календарь.</div>`;
+  body.innerHTML=html;
+}
+function seasonPlayUserMatch(fid){
+  ensureSeasonRuntime();
+  const f=state.season.fixtures.find(x=>x.id===fid);
+  if(!f||f.played)return;
+  // Mark the current fixture as the only match that can be opened live.
+  state.liveMatchFixtureId=f.id;
+  saveState();
+  closeSeasonHub();
+  if(typeof openPreMatch==="function") openPreMatch(f);
+  else if(typeof startLiveMatch==="function") startLiveMatch();
+  else if(typeof playMatch==="function") playMatch();
+}
+</script>
+
+<style id="fom-v10-career-style">
+.career-strip{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.career-chip{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:12px}
+.career-chip b{color:var(--accent2)}
+.fixture-played{opacity:.72}
+.user-fixture{border-color:rgba(255,122,24,.45)!important;background:#1b1510}
+.match-next{margin-top:12px;border:1px solid rgba(255,122,24,.25);background:#19140f;border-radius:16px;padding:13px}
+</style>
+<script>
+/* =========================================================
+   v1.0 — UNIFIED CAREER LOOP
+   Calendar -> user's fixture -> pre-match -> live 90'
+   -> fixture result -> table -> next round.
+   ========================================================= */
+(function(){
+  function clubs(){ return leagueClubs(); }
+  function roundsCount(){ const n=clubs().length; return n>1 ? (n%2===0?(n-1)*2:n*2) : 1; }
+
+  function fixtureId(round,home,away){ return `r${round}|${home}|${away}`; }
+
+  function makeRounds(names){
+    let ids=[...names];
+    if(ids.length%2) ids.push('__BYE__');
+    const n=ids.length, half=n/2, first=[];
+    for(let r=0;r<n-1;r++){
+      const pairs=[];
+      for(let i=0;i<half;i++){
+        const a=ids[i], b=ids[n-1-i];
+        if(a==='__BYE__'||b==='__BYE__') continue;
+        const home=((r+i)%2===0)?a:b;
+        const away=home===a?b:a;
+        pairs.push({homeId:home,awayId:away});
+      }
+      first.push(pairs);
+      ids.splice(1,0,ids.pop());
+    }
+    return first.concat(first.map(ps=>ps.map(f=>({homeId:f.awayId,awayId:f.homeId}))));
+  }
+
+  function ensureCareer(){
+    if(!state.season) state.season={};
+    const s=state.season;
+    if(!Array.isArray(s.fixtures) || !s.fixtures.length || s.fixtureLeague!==currentClub()?.league){
+      const rs=makeRounds(clubs());
+      s.fixtures=[];
+      rs.forEach((matches,ri)=>{
+        matches.forEach(f=>{
+          s.fixtures.push({
+            id:fixtureId(ri+1,f.homeId,f.awayId),
+            round:ri+1,homeId:f.homeId,awayId:f.awayId,
+            homeScore:null,awayScore:null,played:false
+          });
+        });
+      });
+      s.fixtureLeague=currentClub()?.league||null;
+      s.currentRound=1;
+      s.playedFixtures={};
+      s.completedRounds={};
+      s.standings={};
+      clubs().forEach(n=>s.standings[n]={p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0});
+    }else{
+      s.playedFixtures ||= {};
+      s.completedRounds ||= {};
+      s.currentRound ||= 1;
+      s.standings ||= {};
+      clubs().forEach(n=>s.standings[n] ||= {p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0});
+    }
+    rebuildCareerTable();
+    save();
+  }
+
+  function rebuildCareerTable(){
+    if(!state.season)return;
+    const s=state.season;
+    s.standings={};
+    clubs().forEach(n=>s.standings[n]={p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0});
+    (s.fixtures||[]).filter(f=>f.played).forEach(f=>{
+      const h=s.standings[f.homeId], a=s.standings[f.awayId];
+      if(!h||!a)return;
+      h.p++;a.p++;
+      h.gf+=+f.homeScore||0;h.ga+=+f.awayScore||0;
+      a.gf+=+f.awayScore||0;a.ga+=+f.homeScore||0;
+      if(f.homeScore>f.awayScore){h.w++;h.pts+=3;a.l++}
+      else if(f.homeScore<f.awayScore){a.w++;a.pts+=3;h.l++}
+      else{h.d++;a.d++;h.pts++;a.pts++}
+    });
+    Object.values(s.standings).forEach(x=>x.gd=x.gf-x.ga);
+  }
+
+  function roundFixtures(r){ ensureCareer(); return state.season.fixtures.filter(f=>f.round===r); }
+  function userFixture(r){
+    return roundFixtures(r).find(f=>f.homeId===state.club||f.awayId===state.club);
+  }
+
+  function simulateOtherFixtures(r){
+    ensureCareer();
+    const fs=roundFixtures(r);
+    fs.forEach(f=>{
+      if(f.played)return;
+      if(f.homeId===state.club || f.awayId===state.club)return;
+      const result=simulateUnifiedMatch(f.homeId,f.awayId);
+      f.homeScore=result.home; f.awayScore=result.away; f.played=true;
+      state.season.playedFixtures[f.id]=true;
+    });
+    rebuildCareerTable();
+    save();
+  }
+
+  function markUserFixtureResult(m){
+    ensureCareer();
+    const f=state.season.fixtures.find(x=>x.id===m.fixtureId);
+    if(!f || f.played)return false;
+    const userHome=f.homeId===state.club;
+    f.homeScore=userHome?m.userGoals:m.oppGoals;
+    f.awayScore=userHome?m.oppGoals:m.userGoals;
+    f.played=true;
+    state.season.playedFixtures[f.id]=true;
+    return true;
+  }
+
+  function completeRoundIfReady(round){
+    const fs=roundFixtures(round);
+    if(fs.length && fs.every(f=>f.played)){
+      state.season.completedRounds[round]=true;
+      if(state.season.currentRound===round) state.season.currentRound=Math.min(round+1,roundsCount());
+      (currentClub()?.squad||[]).forEach(p=>{
+        state.season.fatigue[p[0]]=Math.max(0,(state.season.fatigue[p[0]]||0)-12);
+        if(state.season.injuries[p[0]]){
+          state.season.injuries[p[0]].weeks--;
+          if(state.season.injuries[p[0]].weeks<=0)delete state.season.injuries[p[0]];
+        }
+      });
+    }
+  }
+
+  // Public season API replaces the earlier experimental fixture layer.
+  window.FOMCareer={
+    ensureCareer,roundFixtures,userFixture,simulateOtherFixtures,
+    markUserFixtureResult,completeRoundIfReady,rebuildCareerTable,roundsCount
+  };
+
+  // The calendar button now opens the actual current career round.
+  window.openSeasonHub=function(round){
+    ensureCareer();
+    if(Number.isFinite(round))state.season.currentRound=Math.max(1,Math.min(roundsCount(),round));
+    const hub=document.getElementById('seasonHub');
+    if(hub)hub.classList.add('open');
+    renderSeasonHubV10();
+  };
+  window.seasonPrevRound=function(){
+    ensureCareer();
+    state.season.currentRound=Math.max(1,(state.season.currentRound||1)-1);
+    renderSeasonHubV10();
+  };
+  window.seasonNextRound=function(){
+    ensureCareer();
+    state.season.currentRound=Math.min(roundsCount(),(state.season.currentRound||1)+1);
+    renderSeasonHubV10();
+  };
+
+  function renderSeasonHubV10(){
+    ensureCareer();
+    const r=state.season.currentRound||1, fs=roundFixtures(r), uf=userFixture(r);
+    const body=document.getElementById('seasonHubBody'); if(!body)return;
+    let out=`<div class="season-round"><strong>Тур ${r} / ${roundsCount()}</strong><span>${uf?.played?'Завершён':'В процессе'}</span></div>`;
+    if(uf){
+      const home=uf.homeId===state.club;
+      out+=`<div class="card user-fixture" style="padding:14px;margin-bottom:12px">
+        <div class="eyebrow">ВАШ МАТЧ</div>
+        <div class="season-match">
+          <div class="home"><b>${esc(uf.homeId)}</b></div>
+          <div class="season-score">${uf.played?`${uf.homeScore} : ${uf.awayScore}`:'—'}</div>
+          <div class="away"><b>${esc(uf.awayId)}</b></div>
+        </div>
+        ${!uf.played?`<button class="btn" style="width:100%;margin-top:10px" onclick="openCareerFixture('${uf.id.replace(/'/g,"&#39;")}')">⚽ Играть матч</button>`:
+        `<button class="btn secondary" style="width:100%;margin-top:10px" onclick="showScreen('match')">Открыть результат</button>`}
+      </div>`;
+    }
+    out+=`<div class="eyebrow" style="margin:12px 0 8px">МАТЧИ ТУРА</div>`;
+    fs.forEach(f=>{
+      const mine=f.id===uf?.id;
+      out+=`<div class="season-match ${mine?'user-fixture':''} ${f.played?'fixture-played':''}">
+        <div class="home">${f.homeId===state.club?'★ ':''}${esc(f.homeId)}</div>
+        <div class="season-score">${f.played?`${f.homeScore}:${f.awayScore}`:'—'}</div>
+        <div class="away">${esc(f.awayId)}${f.awayId===state.club?' ★':''}</div>
+      </div>`;
+    });
+    body.innerHTML=out;
+  }
+
+  window.openCareerFixture=function(fid){
+    ensureCareer();
+    const f=state.season.fixtures.find(x=>x.id===fid);
+    if(!f||f.played)return;
+    if(f.homeId!==state.club&&f.awayId!==state.club)return;
+
+    // All other fixtures of the round are played now; the user's fixture remains open.
+    simulateOtherFixtures(f.round);
+    state.season.currentRound=f.round;
+    state.careerActiveFixture=f.id;
+    state.liveMatch=null;
+    state.matchSetup=null;
+    save();
+    showScreen('match');
+    ensureMatchSetup(f.awayId===state.club?f.homeId:f.awayId);
+    renderMatch();
+  };
+
+  // Start the existing pre-match setup only for the active career fixture.
+  window.startPreparedMatch=function(){
+    ensureCareer();
+    const fid=state.careerActiveFixture;
+    const f=state.season.fixtures.find(x=>x.id===fid);
+    if(!f||f.played){alert('Нет доступного матча текущего тура. Открой свой матч из календаря.');return}
+    const expected=f.homeId===state.club?f.awayId:f.homeId;
+    const ms=ensureMatchSetup(expected);
+    if(!prepReady()){alert('Выбери ровно 11 игроков в стартовый состав.');return}
+    if(ms.opponent!==expected){alert('Соперник не совпадает с календарём.');return}
+    createCareerLiveMatch(f);
+  };
+
+  function createCareerLiveMatch(f){
+    const c=currentClub(),ms=ensureMatchSetup(f.homeId===state.club?f.awayId:f.homeId);
+    if(!c||!prepReady())return;
+    assignMatchPositions();
+    const slots=FORMATIONS[ms.formation].slots;
+    const starters=ms.starters.map((idx,i)=>{
+      const p=c.squad[idx],xy=state.positions[state.club]?.[idx]||{x:slots[i][0],y:slots[i][1]};
+      return {player:p,idx,x:xy.x,y:xy.y,role:ms.roles[idx]||slots[i][2],card:null,subbed:false,injured:false};
+    });
+    const bench=ms.bench.map(idx=>({player:c.squad[idx],idx,used:false,role:ms.roles[idx]||c.squad[idx][1]}));
+    state.liveMatch={
+      fixtureId:f.id,round:f.round,
+      opponent:f.homeId===state.club?f.awayId:f.homeId,
+      userHome:f.homeId===state.club,
+      minute:0,running:true,finished:false,half:1,
+      userGoals:0,oppGoals:0,home:0,away:0,
+      events:[{m:0,type:'info',text:`${f.homeId} — ${f.awayId} • ${f.homeId===state.club?'Домашний матч':'Выездной матч'}`}],
+      starters,bench,subs:0,homeCards:0,awayCards:0,
+      tactic:{tempo:(state.tactics||{}).tempo||55,press:(state.tactics||{}).press||50,width:(state.tactics||{}).width||55},
+      opponentLineup:lineupFor(state.club===f.homeId?f.awayId:f.homeId,false),
+      captain:ms.captain,penalty:ms.penalty,freeKick:ms.freeKick,corner:ms.corner,autoSub:ms.autoSub
+    };
+    save();renderLiveMatch();
+  }
+
+  // Replace live tick with a fixture-aware version. The user score is kept
+  // separate from the actual home/away score.
+  window.liveTick=function(){
+    const m=state.liveMatch;if(!m||!m.running)return;
+    if(m.minute>=90){finishLiveMatch();return}
+    let next=m.minute+(Math.random()<.10?2:1);
+    if(m.minute<45&&next>45)next=45;
+    if(m.minute>=45&&next>90)next=90;
+    m.minute=next;
+
+    if(m.minute===45){
+      m.running=false;m.half=2;
+      m.events.unshift({m:45,type:'half',text:'⏸ Перерыв. Можно менять состав и тактику.'});
+      save();renderLiveMatch();return;
+    }
+
+    const active=m.starters.filter(s=>!s.subbed&&s.card!=='red');
+    const userTeam={attack:0,mid:0,def:0,press:m.tactic.press,tempo:m.tactic.tempo};
+    active.forEach(s=>{
+      const p=livePlayerPower(s);
+      if(s.y<35)userTeam.attack+=p.atk;
+      else if(s.y>65)userTeam.def+=p.def;
+      else userTeam.mid+=p.pass+p.atk*.3+p.def*.2;
+    });
+    const acA=active.filter(s=>s.y<35).length,acM=active.filter(s=>s.y>=35&&s.y<=65).length,acD=active.filter(s=>s.y>65).length;
+    userTeam.attack/=Math.max(1,acA);userTeam.mid/=Math.max(1,acM);userTeam.def/=Math.max(1,acD);
+
+    const opp=tacticalTeamPower(m.opponent,false);
+    const fatiguePenalty=m.minute>65?Math.max(0,(m.minute-65)/170):0;
+    const redPenalty=active.filter(s=>s.card==='red').length*.10;
+    const userChance=Math.max(.010,Math.min(.15,.030+(userTeam.attack-opp.def)/1450+(userTeam.mid-opp.mid)/2600+(userTeam.press-50)/2500-fatiguePenalty-redPenalty));
+    const oppChance=Math.max(.010,Math.min(.14,.028+(opp.attack-userTeam.def)/1450+(opp.mid-userTeam.mid)/2800-fatiguePenalty*.25));
+
+    const roll=Math.random();
+    if(roll<userChance){
+      m.userGoals++;
+      m.events.unshift({m:m.minute,type:'goal',text:`⚽ ГОЛ! ${state.club} • ${pickLiveScorer(m)}`});
+    }else if(roll<userChance+oppChance){
+      m.oppGoals++;
+      m.events.unshift({m:m.minute,type:'goal',text:`⚽ ГОЛ! ${m.opponent}`});
+    }else if(Math.random()<.07){
+      const team=Math.random()<.58?state.club:m.opponent;
+      m.events.unshift({m:m.minute,type:'shot',text:`🥅 Опасный удар — ${team}`});
+    }else if(Math.random()<.038){
+      const user=Math.random()<.65;
+      if(user){
+        const cardable=active.filter(s=>!s.card||s.card==='yellow');
+        const s=cardable[Math.floor(Math.random()*Math.max(1,cardable.length))];
+        if(s){
+          if(s.card==='yellow'){s.card='red';m.events.unshift({m:m.minute,type:'red',text:`🟥 Вторая жёлтая — ${s.player[0]}`});}
+          else{s.card='yellow';m.events.unshift({m:m.minute,type:'card',text:`🟨 ${s.player[0]}`});}
+        }
+      }else{
+        m.awayCards++;
+        m.events.unshift({m:m.minute,type:'card',text:`🟨 Карточка — ${m.opponent}`});
+      }
+    }else if(Math.random()<.022){
+      const aps=m.starters.filter(s=>!s.subbed&&s.card!=='red');
+      if(aps.length){
+        const s=aps[Math.floor(Math.random()*aps.length)];
+        const name=s.player[0];
+        if(!state.season.injuries[name]){
+          state.season.injuries[name]={weeks:1+Math.floor(Math.random()*3)};
+          s.injured=true;
+          m.events.unshift({m:m.minute,type:'injury',text:`🩹 Травма — ${name}`});
+          if(m.autoSub)autoSubLive('травма');
+        }
+      }
+    }
+
+    m.starters.filter(s=>!s.subbed).forEach(s=>{
+      const name=s.player[0];
+      state.season.fatigue[name]=Math.min(95,(state.season.fatigue[name]||0)+.72+(m.tactic.press/100)*.38+(m.tactic.tempo/100)*.20);
+    });
+    if(m.autoSub)autoSubLive('усталость');
+    m.home=m.userHome?m.userGoals:m.oppGoals;
+    m.away=m.userHome?m.oppGoals:m.userGoals;
+    save();renderLiveMatch();
+    if(m.minute>=90)finishLiveMatch();
+  };
+
+  function pickLiveScorer(m){
+    const candidates=m.starters.filter(s=>!s.subbed&&s.card!=='red'&&s.role!=='GK');
+    const preferred=candidates.filter(s=>[m.penalty,m.freeKick,m.corner].includes(s.idx));
+    const p=(preferred.length?preferred:candidates)[Math.floor(Math.random()*Math.max(1,(preferred.length?preferred:candidates).length))];
+    return p?.player?.[0]||'Атака';
+  }
+
+  // Final whistle is now the single place where the user's fixture is committed.
+  window.finishLiveMatch=function(){
+    const m=state.liveMatch;if(!m)return;
+    if(m.finished)return;
+    m.minute=90;m.running=false;m.finished=true;
+    m.home=m.userHome?m.userGoals:m.oppGoals;
+    m.away=m.userHome?m.oppGoals:m.userGoals;
+
+    if(m.fixtureId){
+      FOMCareer.markUserFixtureResult(m);
+      FOMCareer.completeRoundIfReady(m.round);
+      FOMCareer.rebuildCareerTable();
+    }
+
+    state.lastMatch={
+      score:`${m.userHome?state.club:m.opponent} ${m.home}:${m.away} ${m.userHome?m.opponent:state.club}`,
+      xg:'—',possession:'—',shots:'—',events:m.events
+    };
+    state.careerActiveFixture=null;
+    save();renderLiveMatch();
+  };
+
+  // Prevent the old "Сыграть тур" path from bypassing the user's match.
+  window.playSeasonRound=function(){
+    ensureCareer();
+    const r=state.season.currentRound||1, f=userFixture(r);
+    if(!f){alert('В текущем туре нет матча вашего клуба.');return}
+    if(f.played){state.season.currentRound=Math.min(roundsCount(),r+1);save();renderSeason();return}
+    openCareerFixture(f.id);
+  };
+
+  // The season screen becomes the authoritative career calendar/table.
+  window.renderSeason=function(){
+    const box=document.getElementById('seasonContent');if(!box)return;
+    ensureCareer();
+    const s=state.season,r=s.currentRound||1;
+    if(window.currentSeasonTab==='table'){
+      const rows=clubs().map(n=>({n,x:s.standings[n]})).sort((a,b)=>(b.x.pts-a.x.pts)||(b.x.gd-a.x.gd)||(b.x.gf-a.x.gf));
+      box.innerHTML=`<div class="card">
+        <div class="sub">ТУРНИРНАЯ ТАБЛИЦА • ТУР ${Math.min(r,roundsCount())}</div>
+        <table><tr><th>#</th><th>Клуб</th><th>И</th><th>М</th><th>О</th></tr>
+        ${rows.map((q,i)=>`<tr ${q.n===state.club?'style="background:#1b1510"':''}><td>${i+1}</td><td>${esc(q.n)}</td><td>${q.x.p}</td><td>${q.x.gf}:${q.x.ga}</td><td><b>${q.x.pts}</b></td></tr>`).join('')}</table>
+      </div>`;
+    }else if(window.currentSeasonTab==='training'){
+      const c=currentClub();
+      box.innerHTML=`<div class="grid">
+        <button class="card" onclick="trainTeam('fitness')"><h2>🏃 Физика</h2><div class="sub">Восстановление</div></button>
+        <button class="card" onclick="trainTeam('attack')"><h2>⚡ Атака</h2><div class="sub">Атакующая подготовка</div></button>
+        <button class="card" onclick="trainTeam('defense')"><h2>🛡 Оборона</h2><div class="sub">Оборонительная подготовка</div></button>
+        <button class="card" onclick="trainTeam('tactics')"><h2>🧠 Тактика</h2><div class="sub">Сыгранность</div></button>
+      </div>
+      <div class="card" style="margin-top:12px"><h2>Форма</h2>${(c?.squad||[]).map(p=>`<div class="statline"><span>${esc(p[0])}</span><span>${Math.max(0,100-(s.fatigue[p[0]]||0))}%</span></div>`).join('')}</div>`;
+    }else if(window.currentSeasonTab==='transfers'){
+      if(!s.transferList.length)generateTransfers();
+      box.innerHTML=`<div class="card"><div class="sub">РЫНОК</div><h2>Доступные игроки</h2>${s.transferList.map(p=>`<div class="player-row"><div><b>${esc(p.name)}</b><div class="sub">${esc(p.club)} • ${p.pos} • ${p.rating}</div></div><button class="smallbtn" onclick="transferPlayer('${esc(p.name).replace(/'/g,"&#39;")}',${p.price})">${moneyFmt(p.price)}</button></div>`).join('')}</div>`;
+    }else if(window.currentSeasonTab==='contracts'){
+      const c=currentClub();
+      box.innerHTML=`<div class="card"><div class="sub">КОНТРАКТЫ</div>${(c?.squad||[]).map(p=>{const x=s.contracts[p[0]]||{until:2029,wage:0};return`<div class="player-row"><div><b>${esc(p[0])}</b><div class="sub">${p[1]} • до ${x.until} • ${moneyFmt(x.wage)}/нед.</div></div><button class="smallbtn" onclick="extendContract('${esc(p[0]).replace(/'/g,"&#39;")}')">Продлить</button></div>`}).join('')}</div>`;
+    }else{
+      const fs=FOMCareer.roundFixtures(r),uf=FOMCareer.userFixture(r);
+      box.innerHTML=`<div class="card">
+        <div class="row between"><div><div class="sub">ТЕКУЩИЙ ТУР</div><h2>Тур ${r} / ${roundsCount()}</h2></div><button class="btn" onclick="openSeasonHub(${r})">Календарь</button></div>
+        <div class="career-strip">
+          <div class="career-chip">Матчей сыграно <b>${s.fixtures.filter(f=>f.played).length}</b></div>
+          <div class="career-chip">Туров завершено <b>${Object.keys(s.completedRounds).length}</b></div>
+          <div class="career-chip">Ваш матч <b>${uf?.played?'завершён':'ожидает'}</b></div>
+        </div>
+        <div class="calendar">${fs.map(f=>`<div class="match ${f.id===uf?.id?'user-fixture':''} ${f.played?'fixture-played':''}">
+          <div class="team">${svgCrest(f.homeId)}${f.homeId===state.club?'★ ':''}${esc(f.homeId)}</div>
+          <div class="score">${f.played?`${f.homeScore}:${f.awayScore}`:'—'}</div>
+          <div class="team">${svgCrest(f.awayId)}${esc(f.awayId)}${f.awayId===state.club?' ★':''}</div>
+        </div>`).join('')}</div>
+        ${uf&&!uf.played?`<div class="match-next"><b>Следующий матч: ${esc(uf.homeId)} — ${esc(uf.awayId)}</b><div class="sub" style="margin-top:4px">Остальные матчи тура уже будут рассчитаны, когда ты откроешь эту игру.</div><button class="btn" style="width:100%;margin-top:10px" onclick="openCareerFixture('${uf.id.replace(/'/g,"&#39;")}')">⚽ Перейти к матчу</button></div>`:''}
+      </div>`;
+    }
+  };
+
+  // Make match screen aware of a live result or active career fixture.
+  const oldRenderMatchPrep=window.renderMatchPrep;
+  window.renderMatchPrep=function(){
+    ensureCareer();
+    const r=state.season.currentRound||1, f=state.season.fixtures.find(x=>x.id===state.careerActiveFixture)||FOMCareer.userFixture(r);
+    if(f && !f.played){
+      state.careerActiveFixture=f.id;
+      ensureMatchSetup(f.homeId===state.club?f.awayId:f.homeId);
+    }
+    oldRenderMatchPrep();
+    const box=document.getElementById('matchContent');
+    if(f && !f.played && box){
+      const header=`<div class="career-strip"><div class="career-chip">${f.homeId===state.club?'🏠 Дома':'✈️ Выезд'}</div><div class="career-chip">Тур <b>${f.round}</b></div><div class="career-chip">Календарь: <b>официальный матч</b></div></div>`;
+      box.insertAdjacentHTML('afterbegin',header);
+    }
+  };
+
+  // If an old save has a broken/experimental fixture structure, migrate it cleanly.
+  if(state.club){
+    ensureCareer();
+    const active=state.careerActiveFixture;
+    if(active){
+      const f=state.season.fixtures.find(x=>x.id===active);
+      if(!f||f.played)state.careerActiveFixture=null;
+    }
+    save();
+  }
+})();
+</script>
+
 </body>
 </html>
