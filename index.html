@@ -4553,5 +4553,329 @@ function seasonPlayUserMatch(fid){
 })();
 </script>
 
+
+<script>
+/* =========================================================
+   FOM v2.1 — SQUAD / PLAYER HUB / LINEUP / ACADEMY
+   Real-name squads are used where the database is populated.
+   ========================================================= */
+(function(){
+  const C=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+  const euro=n=>"€"+Number(n||0).toFixed(1)+"M";
+  const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+
+  const FORMATIONS={
+    "4-3-3":[
+      ["GK",50,91],["LB",16,72],["CB",38,76],["CB",62,76],["RB",84,72],
+      ["CM",30,55],["DM",50,60],["CM",70,55],["LW",18,30],["ST",50,23],["RW",82,30]
+    ],
+    "4-2-3-1":[
+      ["GK",50,91],["LB",16,72],["CB",38,76],["CB",62,76],["RB",84,72],
+      ["DM",38,61],["DM",62,61],["LW",18,43],["AM",50,39],["RW",82,43],["ST",50,21]
+    ],
+    "4-4-2":[
+      ["GK",50,91],["LB",16,72],["CB",38,76],["CB",62,76],["RB",84,72],
+      ["LM",18,54],["CM",38,57],["CM",62,57],["RM",82,54],["ST",40,25],["ST",60,25]
+    ],
+    "3-5-2":[
+      ["GK",50,91],["CB",28,75],["CB",50,78],["CB",72,75],
+      ["LWB",10,53],["DM",34,59],["CM",50,54],["CM",66,59],["RWB",90,53],
+      ["ST",40,25],["ST",60,25]
+    ]
+  };
+
+  const POS={
+    GK:"Вратарь",CB:"Центральный защитник",LB:"Левый защитник",RB:"Правый защитник",
+    LWB:"Левый латераль",RWB:"Правый латераль",DM:"Опорный полузащитник",CM:"Центральный полузащитник",
+    AM:"Атакующий полузащитник",LM:"Левый полузащитник",RM:"Правый полузащитник",
+    LW:"Левый вингер",RW:"Правый вингер",ST:"Нападающий",CF:"Центральный нападающий"
+  };
+
+  function clubSquad(){
+    const name=state.club?.name;
+    let raw=(typeof SQUADS!=="undefined" && Array.isArray(SQUADS[name]))?SQUADS[name]:[];
+    return raw.map((x,i)=>{
+      if(Array.isArray(x)) return {name:x[0],position:x[1],rating:Number(x[2]||70),index:i};
+      return {...x,index:i,position:x.position||"CM",rating:Number(x.rating||70)};
+    });
+  }
+
+  function careerFor(p){
+    state.playerCareer=state.playerCareer||{};
+    const c=state.playerCareer[p.name];
+    if(c)return c;
+    const age=18+R(0,16);
+    const v=Math.max(1,Math.round(p.rating*p.rating/180));
+    state.playerCareer[p.name]={
+      age,potential:C(p.rating+R(4,14),p.rating,99),rating:p.rating,
+      form:R(65,95),morale:R(65,95),fitness:R(72,100),
+      minutes:0,appearances:0,starts:0,goals:0,assists:0,
+      value:v,wage:+(v*.006+0.02).toFixed(2),contractYears:R(1,5),
+      training:0,practice:0,promise:null,decline:false,shirt:R(1,99),
+      instruction:"balanced",injury:null,suspension:0
+    };
+    return state.playerCareer[p.name];
+  }
+
+  function ensureSquadState(){
+    state.squadState=state.squadState||{};
+    const ps=clubSquad();
+    ps.forEach((p,i)=>{
+      const c=careerFor(p);
+      if(!state.squadState[p.name]){
+        state.squadState[p.name]={
+          status:i<11?"starting":"reserve",
+          preferredPosition:p.position,
+          instruction:"balanced",
+          shirt:c.shirt||i+1,
+          captain:false,
+          penalty:false,
+          freekick:false,
+          corner:false
+        };
+      }
+    });
+    const names=ps.map(p=>p.name);
+    Object.keys(state.squadState).forEach(n=>{if(!names.includes(n))delete state.squadState[n]});
+    const starters=ps.filter(p=>state.squadState[p.name].status==="starting");
+    if(starters.length<11){
+      ps.forEach(p=>{if(starters.length<11 && state.squadState[p.name].status!=="starting"){
+        state.squadState[p.name].status="starting";starters.push(p);
+      }});
+    }
+  }
+
+  function grouped(){
+    const ps=clubSquad();
+    return {
+      GK:ps.filter(p=>p.position==="GK"),
+      DEF:ps.filter(p=>["CB","LB","RB","LWB","RWB"].includes(p.position)),
+      MID:ps.filter(p=>["DM","CM","AM","LM","RM"].includes(p.position)),
+      ATT:ps.filter(p=>["LW","RW","ST","CF"].includes(p.position))
+    };
+  }
+
+  function playerCard(name){
+    const p=clubSquad().find(x=>x.name===name);
+    if(!p)return;
+    const c=careerFor(p), ss=state.squadState[name]||{};
+    const initials=p.name.split(/\s+/).map(x=>x[0]).slice(0,2).join("").toUpperCase();
+    const availability=c.injury?`🩹 ${c.injury}`:c.suspension>0?`🟥 Дисквалификация: ${c.suspension}`:"Доступен";
+    const old=document.getElementById("fomV21Player");
+    if(old)old.remove();
+    const o=document.createElement("div");o.id="fomV21Player";
+    o.innerHTML=`<div class="v21-player-modal">
+      <div class="v21-phead"><button id="v21pc">← Назад</button><span>КАРТОЧКА ИГРОКА</span></div>
+      <div class="v21-profile">
+        <div class="v21-avatar">${initials}</div>
+        <div><small>${esc(POS[p.position]||p.position)}</small><h2>${esc(p.name)}</h2><span>${state.club?.name||"Клуб"} · №${ss.shirt||"—"}</span></div>
+        <strong>${c.rating.toFixed(1)}</strong>
+      </div>
+      <div class="v21-status"><span>Состояние<strong>${availability}</strong></span><span>Потенциал<strong>${c.potential}</strong></span><span>Возраст<strong>${c.age.toFixed(1)}</strong></span></div>
+      <div class="v21-bars">
+        <div><label>Форма <b>${Math.round(c.form)}</b></label><i><em style="width:${c.form}%"></em></i></div>
+        <div><label>Мораль <b>${Math.round(c.morale)}</b></label><i><em style="width:${c.morale}%"></em></i></div>
+        <div><label>Физическое состояние <b>${Math.round(c.fitness)}</b></label><i><em style="width:${c.fitness}%"></em></i></div>
+      </div>
+      <div class="v21-info">
+        <span>Зарплата<b>${euro(c.wage)}/нед.</b></span><span>Стоимость<b>${euro(c.value)}</b></span><span>Контракт<b>${c.contractYears.toFixed(1)} г.</b></span><span>Игровая практика<b>${c.appearances} матч.</b></span>
+      </div>
+      <div class="v21-stats">
+        <h3>Статистика сезона</h3>
+        <div><span>Матчи<b>${c.appearances}</b></span><span>Голы<b>${c.goals}</b></span><span>Ассисты<b>${c.assists}</b></span><span>Минуты<b>${c.minutes}</b></span></div>
+      </div>
+      <div class="v21-actions">
+        <button id="v21start">${ss.status==="starting"?"↩ В резерв":"⭐ В основу"}</button>
+        <button id="v21pos">Позиция</button>
+        <button id="v21inst">Инструкция</button>
+      </div>
+    </div>`;
+    document.body.appendChild(o);
+    o.querySelector("#v21pc").onclick=()=>o.remove();
+    o.querySelector("#v21start").onclick=()=>{ss.status=ss.status==="starting"?"reserve":"starting";normalizeXI();saveState();playerCard(name);};
+    o.querySelector("#v21pos").onclick=()=>{const opts=Object.keys(POS);const i=Math.max(0,opts.indexOf(ss.preferredPosition));ss.preferredPosition=opts[(i+1)%opts.length];saveState();playerCard(name);};
+    o.querySelector("#v21inst").onclick=()=>{const x=["balanced","attacking","defensive","stayForward","dropDeep","wide","roam"];const i=x.indexOf(ss.instruction);ss.instruction=x[(i+1)%x.length];saveState();playerCard(name);};
+  }
+
+  function normalizeXI(){
+    const ps=clubSquad();
+    let st=ps.filter(p=>state.squadState[p.name].status==="starting");
+    while(st.length>11){
+      const p=st.pop();state.squadState[p.name].status="reserve";
+    }
+    while(st.length<11){
+      const p=ps.find(x=>state.squadState[x.name].status!=="starting" && !careerFor(x).injury && !careerFor(x).suspension);
+      if(!p)break;
+      state.squadState[p.name].status="starting";st.push(p);
+    }
+  }
+
+  function setFormation(f){
+    state.lineupFormation=f;
+    saveState();
+    renderLineup();
+  }
+
+  function renderLineup(){
+    ensureSquadState();
+    const f=state.lineupFormation||"4-3-3", spots=FORMATIONS[f];
+    const starters=clubSquad().filter(p=>state.squadState[p.name].status==="starting");
+    const used=new Set();
+    const cards=spots.map((s,i)=>{
+      let p=starters.find(x=>!used.has(x.name)&&(
+        x.position===s[0] ||
+        (s[0]==="CB"&&["CB","LB","RB"].includes(x.position)) ||
+        (["CM","DM","AM"].includes(s[0])&&["CM","DM","AM"].includes(x.position)) ||
+        (["ST","CF"].includes(s[0])&&["ST","CF","LW","RW"].includes(x.position))
+      ));
+      if(!p)p=starters.find(x=>!used.has(x.name));
+      if(p)used.add(p.name);
+      const c=p?careerFor(p):null;
+      return `<div class="v21-slot" style="left:${s[1]}%;top:${s[2]}%" draggable="${!!p}" data-player="${p?esc(p.name):""}">
+        ${p?`<div class="v21-kit">${esc(p.name.split(/\s+/).map(x=>x[0]).slice(0,2).join(""))}</div><b>${esc(p.name)}</b><small>${c.rating.toFixed(1)} · ${s[0]}</small>`:"<div class='v21-empty-slot'>+</div>"}
+      </div>`;
+    }).join("");
+    const bench=clubSquad().filter(p=>state.squadState[p.name].status!=="starting").map(p=>{
+      const c=careerFor(p);return `<button class="v21-bench" data-player="${esc(p.name)}"><b>${esc(p.name)}</b><span>${p.position} · ${c.rating.toFixed(1)}</span></button>`;
+    }).join("");
+    const old=document.getElementById("fomV21Lineup");
+    if(old)old.remove();
+    const o=document.createElement("div");o.id="fomV21Lineup";
+    o.innerHTML=`<div class="v21-lineup-modal">
+      <div class="v21-phead"><button id="v21lc">← Назад</button><span>СТАРТОВЫЙ СОСТАВ</span><button id="v21save">Сохранить</button></div>
+      <div class="v21-formations">${Object.keys(FORMATIONS).map(x=>`<button class="${x===f?"active":""}" data-f="${x}">${x}</button>`).join("")}</div>
+      <div class="v21-pitch">${cards}</div>
+      <div class="v21-setpieces"><span>Капитан: <b>${Object.keys(state.squadState).find(n=>state.squadState[n].captain)||"не выбран"}</b></span><span>Пенальти: <b>${Object.keys(state.squadState).find(n=>state.squadState[n].penalty)||"не выбран"}</b></span><span>Штрафные: <b>${Object.keys(state.squadState).find(n=>state.squadState[n].freekick)||"не выбран"}</b></span><span>Угловые: <b>${Object.keys(state.squadState).find(n=>state.squadState[n].corner)||"не выбран"}</b></span></div>
+      <h3>Запасные</h3><div class="v21-bench">${bench}</div>
+      <p class="v21-hint">Перетаскивай игроков по полю. Нажми на игрока в списке, чтобы открыть его карточку.</p>
+    </div>`;
+    document.body.appendChild(o);
+    o.querySelector("#v21lc").onclick=()=>o.remove();
+    o.querySelector("#v21save").onclick=()=>{saveState();o.remove();};
+    o.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>setFormation(b.dataset.f));
+    o.querySelectorAll("[data-player]").forEach(el=>{
+      el.onclick=e=>{if(!e.target.closest(".v21-kit"))playerCard(el.dataset.player);}
+      el.ondragstart=e=>e.dataTransfer.setData("text/plain",el.dataset.player);
+    });
+    o.querySelectorAll(".v21-slot").forEach(slot=>{
+      slot.ondragover=e=>e.preventDefault();
+      slot.ondrop=e=>{
+        e.preventDefault();
+        const from=e.dataTransfer.getData("text/plain"),to=slot.dataset.player;
+        if(from&&to&&from!==to){
+          const a=state.squadState[from],b=state.squadState[to];
+          const tmp=a.status;a.status=b.status;b.status=tmp;
+          saveState();renderLineup();
+        }
+      };
+    });
+    o.querySelectorAll(".v21-bench").forEach(b=>b.onclick=()=>playerCard(b.dataset.player));
+  }
+
+  function renderSquad(){
+    ensureSquadState();
+    const g=grouped();
+    const old=document.getElementById("fomV21Squad");
+    if(old)old.remove();
+    const o=document.createElement("div");o.id="fomV21Squad";
+    const section=(title,arr)=>`<section class="v21-section"><h3>${title}<small>${arr.length}</small></h3>${arr.map(p=>{
+      const c=careerFor(p),s=state.squadState[p.name],avail=c.injury?"🩹":c.suspension?"🟥":"";
+      return `<button class="v21-player-row" data-player="${esc(p.name)}">
+        <div class="v21-mini-avatar">${esc(p.name.split(/\s+/).map(x=>x[0]).slice(0,2).join(""))}</div>
+        <div class="v21-player-main"><b>${esc(p.name)}</b><small>${POS[p.position]||p.position} · №${s.shirt} ${avail}</small></div>
+        <span class="v21-state ${s.status==="starting"?"starter":""}">${s.status==="starting"?"ОСНОВА":"РЕЗЕРВ"}</span>
+        <strong>${c.rating.toFixed(1)}</strong>
+      </button>`;
+    }).join("")}</section>`;
+    const ps=clubSquad();
+    const starters=ps.filter(p=>state.squadState[p.name].status==="starting");
+    o.innerHTML=`<div class="v21-squad-modal">
+      <div class="v21-phead"><button id="v21sc">← Назад</button><span>СОСТАВ КЛУБА</span><button id="v21line">⚽ Состав</button></div>
+      <div class="v21-squad-hero"><div><small>${state.club?.name||"Ваш клуб"}</small><b>${ps.length} игроков</b></div><div><small>Основа</small><b>${starters.length}/11</b></div><div><small>Средний рейтинг</small><b>${(ps.reduce((a,p)=>a+careerFor(p).rating,0)/Math.max(1,ps.length)).toFixed(1)}</b></div></div>
+      ${section("🧤 Вратари",g.GK)}
+      ${section("🛡️ Защитники",g.DEF)}
+      ${section("🎯 Полузащитники",g.MID)}
+      ${section("⚡ Нападающие",g.ATT)}
+      <section class="v21-section"><h3>🌱 Академия <small>${academyCount()}</small></h3><div class="v21-academy"><b>Молодёжная система</b><span>Развитие талантов и продвижение в первую команду</span><button id="v21academy">Открыть академию</button></div></section>
+    </div>`;
+    document.body.appendChild(o);
+    o.querySelector("#v21sc").onclick=()=>o.remove();
+    o.querySelector("#v21line").onclick=renderLineup;
+    o.querySelectorAll(".v21-player-row").forEach(b=>b.onclick=()=>playerCard(b.dataset.player));
+    o.querySelector("#v21academy").onclick=renderAcademy;
+  }
+
+  function academyCount(){
+    state.academy=state.academy||seedAcademy();
+    return state.academy.length;
+  }
+  function seedAcademy(){
+    return [
+      {name:"Молодой талант 1",age:17,position:"CM",rating:62,potential:82,development:0},
+      {name:"Молодой талант 2",age:18,position:"LW",rating:64,potential:85,development:0},
+      {name:"Молодой талант 3",age:16,position:"CB",rating:58,potential:80,development:0},
+      {name:"Молодой талант 4",age:17,position:"ST",rating:61,potential:84,development:0}
+    ];
+  }
+
+  function renderAcademy(){
+    state.academy=state.academy||seedAcademy();
+    const old=document.getElementById("fomV21Academy");if(old)old.remove();
+    const o=document.createElement("div");o.id="fomV21Academy";
+    o.innerHTML=`<div class="v21-academy-modal">
+      <div class="v21-phead"><button id="v21ac">← Назад</button><span>АКАДЕМИЯ</span></div>
+      <div class="v21-academy-hero"><b>🌱 Молодёжная академия</b><span>Таланты развиваются каждую неделю. Потенциал определяет верхний предел роста.</span></div>
+      ${state.academy.map((p,i)=>`<div class="v21-youth"><div class="v21-mini-avatar">${p.name.split(/\s+/).map(x=>x[0]).join("").slice(0,2)}</div><div><b>${esc(p.name)}</b><small>${p.age} лет · ${POS[p.position]}</small></div><strong>${p.rating}</strong><span>Потенциал ${p.potential}</span><button data-promote="${i}">В основу</button></div>`).join("")}
+    </div>`;
+    document.body.appendChild(o);o.querySelector("#v21ac").onclick=()=>o.remove();
+    o.querySelectorAll("[data-promote]").forEach(b=>b.onclick=()=>{
+      const p=state.academy[Number(b.dataset.promote)];
+      const base={name:p.name,position:p.position,rating:p.rating};
+      if(!SQUADS[state.club.name])SQUADS[state.club.name]=[];
+      SQUADS[state.club.name].push([base.name,base.position,base.rating]);
+      delete state.academy[Number(b.dataset.promote)];
+      state.academy=state.academy.filter(Boolean);
+      saveState();renderAcademy();
+    });
+  }
+
+  // Expose for the existing app / future navigation.
+  window.FOMSquad={open:renderSquad,lineup:renderLineup,player:playerCard,academy:renderAcademy};
+
+  // Add a compact entry button to the existing header if possible.
+  function addEntry(){
+    if(document.getElementById("fomV21Entry"))return;
+    const buttons=[...document.querySelectorAll("button")];
+    const anchor=buttons.find(b=>/состав|squad|команда/i.test(b.textContent||""));
+    if(anchor)return;
+    const header=document.querySelector("header,.top");
+    if(!header)return;
+    const b=document.createElement("button");b.id="fomV21Entry";b.textContent="👥 Состав";b.onclick=renderSquad;
+    b.style.cssText="border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:8px 10px;font-size:11px;margin-left:6px";
+    header.appendChild(b);
+  }
+  new MutationObserver(addEntry).observe(document.body,{childList:true,subtree:true});
+
+  const css=document.createElement("style");css.id="fom-v21-css";
+  css.textContent=`
+    #fomV21Squad,#fomV21Lineup,#fomV21Player,#fomV21Academy{position:fixed;inset:0;z-index:12000;background:var(--bg,#0b0d10);overflow:auto;color:var(--text,#fff)}
+    .v21-squad-modal,.v21-lineup-modal,.v21-player-modal,.v21-academy-modal{max-width:800px;margin:auto;padding:12px 12px 90px}
+    .v21-phead{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;margin-bottom:12px}.v21-phead span{font-size:10px;letter-spacing:1.5px;opacity:.45;text-align:center}.v21-phead button{font-size:10px}
+    .v21-squad-hero{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:7px;margin-bottom:12px}.v21-squad-hero>div{padding:14px;border:1px solid var(--line);border-radius:15px;background:var(--panel);display:flex;flex-direction:column;gap:5px}.v21-squad-hero small{font-size:9px;opacity:.45}.v21-squad-hero b{font-size:16px}
+    .v21-section{border:1px solid var(--line);border-radius:17px;background:var(--panel);padding:12px;margin-bottom:10px}.v21-section>h3{margin:0 0 7px;font-size:13px}.v21-section>h3 small{float:right;opacity:.4}
+    .v21-player-row{width:100%;display:grid;grid-template-columns:34px minmax(0,1fr) auto 40px;gap:8px;align-items:center;text-align:left;padding:9px 0;border:0;border-top:1px solid rgba(255,255,255,.05);background:transparent;color:inherit}.v21-player-row:first-of-type{border-top:0}.v21-mini-avatar,.v21-kit{display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--panel2);border:1px solid var(--line);font-size:10px;font-weight:800}.v21-mini-avatar{width:32px;height:32px}.v21-player-main{min-width:0;display:flex;flex-direction:column;gap:3px}.v21-player-main b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v21-player-main small{font-size:9px;opacity:.45}.v21-state{font-size:8px;padding:4px 6px;border-radius:7px;background:rgba(255,255,255,.05);opacity:.65}.v21-state.starter{background:rgba(255,122,24,.12);color:#ff9f4a;opacity:1}.v21-player-row>strong{font-size:13px;text-align:center}
+    .v21-formations{display:flex;gap:6px;overflow:auto;margin-bottom:10px}.v21-formations button{white-space:nowrap;font-size:10px;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:inherit}.v21-formations button.active{border-color:#ff7a18}
+    .v21-pitch{position:relative;width:100%;max-width:620px;margin:auto;aspect-ratio:1.5;border-radius:18px;overflow:hidden;background:#18301f;border:1px solid rgba(255,255,255,.1);background-image:linear-gradient(90deg,transparent 49.7%,rgba(255,255,255,.25) 50%,transparent 50.3%),linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px);background-size:100% 100%,100% 12.5%;margin-bottom:12px}.v21-pitch:before{content:"";position:absolute;inset:4%;border:1px solid rgba(255,255,255,.4);border-radius:4px;pointer-events:none}
+    .v21-slot{position:absolute;transform:translate(-50%,-50%);width:82px;text-align:center;cursor:grab}.v21-slot .v21-kit{width:30px;height:30px;margin:auto;background:#ff7a18;color:#111;border-color:#ffb477}.v21-slot b{display:block;font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.v21-slot small{display:block;font-size:7px;opacity:.65}.v21-empty-slot{width:28px;height:28px;border:1px dashed rgba(255,255,255,.4);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:auto}
+    .v21-setpieces{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:14px}.v21-setpieces span{padding:8px;border-radius:10px;background:var(--panel);font-size:9px;opacity:.7}.v21-setpieces b{color:var(--text);opacity:1}.v21-bench{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.v21-bench button{padding:9px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:inherit;text-align:left}.v21-bench b{display:block;font-size:10px}.v21-bench span{font-size:8px;opacity:.5}.v21-hint{font-size:9px;opacity:.4;text-align:center}
+    .v21-profile{display:grid;grid-template-columns:70px 1fr 55px;gap:12px;align-items:center;padding:18px;border:1px solid var(--line);border-radius:19px;background:var(--panel);margin-bottom:10px}.v21-avatar{width:68px;height:68px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:var(--panel2);font-size:21px;font-weight:900}.v21-profile small{font-size:9px;opacity:.45}.v21-profile h2{font-size:19px;margin:4px 0}.v21-profile span{font-size:9px;opacity:.5}.v21-profile>strong{font-size:28px;text-align:center}.v21-status,.v21-info{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px}.v21-info{grid-template-columns:repeat(2,1fr)}.v21-status span,.v21-info span{padding:11px;border-radius:12px;background:var(--panel);font-size:9px;opacity:.55}.v21-status strong,.v21-info b{display:block;color:var(--text);font-size:11px;margin-top:5px}.v21-bars{padding:13px;border:1px solid var(--line);border-radius:15px;background:var(--panel);margin-bottom:10px}.v21-bars>div{margin:8px 0}.v21-bars label{display:flex;justify-content:space-between;font-size:9px;opacity:.7}.v21-bars i{display:block;height:5px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;margin-top:5px}.v21-bars em{display:block;height:100%;background:#ff7a18}.v21-stats{padding:13px;border:1px solid var(--line);border-radius:15px;background:var(--panel);margin-bottom:10px}.v21-stats h3{font-size:13px;margin:0 0 10px}.v21-stats>div{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.v21-stats span{text-align:center;font-size:8px;opacity:.5}.v21-stats b{display:block;font-size:15px;color:var(--text);margin-top:4px}.v21-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.v21-actions button,.v21-primary{padding:11px;border-radius:11px;border:1px solid var(--line);background:var(--panel);color:inherit;font-size:10px}
+    .v21-academy-hero{padding:16px;border-radius:17px;background:var(--panel);border:1px solid var(--line);margin-bottom:10px}.v21-academy-hero b{display:block;font-size:16px}.v21-academy-hero span{display:block;font-size:10px;opacity:.55;margin-top:6px;line-height:1.5}.v21-youth{display:grid;grid-template-columns:34px minmax(0,1fr) 38px 80px auto;gap:7px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}.v21-youth>div{display:flex;flex-direction:column}.v21-youth b{font-size:10px}.v21-youth small{font-size:8px;opacity:.45}.v21-youth strong{font-size:14px}.v21-youth span{font-size:8px;opacity:.5}.v21-youth button{font-size:8px;padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:inherit}
+    @media(max-width:560px){.v21-squad-hero{grid-template-columns:1fr 1fr}.v21-squad-hero>div:first-child{grid-column:1/-1}.v21-slot{width:64px}.v21-slot b{font-size:7px}.v21-slot small{font-size:6px}.v21-status{grid-template-columns:1fr 1fr}.v21-status span:last-child{grid-column:1/-1}.v21-youth{grid-template-columns:32px minmax(0,1fr) 34px auto}.v21-youth span{display:none}}
+  `;
+  document.head.appendChild(css);
+})();
+</script>
+
 </body>
 </html>
