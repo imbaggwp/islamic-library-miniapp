@@ -4160,5 +4160,398 @@ function seasonPlayUserMatch(fid){
 })();
 </script>
 
+
+<script>
+/* =========================================================
+   FOM v2.0 — CAREER / COMPETITIONS / ECONOMY / TRANSFERS /
+   NEWS / BOARD / SEASON STRUCTURE
+   ========================================================= */
+(function(){
+  const C=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+  const euro=n=>"€"+Math.round(Number(n||0)).toLocaleString("ru-RU")+"M";
+  const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+
+  function initV2(){
+    state.economy=state.economy||{
+      transferBudget: state.finances?.transferBudget ?? 65,
+      wageBudget: state.finances?.wageBudget ?? 3.2,
+      weeklyWages: state.finances?.weeklyWages ?? 0.9,
+      revenue:0, expenses:0, sponsorship:0, matchIncome:0, prizeMoney:0,
+      history:[]
+    };
+    state.playerCareer=state.playerCareer||{};
+    state.promises=state.promises||[];
+    state.clubInterest=state.clubInterest||[];
+    state.news=state.news||[];
+    state.board=state.board||{
+      confidence:72,
+      objective:"Топ-4 чемпионата",
+      targetPosition:4,
+      seasonBudget:100,
+      sacked:false,
+      contractYears:2
+    };
+    state.competitions=state.competitions||{
+      cup:{name:"Национальный кубок",round:"1/32 финала",status:"upcoming",opponent:null,home:null},
+      europe:{name:"Лига чемпионов",stage:"Групповой этап",status:"upcoming",opponent:null,home:null,leg:0,aggregate:[0,0]},
+      calendar:[],
+      history:[],
+      awards:[]
+    };
+    state.seasonStats=state.seasonStats||{
+      league:{played:0,wins:0,draws:0,losses:0,goals:0,conceded:0,points:0},
+      cup:{played:0,wins:0,rounds:0},
+      europe:{played:0,wins:0,draws:0,losses:0,goals:0,conceded:0},
+      titles:0
+    };
+    seedCareerPlayers();
+    seedCompetitions();
+    seedNews();
+    saveState();
+  }
+
+  function squad(){
+    const names=state.club?.squad||[];
+    if(Array.isArray(names)&&names.length)return names;
+    if(typeof SQUADS!=="undefined" && state.club?.name && Array.isArray(SQUADS[state.club.name]))return SQUADS[state.club.name];
+    return [];
+  }
+
+  function playerObj(name,i){
+    if(typeof name==="object")return name;
+    return {name:String(name||("Игрок "+(i+1))),rating:68+R(0,13),potential:72+R(0,18),age:20+R(0,13),value:5+R(0,35),wage:.05+Math.random()*.15,position:"CM"};
+  }
+
+  function seedCareerPlayers(){
+    const ps=squad();
+    ps.forEach((p,i)=>{
+      const n=typeof p==="object"?p.name:p;
+      if(!n)return;
+      if(!state.playerCareer[n]){
+        const base=playerObj(p,i);
+        state.playerCareer[n]={
+          age:Number(base.age||22), potential:Number(base.potential||Math.max(70,Number(base.rating||70)+8)),
+          rating:Number(base.rating||70), form:65+R(0,30), morale:65+R(0,30),
+          fitness:78+R(0,22), minutes:0, appearances:0, starts:0,
+          goals:0,assists:0,training:0,practice:0,development:0,
+          promise:null,agent:"Стандартный агент",contractYears:1+R(0,4),
+          wage:Number(base.wage||.1), value:Number(base.value||10), decline:false
+        };
+      }
+    });
+  }
+
+  function seedCompetitions(){
+    if(state.competitions.calendar.length)return;
+    const opponents=(typeof LEAGUES!=="undefined"?Object.values(LEAGUES).flatMap(x=>x.clubs||[]):[]);
+    const uniq=[...new Set(opponents)].filter(x=>x&&x!==state.club?.name);
+    for(let i=0;i<10;i++)state.competitions.calendar.push({
+      week:i+1,type:"league",title:"Чемпионат",status:i<1?"active":"scheduled",
+      opponent:uniq[i%Math.max(1,uniq.length)]||"Соперник",home:i%2===0
+    });
+    state.competitions.calendar.push({week:3,type:"cup",title:"Национальный кубок",status:"scheduled",opponent:uniq[2]||"Соперник",home:true});
+    state.competitions.calendar.push({week:5,type:"europe",title:"Лига чемпионов",status:"scheduled",opponent:uniq[4]||"Соперник",home:true,leg:1});
+    state.competitions.calendar.push({week:7,type:"europe",title:"Лига чемпионов",status:"scheduled",opponent:uniq[4]||"Соперник",home:false,leg:2});
+  }
+
+  function seedNews(){
+    if(state.news.length)return;
+    state.news=[
+      {date:"Сегодня",icon:"🏟️",title:"Новый сезон начался",text:"Совет директоров подтвердил цели клуба на сезон."},
+      {date:"Сегодня",icon:"💰",title:"Трансферный бюджет утверждён",text:"Клуб готов инвестировать в усиление состава."},
+      {date:"Недавно",icon:"📈",title:"Оценка состава обновлена",text:"Форма и игровая практика игроков влияют на их развитие."}
+    ];
+  }
+
+  function evolvePlayers(){
+    Object.values(state.playerCareer).forEach(p=>{
+      const age=p.age;
+      let delta=0;
+      if(age<=23)delta=.25+(p.practice/1000);
+      else if(age<=28)delta=.10;
+      else if(age<=31)delta=.02;
+      else {delta=-.10; p.decline=true;}
+      delta+=(p.form-70)*.008+(p.morale-70)*.004;
+      p.rating=C(+(p.rating+delta).toFixed(1),50,p.potential);
+      p.form=C(p.form+R(-5,5),35,99);
+      p.fitness=C(p.fitness+R(-3,7),45,100);
+      p.age=+(p.age+.0192).toFixed(2);
+      p.minutes=0;p.practice=0;
+      if(p.contractYears>0)p.contractYears=Math.max(0,+(p.contractYears-.0192).toFixed(2));
+      if(p.promise){
+        p.promise.weeks=Math.max(0,p.promise.weeks-1);
+        if(p.promise.type==="minutes")p.morale=C(p.morale+(p.minutes>0?1:-2),20,100);
+      }
+    });
+  }
+
+  function processMatchEconomy(){
+    const lm=state.liveMatch;if(!lm)return;
+    const attendance=R(28,62), ticket=R(20,42);
+    const income=+(attendance*ticket/1000).toFixed(2);
+    state.economy.matchIncome+=income;
+    state.economy.revenue+=income;
+    state.economy.sponsorship+=.45;
+    state.economy.revenue+=.45;
+    state.economy.expenses+=state.economy.weeklyWages;
+    state.economy.history.push({week:state.season?.round||1,income,expenses:state.economy.weeklyWages});
+    state.board.confidence=C(state.board.confidence+(lm.userGoals>lm.oppGoals?2:lm.userGoals<lm.oppGoals?-2:0),0,100);
+  }
+
+  function prize(type,amount){
+    state.economy.prizeMoney+=amount;state.economy.revenue+=amount;
+    state.news.unshift({date:"Сегодня",icon:"🏆",title:"Призовые получены",text:`Клуб получил ${euro(amount)} за выступление в турнире.`});
+  }
+
+  function transferWindow(){
+    const week=Number(state.season?.round||1);
+    return week<=8;
+  }
+
+  function addInterest(name,club,reason){
+    state.clubInterest.unshift({player:name,club,reason,date:"Сегодня"});
+    state.news.unshift({date:"Сегодня",icon:"👀",title:"Интерес к игроку",text:`${club} следит за ${name}. ${reason||""}`});
+    state.clubInterest=state.clubInterest.slice(0,20);
+  }
+
+  function negotiate(name,type="buy"){
+    const p=state.playerCareer[name];if(!p)return;
+    const fee=Math.max(1,Math.round(p.value*(.9+Math.random()*.5)));
+    const salary=+(Math.max(.03,p.wage*(1.05+Math.random()*.35))).toFixed(2);
+    const competition=R(0,3);
+    const agent=["Сильный агент","Молодой агент","Опытный агент","Независимый агент"][R(0,3)];
+    const accept=type==="buy" ? state.economy.transferBudget>=fee && Math.random()<.72-competition*.09 : Math.random()<.65;
+    state.news.unshift({
+      date:"Сегодня",icon:accept?"🤝":"❌",
+      title:accept?"Переговоры успешны":"Переговоры сорвались",
+      text:accept?`${name}: договорённость ${euro(fee)}, зарплата €${salary.toFixed(2)}M/нед., агент — ${agent}.`:`${name}: стороны не смогли договориться. Конкуренция: ${competition+1} клуб(а).`
+    });
+    if(accept&&type==="buy"){state.economy.transferBudget=Math.max(0,state.economy.transferBudget-fee);p.contractYears=4;p.wage=salary;}
+    saveState();renderV2();
+  }
+
+  function promise(name,type){
+    const p=state.playerCareer[name];if(!p)return;
+    p.promise={type,weeks:12};
+    state.promises.push({player:name,type,weeks:12});
+    p.morale=C(p.morale+5,0,100);
+    state.news.unshift({date:"Сегодня",icon:"📝",title:"Обещание игроку",text:`${name}: ${type==="minutes"?"регулярная игровая практика":type==="role"?"важная роль в составе":"улучшение контракта"}.`});
+    saveState();renderV2();
+  }
+
+  function addNewsEvent(){
+    const ps=Object.keys(state.playerCareer);
+    if(!ps.length)return;
+    const n=ps[R(0,ps.length-1)],p=state.playerCareer[n];
+    const events=[
+      ["🩹","Травма","получил небольшое повреждение на тренировке."],
+      ["😤","Недовольство","недоволен количеством игрового времени."],
+      ["🔥","Форма","показывает отличную форму на тренировках."],
+      ["👀","Интерес клубов","попал в список интересов нескольких клубов."]
+    ];
+    const e=events[R(0,events.length-1)];
+    state.news.unshift({date:"Сегодня",icon:e[0],title:e[1],text:`${n} ${e[2]}`});
+    if(e[1]==="Недовольство")p.morale=C(p.morale-5,0,100);
+    if(e[1]==="Форма")p.form=C(p.form+7,0,100);
+    if(e[1]==="Интерес клубов")addInterest(n,"Европейский клуб","скауты оценили текущую форму");
+    state.news=state.news.slice(0,40);
+  }
+
+  function boardUpdate(){
+    const pos=Number(state.season?.standings?.find?.(x=>x.club===state.club?.name)?.position||4);
+    const target=state.board.targetPosition;
+    if(pos<=target)state.board.confidence=C(state.board.confidence+3,0,100);
+    else state.board.confidence=C(state.board.confidence-2,0,100);
+    if(state.board.confidence<20)state.board.sacked=true;
+  }
+
+  function awardSeason(){
+    const ps=Object.entries(state.playerCareer).sort((a,b)=>b[1].rating-a[1].rating);
+    state.competitions.awards=[
+      {name:"Игрок сезона",player:ps[0]?.[0]||"—"},
+      {name:"Лучший бомбардир",player:ps.sort((a,b)=>b[1].goals-a[1].goals)[0]?.[0]||"—"},
+      {name:"Лучший ассистент",player:ps.sort((a,b)=>b[1].assists-a[1].assists)[0]?.[0]||"—"}
+    ];
+  }
+
+  function renderV2(){
+    initV2();
+    let old=document.getElementById("fomV2Panel");
+    if(old)old.remove();
+    old=document.createElement("div");old.id="fomV2Panel";
+    old.innerHTML=`<div class="v2-shell">
+      <div class="v2-head"><button id="v2close">← Назад</button><b>УПРАВЛЕНИЕ КЛУБОМ</b><span>${state.season?.round||1} тур</span></div>
+      <div class="v2-tabs">
+        <button data-t="season">🏆 Сезон</button><button data-t="economy">💰 Финансы</button>
+        <button data-t="players">👥 Игроки</button><button data-t="transfers">🔁 Трансферы</button>
+        <button data-t="news">📰 Новости</button><button data-t="board">📋 Руководство</button>
+      </div>
+      <div id="v2content"></div>
+    </div>`;
+    document.body.appendChild(old);
+    old.querySelector("#v2close").onclick=()=>old.remove();
+    old.querySelectorAll(".v2-tabs button").forEach(b=>b.onclick=()=>showTab(b.dataset.t));
+    showTab("season");
+  }
+
+  function showTab(t){
+    const c=document.querySelector("#v2content");if(!c)return;
+    document.querySelectorAll(".v2-tabs button").forEach(b=>b.classList.toggle("active",b.dataset.t===t));
+    if(t==="season")renderSeasonTab(c);
+    if(t==="economy")renderEconomy(c);
+    if(t==="players")renderPlayers(c);
+    if(t==="transfers")renderTransfersV2(c);
+    if(t==="news")renderNews(c);
+    if(t==="board")renderBoard(c);
+  }
+
+  function card(title,body){return `<section class="v2-card"><h3>${title}</h3>${body}</section>`}
+  function renderSeasonTab(c){
+    const cal=state.competitions.calendar;
+    c.innerHTML=`
+      <div class="v2-hero"><small>СЕЗОН ${state.season?.year||1}</small><strong>${state.club?.name||"Ваш клуб"}</strong><span>Чемпионат · Кубок · Еврокубки</span></div>
+      ${card("Ближайшие матчи",cal.map((x,i)=>`<div class="v2-fixture"><b>${x.week}</b><span>${x.title}</span><strong>${x.home?"Дома":"В гостях"} · ${esc(x.opponent)}</strong><em>${x.status==="active"?"Сейчас":"Запланирован"}</em></div>`).join(""))}
+      ${card("Турниры",`
+        <div class="v2-grid3"><div><b>🏟️ Чемпионат</b><small>${state.seasonStats.league.points} очков</small></div>
+        <div><b>🏆 ${state.competitions.cup.name}</b><small>${state.competitions.cup.round}</small></div>
+        <div><b>🌍 ${state.competitions.europe.name}</b><small>${state.competitions.europe.stage}</small></div></div>`)}
+      ${card("Сезонная статистика",`<div class="v2-metrics">
+        <span>Матчи<strong>${state.seasonStats.league.played}</strong></span>
+        <span>Победы<strong>${state.seasonStats.league.wins}</strong></span>
+        <span>Голы<strong>${state.seasonStats.league.goals}</strong></span>
+        <span>Пропущено<strong>${state.seasonStats.league.conceded}</strong></span>
+      </div>`)}
+      ${state.competitions.awards.length?card("Награды сезона",state.competitions.awards.map(a=>`<div class="v2-award">🏅 <b>${a.name}</b><span>${esc(a.player)}</span></div>`).join("")):""}`;
+  }
+
+  function renderEconomy(c){
+    const e=state.economy;
+    c.innerHTML=`
+      ${card("Финансовый обзор",`<div class="v2-money"><div><small>Трансферный бюджет</small><b>${euro(e.transferBudget)}</b></div><div><small>Зарплатный фонд / нед.</small><b>${euro(e.wageBudget)}</b></div></div>`)}
+      ${card("Доходы",`<div class="v2-list"><p>Билеты <b>${euro(e.matchIncome)}</b></p><p>Спонсоры <b>${euro(e.sponsorship)}</b></p><p>Призовые <b>${euro(e.prizeMoney)}</b></p><p>Всего доходов <b>${euro(e.revenue)}</b></p></div>`)}
+      ${card("Расходы",`<div class="v2-list"><p>Зарплаты <b>${euro(e.expenses)}</b></p><p>Трансферы <b>${euro(Math.max(0,100-e.transferBudget))}</b></p><p>Баланс <b>${euro(e.revenue-e.expenses)}</b></p></div>`)}
+      ${card("Спонсорские условия",`<p class="v2-muted">Базовый спонсор приносит еженедельный доход. При росте результатов и репутации клуба условия могут улучшаться.</p>`)}`;
+  }
+
+  function renderPlayers(c){
+    const ps=Object.entries(state.playerCareer);
+    c.innerHTML=`
+      ${card("Развитие состава",`<p class="v2-muted">Молодые игроки быстрее растут. После пикового возраста начинается постепенный спад, а форма, мораль и игровая практика меняют текущий рейтинг.</p>`)}
+      ${ps.map(([n,p])=>`<div class="v2-player">
+        <div><b>${esc(n)}</b><small>${p.age.toFixed(1)} лет · ${p.decline?"📉 спад":"📈 развитие"} · ${p.agent}</small></div>
+        <strong>${p.rating.toFixed(1)}</strong>
+        <span>Потенциал ${p.potential}</span>
+        <span>Форма ${Math.round(p.form)}</span><span>Мораль ${Math.round(p.morale)}</span><span>Практика ${p.appearances} матч.</span>
+        <button onclick='window.FOMV2.promise(${JSON.stringify(n)},"minutes")'>Обещание</button>
+      </div>`).join("")}`;
+  }
+
+  function renderTransfersV2(c){
+    const ps=Object.entries(state.playerCareer).slice(0,30);
+    c.innerHTML=`
+      ${card("Трансферное окно",`<div class="v2-window ${transferWindow()?"open":"closed"}">${transferWindow()?"🟢 Открыто":"🔴 Закрыто"}<span>Дедлайн: после 8-го тура</span></div>`)}
+      ${card("Скаутинг и переговоры",ps.map(([n,p])=>`<div class="v2-transfer">
+        <div><b>${esc(n)}</b><small>Рейтинг ${p.rating.toFixed(1)} · ${p.age.toFixed(1)} лет · ${euro(p.value)} · ${p.agent}</small></div>
+        <button onclick='window.FOMV2.interest(${JSON.stringify(n)})'>Интерес</button>
+        <button onclick='window.FOMV2.negotiate(${JSON.stringify(n)})'>Переговоры</button>
+        <button onclick='window.FOMV2.loan(${JSON.stringify(n)})'>Аренда</button>
+      </div>`).join(""))}
+      ${card("Обмен",`<p class="v2-muted">Обмены используют стоимость игрока и зарплатные условия. Система сравнивает ценность сторон и вероятность согласия клуба.</p>`)}`;
+  }
+
+  function renderNews(c){
+    c.innerHTML=`
+      <button class="v2-primary" id="v2event">+ Создать событие недели</button>
+      ${card("Лента клуба",state.news.map(n=>`<div class="v2-news"><b>${n.icon}</b><div><strong>${esc(n.title)}</strong><small>${esc(n.date)}</small><p>${esc(n.text)}</p></div></div>`).join(""))}
+      ${card("Интерес клубов",state.clubInterest.length?state.clubInterest.map(x=>`<div class="v2-interest">👀 <b>${esc(x.player)}</b><span>${esc(x.club)} · ${esc(x.reason)}</span></div>`).join(""):"<p class='v2-muted'>Пока никто не проявляет интерес.</p>")}`;
+    document.querySelector("#v2event").onclick=()=>{addNewsEvent();renderV2();};
+  }
+
+  function renderBoard(c){
+    const b=state.board;
+    c.innerHTML=`
+      ${card("Совет директоров",`<div class="v2-confidence"><strong>${b.confidence}%</strong><span>Доверие руководства</span><div><i style="width:${b.confidence}%"></i></div></div>`)}
+      ${card("Цели сезона",`<div class="v2-objective"><b>${b.objective}</b><span>Требование: не ниже ${b.targetPosition}-го места</span></div>`)}
+      ${card("Контракт тренера",`<div class="v2-list"><p>Срок <b>${b.contractYears} лет</b></p><p>Статус <b>${b.sacked?"Уволен":"Действующий"}</b></p></div>
+      <button class="v2-primary" onclick="window.FOMV2.extend()">Продлить контракт</button>`)}
+      ${card("Риски",`<p class="v2-muted">${b.confidence<35?"Руководство недовольно результатами. Следующие матчи критичны.":"Позиция тренера стабильна. Хорошие результаты повышают бюджет и доверие."}</p>`)}`;
+  }
+
+  window.FOMV2={
+    open:renderV2, promise, negotiate,
+    interest:(n)=>{addInterest(n,"Клуб-конкурент","изучает возможность трансфера");saveState();renderV2()},
+    loan:(n)=>{state.news.unshift({date:"Сегодня",icon:"🔁",title:"Предложена аренда",text:`${n}: клуб-конкурент запросил условия аренды.`});saveState();renderV2()},
+    extend:()=>{state.board.contractYears++;state.board.confidence=C(state.board.confidence+4,0,100);state.news.unshift({date:"Сегодня",icon:"✍️",title:"Контракт продлён",text:"Совет директоров продлил контракт главного тренера."});saveState();renderV2()}
+  };
+
+  // Process the existing match finalization once per match.
+  const oldFinish=window.finishLiveMatch;
+  if(typeof oldFinish==="function"){
+    window.finishLiveMatch=function(){
+      const r=oldFinish.apply(this,arguments);
+      try{
+        initV2();
+        const lm=state.liveMatch;
+        if(lm&&!lm._v2Processed){
+          lm._v2Processed=true;
+          processMatchEconomy();
+          state.seasonStats.league.played++;
+          if(lm.userGoals>lm.oppGoals){state.seasonStats.league.wins++;state.seasonStats.league.points+=3}
+          else if(lm.userGoals===lm.oppGoals){state.seasonStats.league.draws++;state.seasonStats.league.points++}
+          else state.seasonStats.league.losses++;
+          state.seasonStats.league.goals+=Number(lm.userGoals||0);
+          state.seasonStats.league.conceded+=Number(lm.oppGoals||0);
+          Object.values(state.playerCareer).forEach(p=>{p.appearances++;p.minutes+=90;p.practice+=90;p.morale=C(p.morale+(lm.userGoals>lm.oppGoals?1:-1),20,100)});
+          if(lm.userGoals>lm.oppGoals)prize("league",.25);
+          evolvePlayers();boardUpdate();saveState();
+        }
+      }catch(e){console.warn("FOM v2 finish",e)}
+      return r;
+    };
+  }
+
+  // New season hook: if existing code exposes season advancement, enrich it.
+  const oldAdvance=window.advanceSeason;
+  if(typeof oldAdvance==="function"){
+    window.advanceSeason=function(){
+      evolvePlayers();awardSeason();boardUpdate();state.seasonStats={league:{played:0,wins:0,draws:0,losses:0,goals:0,conceded:0,points:0},cup:{played:0,wins:0,rounds:0},europe:{played:0,wins:0,draws:0,losses:0,goals:0,conceded:0},titles:0};
+      state.competitions.calendar=[];state.competitions.cup.round="1/32 финала";state.competitions.europe.stage="Групповой этап";
+      const r=oldAdvance.apply(this,arguments);saveState();return r;
+    };
+  }
+
+  const css=document.createElement("style");css.id="fom-v2-css";
+  css.textContent=`
+    #fomV2Panel{position:fixed;inset:0;z-index:11000;overflow:auto;background:var(--bg,#0e1013);color:var(--text,#fff)}
+    .v2-shell{max-width:780px;margin:auto;padding:10px 12px 90px}
+    .v2-head{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;margin-bottom:10px}
+    .v2-head b{font-size:11px;text-align:center;letter-spacing:1px}.v2-head span{font-size:10px;opacity:.45}
+    .v2-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+    .v2-tabs button{padding:10px 5px;border:1px solid var(--border,#2b2f36);border-radius:12px;background:var(--card,#171a1f);color:inherit;font-size:10px}
+    .v2-tabs button.active{outline:1px solid #ff9f43}
+    .v2-hero{padding:20px;border-radius:20px;background:var(--card,#171a1f);border:1px solid var(--border,#2b2f36);display:flex;flex-direction:column;gap:7px;margin-bottom:12px}.v2-hero small{opacity:.4;font-size:9px;letter-spacing:1.5px}.v2-hero strong{font-size:25px}.v2-hero span,.v2-muted{font-size:11px;opacity:.55}
+    .v2-card{padding:14px;border:1px solid var(--border,#2b2f36);border-radius:18px;background:var(--card,#171a1f);margin-bottom:12px}.v2-card h3{font-size:14px;margin:0 0 11px}
+    .v2-fixture{display:grid;grid-template-columns:26px 1fr auto auto;gap:8px;align-items:center;padding:10px 0;border-top:1px solid rgba(255,255,255,.05);font-size:10px}.v2-fixture:first-of-type{border-top:0}.v2-fixture em{font-style:normal;opacity:.5}
+    .v2-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.v2-grid3>div{padding:11px;border-radius:13px;background:rgba(255,255,255,.035);display:flex;flex-direction:column;gap:7px}.v2-grid3 b{font-size:10px}.v2-grid3 small{font-size:9px;opacity:.5}
+    .v2-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.v2-metrics span{font-size:9px;opacity:.55;text-align:center}.v2-metrics strong{display:block;font-size:17px;opacity:1;margin-top:4px}
+    .v2-money{display:grid;grid-template-columns:1fr 1fr;gap:8px}.v2-money>div{padding:13px;border-radius:14px;background:rgba(255,255,255,.035);display:flex;flex-direction:column;gap:6px}.v2-money small{font-size:9px;opacity:.5}.v2-money b{font-size:20px}
+    .v2-list p{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.05);padding:8px 0;margin:0;font-size:11px}.v2-list b{font-size:11px}
+    .v2-player{display:grid;grid-template-columns:minmax(120px,1fr) 42px 70px 60px 60px 72px auto;gap:5px;align-items:center;padding:10px 0;border-top:1px solid rgba(255,255,255,.05);font-size:9px}.v2-player>div{display:flex;flex-direction:column;min-width:0}.v2-player div b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v2-player small{opacity:.45;margin-top:3px}.v2-player strong{font-size:14px;text-align:center}.v2-player span{opacity:.6}.v2-player button,.v2-transfer button{font-size:9px;padding:6px;border-radius:8px}
+    .v2-window{padding:12px;border-radius:13px;display:flex;justify-content:space-between;font-weight:700}.v2-window span{font-size:10px;opacity:.5;font-weight:400}.v2-window.open{background:rgba(80,180,100,.08)}.v2-window.closed{background:rgba(220,80,80,.08)}
+    .v2-transfer{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:5px;align-items:center;padding:10px 0;border-top:1px solid rgba(255,255,255,.05)}.v2-transfer>div{display:flex;flex-direction:column;min-width:0}.v2-transfer small{opacity:.45;font-size:9px;margin-top:3px}.v2-transfer b{font-size:11px}
+    .v2-news{display:grid;grid-template-columns:30px 1fr;gap:9px;padding:12px 0;border-top:1px solid rgba(255,255,255,.05)}.v2-news>b{font-size:20px}.v2-news div{display:flex;flex-direction:column;gap:3px}.v2-news strong{font-size:11px}.v2-news small{font-size:9px;opacity:.4}.v2-news p{font-size:10px;opacity:.65;margin:4px 0 0;line-height:1.45}
+    .v2-interest{display:flex;gap:7px;padding:9px 0;border-top:1px solid rgba(255,255,255,.05);font-size:10px}.v2-interest span{opacity:.5}
+    .v2-confidence{text-align:center}.v2-confidence strong{display:block;font-size:40px}.v2-confidence span{font-size:10px;opacity:.5}.v2-confidence>div{height:7px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:12px}.v2-confidence i{display:block;height:100%;background:#ff9f43}
+    .v2-objective{display:flex;flex-direction:column;gap:6px}.v2-objective b{font-size:16px}.v2-objective span{font-size:10px;opacity:.5}.v2-primary{width:100%;padding:11px;border-radius:12px;border:1px solid var(--border,#2b2f36);background:var(--card,#171a1f);color:inherit;font-weight:700;margin-bottom:10px}
+    .v2-award{display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid rgba(255,255,255,.05);font-size:10px}.v2-award span{opacity:.6}
+    @media(max-width:520px){.v2-grid3{grid-template-columns:1fr}.v2-player{grid-template-columns:minmax(100px,1fr) 35px 55px 50px 50px auto}.v2-player span:nth-of-type(3){display:none}.v2-transfer{grid-template-columns:minmax(0,1fr) auto auto}.v2-transfer button:last-child{display:none}.v2-fixture{grid-template-columns:24px 1fr auto}}
+  `;
+  document.head.appendChild(css);
+
+  initV2();
+})();
+</script>
+
 </body>
 </html>
