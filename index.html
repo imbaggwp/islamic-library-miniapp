@@ -88,16 +88,6 @@ input[type=range]{padding:0;height:6px;accent-color:var(--accent)}
 <div class="screen" id="s-lobby">
 <h2>Комната <span id="lb-code"></span></h2>
 <p class="sub">Скажи код друзьям — они войдут по нему</p>
-<div class="card" id="lb-settings" style="display:none">
-<label>Набор локаций</label>
-<select id="lb-pack"></select>
-<label style="margin-top:16px">Время раунда</label>
-<select id="lb-time">
-<option value="300">5 минут</option>
-<option value="480" selected>8 минут</option>
-<option value="600">10 минут</option>
-</select>
-</div>
 <div class="card">
 <label>Игроки (<span id="lb-count">1</span>)</label>
 <div class="chips" id="lb-list" style="flex-direction:column;align-items:stretch"></div>
@@ -251,8 +241,6 @@ const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ";
 (function init(){
 const sel = $('p-pack');
 for (const k of Object.keys(PACKS)) { const o=document.createElement('option'); o.value=k; o.textContent=k; sel.appendChild(o); }
-const selLb = $('lb-pack');
-for (const k of Object.keys(PACKS)) { const o=document.createElement('option'); o.value=k; o.textContent=k; selLb.appendChild(o); }
 })();
 function roleCardHTML(r, locName){
 return r.spy
@@ -284,7 +272,7 @@ deadline: null, timerId: null,
 score: {civ:0, spy:0}, round: 1,
 guessPick: null, myVotePick: null,
 pack: "🏢 Офис", time: 480,
-createRetries: 0
+createRetries: 0, joinTimeout: null
 };
 const ROOM_PREFIX = 'spyoffice-v1-';
 function genCode(){ let c=''; for(let i=0;i<4;i++) c+=CODE_ALPHABET[Math.floor(Math.random()*CODE_ALPHABET.length)]; return c; }
@@ -299,7 +287,6 @@ const code = genCode();
 NET.peer = new Peer(ROOM_PREFIX + code, {debug:0});
 NET.peer.on('open', () => { 
 $('lb-code').textContent = code; 
-$('lb-settings').style.display = 'block';
 renderLobby(); 
 show('s-lobby'); 
 });
@@ -308,10 +295,11 @@ conn.on('data', d => hostOnData(conn, d));
 conn.on('close', () => hostOnLeave(conn.peer));
 });
 NET.peer.on('error', e => {
+console.error('PeerJS error:', e);
 if (e.type === 'unavailable-id' && NET.createRetries++ < 5) {
 setTimeout(() => onlineCreate(), 500);
 } else {
-err('Не удалось создать комнату: ' + e.type);
+err('Не удалось создать комнату: ' + e.type + '. Попробуйте позже или используйте оффлайн-режим.');
 }
 });
 }
@@ -363,12 +351,29 @@ NET.peer = new Peer({debug:0});
 NET.peer.on('open', id => {
 NET.myId = id;
 NET.hostConn = NET.peer.connect(ROOM_PREFIX + code, {reliable:true});
-NET.hostConn.on('open', () => NET.hostConn.send({type:'join', name}));
+NET.hostConn.on('open', () => {
+clearTimeout(NET.joinTimeout);
+NET.hostConn.send({type:'join', name});
+});
 NET.hostConn.on('data', peerOnData);
 NET.hostConn.on('close', () => { if (!NET.gameOver) err('Связь с комнатой потеряна. Возможно, ведущий вышел.'); });
+NET.hostConn.on('error', e => {
+console.error('Connection error:', e);
+err('Ошибка соединения с хостом: ' + e.type);
+});
+// Таймаут на подключение
+NET.joinTimeout = setTimeout(() => {
+if (!NET.hostConn || !NET.hostConn.open) {
+err('Не удалось подключиться к комнате. Проверьте код и попробуйте снова.');
+}
+}, 10000);
 });
 NET.peer.on('error', e => {
-if (e.type === 'peer-unavailable') err('Комната с кодом ' + code + ' не найдена.');
+console.error('PeerJS error:', e);
+clearTimeout(NET.joinTimeout);
+if (e.type === 'peer-unavailable') err('Комната с кодом ' + code + ' не найдена. Проверьте код.');
+else if (e.type === 'network') err('Проблема с сетью. Проверьте интернет-соединение.');
+else if (e.type === 'server-error') err('Сервер PeerJS недоступен. Попробуйте позже.');
 else err('Ошибка подключения: ' + e.type);
 });
 }
@@ -421,8 +426,8 @@ show('s-on-role'); break;
 function hostStart(){
 if (NET.players.length < 3) return;
 NET.started = true;
-NET.pack = $('lb-pack').value;
-NET.time = +$('lb-time').value;
+NET.pack = "🏢 Офис";
+NET.time = 480;
 broadcast({type:'settings', pack: NET.pack, time: NET.time});
 dealOnlineRoles();
 broadcast({type:'start'});
@@ -559,9 +564,6 @@ if (id === 'HOST') renderOnlineGuess(locations), show('s-on-guess');
 else NET.conns.get(id)?.send({type:'guess-offer', locations});
 });
 broadcast({type:'wait', text:'Шпион пойман! Он решает, угадать ли локацию…'});
-} else if (suspects.length > 1) {
-NET.score.spy++;
-finishRound({winner:'tie', suspects});
 } else {
 NET.score.spy++;
 finishRound({winner:'spy'});
@@ -595,7 +597,6 @@ NET.gameOver = true;
 broadcast({type:'score', score: NET.score, round: NET.round});
 const msgs = {
 'spy':      ['🕵️','Шпион ускользнул!', 'Голосование не вычислило шпиона. Очко шпионам.'],
-'tie':      ['🤷','Ничья в голосовании!', `Подозрение пало на нескольких игроков. Очко шпионам.`],
 'spy-guess':['😱','Шпион угадал локацию!', `Локация «${NET.location.loc}» раскрыта. Очко шпионам.`],
 'civ':      ['🎉','Мирные победили!', `Шпион не угадал локацию «${NET.location.loc}». Очко мирным.`]
 };
