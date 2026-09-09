@@ -6,769 +6,801 @@
 <title>Шпион в офисе</title>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
-  :root{
-    --bg:#0d1117; --bg2:#161b22; --card:#1c2330; --accent:#e8b93c;
-    --accent2:#c0392b; --text:#e8eaed; --muted:#8b94a3; --ok:#3fb950;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;justify-content:center}
-  #app{width:100%;max-width:480px;padding:20px 16px 40px;display:flex;flex-direction:column;min-height:100vh}
-  .screen{display:none;flex-direction:column;flex:1;animation:fade .3s}
-  .screen.active{display:flex}
-  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-  h1{font-size:26px;text-align:center;margin:24px 0 4px}
-  h2{font-size:20px;text-align:center;margin:12px 0}
-  .sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:24px}
-  .logo{font-size:64px;text-align:center;margin-top:32px}
-  .card{background:var(--card);border:1px solid #2a3342;border-radius:16px;padding:20px;margin-bottom:16px}
-  label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
-  select,input[type=range],input[type=text]{width:100%;background:var(--bg2);color:var(--text);border:1px solid #2a3342;border-radius:10px;padding:12px;font-size:16px}
-  input[type=range]{padding:0;height:6px;accent-color:var(--accent)}
-  .val{font-size:28px;font-weight:700;color:var(--accent);text-align:center;margin:6px 0}
-  .btn{display:block;width:100%;background:var(--accent);color:#141414;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;margin-top:12px;transition:transform .1s}
-  .btn:active{transform:scale(.97)}
-  .btn.ghost{background:transparent;color:var(--muted);border:1px solid #2a3342}
-  .btn.danger{background:var(--accent2);color:#fff}
-  .btn:disabled{opacity:.4}
-  .hold-btn{user-select:none;width:100%;padding:20px;border-radius:14px;font-size:16px;font-weight:600;background:var(--bg2);border:2px dashed #3a4457;color:var(--muted);margin-top:12px}
-  .hold-btn:active{border-color:var(--accent);color:var(--text)}
-  .role-card{border-radius:20px;padding:36px 24px;text-align:center;margin-top:16px;min-height:260px;display:flex;flex-direction:column;justify-content:center;gap:14px}
-  .role-card.civilian{background:linear-gradient(160deg,#1a2f1e,#12241a);border:1px solid #2d5a38}
-  .role-card.spy{background:linear-gradient(160deg,#3a1418,#241014);border:1px solid #6b2230}
-  .role-emoji{font-size:64px}
-  .role-title{font-size:28px;font-weight:800}
-  .role-loc{font-size:18px;color:var(--accent)}
-  .role-hint{font-size:14px;color:var(--muted)}
-  .timer{font-size:64px;font-weight:800;text-align:center;margin:16px 0 4px;font-variant-numeric:tabular-nums}
-  .timer.low{color:var(--accent2);animation:pulse 1s infinite}
-  @keyframes pulse{50%{opacity:.55}}
-  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
-  .chip{background:var(--bg2);border:1px solid #2a3342;border-radius:999px;padding:8px 14px;font-size:14px;cursor:pointer}
-  .chip.spoke{opacity:.45;text-decoration:line-through}
-  .chip.sel{border-color:var(--accent);background:#2a2410}
-  .players-list .chip{cursor:default}
-  .result-big{font-size:46px;text-align:center;margin:20px 0}
-  .score-row{display:flex;justify-content:space-between;padding:12px 4px;border-bottom:1px solid #2a3342;font-size:16px}
-  .winner-banner{background:linear-gradient(160deg,#1a2f1e,#12241a);border:1px solid #2d5a38;border-radius:16px;padding:20px;text-align:center;font-size:18px;font-weight:700;margin:16px 0}
-  .winner-banner.spy-win{border-color:#6b2230;background:linear-gradient(160deg,#3a1418,#241014)}
-  .hint{color:var(--muted);font-size:13px;text-align:center;margin-top:10px}
-  .code-big{font-size:52px;font-weight:800;text-align:center;letter-spacing:12px;color:var(--accent);margin:12px 0}
-  .status{color:var(--muted);text-align:center;margin-top:14px;font-size:14px}
-  .spin{display:inline-block;animation:spin 1.2s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .me-tag{color:var(--accent);font-weight:700}
+:root{
+--bg:#0d1117; --bg2:#161b22; --card:#1c2330; --accent:#e8b93c;
+--accent2:#c0392b; --text:#e8eaed; --muted:#8b94a3; --ok:#3fb950;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;justify-content:center}
+#app{width:100%;max-width:480px;padding:20px 16px 40px;display:flex;flex-direction:column;min-height:100vh}
+.screen{display:none;flex-direction:column;flex:1;animation:fade .3s}
+.screen.active{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1{font-size:26px;text-align:center;margin:24px 0 4px}
+h2{font-size:20px;text-align:center;margin:12px 0}
+.sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:24px}
+.logo{font-size:64px;text-align:center;margin-top:32px}
+.card{background:var(--card);border:1px solid #2a3342;border-radius:16px;padding:20px;margin-bottom:16px}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+select,input[type=range],input[type=text]{width:100%;background:var(--bg2);color:var(--text);border:1px solid #2a3342;border-radius:10px;padding:12px;font-size:16px}
+input[type=range]{padding:0;height:6px;accent-color:var(--accent)}
+.val{font-size:28px;font-weight:700;color:var(--accent);text-align:center;margin:6px 0}
+.btn{display:block;width:100%;background:var(--accent);color:#141414;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;margin-top:12px;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid #2a3342}
+.btn.danger{background:var(--accent2);color:#fff}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.hold-btn{user-select:none;width:100%;padding:20px;border-radius:14px;font-size:16px;font-weight:600;background:var(--bg2);border:2px dashed #3a4457;color:var(--muted);margin-top:12px}
+.hold-btn:active{border-color:var(--accent);color:var(--text)}
+.role-card{border-radius:20px;padding:36px 24px;text-align:center;margin-top:16px;min-height:260px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.role-card.civilian{background:linear-gradient(160deg,#1a2f1e,#12241a);border:1px solid #2d5a38}
+.role-card.spy{background:linear-gradient(160deg,#3a1418,#241014);border:1px solid #6b2230}
+.role-emoji{font-size:64px}
+.role-title{font-size:28px;font-weight:800}
+.role-loc{font-size:18px;color:var(--accent)}
+.role-hint{font-size:14px;color:var(--muted)}
+.timer{font-size:64px;font-weight:800;text-align:center;margin:16px 0 4px;font-variant-numeric:tabular-nums}
+.timer.low{color:var(--accent2);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.55}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
+.chip{background:var(--bg2);border:1px solid #2a3342;border-radius:999px;padding:8px 14px;font-size:14px;cursor:pointer;transition:all .2s}
+.chip.spoke{opacity:.45;text-decoration:line-through}
+.chip.sel{border-color:var(--accent);background:#2a2410}
+.players-list .chip{cursor:default}
+.result-big{font-size:46px;text-align:center;margin:20px 0}
+.score-row{display:flex;justify-content:space-between;padding:12px 4px;border-bottom:1px solid #2a3342;font-size:16px}
+.winner-banner{background:linear-gradient(160deg,#1a2f1e,#12241a);border:1px solid #2d5a38;border-radius:16px;padding:20px;text-align:center;font-size:18px;font-weight:700;margin:16px 0}
+.winner-banner.spy-win{border-color:#6b2230;background:linear-gradient(160deg,#3a1418,#241014)}
+.hint{color:var(--muted);font-size:13px;text-align:center;margin-top:10px}
+.code-big{font-size:52px;font-weight:800;text-align:center;letter-spacing:12px;color:var(--accent);margin:12px 0}
+.status{color:var(--muted);text-align:center;margin-top:14px;font-size:14px}
+.spin{display:inline-block;animation:spin 1.2s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.me-tag{color:var(--accent);font-weight:700}
 </style>
 </head>
 <body>
 <div id="app">
-
-  <!-- ===== МЕНЮ ===== -->
-  <div class="screen active" id="s-menu">
-    <div class="logo">🕵️</div>
-    <h1>Шпион в офисе</h1>
-    <p class="sub">Социальная дедукция: найди шпиона среди коллег</p>
-    <button class="btn" onclick="show('s-on-entry')">🌐 Онлайн — каждый со своего телефона</button>
-    <button class="btn ghost" onclick="show('s-off-setup')">📵 Оффлайн — передай телефон</button>
-  </div>
-
-  <!-- ===== ОНЛАЙН: вход ===== -->
-  <div class="screen" id="s-on-entry">
-    <h2>Онлайн-игра</h2>
-    <div class="card">
-      <label>Твоё имя</label>
-      <input type="text" id="oe-name" maxlength="16" placeholder="Например, Николай">
-    </div>
-    <button class="btn" onclick="onlineCreate()">➕ Создать комнату</button>
-    <div class="card" style="margin-top:12px">
-      <label>Код комнаты</label>
-      <input type="text" id="oe-code" maxlength="4" placeholder="ABCD" style="text-transform:uppercase;letter-spacing:8px;text-align:center">
-    </div>
-    <button class="btn ghost" onclick="onlineJoin()">🔑 Войти по коду</button>
-    <p class="hint">Телефоны соединяются напрямую (P2P). Нужен интернет у всех игроков.</p>
-  </div>
-
-  <!-- ===== ЛОББИ ===== -->
-  <div class="screen" id="s-lobby">
-    <h2>Комната <span id="lb-code"></span></h2>
-    <p class="sub">Скажи код друзьям — они войдут по нему</p>
-    <div class="card">
-      <label>Игроки (<span id="lb-count">1</span>)</label>
-      <div class="chips" id="lb-list" style="flex-direction:column;align-items:stretch"></div>
-    </div>
-    <button class="btn" id="lb-start" onclick="hostStart()" disabled>Начать игру 🎬</button>
-    <p class="status" id="lb-status"></p>
-  </div>
-
-  <!-- ===== ОНЛАЙН: роль ===== -->
-  <div class="screen" id="s-on-role">
-    <h2>Твоя роль</h2>
-    <p class="sub">Только ты видишь этот экран</p>
-    <div class="hold-btn" id="or-hold" ontouchstart="holdStart(event)" onmousedown="holdStart(event)"
-         ontouchend="holdEnd()" onmouseup="holdEnd()" onmouseleave="holdEnd()">👆 Удерживай, чтобы увидеть роль</div>
-    <div id="or-card" style="display:none"></div>
-    <button class="btn" id="or-next" style="display:none" onclick="onlineToGame()">Понял, к игре ➡</button>
-  </div>
-
-  <!-- ===== ОНЛАЙН: игра/таймер ===== -->
-  <div class="screen" id="s-on-game">
-    <h2>Раунд идёт… 🕒</h2>
-    <div class="timer" id="og-timer">--:--</div>
-    <p class="hint" id="og-hint">Задавайте вопросы по кругу вслух. Не подсматривайте в чужие экраны!</p>
-    <div class="card" style="margin-top:16px"><label>Игроки</label><div class="chips players-list" id="og-players"></div></div>
-    <button class="btn danger" id="og-forcevote" style="display:none" onclick="hostStartVote()">🗳 Начать голосование</button>
-  </div>
-
-  <!-- ===== ОНЛАЙН: голосование ===== -->
-  <div class="screen" id="s-on-vote">
-    <h2>🗳 Голосование</h2>
-    <p class="sub">Кто шпион? Выбери одного:</p>
-    <div class="chips" id="ov-list"></div>
-    <button class="btn" id="ov-confirm" style="display:none" onclick="onlineConfirmVote()">Подтвердить ✅</button>
-  </div>
-
-  <!-- ===== ОНЛАЙН: ожидание ===== -->
-  <div class="screen" id="s-on-wait">
-    <div class="result-big spin">⏳</div>
-    <h2 id="ow-text">Ждём других игроков…</h2>
-  </div>
-
-  <!-- ===== ОНЛАЙН: угадывание шпиона ===== -->
-  <div class="screen" id="s-on-guess">
-    <h2>🕵️ Последний шанс шпиона</h2>
-    <p class="sub">Угадай локацию — и победа твоя!</p>
-    <div class="card"><div class="chips" id="og-list"></div></div>
-    <button class="btn" id="og-confirm" style="display:none" onclick="onlineConfirmGuess()">Это эта локация 🎯</button>
-  </div>
-
-  <!-- ===== ОНЛАЙН: результат раунда ===== -->
-  <div class="screen" id="s-on-result">
-    <div class="result-big" id="orl-emoji">🎉</div>
-    <h2 id="orl-title"></h2>
-    <div class="card" id="orl-body"></div>
-    <button class="btn" id="orl-next" onclick="onlineNextRound()">🔄 Следующий раунд</button>
-  </div>
-
-  <!-- ===== Ошибка соединения ===== -->
-  <div class="screen" id="s-on-error">
-    <div class="result-big">😵</div>
-    <h2>Что-то пошло не так</h2>
-    <p class="sub" id="err-text"></p>
-    <button class="btn" onclick="location.reload()">🔄 Начать заново</button>
-  </div>
-
-  <!-- ===== ОФФЛАЙН: настройка ===== -->
-  <div class="screen" id="s-off-setup">
-    <h2>Оффлайн-режим</h2>
-    <p class="sub">Один телефон на всех — передайте его по кругу</p>
-    <div class="card">
-      <label>Количество игроков</label>
-      <input type="range" id="p-count" min="4" max="12" value="6" oninput="document.getElementById('p-val').textContent=this.value">
-      <div class="val"><span id="p-val">6</span> 👥</div>
-      <label style="margin-top:16px">Набор локаций</label>
-      <select id="p-pack"></select>
-      <label style="margin-top:16px">Время раунда</label>
-      <select id="p-time"><option value="300">5 минут</option><option value="480" selected>8 минут</option><option value="600">10 минут</option></select>
-    </div>
-    <button class="btn" onclick="startOffline()">Начать игру 🎬</button>
-  </div>
-
-  <!-- ===== ОФФЛАЙН: раздача ===== -->
-  <div class="screen" id="s-reveal">
-    <h2 id="rv-title">Передайте телефон</h2>
-    <p class="sub" id="rv-sub">Игрок 1 из 6 — возьмите телефон</p>
-    <div class="hold-btn" id="rv-hold" ontouchstart="holdStartOff(event)" onmousedown="holdStartOff(event)"
-         ontouchend="holdEnd()" onmouseup="holdEnd()" onmouseleave="holdEnd()">👆 Удерживайте, чтобы увидеть роль</div>
-    <div id="rv-card" style="display:none"></div>
-    <button class="btn" id="rv-next" style="display:none" onclick="nextReveal()">Скрыть и передать дальше ➡</button>
-  </div>
-
-  <!-- ===== ОФФЛАЙН: игра ===== -->
-  <div class="screen" id="s-game">
-    <h2>Раунд идёт… 🕒</h2>
-    <div class="timer" id="g-timer">08:00</div>
-    <p class="hint">Задавайте вопросы по кругу. Отмечайте, кто уже спрашивал.</p>
-    <div class="card" style="margin-top:16px"><label>Кто уже спрашивал</label><div class="chips players-list" id="g-players"></div></div>
-    <button class="btn danger" onclick="startVoteOffline()">🗳 Голосование!</button>
-  </div>
-
-  <!-- ===== ОФФЛАЙН: голосование ===== -->
-  <div class="screen" id="s-vote">
-    <h2>Голосование</h2>
-    <p class="sub" id="v-sub">Передайте телефон игроку 1</p>
-    <div class="card"><label>Кто шпион?</label><div class="chips" id="v-list"></div></div>
-    <button class="btn" id="v-confirm" style="display:none" onclick="confirmVoteOffline()">Подтвердить выбор ✅</button>
-  </div>
-
-  <!-- ===== ОФФЛАЙН: результат ===== -->
-  <div class="screen" id="s-result">
-    <h2>Итоги раунда</h2>
-    <div id="r-body"></div>
-    <button class="btn" id="r-next" onclick="afterResultOffline()">Продолжить ➡</button>
-  </div>
-
-  <!-- ===== ОФФЛАЙН: угадывание ===== -->
-  <div class="screen" id="s-guess">
-    <h2>🕵️ Последний шанс шпиона</h2>
-    <p class="sub">Шпион видит этот экран. Одна попытка угадать локацию!</p>
-    <div class="card"><div class="chips" id="gs-list"></div></div>
-    <button class="btn" id="gs-confirm" style="display:none" onclick="confirmGuessOffline()">Это была эта локация 🎯</button>
-    <button class="btn ghost" onclick="resolveGuessOffline(false)">Шпион сдаётся 🏳</button>
-  </div>
-
-  <!-- ===== ОФФЛАЙН: счёт ===== -->
-  <div class="screen" id="s-score">
-    <h2>Таблица игры 📊</h2>
-    <div class="card" id="sc-body"></div>
-    <button class="btn" onclick="nextRoundOffline()">🔄 Ещё раунд (те же игроки)</button>
-    <button class="btn ghost" onclick="show('s-menu')">🏠 В меню</button>
-  </div>
-
+<!-- ===== МЕНЮ ===== -->
+<div class="screen active" id="s-menu">
+<div class="logo">🕵️</div>
+<h1>Шпион в офисе</h1>
+<p class="sub">Социальная дедукция: найди шпиона среди коллег</p>
+<button class="btn" onclick="show('s-on-entry')">🌐 Онлайн — каждый со своего телефона</button>
+<button class="btn ghost" onclick="show('s-off-setup')">📵 Оффлайн — передай телефон</button>
 </div>
-
+<!-- ===== ОНЛАЙН: вход ===== -->
+<div class="screen" id="s-on-entry">
+<h2>Онлайн-игра</h2>
+<div class="card">
+<label>Твоё имя</label>
+<input type="text" id="oe-name" maxlength="16" placeholder="Например, Николай">
+</div>
+<button class="btn" onclick="onlineCreate()">➕ Создать комнату</button>
+<div class="card" style="margin-top:12px">
+<label>Код комнаты</label>
+<input type="text" id="oe-code" maxlength="4" placeholder="ABCD" style="text-transform:uppercase;letter-spacing:8px;text-align:center">
+</div>
+<button class="btn ghost" onclick="onlineJoin()">🔑 Войти по коду</button>
+<p class="hint">Телефоны соединяются напрямую (P2P). Нужен интернет у всех игроков.</p>
+</div>
+<!-- ===== ЛОББИ ===== -->
+<div class="screen" id="s-lobby">
+<h2>Комната <span id="lb-code"></span></h2>
+<p class="sub">Скажи код друзьям — они войдут по нему</p>
+<div class="card" id="lb-settings" style="display:none">
+<label>Набор локаций</label>
+<select id="lb-pack"></select>
+<label style="margin-top:16px">Время раунда</label>
+<select id="lb-time">
+<option value="300">5 минут</option>
+<option value="480" selected>8 минут</option>
+<option value="600">10 минут</option>
+</select>
+</div>
+<div class="card">
+<label>Игроки (<span id="lb-count">1</span>)</label>
+<div class="chips" id="lb-list" style="flex-direction:column;align-items:stretch"></div>
+</div>
+<button class="btn" id="lb-start" onclick="hostStart()" disabled>Начать игру 🎬</button>
+<p class="status" id="lb-status"></p>
+</div>
+<!-- ===== ОНЛАЙН: роль ===== -->
+<div class="screen" id="s-on-role">
+<h2>Твоя роль</h2>
+<p class="sub">Только ты видишь этот экран</p>
+<div class="hold-btn" id="or-hold" ontouchstart="holdStart(event)" onmousedown="holdStart(event)"
+ontouchend="holdEnd()" onmouseup="holdEnd()" onmouseleave="holdEnd()">👆 Удерживай, чтобы увидеть роль</div>
+<div id="or-card" style="display:none"></div>
+<button class="btn" id="or-next" style="display:none" onclick="onlineToGame()">Понял, к игре ➡</button>
+</div>
+<!-- ===== ОНЛАЙН: игра/таймер ===== -->
+<div class="screen" id="s-on-game">
+<h2>Раунд идёт… 🕒</h2>
+<div class="timer" id="og-timer">--:--</div>
+<p class="hint" id="og-hint">Задавайте вопросы по кругу вслух. Не подсматривайте в чужие экраны!</p>
+<div class="card" style="margin-top:16px"><label>Игроки</label><div class="chips players-list" id="og-players"></div></div>
+<button class="btn danger" id="og-forcevote" style="display:none" onclick="hostStartVote()">🗳 Начать голосование</button>
+</div>
+<!-- ===== ОНЛАЙН: голосование ===== -->
+<div class="screen" id="s-on-vote">
+<h2>🗳 Голосование</h2>
+<p class="sub">Кто шпион? Выбери одного:</p>
+<div class="chips" id="ov-list"></div>
+<button class="btn" id="ov-confirm" style="display:none" onclick="onlineConfirmVote()">Подтвердить ✅</button>
+</div>
+<!-- ===== ОНЛАЙН: ожидание ===== -->
+<div class="screen" id="s-on-wait">
+<div class="result-big spin">⏳</div>
+<h2 id="ow-text">Ждём других игроков…</h2>
+</div>
+<!-- ===== ОНЛАЙН: угадывание шпиона ===== -->
+<div class="screen" id="s-on-guess">
+<h2>🕵️ Последний шанс шпиона</h2>
+<p class="sub">Угадай локацию — и победа твоя!</p>
+<div class="card"><div class="chips" id="og-list"></div></div>
+<button class="btn" id="og-confirm" style="display:none" onclick="onlineConfirmGuess()">Это эта локация 🎯</button>
+</div>
+<!-- ===== ОНЛАЙН: результат раунда ===== -->
+<div class="screen" id="s-on-result">
+<div class="result-big" id="orl-emoji">🎉</div>
+<h2 id="orl-title"></h2>
+<div class="card" id="orl-body"></div>
+<button class="btn" id="orl-next" onclick="onlineNextRound()">🔄 Следующий раунд</button>
+</div>
+<!-- ===== Ошибка соединения ===== -->
+<div class="screen" id="s-on-error">
+<div class="result-big">😵</div>
+<h2>Что-то пошло не так</h2>
+<p class="sub" id="err-text"></p>
+<button class="btn" onclick="location.reload()">🔄 Начать заново</button>
+</div>
+<!-- ===== ОФФЛАЙН: настройка ===== -->
+<div class="screen" id="s-off-setup">
+<h2>Оффлайн-режим</h2>
+<p class="sub">Один телефон на всех — передайте его по кругу</p>
+<div class="card">
+<label>Количество игроков</label>
+<input type="range" id="p-count" min="4" max="12" value="6" oninput="document.getElementById('p-val').textContent=this.value">
+<div class="val"><span id="p-val">6</span> 👥</div>
+<label style="margin-top:16px">Набор локаций</label>
+<select id="p-pack"></select>
+<label style="margin-top:16px">Время раунда</label>
+<select id="p-time"><option value="300">5 минут</option><option value="480" selected>8 минут</option><option value="600">10 минут</option></select>
+</div>
+<button class="btn" onclick="startOffline()">Начать игру 🎬</button>
+</div>
+<!-- ===== ОФФЛАЙН: раздача ===== -->
+<div class="screen" id="s-reveal">
+<h2 id="rv-title">Передайте телефон</h2>
+<p class="sub" id="rv-sub">Игрок 1 из 6 — возьмите телефон</p>
+<div class="hold-btn" id="rv-hold" ontouchstart="holdStartOff(event)" onmousedown="holdStartOff(event)"
+ontouchend="holdEnd()" onmouseup="holdEnd()" onmouseleave="holdEnd()">👆 Удерживайте, чтобы увидеть роль</div>
+<div id="rv-card" style="display:none"></div>
+<button class="btn" id="rv-next" style="display:none" onclick="nextReveal()">Скрыть и передать дальше ➡</button>
+</div>
+<!-- ===== ОФФЛАЙН: игра ===== -->
+<div class="screen" id="s-game">
+<h2>Раунд идёт… 🕒</h2>
+<div class="timer" id="g-timer">08:00</div>
+<p class="hint">Задавайте вопросы по кругу. Отмечайте, кто уже спрашивал.</p>
+<div class="card" style="margin-top:16px"><label>Кто уже спрашивал</label><div class="chips players-list" id="g-players"></div></div>
+<button class="btn danger" onclick="startVoteOffline()">🗳 Голосование!</button>
+</div>
+<!-- ===== ОФФЛАЙН: голосование ===== -->
+<div class="screen" id="s-vote">
+<h2>Голосование</h2>
+<p class="sub" id="v-sub">Передайте телефон игроку 1</p>
+<div class="card"><label>Кто шпион?</label><div class="chips" id="v-list"></div></div>
+<button class="btn" id="v-confirm" style="display:none" onclick="confirmVoteOffline()">Подтвердить выбор ✅</button>
+</div>
+<!-- ===== ОФФЛАЙН: результат ===== -->
+<div class="screen" id="s-result">
+<h2>Итоги раунда</h2>
+<div id="r-body"></div>
+<button class="btn" id="r-next" onclick="afterResultOffline()">Продолжить ➡</button>
+</div>
+<!-- ===== ОФФЛАЙН: угадывание ===== -->
+<div class="screen" id="s-guess">
+<h2>🕵️ Последний шанс шпиона</h2>
+<p class="sub">Шпион видит этот экран. Одна попытка угадать локацию!</p>
+<div class="card"><div class="chips" id="gs-list"></div></div>
+<button class="btn" id="gs-confirm" style="display:none" onclick="confirmGuessOffline()">Это была эта локация 🎯</button>
+<button class="btn ghost" onclick="resolveGuessOffline(false)">Шпион сдаётся 🏳</button>
+</div>
+<!-- ===== ОФФЛАЙН: счёт ===== -->
+<div class="screen" id="s-score">
+<h2>Таблица игры 📊</h2>
+<div class="card" id="sc-body"></div>
+<button class="btn" onclick="nextRoundOffline()">🔄 Ещё раунд (те же игроки)</button>
+<button class="btn ghost" onclick="show('s-menu')">🏠 В меню</button>
+</div>
+</div>
 <script>
 // ==================== ДАННЫЕ ====================
 const PACKS = {
-  "🏢 Офис": [
-    {loc:"Бухгалтерия", roles:["Главбух","Кассир","Аудитор","Стажёр"]},
-    {loc:"Охрана объекта", roles:["Старший смены","Оператор камер","Патрульный","Пропускной режим"]},
-    {loc:"Корпоратив в ресторане", roles:["Тамада","Бармен","Танцор","Фотограф"]},
-    {loc:"Серверная", roles:["Сисадмин","DevOps","Техник","Стажёр"]},
-    {loc:"Переговорка", roles:["Ведущий встречи","Нотетейкер","Опоздавший","Презентующий"]},
-    {loc:"Кухня офиса", roles:["Бариста","Моющий посуду","Обедающий","Чайник"]},
-    {loc:"Отдел продаж", roles:["Руководитель","Холодные звонки","CRM-менеджер","Новичок"]},
-    {loc:"Ресепшн", roles:["Администратор","Курьер","Охранник","Гость"]}
-  ],
-  "✈️ Путешествия": [
-    {loc:"Аэропорт", roles:["Пилот","Бортпроводник","Таможенник","Задержанный рейс"]},
-    {loc:"Отель 5 звёзд", roles:["Портье","Горничная","Гость","Менеджер"]},
-    {loc:"Пляж", roles:["Спасатель","Продавец кокосов","Загорающий","Сёрфер"]},
-    {loc:"Вокзал", roles:["Диктор","Проводник","Пассажир","Грузчик"]},
-    {loc:"Круизный лайнер", roles:["Капитан","Аниматор","Пассажир","Повар"]},
-    {loc:"Поход в горах", roles:["Гид","Кок","Турист","Фотограф"]}
-  ],
-  "🚀 Фантастика": [
-    {loc:"Космическая станция", roles:["Командир","Бортинженер","Киборг","Астробиолог"]},
-    {loc:"Подводная база", roles:["Капитан","Сонарист","Акванавт","Повар"]},
-    {loc:"Лунная колония", roles:["Глава колонии","Геолог","Робот","Шахтёр"]},
-    {loc:"Лаборатория", roles:["Профессор","Ассистент","Подопытный","Стажёр"]}
-  ]
+"🏢 Офис": [
+{loc:"Бухгалтерия", roles:["Главбух","Кассир","Аудитор","Стажёр"]},
+{loc:"Охрана объекта", roles:["Старший смены","Оператор камер","Патрульный","Пропускной режим"]},
+{loc:"Корпоратив в ресторане", roles:["Тамада","Бармен","Танцор","Фотограф"]},
+{loc:"Серверная", roles:["Сисадмин","DevOps","Техник","Стажёр"]},
+{loc:"Переговорка", roles:["Ведущий встречи","Нотетейкер","Опоздавший","Презентующий"]},
+{loc:"Кухня офиса", roles:["Бариста","Моющий посуду","Обедающий","Чайник"]},
+{loc:"Отдел продаж", roles:["Руководитель","Холодные звонки","CRM-менеджер","Новичок"]},
+{loc:"Ресепшн", roles:["Администратор","Курьер","Охранник","Гость"]}
+],
+"✈️ Путешествия": [
+{loc:"Аэропорт", roles:["Пилот","Бортпроводник","Таможенник","Задержанный рейс"]},
+{loc:"Отель 5 звёзд", roles:["Портье","Горничная","Гость","Менеджер"]},
+{loc:"Пляж", roles:["Спасатель","Продавец кокосов","Загорающий","Сёрфер"]},
+{loc:"Вокзал", roles:["Диктор","Проводник","Пассажир","Грузчик"]},
+{loc:"Круизный лайнер", roles:["Капитан","Аниматор","Пассажир","Повар"]},
+{loc:"Поход в горах", roles:["Гид","Кок","Турист","Фотограф"]}
+],
+"🚀 Фантастика": [
+{loc:"Космическая станция", roles:["Командир","Бортинженер","Киборг","Астробиолог"]},
+{loc:"Подводная база", roles:["Капитан","Сонарист","Акванавт","Повар"]},
+{loc:"Лунная колония", roles:["Глава колонии","Геолог","Робот","Шахтёр"]},
+{loc:"Лаборатория", roles:["Профессор","Ассистент","Подопытный","Стажёр"]}
+]
 };
-
 const $ = id => document.getElementById(id);
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); }
 function err(msg){ $('err-text').textContent = msg; show('s-on-error'); }
 const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ";
-
 (function init(){
-  const sel = $('p-pack');
-  for (const k of Object.keys(PACKS)) { const o=document.createElement('option'); o.value=k; o.textContent=k; sel.appendChild(o); }
+const sel = $('p-pack');
+for (const k of Object.keys(PACKS)) { const o=document.createElement('option'); o.value=k; o.textContent=k; sel.appendChild(o); }
+const selLb = $('lb-pack');
+for (const k of Object.keys(PACKS)) { const o=document.createElement('option'); o.value=k; o.textContent=k; selLb.appendChild(o); }
 })();
-
 function roleCardHTML(r, locName){
-  return r.spy
-    ? `<div class="role-card spy"><div class="role-emoji">🕵️</div><div class="role-title">ВЫ — ШПИОН</div>
-       <div class="role-loc">Локация вам неизвестна</div>
-       <div class="role-hint">Слушайте вопросы, блефуйте, не попадитесь на голосовании. Если поймают — угадаете локацию одной попыткой!</div></div>`
-    : `<div class="role-card civilian"><div class="role-emoji">🙂</div><div class="role-title">Вы МИРНЫЙ</div>
-       <div class="role-loc">📍 ${locName}</div>
-       <div class="role-hint" style="font-size:17px;color:var(--text)">Ваша роль: <b>${r.role}</b></div>
-       <div class="role-hint">Задавайте вопросы так, чтобы «свои» поняли, а шпион — нет.</div></div>`;
+return r.spy
+? `<div class="role-card spy"><div class="role-emoji">🕵️</div><div class="role-title">ВЫ — ШПИОН</div>
+<div class="role-loc">Локация вам неизвестна</div>
+<div class="role-hint">Слушайте вопросы, блефуйте, не попадитесь на голосовании. Если поймают — угадаете локацию одной попыткой!</div></div>`
+: `<div class="role-card civilian"><div class="role-emoji">🙂</div><div class="role-title">Вы МИРНЫЙ</div>
+<div class="role-loc">📍 ${locName}</div>
+<div class="role-hint" style="font-size:17px;color:var(--text)">Ваша роль: <b>${r.role}</b></div>
+<div class="role-hint">Задавайте вопросы так, чтобы «свои» поняли, а шпион — нет.</div></div>`;
 }
-
 // удержание для показа роли
 let holdTimer = null;
 function holdStart(e){ e.preventDefault(); holdTimer=setTimeout(showRoleOnline, 400); }
 function holdStartOff(e){ e.preventDefault(); holdTimer=setTimeout(showRoleOffline, 400); }
 function holdEnd(){ clearTimeout(holdTimer); }
-
 /* =========================================================
-   ОНЛАЙН-РЕЖИМ (PeerJS, телефон хоста = сервер)
+ОНЛАЙН-РЕЖИМ (PeerJS, телефон хоста = сервер)
 ========================================================= */
 const NET = {
-  isHost: false, peer: null, hostConn: null,
-  conns: new Map(),          // host: id -> conn
-  players: [],               // [{id, name}] (host: id='HOST' у создателя)
-  myId: null, myName: '',
-  started: false,
-  location: null, myRole: null,
-  votes: {}, voteDeadline: null, voteTallied: true,
-  tLeft: 0, timerId: null,
-  score: {civ:0, spy:0}, round: 1,
-  guessPick: null, myVotePick: null
+isHost: false, peer: null, hostConn: null,
+conns: new Map(),
+players: [],
+myId: null, myName: '',
+started: false, gameOver: false,
+location: null, myRole: null,
+votes: {}, voteDeadline: null, voteTallied: true,
+deadline: null, timerId: null,
+score: {civ:0, spy:0}, round: 1,
+guessPick: null, myVotePick: null,
+pack: "🏢 Офис", time: 480,
+createRetries: 0
 };
 const ROOM_PREFIX = 'spyoffice-v1-';
-
 function genCode(){ let c=''; for(let i=0;i<4;i++) c+=CODE_ALPHABET[Math.floor(Math.random()*CODE_ALPHABET.length)]; return c; }
-
 // ---------- Создание комнаты ----------
 function onlineCreate(){
-  const name = $('oe-name').value.trim();
-  if (!name) { $('oe-name').focus(); return; }
-  NET.myName = name; NET.isHost = true; NET.myId = 'HOST';
-  NET.players = [{id:'HOST', name}];
-  const code = genCode();
-  NET.peer = new Peer(ROOM_PREFIX + code, {debug:0});
-  NET.peer.on('open', () => { $('lb-code').textContent = code; renderLobby(); show('s-lobby'); });
-  NET.peer.on('connection', conn => {
-    conn.on('data', d => hostOnData(conn, d));
-    conn.on('close', () => hostOnLeave(conn.peer));
-  });
-  NET.peer.on('error', e => {
-    if (e.type === 'unavailable-id') onlineCreate(); // код занят — генерируем новый
-    else err('Не удалось создать комнату: ' + e.type);
-  });
+const name = $('oe-name').value.trim();
+if (!name) { $('oe-name').focus(); return; }
+NET.myName = name; NET.isHost = true; NET.myId = 'HOST';
+NET.players = [{id:'HOST', name}];
+NET.createRetries = 0;
+const code = genCode();
+NET.peer = new Peer(ROOM_PREFIX + code, {debug:0});
+NET.peer.on('open', () => { 
+$('lb-code').textContent = code; 
+$('lb-settings').style.display = 'block';
+renderLobby(); 
+show('s-lobby'); 
+});
+NET.peer.on('connection', conn => {
+conn.on('data', d => hostOnData(conn, d));
+conn.on('close', () => hostOnLeave(conn.peer));
+});
+NET.peer.on('error', e => {
+if (e.type === 'unavailable-id' && NET.createRetries++ < 5) {
+setTimeout(() => onlineCreate(), 500);
+} else {
+err('Не удалось создать комнату: ' + e.type);
 }
-
+});
+}
 function renderLobby(){
-  $('lb-count').textContent = NET.players.length;
-  const l = $('lb-list'); l.innerHTML = '';
-  NET.players.forEach(p => {
-    const c = document.createElement('div');
-    c.className = 'chip'; c.style.cursor = 'default';
-    c.innerHTML = (p.id === NET.myId ? '<span class="me-tag">👑 ' : '') + escapeHtml(p.name) + (p.id === NET.myId ? ' (вы)</span>' : '');
-    l.appendChild(c);
-  });
-  $('lb-start').disabled = NET.players.length < 3;
-  $('lb-status').textContent = NET.players.length < 3 ? 'Нужно минимум 3 игрока' : 'Все на местах? Начинайте!';
+$('lb-count').textContent = NET.players.length;
+const l = $('lb-list'); l.innerHTML = '';
+NET.players.forEach(p => {
+const c = document.createElement('div');
+c.className = 'chip'; c.style.cursor = 'default';
+c.innerHTML = (p.id === NET.myId ? '<span class="me-tag">👑 ' : '') + escapeHtml(p.name) + (p.id === NET.myId ? ' (вы)</span>' : '');
+l.appendChild(c);
+});
+$('lb-start').disabled = NET.players.length < 3;
+$('lb-status').textContent = NET.players.length < 3 ? 'Нужно минимум 3 игрока' : 'Все на местах? Начинайте!';
 }
-
-function escapeHtml(s){ return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 function hostOnData(conn, d){
-  if (d.type === 'join'){
-    if (NET.started) { conn.send({type:'error', msg:'Игра уже идёт'}); setTimeout(()=>conn.close(), 500); return; }
-    NET.conns.set(conn.peer, conn);
-    NET.players.push({id: conn.peer, name: String(d.name).slice(0,16)});
-    broadcast({type:'lobby', players: NET.players});
-    renderLobby();
-  }
-  else if (d.type === 'vote'){ NET.votes[conn.peer] = d.target; hostCheckVotes(); }
-  else if (d.type === 'guess'){ hostResolveGuess(d.loc); }
+if (d.type === 'join'){
+if (NET.started) { conn.send({type:'error', msg:'Игра уже идёт'}); setTimeout(()=>conn.close(), 500); return; }
+NET.conns.set(conn.peer, conn);
+NET.players.push({id: conn.peer, name: String(d.name).slice(0,16)});
+broadcast({type:'lobby', players: NET.players});
+renderLobby();
 }
-
+else if (d.type === 'vote'){
+const validTarget = NET.players.some(p => p.id === d.target);
+if (validTarget) {
+NET.votes[conn.peer] = d.target;
+hostCheckVotes();
+}
+}
+else if (d.type === 'guess'){ hostResolveGuess(d.loc); }
+}
 function hostOnLeave(id){
-  if (!NET.conns.has(id)) return;
-  NET.conns.delete(id);
-  NET.players = NET.players.filter(p => p.id !== id);
-  if (!NET.started){ broadcast({type:'lobby', players: NET.players}); renderLobby(); }
-  else { broadcast({type:'peer-left', name:'Игрок'}); }
+if (!NET.conns.has(id)) return;
+NET.conns.delete(id);
+NET.players = NET.players.filter(p => p.id !== id);
+if (!NET.started){ broadcast({type:'lobby', players: NET.players}); renderLobby(); }
 }
-
 function broadcast(msg){ NET.conns.forEach(c => { try{ c.send(msg); }catch(e){} }); }
-
 // ---------- Подключение к комнате ----------
 function onlineJoin(){
-  const name = $('oe-name').value.trim();
-  const code = $('oe-code').value.trim().toUpperCase();
-  if (!name) { $('oe-name').focus(); return; }
-  if (code.length !== 4) { $('oe-code').focus(); return; }
-  NET.myName = name; NET.isHost = false;
-  NET.peer = new Peer({debug:0});
-  NET.peer.on('open', id => {
-    NET.myId = id;
-    NET.hostConn = NET.peer.connect(ROOM_PREFIX + code, {reliable:true});
-    NET.hostConn.on('open', () => NET.hostConn.send({type:'join', name}));
-    NET.hostConn.on('data', peerOnData);
-    NET.hostConn.on('close', () => { if (!NET.gameOver) err('Связь с комнатой потеряна. Возможно, ведущий вышел.'); });
-  });
-  NET.peer.on('error', e => {
-    if (e.type === 'peer-unavailable') err('Комната с кодом ' + code + ' не найдена.');
-    else err('Ошибка подключения: ' + e.type);
-  });
+const name = $('oe-name').value.trim();
+const code = $('oe-code').value.trim().toUpperCase();
+if (!name) { $('oe-name').focus(); return; }
+if (code.length !== 4) { $('oe-code').focus(); return; }
+NET.myName = name; NET.isHost = false;
+NET.peer = new Peer({debug:0});
+NET.peer.on('open', id => {
+NET.myId = id;
+NET.hostConn = NET.peer.connect(ROOM_PREFIX + code, {reliable:true});
+NET.hostConn.on('open', () => NET.hostConn.send({type:'join', name}));
+NET.hostConn.on('data', peerOnData);
+NET.hostConn.on('close', () => { if (!NET.gameOver) err('Связь с комнатой потеряна. Возможно, ведущий вышел.'); });
+});
+NET.peer.on('error', e => {
+if (e.type === 'peer-unavailable') err('Комната с кодом ' + code + ' не найдена.');
+else err('Ошибка подключения: ' + e.type);
+});
 }
-
 function peerOnData(d){
-  switch(d.type){
-    case 'error': err(d.msg); break;
-    case 'lobby':
-      NET.players = d.players; renderLobby();
-      if (!NET.started) show('s-lobby');
-      break;
-    case 'start':
-      NET.started = true;
-      $('lb-code').textContent = '';
-      $('or-card').style.display='none'; $('or-next').style.display='none'; $('or-hold').style.display='block';
-      show('s-on-role');
-      break;
-    case 'role': NET.myRole = d.role; break;
-    case 'timer': NET.tLeft = d.t; renderOnlineTimer(); break;
-    case 'vote':
-      NET.myVotePick = null; $('ov-confirm').style.display='none';
-      renderOnlineVoteList(d.players); show('s-on-vote'); break;
-    case 'wait': $('ow-text').textContent = d.text || 'Ждём других игроков…'; show('s-on-wait'); break;
-    case 'result': showOnlineResult(d); break;
-    case 'guess-offer': renderOnlineGuess(d.locations); show('s-on-guess'); break;
-    case 'score':
-      NET.score = d.score; NET.round = d.round;
-      $('orl-emoji').textContent='📊'; $('orl-title').textContent='Счёт после раунда';
-      $('orl-body').innerHTML = `<div class="score-row"><span>🙂 Мирные</span><b>${NET.score.civ}</b></div>
-        <div class="score-row"><span>🕵️ Шпионы</span><b>${NET.score.spy}</b></div>
-        <div class="score-row"><span>Раунд</span><b>${NET.round}</b></div>`;
-      $('orl-next').textContent = '🔄 Следующий раунд';
-      $('orl-next').style.display = NET.isHost ? 'block' : 'none';
-      show('s-on-result');
-      break;
-    case 'newround':
-      NET.round = d.round;
-      $('or-card').style.display='none'; $('or-next').style.display='none'; $('or-hold').style.display='block';
-      show('s-on-role'); break;
-  }
+switch(d.type){
+case 'error': err(d.msg); break;
+case 'lobby':
+NET.players = d.players; renderLobby();
+if (!NET.started) show('s-lobby');
+break;
+case 'settings':
+NET.pack = d.pack;
+NET.time = d.time;
+break;
+case 'start':
+NET.started = true;
+$('lb-code').textContent = '';
+$('or-card').style.display='none'; $('or-next').style.display='none'; $('or-hold').style.display='block';
+show('s-on-role');
+break;
+case 'role': NET.myRole = d.role; break;
+case 'timer-sync':
+NET.deadline = d.deadline;
+NET.location = d.location;
+startClientTimer();
+break;
+case 'vote':
+NET.myVotePick = null; $('ov-confirm').style.display='none';
+renderOnlineVoteList(d.players); show('s-on-vote'); break;
+case 'wait': $('ow-text').textContent = d.text || 'Ждём других игроков…'; show('s-on-wait'); break;
+case 'result': showOnlineResult(d); break;
+case 'guess-offer': renderOnlineGuess(d.locations); show('s-on-guess'); break;
+case 'score':
+NET.score = d.score; NET.round = d.round;
+$('orl-emoji').textContent='📊'; $('orl-title').textContent='Счёт после раунда';
+$('orl-body').innerHTML = `<div class="score-row"><span>🙂 Мирные</span><b>${NET.score.civ}</b></div>
+<div class="score-row"><span>🕵️ Шпионы</span><b>${NET.score.spy}</b></div>
+<div class="score-row"><span>Раунд</span><b>${NET.round}</b></div>`;
+$('orl-next').textContent = '🔄 Следующий раунд';
+$('orl-next').style.display = NET.isHost ? 'block' : 'none';
+show('s-on-result');
+break;
+case 'newround':
+NET.round = d.round;
+$('or-card').style.display='none'; $('or-next').style.display='none'; $('or-hold').style.display='block';
+show('s-on-role'); break;
 }
-
+}
 // ---------- Хост: старт игры ----------
 function hostStart(){
-  if (NET.players.length < 3) return;
-  NET.started = true;
-  dealOnlineRoles();
-  broadcast({type:'start'});
-  $('or-card').style.display='none'; $('or-next').style.display='none'; $('or-hold').style.display='block';
-  show('s-on-role');
+if (NET.players.length < 3) return;
+NET.started = true;
+NET.pack = $('lb-pack').value;
+NET.time = +$('lb-time').value;
+broadcast({type:'settings', pack: NET.pack, time: NET.time});
+dealOnlineRoles();
+broadcast({type:'start'});
+$('or-card').style.display='none'; $('or-next').style.display='none'; $('or-hold').style.display='block';
+show('s-on-role');
 }
-
 function dealOnlineRoles(){
-  const pack = PACKS["🏢 Офис"]; // онлайн: офисный набор
-  NET.location = pack[Math.floor(Math.random()*pack.length)];
-  const spyCount = NET.players.length >= 7 ? 2 : 1;
-  const idx = NET.players.map((_,i)=>i);
-  for (let i=idx.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [idx[i],idx[j]]=[idx[j],idx[i]]; }
-  const spies = new Set(idx.slice(0, spyCount));
-  NET.spyIds = new Set(NET.players.filter((_,i)=>spies.has(i)).map(p=>p.id));
-  NET.players.forEach((p,i) => {
-    const role = spies.has(i) ? {spy:true} : {spy:false, role: NET.location.roles[i % NET.location.roles.length]};
-    if (p.id === 'HOST') NET.myRole = role;
-    else NET.conns.get(p.id)?.send({type:'role', role});
-  });
+const pack = PACKS[NET.pack];
+NET.location = pack[Math.floor(Math.random()*pack.length)];
+const spyCount = NET.players.length >= 7 ? 2 : 1;
+const idx = NET.players.map((_,i)=>i);
+for (let i=idx.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [idx[i],idx[j]]=[idx[j],idx[i]]; }
+const spies = new Set(idx.slice(0, spyCount));
+NET.spyIds = new Set(NET.players.filter((_,i)=>spies.has(i)).map(p=>p.id));
+NET.players.forEach((p,i) => {
+const role = spies.has(i) ? {spy:true} : {spy:false, role: NET.location.roles[i % NET.location.roles.length]};
+if (p.id === 'HOST') NET.myRole = role;
+else NET.conns.get(p.id)?.send({type:'role', role});
+});
 }
-
 function showRoleOnline(){
-  if (!NET.myRole) return;
-  $('or-hold').style.display='none';
-  $('or-card').innerHTML = roleCardHTML(NET.myRole, NET.location ? NET.location.loc : '');
-  $('or-card').style.display='block';
-  $('or-next').style.display='block';
+if (!NET.myRole) return;
+$('or-hold').style.display='none';
+$('or-card').innerHTML = roleCardHTML(NET.myRole, NET.location ? NET.location.loc : '');
+$('or-card').style.display='block';
+$('or-next').style.display='block';
 }
-
 function onlineToGame(){
-  show('s-on-game');
-  $('og-forcevote').style.display = NET.isHost ? 'block' : 'none';
-  renderOnlinePlayersChips();
-  if (NET.isHost && !NET.timerId) hostRunTimer();
+show('s-on-game');
+$('og-forcevote').style.display = NET.isHost ? 'block' : 'none';
+renderOnlinePlayersChips();
+if (NET.isHost && !NET.deadline) hostStartTimer();
 }
-
 function renderOnlinePlayersChips(){
-  const g = $('og-players'); g.innerHTML='';
-  NET.players.forEach(p => {
-    const c = document.createElement('div'); c.className='chip';
-    c.textContent = p.name + (p.id===NET.myId ? ' (вы)' : '');
-    g.appendChild(c);
-  });
+const g = $('og-players'); g.innerHTML='';
+NET.players.forEach(p => {
+const c = document.createElement('div'); c.className='chip';
+c.textContent = p.name + (p.id===NET.myId ? ' (вы)' : '');
+g.appendChild(c);
+});
 }
-
-function renderOnlineTimer(){
-  const m = String(Math.floor(NET.tLeft/60)).padStart(2,'0'), s = String(NET.tLeft%60).padStart(2,'0');
-  const el = $('og-timer'); el.textContent = `${m}:${s}`;
-  el.classList.toggle('low', NET.tLeft <= 60 && NET.tLeft > 0);
+function renderOnlineTimer(tLeft){
+const m = String(Math.floor(tLeft/60)).padStart(2,'0'), s = String(tLeft%60).padStart(2,'0');
+const el = $('og-timer'); el.textContent = `${m}:${s}`;
+el.classList.toggle('low', tLeft <= 60 && tLeft > 0);
 }
-
-function hostRunTimer(){
-  NET.tLeft = 480;
-  renderOnlineTimer();
-  broadcast({type:'timer', t: NET.tLeft});
-  clearInterval(NET.timerId);
-  NET.timerId = setInterval(() => {
-    NET.tLeft--; renderOnlineTimer(); broadcast({type:'timer', t: NET.tLeft});
-    if (NET.tLeft <= 0){ clearInterval(NET.timerId); NET.timerId=null; hostStartVote(); }
-  }, 1000);
+function hostStartTimer(){
+NET.deadline = Date.now() + NET.time * 1000;
+broadcast({type:'timer-sync', deadline: NET.deadline, location: NET.location});
+startHostTimer();
 }
-
+function startHostTimer(){
+clearInterval(NET.timerId);
+NET.timerId = setInterval(() => {
+const tLeft = Math.max(0, Math.floor((NET.deadline - Date.now()) / 1000));
+renderOnlineTimer(tLeft);
+if (tLeft <= 0){ 
+clearInterval(NET.timerId); 
+NET.timerId = null; 
+NET.deadline = null;
+hostStartVote(); 
+}
+}, 250);
+}
+function startClientTimer(){
+clearInterval(NET.timerId);
+NET.timerId = setInterval(() => {
+const tLeft = Math.max(0, Math.floor((NET.deadline - Date.now()) / 1000));
+renderOnlineTimer(tLeft);
+if (tLeft <= 0){ 
+clearInterval(NET.timerId); 
+NET.timerId = null;
+}
+}, 250);
+}
 // ---------- Голосование ----------
 function hostStartVote(){
-  clearInterval(NET.timerId); NET.timerId = null;
-  NET.votes = {}; NET.voteTallied = false;
-  broadcast({type:'vote', players: NET.players});
-  NET.myVotePick = null; $('ov-confirm').style.display='none';
-  renderOnlineVoteList(NET.players); show('s-on-vote');
-  clearTimeout(NET.voteDeadline);
-  NET.voteDeadline = setTimeout(() => { if (!NET.voteTallied) hostTally(); }, 90000);
+clearInterval(NET.timerId); NET.timerId = null;
+NET.deadline = null;
+NET.votes = {}; NET.voteTallied = false;
+broadcast({type:'vote', players: NET.players});
+NET.myVotePick = null; $('ov-confirm').style.display='none';
+renderOnlineVoteList(NET.players); show('s-on-vote');
+clearTimeout(NET.voteDeadline);
+NET.voteDeadline = setTimeout(() => { if (!NET.voteTallied) hostTally(); }, 90000);
 }
-
 function renderOnlineVoteList(players){
-  const l = $('ov-list'); l.innerHTML='';
-  players.filter(p => p.id !== NET.myId).forEach(p => {
-    const c = document.createElement('div'); c.className='chip';
-    c.textContent = p.name;
-    c.onclick = () => {
-      l.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));
-      c.classList.add('sel'); NET.myVotePick = p.id; $('ov-confirm').style.display='block';
-    };
-    l.appendChild(c);
-  });
+const l = $('ov-list'); l.innerHTML='';
+players.filter(p => p.id !== NET.myId).forEach(p => {
+const c = document.createElement('div'); c.className='chip';
+c.textContent = p.name;
+c.onclick = () => {
+l.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));
+c.classList.add('sel'); NET.myVotePick = p.id; $('ov-confirm').style.display='block';
+};
+l.appendChild(c);
+});
 }
-
 function onlineConfirmVote(){
-  if (NET.isHost){
-    NET.votes['HOST'] = NET.myVotePick;
-    $('ow-text').textContent = 'Ждём голосов других игроков…'; show('s-on-wait');
-    hostCheckVotes();
-  } else {
-    NET.hostConn.send({type:'vote', target: NET.myVotePick});
-    $('ow-text').textContent = 'Ждём голосов других игроков…'; show('s-on-wait');
-  }
+if (NET.isHost){
+NET.votes['HOST'] = NET.myVotePick;
+$('ov-confirm').disabled = true;
+$('ow-text').textContent = 'Ждём голосов других игроков…'; show('s-on-wait');
+hostCheckVotes();
+} else {
+NET.hostConn.send({type:'vote', target: NET.myVotePick});
+$('ov-confirm').disabled = true;
+$('ow-text').textContent = 'Ждём голосов других игроков…'; show('s-on-wait');
 }
-
+}
 function hostCheckVotes(){
-  const expected = NET.players.filter(p => NET.conns.has(p.id) || p.id === 'HOST').length;
-  if (Object.keys(NET.votes).length >= expected) hostTally();
+const expected = NET.players.filter(p => NET.conns.has(p.id) || p.id === 'HOST').length;
+if (Object.keys(NET.votes).length >= expected) hostTally();
 }
-
 function hostTally(){
-  if (NET.voteTallied) return;
-  NET.voteTallied = true;
-  clearTimeout(NET.voteDeadline);
-  const tally = {};
-  for (const v of Object.values(NET.votes)) tally[v] = (tally[v]||0)+1;
-  let max = 0, suspects = [];
-  for (const [k,c] of Object.entries(tally)) if (c>max){max=c; suspects=[k];} else if (c===max) suspects.push(k);
-
-  const spyIds = [...NET.spyIds];
-  const caught = suspects.length === 1 && spyIds.includes(suspects[0]);
-
-  const result = {
-    type:'result', location: NET.location.loc,
-    caught, suspects, max,
-    spyNames: NET.players.filter(p=>spyIds.includes(p.id)).map(p=>p.name)
-  };
-
-  if (caught){
-    // шпиону(ам) — шанс угадать локацию
-    const locations = PACKS["🏢 Офис"].map(l=>l.loc);
-    spyIds.forEach(id => {
-      if (id === 'HOST') renderOnlineGuess(locations), show('s-on-guess');
-      else NET.conns.get(id)?.send({type:'guess-offer', locations});
-    });
-    broadcast({type:'wait', text:'Шпион пойман! Он решает, угадать ли локацию…'});
-  } else {
-    NET.score.spy++;
-    finishRound({winner:'spy'});
-  }
+if (NET.voteTallied) return;
+NET.voteTallied = true;
+clearTimeout(NET.voteDeadline);
+const tally = {};
+for (const v of Object.values(NET.votes)) tally[v] = (tally[v]||0)+1;
+let max = 0, suspects = [];
+for (const [k,c] of Object.entries(tally)) if (c>max){max=c; suspects=[k];} else if (c===max) suspects.push(k);
+const spyIds = [...NET.spyIds];
+const caught = suspects.length === 1 && spyIds.includes(suspects[0]);
+const result = {
+type:'result', location: NET.location.loc,
+caught, suspects, max,
+spyNames: NET.players.filter(p=>spyIds.includes(p.id)).map(p=>p.name)
+};
+if (caught){
+const locations = PACKS[NET.pack].map(l=>l.loc);
+spyIds.forEach(id => {
+if (id === 'HOST') renderOnlineGuess(locations), show('s-on-guess');
+else NET.conns.get(id)?.send({type:'guess-offer', locations});
+});
+broadcast({type:'wait', text:'Шпион пойман! Он решает, угадать ли локацию…'});
+} else if (suspects.length > 1) {
+NET.score.spy++;
+finishRound({winner:'tie', suspects});
+} else {
+NET.score.spy++;
+finishRound({winner:'spy'});
 }
-
+}
 function renderOnlineGuess(locations){
-  NET.guessPick = null;
-  const l = $('og-list'); l.innerHTML='';
-  locations.forEach(name => {
-    const c = document.createElement('div'); c.className='chip'; c.textContent = name;
-    c.onclick = () => {
-      l.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));
-      c.classList.add('sel'); NET.guessPick = name; $('og-confirm').style.display='block';
-    };
-    l.appendChild(c);
-  });
+NET.guessPick = null;
+const l = $('og-list'); l.innerHTML='';
+locations.forEach(name => {
+const c = document.createElement('div'); c.className='chip'; c.textContent=escapeHtml(name);
+c.onclick = () => {
+l.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));
+c.classList.add('sel'); NET.guessPick = name; $('og-confirm').style.display='block';
+};
+l.appendChild(c);
+});
 }
-
 function onlineConfirmGuess(){
-  if (NET.isHost) hostResolveGuess(NET.guessPick);
-  else NET.hostConn.send({type:'guess', loc: NET.guessPick});
-  $('ow-text').textContent = 'Проверяем ответ…'; show('s-on-wait');
+if (NET.isHost) hostResolveGuess(NET.guessPick);
+else NET.hostConn.send({type:'guess', loc: NET.guessPick});
+$('og-confirm').disabled = true;
+$('ow-text').textContent = 'Проверяем ответ…'; show('s-on-wait');
 }
-
 function hostResolveGuess(loc){
-  const correct = loc === NET.location.loc;
-  if (correct) NET.score.spy++; else NET.score.civ++;
-  finishRound({winner: correct ? 'spy-guess' : 'civ'});
+const correct = loc === NET.location.loc;
+if (correct) NET.score.spy++; else NET.score.civ++;
+finishRound({winner: correct ? 'spy-guess' : 'civ'});
 }
-
 function finishRound(info){
-  broadcast({type:'score', score: NET.score, round: NET.round});
-  // экран результата у всех
-  const msgs = {
-    'spy':      ['🕵️','Шпион ускользнул!', 'Голосование не вычислило шпиона. Очко шпионам.'],
-    'spy-guess':['😱','Шпион угадал локацию!', `Локация «${NET.location.loc}» раскрыта. Очко шпионам.`],
-    'civ':      ['🎉','Мирные победили!', `Шпион не угадал локацию «${NET.location.loc}». Очко мирным.`]
-  };
-  const [emoji, title, text] = msgs[info.winner];
-  broadcast({type:'result', emoji, title, text, location: NET.location.loc, score: NET.score, round: NET.round});
-  showOnlineResult({emoji, title, text, location: NET.location.loc});
-  $('orl-next').style.display = NET.isHost ? 'block' : 'none';
+NET.gameOver = true;
+broadcast({type:'score', score: NET.score, round: NET.round});
+const msgs = {
+'spy':      ['🕵️','Шпион ускользнул!', 'Голосование не вычислило шпиона. Очко шпионам.'],
+'tie':      ['🤷','Ничья в голосовании!', `Подозрение пало на нескольких игроков. Очко шпионам.`],
+'spy-guess':['😱','Шпион угадал локацию!', `Локация «${NET.location.loc}» раскрыта. Очко шпионам.`],
+'civ':      ['🎉','Мирные победили!', `Шпион не угадал локацию «${NET.location.loc}». Очко мирным.`]
+};
+const [emoji, title, text] = msgs[info.winner];
+broadcast({type:'result', emoji, title, text, location: NET.location.loc, score: NET.score, round: NET.round});
+showOnlineResult({emoji, title, text, location: NET.location.loc});
+$('orl-next').style.display = NET.isHost ? 'block' : 'none';
 }
-
 function showOnlineResult(d){
-  if (d.emoji){
-    $('orl-emoji').textContent = d.emoji;
-    $('orl-title').textContent = d.title;
-    $('orl-body').innerHTML = `<p style="text-align:center">${d.text}</p>
-      <div class="score-row" style="margin-top:12px"><span>Локация</span><b>📍 ${d.location}</b></div>
-      <div class="score-row"><span>🙂 Мирные</span><b>${NET.score.civ}</b></div>
-      <div class="score-row"><span>🕵️ Шпионы</span><b>${NET.score.spy}</b></div>`;
-    $('orl-next').style.display = NET.isHost ? 'block' : 'none';
-    show('s-on-result');
-  } else {
-    // сырые итоги голосования (заглушка, финал всё равно придёт через finishRound)
-  }
+if (d.emoji){
+$('orl-emoji').textContent = d.emoji;
+$('orl-title').textContent = d.title;
+$('orl-body').innerHTML = `<p style="text-align:center">${d.text}</p>
+<div class="score-row" style="margin-top:12px"><span>Локация</span><b>📍 ${escapeHtml(d.location)}</b></div>
+<div class="score-row"><span>🙂 Мирные</span><b>${NET.score.civ}</b></div>
+<div class="score-row"><span>🕵️ Шпионы</span><b>${NET.score.spy}</b></div>`;
+$('orl-next').style.display = NET.isHost ? 'block' : 'none';
+show('s-on-result');
 }
-
+}
 function onlineNextRound(){
-  if (!NET.isHost) return;
-  NET.round++;
-  dealOnlineRoles();
-  broadcast({type:'newround', round: NET.round});
-  $('or-card').style.display='none'; $('or-next').style.display='none'; $('or-hold').style.display='block';
-  show('s-on-role');
+if (!NET.isHost) return;
+NET.round++;
+NET.gameOver = false;
+dealOnlineRoles();
+broadcast({type:'newround', round: NET.round});
+$('or-card').style.display='none'; $('or-next').style.display='none'; $('or-hold').style.display='block';
+show('s-on-role');
 }
-
 /* =========================================================
-   ОФФЛАЙН-РЕЖИМ (передай телефон)
+ОФФЛАЙН-РЕЖИМ (передай телефон)
 ========================================================= */
-const OFF = { players:6, pack:"🏢 Офис", time:480, roles:[], location:null,
-  score:{civ:0,spy:0}, round:1, revIdx:0, votes:{}, voterIdx:0, timerId:null, tLeft:0,
-  spyCaught:false, guessPick:null };
-
+const OFF = { 
+players:6, pack:"🏢 Офис", time:480, roles:[], location:null,
+score:{civ:0,spy:0}, round:1, revIdx:0, votes:{}, voterIdx:0, 
+timerId:null, deadline:null, wakeLock:null,
+spyCaught:false, guessPick:null 
+};
+async function requestWakeLock() {
+try {
+if ('wakeLock' in navigator) {
+OFF.wakeLock = await navigator.wakeLock.request('screen');
+}
+} catch(e) {}
+}
+function releaseWakeLock() { 
+if (OFF.wakeLock) {
+OFF.wakeLock.release(); 
+OFF.wakeLock = null;
+}
+}
 function startOffline(){
-  OFF.players = +$('p-count').value;
-  OFF.pack = $('p-pack').value;
-  OFF.time = +$('p-time').value;
-  OFF.round = 1; OFF.score = {civ:0, spy:0};
-  dealOfflineRoles();
+OFF.players = +$('p-count').value;
+OFF.pack = $('p-pack').value;
+OFF.time = +$('p-time').value;
+OFF.round = 1; OFF.score = {civ:0, spy:0};
+dealOfflineRoles();
 }
-
 function dealOfflineRoles(){
-  const pack = PACKS[OFF.pack];
-  OFF.location = pack[Math.floor(Math.random()*pack.length)];
-  const spyCount = OFF.players >= 7 ? 2 : 1;
-  const idx = [...Array(OFF.players).keys()];
-  for (let i=idx.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [idx[i],idx[j]]=[idx[j],idx[i]]; }
-  const spies = new Set(idx.slice(0, spyCount));
-  OFF.roles = [];
-  for (let i=0;i<OFF.players;i++){
-    OFF.roles.push(spies.has(i) ? {spy:true} : {spy:false, role: OFF.location.roles[i % OFF.location.roles.length]});
-  }
-  OFF.revIdx = 0; OFF.guessPick = null;
-  showRevealOffline();
+const pack = PACKS[OFF.pack];
+OFF.location = pack[Math.floor(Math.random()*pack.length)];
+const spyCount = OFF.players >= 7 ? 2 : 1;
+const idx = [...Array(OFF.players).keys()];
+for (let i=idx.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [idx[i],idx[j]]=[idx[j],idx[i]]; }
+const spies = new Set(idx.slice(0, spyCount));
+OFF.roles = [];
+for (let i=0;i<OFF.players;i++){
+OFF.roles.push(spies.has(i) ? {spy:true} : {spy:false, role: OFF.location.roles[i % OFF.location.roles.length]});
 }
-
+OFF.revIdx = 0; OFF.guessPick = null;
+showRevealOffline();
+}
 function showRevealOffline(){
-  $('rv-card').style.display='none'; $('rv-next').style.display='none'; $('rv-hold').style.display='block';
-  $('rv-sub').textContent = `Игрок ${OFF.revIdx+1} из ${OFF.players} — возьмите телефон`;
-  show('s-reveal');
+$('rv-card').style.display='none'; $('rv-next').style.display='none'; $('rv-hold').style.display='block';
+$('rv-sub').textContent = `Игрок ${OFF.revIdx+1} из ${OFF.players} — возьмите телефон`;
+show('s-reveal');
 }
-
 function showRoleOffline(){
-  const r = OFF.roles[OFF.revIdx];
-  $('rv-hold').style.display='none';
-  $('rv-card').innerHTML = roleCardHTML(r, OFF.location.loc);
-  $('rv-card').style.display='block';
-  $('rv-next').style.display='block';
+const r = OFF.roles[OFF.revIdx];
+$('rv-hold').style.display='none';
+$('rv-card').innerHTML = roleCardHTML(r, OFF.location.loc);
+$('rv-card').style.display='block';
+$('rv-next').style.display='block';
 }
-
 function nextReveal(){
-  OFF.revIdx++;
-  if (OFF.revIdx >= OFF.players) startRoundOffline(); else showRevealOffline();
+OFF.revIdx++;
+if (OFF.revIdx >= OFF.players) startRoundOffline(); else showRevealOffline();
 }
-
 function startRoundOffline(){
-  show('s-game');
-  const g = $('g-players'); g.innerHTML='';
-  for (let i=0;i<OFF.players;i++){
-    const c = document.createElement('div');
-    c.className='chip'; c.textContent=`Игрок ${i+1}`;
-    c.onclick = () => c.classList.toggle('spoke');
-    g.appendChild(c);
-  }
-  OFF.tLeft = OFF.time;
-  renderOfflineTimer();
-  clearInterval(OFF.timerId);
-  OFF.timerId = setInterval(()=>{ OFF.tLeft--; renderOfflineTimer(); if(OFF.tLeft<=0){clearInterval(OFF.timerId); startVoteOffline();} }, 1000);
+requestWakeLock();
+show('s-game');
+const g = $('g-players'); g.innerHTML='';
+for (let i=0;i<OFF.players;i++){
+const c = document.createElement('div');
+c.className='chip'; c.textContent=`Игрок ${i+1}`;
+c.onclick = () => c.classList.toggle('spoke');
+g.appendChild(c);
 }
-function renderOfflineTimer(){
-  const m=String(Math.floor(OFF.tLeft/60)).padStart(2,'0'), s=String(OFF.tLeft%60).padStart(2,'0');
-  const el=$('g-timer'); el.textContent=`${m}:${s}`; el.classList.toggle('low', OFF.tLeft<=60);
+OFF.deadline = Date.now() + OFF.time * 1000;
+renderOfflineTimer();
+clearInterval(OFF.timerId);
+OFF.timerId = setInterval(()=>{ 
+const tLeft = Math.max(0, Math.floor((OFF.deadline - Date.now()) / 1000));
+renderOfflineTimer(tLeft); 
+if(tLeft<=0){
+clearInterval(OFF.timerId); 
+OFF.timerId = null;
+OFF.deadline = null;
+startVoteOffline();
+} 
+}, 250);
 }
-
+function renderOfflineTimer(tLeft){
+const m=String(Math.floor(tLeft/60)).padStart(2,'0'), s=String(tLeft%60).padStart(2,'0');
+const el=$('g-timer'); el.textContent=`${m}:${s}`; el.classList.toggle('low', tLeft<=60);
+}
 let offVotePick = null;
 function startVoteOffline(){
-  clearInterval(OFF.timerId);
-  OFF.voterIdx = 0; OFF.votes = {}; offVotePick = null;
-  showVoterOffline();
+clearInterval(OFF.timerId);
+OFF.timerId = null;
+OFF.deadline = null;
+OFF.voterIdx = 0; OFF.votes = {}; offVotePick = null;
+showVoterOffline();
 }
 function showVoterOffline(){
-  $('v-sub').textContent = `Передайте телефон игроку ${OFF.voterIdx+1}. Выбери, кто шпион:`;
-  const l = $('v-list'); l.innerHTML=''; offVotePick=null; $('v-confirm').style.display='none';
-  for (let i=0;i<OFF.players;i++){
-    if (i === OFF.voterIdx) continue;
-    const c = document.createElement('div');
-    c.className='chip'; c.textContent=`Игрок ${i+1}`;
-    c.onclick = () => {
-      l.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));
-      c.classList.add('sel'); offVotePick=i; $('v-confirm').style.display='block';
-    };
-    l.appendChild(c);
-  }
-  show('s-vote');
+$('v-sub').textContent = `Передайте телефон игроку ${OFF.voterIdx+1}. Выбери, кто шпион:`;
+const l = $('v-list'); l.innerHTML=''; offVotePick=null; $('v-confirm').style.display='none';
+$('v-confirm').disabled = false;
+for (let i=0;i<OFF.players;i++){
+if (i === OFF.voterIdx) continue;
+const c = document.createElement('div');
+c.className='chip'; c.textContent=`Игрок ${i+1}`;
+c.onclick = () => {
+l.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));
+c.classList.add('sel'); offVotePick=i; $('v-confirm').style.display='block';
+};
+l.appendChild(c);
+}
+show('s-vote');
 }
 function confirmVoteOffline(){
-  OFF.votes[OFF.voterIdx] = offVotePick;
-  OFF.voterIdx++;
-  if (OFF.voterIdx >= OFF.players) tallyOffline(); else showVoterOffline();
+OFF.votes[OFF.voterIdx] = offVotePick;
+OFF.voterIdx++;
+if (OFF.voterIdx >= OFF.players) tallyOffline(); else showVoterOffline();
 }
 function tallyOffline(){
-  const tally = {};
-  for (const v of Object.values(OFF.votes)) tally[v]=(tally[v]||0)+1;
-  let max=0, suspects=[];
-  for (const [k,c] of Object.entries(tally)) if (c>max){max=c; suspects=[+k];} else if (c===max) suspects.push(+k);
-  const spyIdxs = OFF.roles.map((r,i)=>r.spy?i:-1).filter(i=>i>=0);
-  OFF.spyCaught = suspects.length===1 && OFF.roles[suspects[0]].spy;
-  const who = suspects.length===1 ? `Игрок ${suspects[0]+1}` : `Ничья: ${suspects.map(s=>`игрок ${s+1}`).join(' и ')}`;
-
-  let html = `<div class="result-big">🗳</div><div class="card">
-    <div class="score-row"><span>Больше всего голосов</span><b>${who} (${max})</b></div>
-    <div class="score-row"><span>Локация была</span><b>📍 ${OFF.location.loc}</b></div>
-    <div class="score-row"><span>Шпион(ы)</span><b>${spyIdxs.map(i=>`Игрок ${i+1}`).join(', ')}</b></div></div>`;
-
-  if (OFF.spyCaught){
-    html += `<div class="winner-banner">🎯 Шпион пойман! Он может спасти игру одной попыткой…</div>`;
-    $('r-next').textContent = 'Шпион, угадывай локацию 🎯';
-    $('r-next').onclick = () => { renderOfflineGuess(); show('s-guess'); };
-  } else {
-    OFF.score.spy++;
-    html += `<div class="winner-banner spy-win">🕵️ Шпион ускользнул! Очко шпионам.</div>`;
-    $('r-next').textContent = 'К таблице ➡';
-    $('r-next').onclick = afterResultOffline;
-  }
-  $('r-body').innerHTML = html;
-  show('s-result');
+const tally = {};
+for (const v of Object.values(OFF.votes)) tally[v]=(tally[v]||0)+1;
+let max=0, suspects=[];
+for (const [k,c] of Object.entries(tally)) if (c>max){max=c; suspects=[+k];} else if (c===max) suspects.push(+k);
+const spyIdxs = OFF.roles.map((r,i)=>r.spy?i:-1).filter(i=>i>=0);
+OFF.spyCaught = suspects.length===1 && OFF.roles[suspects[0]].spy;
+const who = suspects.length===1 ? `Игрок ${suspects[0]+1}` : `Ничья: ${suspects.map(s=>`игрок ${s+1}`).join(' и ')}`;
+let html = `<div class="result-big">🗳</div><div class="card">
+<div class="score-row"><span>Больше всего голосов</span><b>${who} (${max})</b></div>
+<div class="score-row"><span>Локация была</span><b>📍 ${OFF.location.loc}</b></div>
+<div class="score-row"><span>Шпион(ы)</span><b>${spyIdxs.map(i=>`Игрок ${i+1}`).join(', ')}</b></div></div>`;
+if (OFF.spyCaught){
+html += `<div class="winner-banner">🎯 Шпион пойман! Он может спасти игру одной попыткой…</div>`;
+$('r-next').textContent = 'Шпион, угадывай локацию 🎯';
+$('r-next').onclick = () => { renderOfflineGuess(); show('s-guess'); };
+} else {
+OFF.score.spy++;
+const tieMsg = suspects.length > 1 ? 'Ничья в голосовании' : 'Шпион ускользнул';
+html += `<div class="winner-banner spy-win">🕵️ ${tieMsg}! Очко шпионам.</div>`;
+$('r-next').textContent = 'К таблице ➡';
+$('r-next').onclick = afterResultOffline;
+}
+$('r-body').innerHTML = html;
+show('s-result');
 }
 function renderOfflineGuess(){
-  OFF.guessPick = null;
-  const l = $('gs-list'); l.innerHTML='';
-  PACKS[OFF.pack].forEach(loc => {
-    const c = document.createElement('div'); c.className='chip'; c.textContent=loc.loc;
-    c.onclick = () => {
-      l.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));
-      c.classList.add('sel'); OFF.guessPick=loc; $('gs-confirm').style.display='block';
-    };
-    l.appendChild(c);
-  });
+OFF.guessPick = null;
+const l = $('gs-list'); l.innerHTML='';
+$('gs-confirm').disabled = false;
+PACKS[OFF.pack].forEach(loc => {
+const c = document.createElement('div'); c.className='chip'; c.textContent=loc.loc;
+c.onclick = () => {
+l.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));
+c.classList.add('sel'); OFF.guessPick=loc; $('gs-confirm').style.display='block';
+};
+l.appendChild(c);
+});
 }
 function confirmGuessOffline(){ resolveGuessOffline(OFF.guessPick && OFF.guessPick.loc === OFF.location.loc); }
 function resolveGuessOffline(correct){
-  if (correct){
-    OFF.score.spy++;
-    $('r-body').innerHTML = `<div class="result-big">😱</div>
-      <div class="winner-banner spy-win">Шпион угадал локацию «${OFF.location.loc}» и украл победу! Очко шпионам.</div>`;
-  } else {
-    OFF.score.civ++;
-    $('r-body').innerHTML = `<div class="result-big">🎉</div>
-      <div class="winner-banner">Мирные победили! Шпион не угадал локацию.</div>`;
-  }
-  $('r-next').textContent='К таблице ➡';
-  $('r-next').onclick = afterResultOffline;
-  show('s-result');
+if (correct){
+OFF.score.spy++;
+$('r-body').innerHTML = `<div class="result-big">😱</div>
+<div class="winner-banner spy-win">Шпион угадал локацию «${OFF.location.loc}» и украл победу! Очко шпионам.</div>`;
+} else {
+OFF.score.civ++;
+$('r-body').innerHTML = `<div class="result-big">🎉</div>
+<div class="winner-banner">Мирные победили! Шпион не угадал локацию.</div>`;
+}
+$('r-next').textContent='К таблице ➡';
+$('r-next').onclick = afterResultOffline;
+show('s-result');
 }
 function afterResultOffline(){
-  $('sc-body').innerHTML = `<div class="score-row"><span>🙂 Мирные</span><b>${OFF.score.civ}</b></div>
-    <div class="score-row"><span>🕵️ Шпионы</span><b>${OFF.score.spy}</b></div>
-    <div class="score-row"><span>Раундов сыграно</span><b>${OFF.round}</b></div>`;
-  show('s-score');
+releaseWakeLock();
+$('sc-body').innerHTML = `<div class="score-row"><span>🙂 Мирные</span><b>${OFF.score.civ}</b></div>
+<div class="score-row"><span>🕵️ Шпионы</span><b>${OFF.score.spy}</b></div>
+<div class="score-row"><span>Раундов сыграно</span><b>${OFF.round}</b></div>`;
+show('s-score');
 }
 function nextRoundOffline(){ OFF.round++; dealOfflineRoles(); }
 </script>
