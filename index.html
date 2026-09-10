@@ -29,7 +29,7 @@ input[type=range]{padding:0;height:6px;accent-color:var(--accent)}
 .btn:active{transform:scale(.97)}
 .btn.ghost{background:transparent;color:var(--muted);border:1px solid #2a3342}
 .btn.danger{background:var(--accent2);color:#fff}
-.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn:disabled{opacity:.4}
 .hold-btn{user-select:none;width:100%;padding:20px;border-radius:14px;font-size:16px;font-weight:600;background:var(--bg2);border:2px dashed #3a4457;color:var(--muted);margin-top:12px}
 .hold-btn:active{border-color:var(--accent);color:var(--text)}
 .role-card{border-radius:20px;padding:36px 24px;text-align:center;margin-top:16px;min-height:260px;display:flex;flex-direction:column;justify-content:center;gap:14px}
@@ -43,7 +43,7 @@ input[type=range]{padding:0;height:6px;accent-color:var(--accent)}
 .timer.low{color:var(--accent2);animation:pulse 1s infinite}
 @keyframes pulse{50%{opacity:.55}}
 .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
-.chip{background:var(--bg2);border:1px solid #2a3342;border-radius:999px;padding:8px 14px;font-size:14px;cursor:pointer;transition:all .2s}
+.chip{background:var(--bg2);border:1px solid #2a3342;border-radius:999px;padding:8px 14px;font-size:14px;cursor:pointer}
 .chip.spoke{opacity:.45;text-decoration:line-through}
 .chip.sel{border-color:var(--accent);background:#2a2410}
 .players-list .chip{cursor:default}
@@ -57,6 +57,9 @@ input[type=range]{padding:0;height:6px;accent-color:var(--accent)}
 .spin{display:inline-block;animation:spin 1.2s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .me-tag{color:var(--accent);font-weight:700}
+.session-info{background:#2a2410;border:1px solid var(--accent);border-radius:12px;padding:14px;margin-bottom:16px;text-align:center}
+.session-info .code{font-size:28px;font-weight:800;letter-spacing:8px;color:var(--accent)}
+.session-info .name{font-size:15px;color:var(--text);margin-top:4px}
 </style>
 </head>
 <body>
@@ -66,7 +69,8 @@ input[type=range]{padding:0;height:6px;accent-color:var(--accent)}
 <div class="logo">🕵️</div>
 <h1>Шпион в офисе</h1>
 <p class="sub">Социальная дедукция: найди шпиона среди коллег</p>
-<button class="btn" onclick="show('s-on-entry')">🌐 Онлайн — каждый со своего телефона</button>
+<div id="session-banner" style="display:none"></div>
+<button class="btn" onclick="show('s-on-entry')"> Онлайн — каждый со своего телефона</button>
 <button class="btn ghost" onclick="show('s-off-setup')">📵 Оффлайн — передай телефон</button>
 </div>
 <!-- ===== ОНЛАЙН: вход ===== -->
@@ -188,7 +192,7 @@ ontouchend="holdEnd()" onmouseup="holdEnd()" onmouseleave="holdEnd()">👆 Уд�
 <div class="screen" id="s-result">
 <h2>Итоги раунда</h2>
 <div id="r-body"></div>
-<button class="btn" id="r-next" onclick="afterResultOffline()">Продолжить </button>
+<button class="btn" id="r-next" onclick="afterResultOffline()">Продолжить ➡</button>
 </div>
 <!-- ===== ОФФЛАЙН: угадывание ===== -->
 <div class="screen" id="s-guess">
@@ -200,10 +204,10 @@ ontouchend="holdEnd()" onmouseup="holdEnd()" onmouseleave="holdEnd()">👆 Уд�
 </div>
 <!-- ===== ОФФЛАЙН: счёт ===== -->
 <div class="screen" id="s-score">
-<h2>Таблица игры 📊</h2>
+<h2>Таблица игры </h2>
 <div class="card" id="sc-body"></div>
 <button class="btn" onclick="nextRoundOffline()">🔄 Ещё раунд (те же игроки)</button>
-<button class="btn ghost" onclick="show('s-menu')"> В меню</button>
+<button class="btn ghost" onclick="show('s-menu')">🏠 В меню</button>
 </div>
 </div>
 <script>
@@ -266,6 +270,99 @@ const PEER_CONFIG = {
   debug: 0
 };
 
+// ==================== СОХРАНЕНИЕ СЕССИИ ====================
+const SESSION_KEY = 'spyoffice_session';
+function saveSession(data){
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify(data)); } catch(e){}
+}
+function loadSession(){
+  try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e){ return null; }
+}
+function clearSession(){
+  try { localStorage.removeItem(SESSION_KEY); } catch(e){}
+}
+
+// Проверка сессии при загрузке
+(function checkSession(){
+  const sess = loadSession();
+  if (!sess) return;
+  const banner = $('session-banner');
+  banner.style.display = 'block';
+  banner.innerHTML = `
+    <div class="session-info">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:6px">Найдена прошлая сессия</div>
+      <div class="name">${sess.role === 'host' ? '👑 Хост' : '🎮 Игрок'}: <b>${escapeHtml(sess.name)}</b></div>
+      <div class="code">${sess.code || '—'}</div>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="btn" style="margin:0;flex:1" onclick="restoreSession()">Войти снова</button>
+        <button class="btn ghost" style="margin:0;flex:1" onclick="clearSession();location.reload()">Забыть</button>
+      </div>
+    </div>`;
+})();
+
+function restoreSession(){
+  const sess = loadSession();
+  if (!sess) return;
+  $('oe-name').value = sess.name;
+  if (sess.role === 'host' && sess.code){
+    NET.myName = sess.name;
+    NET.isHost = true;
+    NET.myId = 'HOST';
+    NET.players = [{id:'HOST', name: sess.name}];
+    NET.createRetries = 0;
+    NET.peer = new Peer(ROOM_PREFIX + sess.code, PEER_CONFIG);
+    NET.peer.on('open', () => {
+      $('lb-code').textContent = sess.code;
+      renderLobby();
+      show('s-lobby');
+    });
+    NET.peer.on('connection', conn => {
+      conn.on('data', d => hostOnData(conn, d));
+      conn.on('close', () => hostOnLeave(conn.peer));
+    });
+    NET.peer.on('error', e => {
+      console.error('Restore host error:', e);
+      if (e.type === 'unavailable-id'){
+        err('Комната уже существует. Возможно, вы всё ещё в ней.');
+      } else {
+        err('Не удалось восстановиться: ' + e.type);
+      }
+    });
+  } else if (sess.role === 'player' && sess.code){
+    NET.myName = sess.name;
+    NET.isHost = false;
+    NET.peer = new Peer(PEER_CONFIG);
+    NET.peer.on('open', id => {
+      NET.myId = id;
+      NET.hostConn = NET.peer.connect(ROOM_PREFIX + sess.code, {reliable:true});
+      NET.hostConn.on('open', () => {
+        NET.hostConn.send({type:'join', name: sess.name});
+        show('s-on-wait');
+        $('ow-text').textContent = 'Подключаемся к комнате ' + sess.code + '…';
+      });
+      NET.hostConn.on('data', peerOnData);
+      NET.hostConn.on('close', () => {
+        if (!NET.gameOver) err('Связь с комнатой потеряна.');
+      });
+      NET.hostConn.on('error', e => {
+        console.error('Restore join error:', e);
+        err('Ошибка подключения: ' + e.type);
+      });
+    });
+    NET.peer.on('error', e => {
+      console.error('Restore peer error:', e);
+      if (e.type === 'peer-unavailable') err('Комната ' + sess.code + ' не найдена. Возможно, хост вышел.');
+      else err('Ошибка: ' + e.type);
+    });
+  } else {
+    clearSession();
+    location.reload();
+  }
+}
+
+/* =========================================================
+ОНЛАЙН-РЕЖИМ (PeerJS, телефон хоста = сервер)
+========================================================= */
 const NET = {
 isHost: false, peer: null, hostConn: null,
 conns: new Map(),
@@ -282,7 +379,9 @@ createRetries: 0, joinTimeout: null
 };
 const ROOM_PREFIX = 'spyoffice-v1-';
 function genCode(){ let c=''; for(let i=0;i<4;i++) c+=CODE_ALPHABET[Math.floor(Math.random()*CODE_ALPHABET.length)]; return c; }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
+// ---------- Создание комнаты ----------
 function onlineCreate(){
 const name = $('oe-name').value.trim();
 if (!name) { $('oe-name').focus(); return; }
@@ -292,9 +391,10 @@ NET.createRetries = 0;
 const code = genCode();
 NET.peer = new Peer(ROOM_PREFIX + code, PEER_CONFIG);
 NET.peer.on('open', () => { 
-$('lb-code').textContent = code; 
-renderLobby(); 
-show('s-lobby'); 
+  saveSession({role:'host', name, code});
+  $('lb-code').textContent = code; 
+  renderLobby(); 
+  show('s-lobby'); 
 });
 NET.peer.on('connection', conn => {
 conn.on('data', d => hostOnData(conn, d));
@@ -321,7 +421,6 @@ l.appendChild(c);
 $('lb-start').disabled = NET.players.length < 3;
 $('lb-status').textContent = NET.players.length < 3 ? 'Нужно минимум 3 игрока' : 'Все на местах? Начинайте!';
 }
-function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 function hostOnData(conn, d){
 if (d.type === 'join'){
 if (NET.started) { conn.send({type:'error', msg:'Игра уже идёт'}); setTimeout(()=>conn.close(), 500); return; }
@@ -346,7 +445,7 @@ NET.players = NET.players.filter(p => p.id !== id);
 if (!NET.started){ broadcast({type:'lobby', players: NET.players}); renderLobby(); }
 }
 function broadcast(msg){ NET.conns.forEach(c => { try{ c.send(msg); }catch(e){} }); }
-
+// ---------- Подключение к комнате ----------
 function onlineJoin(){
 const name = $('oe-name').value.trim();
 const code = $('oe-code').value.trim().toUpperCase();
@@ -359,6 +458,7 @@ NET.myId = id;
 NET.hostConn = NET.peer.connect(ROOM_PREFIX + code, {reliable:true});
 NET.hostConn.on('open', () => {
 clearTimeout(NET.joinTimeout);
+saveSession({role:'player', name, code});
 NET.hostConn.send({type:'join', name});
 });
 NET.hostConn.on('data', peerOnData);
@@ -417,7 +517,7 @@ $('orl-emoji').textContent='📊'; $('orl-title').textContent='Счёт посл
 $('orl-body').innerHTML = `<div class="score-row"><span>🙂 Мирные</span><b>${NET.score.civ}</b></div>
 <div class="score-row"><span>🕵️ Шпионы</span><b>${NET.score.spy}</b></div>
 <div class="score-row"><span>Раунд</span><b>${NET.round}</b></div>`;
-$('orl-next').textContent = '🔄 Следующий раунд';
+$('orl-next').textContent = ' Следующий раунд';
 $('orl-next').style.display = NET.isHost ? 'block' : 'none';
 show('s-on-result');
 break;
@@ -427,7 +527,7 @@ $('or-card').style.display='none'; $('or-next').style.display='none'; $('or-hold
 show('s-on-role'); break;
 }
 }
-
+// ---------- Хост: старт игры ----------
 function hostStart(){
 if (NET.players.length < 3) return;
 NET.started = true;
@@ -508,7 +608,7 @@ NET.timerId = null;
 }
 }, 250);
 }
-
+// ---------- Голосование ----------
 function hostStartVote(){
 clearInterval(NET.timerId); NET.timerId = null;
 NET.deadline = null;
@@ -630,7 +730,9 @@ broadcast({type:'newround', round: NET.round});
 $('or-card').style.display='none'; $('or-next').style.display='none'; $('or-hold').style.display='block';
 show('s-on-role');
 }
-
+/* =========================================================
+ОФФЛАЙН-РЕЖИМ (передай телефон)
+========================================================= */
 const OFF = { 
 players:6, pack:"🏢 Офис", time:480, roles:[], location:null,
 score:{civ:0,spy:0}, round:1, revIdx:0, votes:{}, voterIdx:0, 
@@ -801,7 +903,7 @@ show('s-result');
 function afterResultOffline(){
 releaseWakeLock();
 $('sc-body').innerHTML = `<div class="score-row"><span>🙂 Мирные</span><b>${OFF.score.civ}</b></div>
-<div class="score-row"><span>🕵️ Шпионы</span><b>${OFF.score.spy}</b></div>
+<div class="score-row"><span>️ Шпионы</span><b>${OFF.score.spy}</b></div>
 <div class="score-row"><span>Раундов сыграно</span><b>${OFF.round}</b></div>`;
 show('s-score');
 }
