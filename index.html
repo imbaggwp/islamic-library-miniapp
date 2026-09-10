@@ -188,7 +188,7 @@ ontouchend="holdEnd()" onmouseup="holdEnd()" onmouseleave="holdEnd()">👆 Уд�
 <div class="screen" id="s-result">
 <h2>Итоги раунда</h2>
 <div id="r-body"></div>
-<button class="btn" id="r-next" onclick="afterResultOffline()">Продолжить ➡</button>
+<button class="btn" id="r-next" onclick="afterResultOffline()">Продолжить </button>
 </div>
 <!-- ===== ОФФЛАЙН: угадывание ===== -->
 <div class="screen" id="s-guess">
@@ -203,7 +203,7 @@ ontouchend="holdEnd()" onmouseup="holdEnd()" onmouseleave="holdEnd()">👆 Уд�
 <h2>Таблица игры 📊</h2>
 <div class="card" id="sc-body"></div>
 <button class="btn" onclick="nextRoundOffline()">🔄 Ещё раунд (те же игроки)</button>
-<button class="btn ghost" onclick="show('s-menu')">🏠 В меню</button>
+<button class="btn ghost" onclick="show('s-menu')"> В меню</button>
 </div>
 </div>
 <script>
@@ -252,14 +252,20 @@ return r.spy
 <div class="role-hint" style="font-size:17px;color:var(--text)">Ваша роль: <b>${r.role}</b></div>
 <div class="role-hint">Задавайте вопросы так, чтобы «свои» поняли, а шпион — нет.</div></div>`;
 }
-// удержание для показа роли
 let holdTimer = null;
 function holdStart(e){ e.preventDefault(); holdTimer=setTimeout(showRoleOnline, 400); }
 function holdStartOff(e){ e.preventDefault(); holdTimer=setTimeout(showRoleOffline, 400); }
 function holdEnd(){ clearTimeout(holdTimer); }
-/* =========================================================
-ОНЛАЙН-РЕЖИМ (PeerJS, телефон хоста = сервер)
-========================================================= */
+
+// ==================== НАСТРОЙКА P2P СЕРВЕРА ====================
+const PEER_CONFIG = {
+  host: 'peerjs-server-60ip.onrender.com',
+  port: 443,
+  path: '/',
+  secure: true,
+  debug: 0
+};
+
 const NET = {
 isHost: false, peer: null, hostConn: null,
 conns: new Map(),
@@ -276,7 +282,7 @@ createRetries: 0, joinTimeout: null
 };
 const ROOM_PREFIX = 'spyoffice-v1-';
 function genCode(){ let c=''; for(let i=0;i<4;i++) c+=CODE_ALPHABET[Math.floor(Math.random()*CODE_ALPHABET.length)]; return c; }
-// ---------- Создание комнаты ----------
+
 function onlineCreate(){
 const name = $('oe-name').value.trim();
 if (!name) { $('oe-name').focus(); return; }
@@ -284,7 +290,7 @@ NET.myName = name; NET.isHost = true; NET.myId = 'HOST';
 NET.players = [{id:'HOST', name}];
 NET.createRetries = 0;
 const code = genCode();
-NET.peer = new Peer(ROOM_PREFIX + code, {debug:0});
+NET.peer = new Peer(ROOM_PREFIX + code, PEER_CONFIG);
 NET.peer.on('open', () => { 
 $('lb-code').textContent = code; 
 renderLobby(); 
@@ -340,14 +346,14 @@ NET.players = NET.players.filter(p => p.id !== id);
 if (!NET.started){ broadcast({type:'lobby', players: NET.players}); renderLobby(); }
 }
 function broadcast(msg){ NET.conns.forEach(c => { try{ c.send(msg); }catch(e){} }); }
-// ---------- Подключение к комнате ----------
+
 function onlineJoin(){
 const name = $('oe-name').value.trim();
 const code = $('oe-code').value.trim().toUpperCase();
 if (!name) { $('oe-name').focus(); return; }
 if (code.length !== 4) { $('oe-code').focus(); return; }
 NET.myName = name; NET.isHost = false;
-NET.peer = new Peer({debug:0});
+NET.peer = new Peer(PEER_CONFIG);
 NET.peer.on('open', id => {
 NET.myId = id;
 NET.hostConn = NET.peer.connect(ROOM_PREFIX + code, {reliable:true});
@@ -361,7 +367,6 @@ NET.hostConn.on('error', e => {
 console.error('Connection error:', e);
 err('Ошибка соединения с хостом: ' + e.type);
 });
-// Таймаут на подключение
 NET.joinTimeout = setTimeout(() => {
 if (!NET.hostConn || !NET.hostConn.open) {
 err('Не удалось подключиться к комнате. Проверьте код и попробуйте снова.');
@@ -422,7 +427,7 @@ $('or-card').style.display='none'; $('or-next').style.display='none'; $('or-hold
 show('s-on-role'); break;
 }
 }
-// ---------- Хост: старт игры ----------
+
 function hostStart(){
 if (NET.players.length < 3) return;
 NET.started = true;
@@ -503,7 +508,7 @@ NET.timerId = null;
 }
 }, 250);
 }
-// ---------- Голосование ----------
+
 function hostStartVote(){
 clearInterval(NET.timerId); NET.timerId = null;
 NET.deadline = null;
@@ -552,11 +557,6 @@ let max = 0, suspects = [];
 for (const [k,c] of Object.entries(tally)) if (c>max){max=c; suspects=[k];} else if (c===max) suspects.push(k);
 const spyIds = [...NET.spyIds];
 const caught = suspects.length === 1 && spyIds.includes(suspects[0]);
-const result = {
-type:'result', location: NET.location.loc,
-caught, suspects, max,
-spyNames: NET.players.filter(p=>spyIds.includes(p.id)).map(p=>p.name)
-};
 if (caught){
 const locations = PACKS[NET.pack].map(l=>l.loc);
 spyIds.forEach(id => {
@@ -564,6 +564,9 @@ if (id === 'HOST') renderOnlineGuess(locations), show('s-on-guess');
 else NET.conns.get(id)?.send({type:'guess-offer', locations});
 });
 broadcast({type:'wait', text:'Шпион пойман! Он решает, угадать ли локацию…'});
+} else if (suspects.length > 1) {
+NET.score.spy++;
+finishRound({winner:'tie'});
 } else {
 NET.score.spy++;
 finishRound({winner:'spy'});
@@ -596,7 +599,8 @@ function finishRound(info){
 NET.gameOver = true;
 broadcast({type:'score', score: NET.score, round: NET.round});
 const msgs = {
-'spy':      ['🕵️','Шпион ускользнул!', 'Голосование не вычислило шпиона. Очко шпионам.'],
+'spy':      ['️','Шпион ускользнул!', 'Голосование не вычислило шпиона. Очко шпионам.'],
+'tie':      ['🤷','Ничья в голосовании!', 'Подозрение пало на нескольких игроков. Очко шпионам.'],
 'spy-guess':['😱','Шпион угадал локацию!', `Локация «${NET.location.loc}» раскрыта. Очко шпионам.`],
 'civ':      ['🎉','Мирные победили!', `Шпион не угадал локацию «${NET.location.loc}». Очко мирным.`]
 };
@@ -626,9 +630,7 @@ broadcast({type:'newround', round: NET.round});
 $('or-card').style.display='none'; $('or-next').style.display='none'; $('or-hold').style.display='block';
 show('s-on-role');
 }
-/* =========================================================
-ОФФЛАЙН-РЕЖИМ (передай телефон)
-========================================================= */
+
 const OFF = { 
 players:6, pack:"🏢 Офис", time:480, roles:[], location:null,
 score:{civ:0,spy:0}, round:1, revIdx:0, votes:{}, voterIdx:0, 
