@@ -130,7 +130,7 @@ select,input[type=text],input[type=number]{width:100%;background:var(--bg2);colo
 <button class="btn" onclick="show('s-on-entry')">🌐 Онлайн — каждый со своего телефона</button>
 <button class="btn ghost" onclick="show('s-open-rooms')">🏠 Открытые комнаты</button>
 <button class="btn ghost" onclick="show('s-off-setup')">📵 Оффлайн — передай телефон</button>
-<button class="btn ghost" onclick="show('s-tutorial')">📚 Обучение</button>
+<button class="btn ghost" onclick="show('s-tutorial')"> Обучение</button>
 <button class="btn ghost" onclick="show('s-stats')">📊 Статистика</button>
 <button class="btn ghost" onclick="show('s-history')">📜 История игр</button>
 <button class="btn ghost" onclick="show('s-settings')">⚙️ Настройки</button>
@@ -152,8 +152,8 @@ select,input[type=text],input[type=number]{width:100%;background:var(--bg2);colo
 
 <label style="margin-top:16px">Тип комнаты</label>
 <div class="visibility-toggle">
-<button type="button" class="btn active" id="vis-public" onclick="setRoomVisibility('public')"> Открытая</button>
-<button type="button" class="btn" id="vis-private" onclick="setRoomVisibility('private')">🔒 По коду</button>
+<button type="button" class="btn active" id="vis-public" onclick="setRoomVisibility('public')">🌐 Открытая</button>
+<button type="button" class="btn" id="vis-private" onclick="setRoomVisibility('private')"> По коду</button>
 </div>
 <p class="hint" id="vis-hint">Открытая: видна всем в списке. Закрытая: только по коду.</p>
 
@@ -177,14 +177,14 @@ select,input[type=text],input[type=number]{width:100%;background:var(--bg2);colo
 <option value="classic">🎭 Классика</option>
 <option value="chaos">🌀 Хаос</option>
 <option value="paranoia">😱 Паранойя</option>
-<option value="custom"> Свои настройки</option>
+<option value="custom">🎨 Свои настройки</option>
 </select>
 <div id="lb-custom-roles" style="display:none;margin-top:12px">
 <label class="switch"><input type="checkbox" id="lbc-com" checked> 🔍 Комиссар</label>
 <label class="switch"><input type="checkbox" id="lbc-doc" checked> 💉 Доктор</label>
 <label class="switch"><input type="checkbox" id="lbc-man"> 🔪 Маньяк</label>
 <label class="switch"><input type="checkbox" id="lbc-jour"> 📰 Журналист</label>
-<label class="switch"><input type="checkbox" id="lbc-law"> 🛡️ Адвокат</label>
+<label class="switch"><input type="checkbox" id="lbc-law"> ️ Адвокат</label>
 <label class="switch"><input type="checkbox" id="lbc-bull"> 🔫 Пуля</label>
 <label class="switch"><input type="checkbox" id="lbc-det"> 🕵️ Детектив</label>
 <label class="switch"><input type="checkbox" id="lbc-nec"> 💀 Некромант</label>
@@ -239,13 +239,13 @@ select,input[type=text],input[type=number]{width:100%;background:var(--bg2);colo
 </div>
 <div class="emoji-bar">
 <span onclick="addEmoji('👍')">👍</span>
-<span onclick="addEmoji('🤔')">🤔</span>
+<span onclick="addEmoji('')">🤔</span>
 <span onclick="addEmoji('😂')">😂</span>
 <span onclick="addEmoji('😱')">😱</span>
 <span onclick="addEmoji('🕵️')">🕵️</span>
 <span onclick="addEmoji('🔫')">🔫</span>
 <span onclick="addEmoji('💉')">💉</span>
-<span onclick="addEmoji('️')">⚰️</span>
+<span onclick="addEmoji('⚰️')">⚰️</span>
 </div>
 </div>
 <button class="btn danger" id="ond-force" style="display:none" onclick="hostStartVote()">🗳 Начать голосование</button>
@@ -262,7 +262,7 @@ select,input[type=text],input[type=number]{width:100%;background:var(--bg2);colo
 <div class="result-big" id="ona-emoji"></div>
 <h2 id="ona-title"></h2>
 <div class="card" id="ona-body"></div>
-<button class="btn" id="ona-next" style="display:none">Продолжить ➡</button>
+<button class="btn" id="ona-next" style="display:none">Продолжить </button>
 </div>
 
 <div class="screen" id="s-on-wait">
@@ -293,11 +293,11 @@ select,input[type=text],input[type=number]{width:100%;background:var(--bg2);colo
 <input type="range" id="p-count" min="4" max="12" value="6" style="width:100%;accent-color:var(--accent)" oninput="offCfgUpdate()">
 <div style="font-size:28px;font-weight:700;color:var(--accent);text-align:center;margin:6px 0"><span id="p-val">6</span> 👥</div>
 <div class="status" id="ofs-mafia" style="margin:6px 0 10px"></div>
-<label class="switch"><input type="checkbox" id="ofs-com" checked onchange="offCfgUpdate()"> 🔍 Комиссар</label>
+<label class="switch"><input type="checkbox" id="ofs-com" checked onchange="offCfgUpdate()">  Комиссар</label>
 <label class="switch"><input type="checkbox" id="ofs-doc" checked onchange="offCfgUpdate()"> 💉 Доктор</label>
-<label class="switch"><input type="checkbox" id="ofs-man" onchange="offCfgUpdate()"> 🔪 Маньяк</label>
+<label class="switch"><input type="checkbox" id="ofs-man" onchange="offCfgUpdate()">  Маньяк</label>
 <label class="switch"><input type="checkbox" id="ofs-jour" onchange="offCfgUpdate()"> 📰 Журналист</label>
-<label class="switch"><input type="checkbox" id="ofs-law" onchange="offCfgUpdate()"> ️ Адвокат</label>
+<label class="switch"><input type="checkbox" id="ofs-law" onchange="offCfgUpdate()"> 🛡️ Адвокат</label>
 <label class="switch"><input type="checkbox" id="ofs-bull" onchange="offCfgUpdate()"> 🔫 Пуля</label>
 <label class="switch"><input type="checkbox" id="ofs-det" onchange="offCfgUpdate()"> 🕵️ Детектив</label>
 <label class="switch"><input type="checkbox" id="ofs-nec" onchange="offCfgUpdate()"> 💀 Некромант</label>
@@ -307,7 +307,7 @@ select,input[type=text],input[type=number]{width:100%;background:var(--bg2);colo
 <label style="margin-top:12px">Таймер дня</label>
 <select id="ofs-time"><option value="60">1 минута</option><option value="120" selected>2 минуты</option><option value="180">3 минуты</option><option value="300">5 минут</option></select>
 </div>
-<button class="btn" onclick="startOffline()">Начать игру </button>
+<button class="btn" onclick="startOffline()">Начать игру 🎬</button>
 </div>
 
 <div class="screen" id="s-off-reveal">
@@ -332,7 +332,7 @@ select,input[type=text],input[type=number]{width:100%;background:var(--bg2);colo
 </div>
 
 <div class="screen" id="s-off-morning">
-<div class="result-big">🌅</div>
+<div class="result-big"></div>
 <h2>Утро в городе</h2>
 <div class="card" id="om-body"></div>
 <button class="btn" onclick="afterMorning()">☀️ Начать обсуждение</button>
@@ -386,7 +386,7 @@ select,input[type=text],input[type=number]{width:100%;background:var(--bg2);colo
 </div>
 
 <div class="screen" id="s-history">
-<h2 style="margin-top:50px">📜 История игр</h2>
+<h2 style="margin-top:50px"> История игр</h2>
 <div id="hist-list"></div>
 <button class="btn ghost" onclick="clearHistory()" style="margin-top:12px">🗑 Очистить</button>
 </div>
@@ -396,7 +396,7 @@ select,input[type=text],input[type=number]{width:100%;background:var(--bg2);colo
 <div class="card">
 <label>Сохранённые настройки</label>
 <p class="hint" id="saved-settings-info">Нет сохранённых настроек</p>
-<button class="btn ghost" onclick="loadSavedSettings()"> Загрузить</button>
+<button class="btn ghost" onclick="loadSavedSettings()">📥 Загрузить</button>
 <button class="btn ghost" onclick="clearSavedSettings()">🗑 Очистить</button>
 </div>
 <div class="card">
@@ -412,7 +412,7 @@ select,input[type=text],input[type=number]{width:100%;background:var(--bg2);colo
 </div>
 
 <div class="screen" id="s-tutorial">
-<h2 style="margin-top:50px"> Обучение</h2>
+<h2 style="margin-top:50px">📚 Обучение</h2>
 <div id="tutorial-content"></div>
 <div class="tutorial-nav">
 <button class="btn ghost" id="tut-prev" onclick="tutorialNav(-1)" style="flex:1">← Назад</button>
@@ -430,13 +430,13 @@ select,input[type=text],input[type=number]{width:100%;background:var(--bg2);colo
 <li>🌙 <b>Ночь:</b> мафия выбирает жертву, маньяк — свою, доктор спасает одного, комиссар проверяет одного.</li>
 <li>☀️ <b>День:</b> город узнаёт, кто погиб ночью, обсуждает и голосует, кого исключить.</li>
 <li>🔍 <b>Комиссар</b> — узнаёт, мафия ли игрок.</li>
-<li>💉 <b>Доктор</b> — спасает одного игрока от убийства.</li>
+<li> <b>Доктор</b> — спасает одного игрока от убийства.</li>
 <li>📰 <b>Журналист</b> — 1 раз узнаёт роль любого игрока.</li>
 <li>🛡️ <b>Адвокат</b> — защищает от голосования.</li>
-<li> <b>Пуля</b> — забирает убийцу с собой.</li>
+<li>🔫 <b>Пуля</b> — забирает убийцу с собой.</li>
 <li>🕵️ <b>Детектив</b> — узнаёт точную роль игрока.</li>
 <li>💀 <b>Некромант</b> — 1 раз воскрешает мёртвого.</li>
-<li> <b>Призрак</b> — голосует 1 раз после смерти.</li>
+<li>👻 <b>Призрак</b> — голосует 1 раз после смерти.</li>
 <li>🗳 <b>Ничья</b> — повторное голосование между 2 лидерами.</li>
 </ul>
 <button class="btn" onclick="hideRules()">Понятно 👍</button>
@@ -444,7 +444,7 @@ select,input[type=text],input[type=number]{width:100%;background:var(--bg2);colo
 </div>
 
 <div class="pause-overlay" id="pause-overlay">
-<h2>⏸ ПАУЗА</h2>
+<h2> ПАУЗА</h2>
 <p class="sub">Таймер остановлен</p>
 <button class="btn" onclick="togglePause()" style="max-width:240px">▶️ Продолжить</button>
 </div>
@@ -481,7 +481,7 @@ function err(m){ $('err-text').textContent = m; show('s-on-error'); }
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ";
 function genCode(){ let c=''; for(let i=0;i<4;i++) c+=CODE_ALPHABET[Math.floor(Math.random()*CODE_ALPHABET.length)]; return c; }
-const ROLE_RU = {mafia:'🕵️ Мафия',commissar:'🔍 Комиссар',doctor:'💉 Доктор',maniac:'🔪 Маньяк',citizen:'🙂 Мирный',journalist:'📰 Журналист',lawyer:'🛡️ Адвокат',bullet:'🔫 Пуля',detective:'🕵️ Детектив',necromancer:'💀 Некромант',ghost:'👻 Призрак'};
+const ROLE_RU = {mafia:'🕵️ Мафия',commissar:'🔍 Комиссар',doctor:'💉 Доктор',maniac:' Маньяк',citizen:'🙂 Мирный',journalist:'📰 Журналист',lawyer:'🛡️ Адвокат',bullet:' Пуля',detective:'🕵️ Детектив',necromancer:'💀 Некромант',ghost:'👻 Призрак'};
 const ROLE_EVIL = {mafia:1, maniac:1};
 
 // ==================== HAPTIC FEEDBACK ====================
@@ -731,7 +731,7 @@ function tryConnectWithRetry(code, attemptsLeft){
   
   NET.peer.on('error', e => {
     clearTimeout(peerTimeout);
-    console.error(' Ошибка Peer игрока:', e);
+    console.error('❌ Ошибка Peer игрока:', e);
     if(e.type === 'peer-unavailable') {
       if (attemptsLeft > 1) {
         setTimeout(() => tryConnectWithRetry(code, attemptsLeft - 1), 2000);
@@ -762,7 +762,7 @@ setInterval(async () => { if(NET.started) await forceSave(); }, 30000);
 
 // ==================== ТЕМА ====================
 const THEME_KEY='mafia_theme';
-function applyTheme(t){ document.documentElement.setAttribute('data-theme',t); $('theme-btn').textContent = t==='dark'?'🌙':'☀️'; localStorage.setItem(THEME_KEY,t); }
+function applyTheme(t){ document.documentElement.setAttribute('data-theme',t); $('theme-btn').textContent = t==='dark'?'':'☀️'; localStorage.setItem(THEME_KEY,t); }
 function toggleTheme(){ const c=document.documentElement.getAttribute('data-theme')||'dark'; applyTheme(c==='dark'?'light':'dark'); haptic('select'); }
 (function(){ const s=localStorage.getItem(THEME_KEY); if(s) applyTheme(s); else applyTheme(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'); })();
 
@@ -826,7 +826,7 @@ const h=loadHist(),l=$('hist-list');l.innerHTML='';
 if(!h.length){l.innerHTML='<p class="sub">История пуста.</p>';return;}
 h.slice().reverse().forEach(it=>{const d=document.createElement('div');d.className='history-item';
 const dt=new Date(it.date).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-d.innerHTML=`<div style="display:flex;justify-content:space-between"><b>${it.winner==='good'?'🎉 Мирные':it.winner==='mafia'?'🕵️ Мафия':' Маньяк'}</b><span style="color:var(--muted);font-size:12px">${dt}</span></div><div style="font-size:13px;color:var(--muted);margin-top:4px">${it.mode==='online'?' Онлайн':'📵 Оффлайн'} • ${it.players} игр. • ${it.nights} ночей</div>`;l.appendChild(d);});
+d.innerHTML=`<div style="display:flex;justify-content:space-between"><b>${it.winner==='good'?'🎉 Мирные':it.winner==='mafia'?'🕵️ Мафия':' Маньяк'}</b><span style="color:var(--muted);font-size:12px">${dt}</span></div><div style="font-size:13px;color:var(--muted);margin-top:4px">${it.mode==='online'?'🌐 Онлайн':'📵 Оффлайн'} • ${it.players} игр. • ${it.nights} ночей</div>`;l.appendChild(d);});
 }
 
 // ==================== НАСТРОЙКИ ====================
@@ -848,10 +848,10 @@ function clearSavedSettings(){localStorage.removeItem(SETTINGS_KEY);alert('На�
 
 // ==================== ОБУЧЕНИЕ ====================
 const TUTORIAL_STEPS=[
-{title:' Что такое Мафия?',text:'Это игра на дедукцию и блеф. Город делится на мирных жителей и мафию. Мирные не знают, кто мафия. Мафия знает друг друга.'},
+{title:'🎭 Что такое Мафия?',text:'Это игра на дедукцию и блеф. Город делится на мирных жителей и мафию. Мирные не знают, кто мафия. Мафия знает друг друга.'},
 {title:'🌙 Ночь',text:'Ночью все "засыпают". Мафия тайно выбирает жертву. Маньяк (если есть) — свою жертву. Доктор спасает одного. Комиссар/Детектив проверяет одного.'},
 {title:'☀️ День',text:'Утром город узнаёт, кто погиб. Все обсуждают и голосуют, кого исключить. Роль исключённого раскрывается.'},
-{title:'🛡️ Роли мирных',text:'🔍 Комиссар — узнаёт "мафия/не мафия"\n🕵️ Детектив — узнаёт точную роль\n💉 Доктор — спасает от убийства\n📰 Журналист — 1 раз узнаёт роль\n🛡️ Адвокат — защищает от голосования\n💀 Некромант — 1 раз воскрешает'},
+{title:'🛡️ Роли мирных',text:'🔍 Комиссар — узнаёт "мафия/не мафия"\n🕵️ Детектив — узнаёт точную роль\n💉 Доктор — спасает от убийства\n📰 Журналист — 1 раз узнаёт роль\n️ Адвокат — защищает от голосования\n Некромант — 1 раз воскрешает'},
 {title:'🕵️ Роли зла',text:'🕵️ Мафия — убивает ночью (1-3 игрока)\n Маньяк — убивает сам по себе, побеждает в одиночку'},
 {title:' Особые',text:'👻 Призрак — после смерти может проголосовать 1 раз\n🔫 Пуля — если её убивают, забирает убийцу с собой'},
 {title:'🏆 Победа',text:'Мирные побеждают, если вся мафия и маньяк мертвы.\nМафия побеждает, если её стало не меньше остальных.\nМаньяк побеждает, если остался последним.'},
@@ -982,7 +982,7 @@ async function checkCloudSession(){
   if(session && session.code){
     const room = await loadRoomFromCloud(session.code);
     if(room){
-      container.innerHTML = `<div class="restore-banner"><div style="font-size:13px;color:var(--muted)">Найдена активная комната</div><div class="code">${session.code}</div><div style="font-size:14px">${session.role === 'host' ? '👑 Хост' : '🎮 Игрок'}: <b>${escapeHtml(session.name)}</b></div><div class="btn-row"><button class="btn" onclick="restoreFromCloud('${session.code}', '${session.role}')">Войти снова</button><button class="btn ghost" onclick="clearCloudSession();checkCloudSession()">Забыть</button></div></div>`;
+      container.innerHTML = `<div class="restore-banner"><div style="font-size:13px;color:var(--muted)">Найдена активная комната</div><div class="code">${session.code}</div><div style="font-size:14px">${session.role === 'host' ? ' Хост' : '🎮 Игрок'}: <b>${escapeHtml(session.name)}</b></div><div class="btn-row"><button class="btn" onclick="restoreFromCloud('${session.code}', '${session.role}')">Войти снова</button><button class="btn ghost" onclick="clearCloudSession();checkCloudSession()">Забыть</button></div></div>`;
     } else { await cloudRemove('session_' + (tgUser?.id || 'anon')); }
   } else { container.innerHTML = ''; }
   const statusEl = $('cloud-status');
@@ -1065,7 +1065,6 @@ function onlineCreate(){
   console.log('📝 Код комнаты:', code);
   console.log('🆔 Peer ID будет:', peerId);
   
-  // Создаём Peer с явным ID и STUN серверами
   NET.peer = new Peer(peerId, {
     debug: 2,
     config: {
@@ -1087,13 +1086,24 @@ function onlineCreate(){
     haptic('success');
   });
   
+  // ✅ ИСПРАВЛЕНИЕ: принимаем подключения СРАЗУ и добавляем в conns
   NET.peer.on('connection', (conn) => {
     console.log('🔌 Новое подключение от:', conn.peer);
+    
+    // ✅ ВАЖНО: добавляем подключение в список СРАЗУ при получении
+    NET.conns.set(conn.peer, conn);
+    
+    conn.on('open', () => {
+      console.log('✅ Соединение с', conn.peer, 'открыто и готово к обмену данными');
+    });
+    
     conn.on('data', d => hostOnData(conn, d));
+    
     conn.on('close', () => {
       console.log('❌ Отключение:', conn.peer);
       hostOnLeave(conn.peer);
     });
+    
     conn.on('error', (err) => {
       console.error('❌ Ошибка соединения:', err);
     });
@@ -1146,7 +1156,15 @@ function kickPlayer(id){
 }
 
 function broadcast(m){NET.conns.forEach(c=>{try{c.send(m)}catch(e){}});}
-function hostOnLeave(id){if(!NET.conns.has(id))return;NET.conns.delete(id);NET.players=NET.players.filter(p=>p.id!==id);NET.readyPlayers.delete(id);if(!NET.started)renderLobby();}
+
+// ✅ ИСПРАВЛЕННАЯ ФУНКЦИЯ hostOnLeave
+function hostOnLeave(id){
+  console.log('👋 Игрок вышел:', id);
+  NET.conns.delete(id);
+  NET.players=NET.players.filter(p=>p.id!==id);
+  NET.readyPlayers.delete(id);
+  if(!NET.started) renderLobby();
+}
 
 function hostOnData(c,d){
 if(d.type==='join'){
@@ -1180,7 +1198,6 @@ function onlineJoin(){
   const targetId = ROOM_PREFIX + code;
   console.log('🎯 Целевой Peer ID:', targetId);
   
-  // Создаём Peer игрока с STUN серверами
   NET.peer = new Peer({
     debug: 2,
     config: {
@@ -1231,7 +1248,7 @@ function onlineJoin(){
   NET.peer.on('error', (e) => {
     console.error('❌ Ошибка Peer игрока:', e);
     if(e.type === 'peer-unavailable') {
-      console.log(' Хост не найден:', targetId);
+      console.log('❌ Хост не найден:', targetId);
       err('Комната ' + code + ' не найдена. Возможно, она уже закрыта.');
     }
     else if(e.type === 'network') {
@@ -1248,7 +1265,7 @@ function onlineJoin(){
   });
   
   NET.peer.on('disconnected', () => {
-    console.log('️ Игрок отключён от сервера');
+    console.log('⚠️ Игрок отключён от сервера');
   });
 }
 
@@ -1275,7 +1292,7 @@ case'm-revive':NET.alive.push(d.target);renderAliveChips('ond-alive');break;
 
 function resetRoleScreen(){$('or-card').style.display='none';$('or-next').style.display='none';$('or-hold').style.display='block';$('role-hint-bubble').style.display='none';}
 function showRoleHint(){
-const hints={mafia:'🕵️ Вы мафия. Ночью выбирайте жертву с напарниками.',commissar:'🔍 Вы комиссар. Ночью проверяйте игроков.',doctor:'💉 Вы доктор. Ночью спасайте игроков.',maniac:'🔪 Вы маньяк. Играете в одиночку.',citizen:'🙂 Вы мирный. Обсуждайте и голосуйте.',journalist:'📰 Вы журналист. 1 раз узнайте роль.',lawyer:'🛡️ Вы адвокат. Защищайте от голосования.',bullet:'🔫 Вы пуля. Если убьют — заберёте убийцу.',detective:'️ Вы детектив. Узнавайте точные роли.',necromancer:'💀 Вы некромант. 1 раз воскресите мёртвого.',ghost:'👻 Вы призрак. Голосуйте после смерти.'};
+const hints={mafia:'🕵️ Вы мафия. Ночью выбирайте жертву с напарниками.',commissar:'🔍 Вы комиссар. Ночью проверяйте игроков.',doctor:'💉 Вы доктор. Ночью спасайте игроков.',maniac:'🔪 Вы маньяк. Играете в одиночку.',citizen:'🙂 Вы мирный. Обсуждайте и голосуйте.',journalist:'📰 Вы журналист. 1 раз узнайте роль.',lawyer:'🛡️ Вы адвокат. Защищайте от голосования.',bullet:' Вы пуля. Если убьют — заберёте убийцу.',detective:'🕵️ Вы детектив. Узнавайте точные роли.',necromancer:'💀 Вы некромант. 1 раз воскресите мёртвого.',ghost:'👻 Вы призрак. Голосуйте после смерти.'};
 const b=$('role-hint-bubble');
 if(hints[NET.myRole]){b.textContent=hints[NET.myRole];b.style.display='block';}
 }
@@ -1357,7 +1374,7 @@ if(role==='doctor'){html=chipsHTML(targets,'onn')+'<button class="btn" id="onn-b
 else if(role==='commissar'){html=chipsHTML(targets,'onn')+'<button class="btn" id="onn-btn" style="display:none" onclick="sendCheck()">🔍 Проверить</button>';showNightHint('Узнайте, мафия ли игрок.');}
 else if(role==='detective'){html=chipsHTML(targets,'onn')+'<button class="btn" id="onn-btn" style="display:none" onclick="sendDetective()">🕵️ Узнать роль</button>';showNightHint('Узнайте точную роль игрока.');}
 else if(role==='mafia'){html=chipsHTML(targets,'onn')+'<button class="btn" id="onn-btn" style="display:none" onclick="sendNightAct()">🕵️ Выбрать жертву</button><button class="btn ghost" onclick="sendSurrender()">🏳 Сдаться</button>';showNightHint('Выберите жертву с напарниками.');}
-else if(role==='maniac'){html=chipsHTML(targets,'onn')+'<button class="btn" id="onn-btn" style="display:none" onclick="sendNightAct()">🔪 Выбрать жертву</button><button class="btn ghost" onclick="sendSurrender()"> Сдаться</button>';showNightHint('Вы играете в одиночку.');}
+else if(role==='maniac'){html=chipsHTML(targets,'onn')+'<button class="btn" id="onn-btn" style="display:none" onclick="sendNightAct()"> Выбрать жертву</button><button class="btn ghost" onclick="sendSurrender()"> Сдаться</button>';showNightHint('Вы играете в одиночку.');}
 else if(role==='journalist'){if(NET.journalistUsed){html='<p class="hint">Вы уже использовали способность.</p>';}else{html=chipsHTML(targets,'onn')+'<button class="btn" id="onn-btn" style="display:none" onclick="sendJournalist()">📰 Узнать роль</button>';showNightHint('1 раз за игру — узнайте роль.');}}
 else if(role==='lawyer'){html=chipsHTML(targets,'onn')+'<button class="btn" id="onn-btn" style="display:none" onclick="sendLawyer()">🛡️ Защитить</button>';showNightHint('Защитите игрока от голосования.');}
 else if(role==='necromancer'){if(NET.necroUsed){html='<p class="hint">Вы уже воскрешали.</p>';}else{const deadPlayers=NET.players.filter(p=>!NET.alive.includes(p.id)&&NET.roles[p.id]!=='ghost').map(p=>p.id);if(deadPlayers.length===0){html='<p class="hint">Нет мёртвых для воскрешения.</p>';}else{html=chipsHTML(deadPlayers,'onn')+'<button class="btn" id="onn-btn" style="display:none" onclick="sendNecro()">💀 Воскресить</button>';showNightHint('1 раз за игру — воскресите мёртвого.');}}}
@@ -1438,7 +1455,7 @@ function clientDay(deadline){
 NET.dayDeadline=deadline;
 renderAliveChips('ond-alive');
 $('ond-force').style.display=NET.isHost?'block':'none';
-const hints={mafia:'🕵️ Притворяйтесь мирным.',commissar:' Пора проверить подозрительного.',doctor:' Подумайте, кого спасать.',detective:'🕵️ Узнайте роль подозрительного.',lawyer:'🛡️ Решите, кого защитить.',necromancer:'💀 Решите, кого воскресить.',citizen:'🙂 Обсуждайте и ищите мафию!'};
+const hints={mafia:'🕵️ Притворяйтесь мирным.',commissar:'🔍 Пора проверить подозрительного.',doctor:'💉 Подумайте, кого спасать.',detective:'🕵️ Узнайте роль подозрительного.',lawyer:'🛡️ Решите, кого защитить.',necromancer:' Решите, кого воскресить.',citizen:'🙂 Обсуждайте и ищите мафию!'};
 const h=$('day-hint');
 if(hints[NET.myRole]){h.textContent=hints[NET.myRole];h.style.display='block';}else h.style.display='none';
 show('s-on-day'); speak('День. Обсуждение начинается.');
@@ -1519,9 +1536,9 @@ removeOpenRoom(NET.roomCode);
 
 function clientOver(d){
 NET.over=true;
-$('ono-emoji').textContent=d.winner==='good'?'':d.winner==='mafia'?'️':'🔪';
+$('ono-emoji').textContent=d.winner==='good'?'🎉':d.winner==='mafia'?'🕵️':'🔪';
 $('ono-title').textContent=d.winner==='good'?'Победа мирных!':d.winner==='mafia'?'Победа мафии!':'Победа маньяка!';
-$('ono-body').innerHTML=d.reveal.map(r=>`<div class="score-row"><span>${r.alive?'':'💀 '}${escapeHtml(r.name)}</span><b>${ROLE_RU[r.role]||r.role}</b></div>`).join('')+`<div class="score-row"><span>Ночей сыграно</span><b>${d.nights}</b></div>`;
+$('ono-body').innerHTML=d.reveal.map(r=>`<div class="score-row"><span>${r.alive?'':' '}${escapeHtml(r.name)}</span><b>${ROLE_RU[r.role]||r.role}</b></div>`).join('')+`<div class="score-row"><span>Ночей сыграно</span><b>${d.nights}</b></div>`;
 $('ono-again').style.display=NET.isHost?'block':'none';
 show('s-on-over');
 if(d.winner==='good'){SFX.win();haptic('success');launchConfetti();speak('Победа мирных!');}else{SFX.lose();haptic('error');speak(d.winner==='mafia'?'Победа мафии!':'Победа маньяка!');}
@@ -1573,15 +1590,15 @@ const box=$('ona2-box');box.innerHTML='';
 const showHint=(t)=>{const h=$('off-night-hint');h.textContent=t;h.style.display=t?'block':'none';};
 showHint('');
 if(role==='citizen'){$('ona2-title').textContent='😴 Вы спите';box.innerHTML='<p class="hint">Ночью вы ничего не делаете.</p><button class="btn" onclick="nextPass()">Передать телефон ➡</button>';}
-else if(role==='mafia'){const partners=G.roles.map((r,i)=>r==='mafia'&&i!==idx&&G.alive.includes(i)?('Игрок '+(i+1)):null).filter(Boolean).join(', ')||'вы один';$('ona2-title').textContent='🕵️ Мафия — ваш ход';box.innerHTML=`<p class="hint">Напарники: ${partners}</p>`+offChips(idx,'ona2',false)+'<button class="btn" id="ona2-btn" style="display:none" onclick="confirmNightOff()">Выбрать жертву</button><button class="btn ghost" onclick="surrenderOff()">🏳 Сдаться</button>';showHint('Выберите жертву с напарниками.');}
-else if(role==='maniac'){$('ona2-title').textContent='🔪 Маньяк — ваш ход';box.innerHTML=offChips(idx,'ona2',false)+'<button class="btn" id="ona2-btn" style="display:none" onclick="confirmNightOff()">Выбрать жертву</button><button class="btn ghost" onclick="surrenderOff()"> Сдаться</button>';showHint('Вы играете в одиночку.');}
+else if(role==='mafia'){const partners=G.roles.map((r,i)=>r==='mafia'&&i!==idx&&G.alive.includes(i)?('Игрок '+(i+1)):null).filter(Boolean).join(', ')||'вы один';$('ona2-title').textContent='️ Мафия — ваш ход';box.innerHTML=`<p class="hint">Напарники: ${partners}</p>`+offChips(idx,'ona2',false)+'<button class="btn" id="ona2-btn" style="display:none" onclick="confirmNightOff()">Выбрать жертву</button><button class="btn ghost" onclick="surrenderOff()">🏳 Сдаться</button>';showHint('Выберите жертву с напарниками.');}
+else if(role==='maniac'){$('ona2-title').textContent='🔪 Маньяк — ваш ход';box.innerHTML=offChips(idx,'ona2',false)+'<button class="btn" id="ona2-btn" style="display:none" onclick="confirmNightOff()">Выбрать жертву</button><button class="btn ghost" onclick="surrenderOff()">🏳 Сдаться</button>';showHint('Вы играете в одиночку.');}
 else if(role==='commissar'){$('ona2-title').textContent='🔍 Комиссар — проверка';box.innerHTML=offChips(idx,'ona2',false)+'<button class="btn" id="ona2-btn" style="display:none" onclick="confirmNightOff()">Проверить</button>';showHint('Узнайте, мафия ли игрок.');}
-else if(role==='detective'){$('ona2-title').textContent='️ Детектив — узнать роль';box.innerHTML=offChips(idx,'ona2',false)+'<button class="btn" id="ona2-btn" style="display:none" onclick="confirmNightOff()">Узнать роль</button>';showHint('Узнайте точную роль игрока.');}
+else if(role==='detective'){$('ona2-title').textContent='🕵️ Детектив — узнать роль';box.innerHTML=offChips(idx,'ona2',false)+'<button class="btn" id="ona2-btn" style="display:none" onclick="confirmNightOff()">Узнать роль</button>';showHint('Узнайте точную роль игрока.');}
 else if(role==='doctor'){$('ona2-title').textContent='💉 Доктор — спасение';box.innerHTML='<p class="hint">Можно спасти себя. Нельзя того же, кого прошлой ночью.</p>'+offChips(idx,'ona2',true)+'<button class="btn" id="ona2-btn" style="display:none" onclick="confirmNightOff()">Спасти</button>';showHint('Выберите, кого спасти.');}
 else if(role==='journalist'){if(G.journalistUsed){$('ona2-title').textContent='📰 Журналист';box.innerHTML='<p class="hint">Вы уже использовали способность.</p><button class="btn" onclick="nextPass()">Передать ➡</button>';}else{$('ona2-title').textContent='📰 Журналист — узнать роль';box.innerHTML=offChips(idx,'ona2',false)+'<button class="btn" id="ona2-btn" style="display:none" onclick="confirmNightOff()">Узнать роль</button>';showHint('1 раз за игру — узнайте роль.');}}
 else if(role==='lawyer'){$('ona2-title').textContent='🛡️ Адвокат — защита';box.innerHTML=offChips(idx,'ona2',false)+'<button class="btn" id="ona2-btn" style="display:none" onclick="confirmNightOff()">Защитить</button>';showHint('Защитите игрока от голосования.');}
 else if(role==='necromancer'){if(G.necroUsed){$('ona2-title').textContent='💀 Некромант';box.innerHTML='<p class="hint">Вы уже воскрешали.</p><button class="btn" onclick="nextPass()">Передать ➡</button>';}else{const deadPlayers=G.roles.map((r,i)=>r!=='ghost'&&!G.alive.includes(i)?i:null).filter(i=>i!==null);if(deadPlayers.length===0){$('ona2-title').textContent='💀 Некромант';box.innerHTML='<p class="hint">Нет мёртвых для воскрешения.</p><button class="btn" onclick="nextPass()">Передать ➡</button>';}else{$('ona2-title').textContent='💀 Некромант — воскрешение';box.innerHTML=offChips2(deadPlayers,'ona2')+'<button class="btn" id="ona2-btn" style="display:none" onclick="confirmNecroOff()">Воскресить</button>';showHint('1 раз за игру — воскресите мёртвого.');}}}
-else{$('ona2-title').textContent='🌙 Ночь';box.innerHTML='<p class="hint">Ночью вы ничего не делаете.</p><button class="btn" onclick="nextPass()">Передать ➡</button>';}
+else{$('ona2-title').textContent=' Ночь';box.innerHTML='<p class="hint">Ночью вы ничего не делаете.</p><button class="btn" onclick="nextPass()">Передать ➡</button>';}
 show('s-off-night-act');
 }
 function offChips(idx,prefix,allowSelf){const list=G.alive.filter(i=>(allowSelf?true:i!==idx)&&!(prefix==='ona2'&&G.roles[idx]==='doctor'&&i===G.docLast));return'<div class="chips" id="'+prefix+'-chips">'+list.map(i=>`<div class="chip" data-id="${i}" onclick="pickChip('${prefix}',this)">Игрок ${i+1}${i===idx?' (вы)':''}</div>`).join('')+'</div>';}
@@ -1591,9 +1608,9 @@ const role=G.roles[G.curIdx];
 if(role==='mafia')G.mafiaPicks.push(offPick);
 if(role==='maniac')G.maniacPick=offPick;
 if(role==='doctor')G.docPick=offPick;
-if(role==='commissar'){const isM=G.roles[offPick]==='mafia';$('ona2-box').innerHTML=`<div class="result-big">${isM?'🚨':'😌'}</div><p class="hint" style="font-size:17px">${isM?'Игрок '+(offPick+1)+' — МАФИЯ!':'Игрок '+(offPick+1)+' не мафия.'}</p><button class="btn" onclick="nextPass()">Передать </button>`;SFX.check();haptic('medium');return;}
+if(role==='commissar'){const isM=G.roles[offPick]==='mafia';$('ona2-box').innerHTML=`<div class="result-big">${isM?'🚨':'😌'}</div><p class="hint" style="font-size:17px">${isM?'Игрок '+(offPick+1)+' — МАФИЯ!':'Игрок '+(offPick+1)+' не мафия.'}</p><button class="btn" onclick="nextPass()">Передать ➡</button>`;SFX.check();haptic('medium');return;}
 if(role==='detective'){const r=G.roles[offPick];$('ona2-box').innerHTML=`<div class="result-big">🕵️</div><p class="hint" style="font-size:17px">Роль игрока ${offPick+1}: ${ROLE_RU[r]||r}</p><button class="btn" onclick="nextPass()">Передать ➡</button>`;SFX.check();haptic('medium');return;}
-if(role==='journalist'){const r=G.roles[offPick];G.journalistUsed=true;$('ona2-box').innerHTML=`<div class="result-big"></div><p class="hint" style="font-size:17px">Роль игрока ${offPick+1}: ${ROLE_RU[r]||r}</p><button class="btn" onclick="nextPass()">Передать ➡</button>`;SFX.check();haptic('medium');return;}
+if(role==='journalist'){const r=G.roles[offPick];G.journalistUsed=true;$('ona2-box').innerHTML=`<div class="result-big">📰</div><p class="hint" style="font-size:17px">Роль игрока ${offPick+1}: ${ROLE_RU[r]||r}</p><button class="btn" onclick="nextPass()">Передать ➡</button>`;SFX.check();haptic('medium');return;}
 if(role==='lawyer'){G.lawyerProtect=offPick;SFX.lawyer();}
 SFX.vote();haptic('medium');nextPass();
 }
@@ -1612,7 +1629,7 @@ deaths.forEach(i=>{G.alive=G.alive.filter(x=>x!==i);if(!G.firstDeath)G.firstDeat
 const role=G.roles[i];
 if(role==='bullet'){const killer=mTarget===i?(G.mafiaPicks.find((v,idx)=>picks[idx]===i)?G.mafiaPicks[G.mafiaPicks.indexOf(mTarget)]:null):G.maniacPick===i?G.maniacPick:null;if(killer!=null&&G.alive.includes(killer)){G.alive=G.alive.filter(x=>x!==killer);deaths.push(killer);}}
 });
-$('om-body').innerHTML=deaths.length?deaths.map(i=>`<div class="score-row"><span> Игрок ${i+1}</span><b>погиб ночью</b></div>`).join(''):'<p style="text-align:center;font-size:17px">😇 Мирное утро — никто не погиб.</p>';
+$('om-body').innerHTML=deaths.length?deaths.map(i=>`<div class="score-row"><span>💀 Игрок ${i+1}</span><b>погиб ночью</b></div>`).join(''):'<p style="text-align:center;font-size:17px">😇 Мирное утро — никто не погиб.</p>';
 show('s-off-morning');SFX.day();if(deaths.length)SFX.shot();
 speak('Утро. '+(deaths.length?'Погиб игрок '+(deaths[0]+1)+'.':'Никто не погиб.'));
 }
@@ -1627,7 +1644,7 @@ function renderOffAlive(){const g=$('od-alive');g.innerHTML='';G.roles.forEach((
 function startVoteOffline(){clearInterval(G.timerId);G.timerId=null;paused=false;$('pause-overlay').classList.remove('active');G.voterQ=G.alive.slice();G.voterI=0;G.votes={};G.secondRound=false;G.secondCandidates=[];showVotePass();}
 function showVotePass(){
 offPick=null;$('ovp-confirm').style.display='none';
-$('ovp-sub').textContent=G.secondRound?`🔁 Повторное голосование. Игрок ${G.voterQ[G.voterI]+1}:`:`Передайте телефон игроку ${G.voterQ[G.voterI]+1}`;
+$('ovp-sub').textContent=G.secondRound?` Повторное голосование. Игрок ${G.voterQ[G.voterI]+1}:`:`Передайте телефон игроку ${G.voterQ[G.voterI]+1}`;
 const l=$('ovp-list');l.innerHTML='';
 const list=G.secondRound?G.secondCandidates:G.alive.filter(i=>i!==G.voterQ[G.voterI]);
 list.forEach(i=>{const c=document.createElement('div');c.className='chip';c.textContent='Игрок '+(i+1);
@@ -1644,9 +1661,9 @@ let max=0;for(const k in tally)if(tally[k]>max)max=tally[k];
 const candidates=Object.keys(tally).filter(k=>tally[k]===max).map(Number).slice(0,2);
 if(candidates.length===2){G.secondRound=true;G.secondCandidates=candidates;G.voterQ=G.alive.slice();G.voterI=0;G.votes={};alert('🔁 Ничья! Повторное голосование между игроками '+(candidates.map(c=>c+1).join(' и '))+'.');showVotePass();return;}
 }
-$('oe-body').innerHTML='<p style="text-align:center"> Ничья — никто не исключён.</p>';$('s-off-elim').dataset.next='night';show('s-off-elim');return;
+$('oe-body').innerHTML='<p style="text-align:center">🤷 Ничья — никто не исключён.</p>';$('s-off-elim').dataset.next='night';show('s-off-elim');return;
 }
-if(G.lawyerProtect===target){$('oe-body').innerHTML='<p style="text-align:center">️ Адвокат защитил! Голосование отменено.</p>';$('s-off-elim').dataset.next='night';show('s-off-elim');SFX.lawyer();return;}
+if(G.lawyerProtect===target){$('oe-body').innerHTML='<p style="text-align:center">🛡️ Адвокат защитил! Голосование отменено.</p>';$('s-off-elim').dataset.next='night';show('s-off-elim');SFX.lawyer();return;}
 G.alive=G.alive.filter(x=>x!==target);
 $('oe-body').innerHTML=`<div class="score-row"><span>Игрок ${target+1}</span><b>${ROLE_RU[G.roles[target]]||G.roles[target]}</b></div>`;
 $('s-off-elim').dataset.next='check';$('s-off-elim').dataset.elim=target;
