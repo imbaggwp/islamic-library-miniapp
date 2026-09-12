@@ -163,7 +163,7 @@ select,input[type=text],input[type=number]{width:100%;background:var(--bg2);colo
 <input type="text" id="oe-code" maxlength="4" placeholder="ABCD" style="text-transform:uppercase;letter-spacing:8px;text-align:center">
 </div>
 <button class="btn ghost" onclick="onlineJoin()">🔑 Войти по коду</button>
-<p class="hint">Состояние комнаты сохраняется в облаке. Можно закрывать приложение!</p>
+<p class="hint">Состояние игры сохраняется в облаке. После повторного открытия можно восстановить игру.</p>
 </div>
 
 <div class="screen" id="s-lobby">
@@ -958,15 +958,46 @@ let tgUser = null;
 })();
 
 // ==================== СОХРАНЕНИЕ КОМНАТ В ОБЛАКО ====================
+function getPlayerKey(){
+  if(tgUser?.id) return 'tg:' + String(tgUser.id);
+  let k=localStorage.getItem('mafia_player_key');
+  if(!k){ k='local:'+Math.random().toString(36).slice(2)+Date.now().toString(36); localStorage.setItem('mafia_player_key',k); }
+  return k;
+}
+function setOnlinePhase(phase, endsAt=null, meta=null){
+  NET.phase=phase; NET.phaseStartedAt=Date.now(); NET.phaseEndsAt=endsAt;
+  NET.phaseMeta=meta||null; NET.stateVersion=(NET.stateVersion||0)+1; NET.lastStateAt=Date.now();
+}
+function serializeOnlineState(){
+  return {
+    code:NET.roomCode,started:!!NET.started,players:NET.players,roles:NET.roles,alive:NET.alive,
+    night:NET.night,cfg:NET.cfg,nightTime:NET.nightTime,dayTime:NET.dayTime,
+    phase:NET.phase,phaseStartedAt:NET.phaseStartedAt,phaseEndsAt:NET.phaseEndsAt,phaseMeta:NET.phaseMeta,
+    stateVersion:NET.stateVersion,lastStateAt:NET.lastStateAt,hostId:NET.hostId,
+    nightDeadline:NET.nightDeadline,dayDeadline:NET.dayDeadline,
+    voteStartedAt:NET.voteStartedAt,voteEndsAt:NET.voteEndsAt,
+    mafiaPicks:NET.mafiaPicks,maniacPick:NET.maniacPick,docPick:NET.docPick,docLast:NET.docLast,
+    votes:NET.votes,voteTallied:NET.voteTallied,lawyerProtect:NET.lawyerProtect,firstDeath:NET.firstDeath,
+    chatMessages:(NET.chatMessages||[]).slice(-50),scenario:NET.scenario,
+    necroUsed:NET.necroUsed,necroTarget:NET.necroTarget,ghostVoted:NET.ghostVoted,ghostVoteId:NET.ghostVoteId,
+    detectiveCheck:NET.detectiveCheck,journalistUsed:NET.journalistUsed,
+    secondRound:NET.secondRound,secondCandidates:NET.secondCandidates,secondVotes:NET.secondVotes,
+    timestamp:Date.now()
+  };
+}
 async function saveRoomToCloud(){
   if(!NET.roomCode) return;
-  const data = { code: NET.roomCode, players: NET.players, roles: NET.roles, alive: NET.alive, night: NET.night, cfg: NET.cfg, nightTime: NET.nightTime, dayTime: NET.dayTime, phase: 'active', timestamp: Date.now() };
-  try{ await cloudSet('room_' + NET.roomCode, data); }catch(e){ console.error('Cloud save error:', e); }
+  NET.lastStateAt=Date.now();
+  try{ await cloudSet('room_'+NET.roomCode,serializeOnlineState()); }
+  catch(e){ console.error('Cloud save error:',e); }
 }
 async function saveSessionToCloud(){
-  if(!NET.myId || !NET.roomCode) return;
-  const session = { role: NET.isHost ? 'host' : 'player', name: NET.myName, code: NET.roomCode, userId: NET.myId, timestamp: Date.now() };
-  try{ await cloudSet('session_' + (tgUser?.id || NET.myId), session); }catch(e){ console.error('Session save error:', e); }
+  if(!NET.roomCode) return;
+  if(!NET.playerKey) NET.playerKey=getPlayerKey();
+  const session={role:NET.isHost?'host':'player',name:NET.myName,code:NET.roomCode,
+    userId:NET.myId,playerKey:NET.playerKey,phase:NET.phase,timestamp:Date.now()};
+  try{ await cloudSet('session_'+(tgUser?.id||NET.playerKey),session); }
+  catch(e){ console.error('Session save error:',e); }
 }
 async function loadRoomFromCloud(code){ try{ return await cloudGet('room_' + code); }catch(e){ return null; } }
 async function loadSessionFromCloud(){ try{ return await cloudGet('session_' + (tgUser?.id || 'anon')); }catch(e){ return null; } }
@@ -989,28 +1020,39 @@ async function checkCloudSession(){
   if(statusEl){ statusEl.textContent = session ? '✅ Есть активная сессия' : 'Нет активных сессий'; }
 }
 async function restoreFromCloud(code, role){
-  if(role === 'host'){
-    const room = await loadRoomFromCloud(code);
-    if(!room){ err('Комната не найдена в облаке'); return; }
-    NET.myName = room.players[0]?.name || tgUser?.first_name || 'Хост';
-    NET.isHost = true; NET.myId = 'HOST'; NET.players = room.players; NET.roles = room.roles; NET.alive = room.alive;
-    NET.night = room.night; NET.cfg = room.cfg; NET.nightTime = room.nightTime; NET.dayTime = room.dayTime;
-    NET.roomCode = code; NET.started = true;
-    NET.peer = new Peer(ROOM_PREFIX + code, {
-      debug: 2,
-      config: {
-        iceServers: [
-          { urls: 'stun:stun.l.google.com:19302' },
-          { urls: 'stun:stun1.l.google.com:19302' }
-        ]
-      }
+  const room=await loadRoomFromCloud(code);
+  if(!room){err('Комната не найдена в облаке');return;}
+  if(role==='host'){
+    NET.myName=room.players?.[0]?.name||tgUser?.first_name||'Хост';
+    NET.isHost=true;NET.isPlayer=false;NET.myId='HOST';NET.hostId='HOST';NET.playerKey=getPlayerKey();
+    NET.roomCode=code; NET.players=room.players||[]; NET.roles=room.roles||{}; NET.alive=room.alive||[];
+    NET.night=room.night||1; NET.cfg=room.cfg||NET.cfg; NET.nightTime=room.nightTime??60; NET.dayTime=room.dayTime??120;
+    NET.phase=room.phase||'lobby'; NET.phaseStartedAt=room.phaseStartedAt||null; NET.phaseEndsAt=room.phaseEndsAt||null;
+    NET.phaseMeta=room.phaseMeta||null; NET.stateVersion=room.stateVersion||0; NET.lastStateAt=room.lastStateAt||Date.now();
+    NET.nightDeadline=room.nightDeadline||null; NET.dayDeadline=room.dayDeadline||null;
+    NET.voteStartedAt=room.voteStartedAt||null; NET.voteEndsAt=room.voteEndsAt||null;
+    NET.mafiaPicks=room.mafiaPicks||{};NET.maniacPick=room.maniacPick??null;NET.docPick=room.docPick??null;NET.docLast=room.docLast??null;
+    NET.votes=room.votes||{};NET.voteTallied=room.voteTallied!==false;NET.lawyerProtect=room.lawyerProtect??null;NET.firstDeath=room.firstDeath??null;
+    NET.chatMessages=room.chatMessages||[];NET.scenario=room.scenario||'classic';NET.necroUsed=!!room.necroUsed;NET.necroTarget=room.necroTarget??null;
+    NET.ghostVoted=!!room.ghostVoted;NET.ghostVoteId=room.ghostVoteId??null;NET.journalistUsed=!!room.journalistUsed;
+    NET.secondRound=!!room.secondRound;NET.secondCandidates=room.secondCandidates||[];NET.secondVotes=room.secondVotes||{};
+    NET.myRole=NET.roles.HOST; NET.started=!['menu','lobby'].includes(NET.phase); NET.over=NET.phase==='over';
+    NET.peer=new Peer(ROOM_PREFIX+code,{debug:2,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]}});
+    NET.peer.on('open',()=>{ $('lb-code').textContent=code; renderLobby(); saveSessionToCloud(); saveRoomToCloud();
+      if(NET.phase==='lobby')show('s-lobby');
+      else if(NET.phase==='role'){resetRoleScreen();showRoleHint();show('s-on-role');}
+      else if(NET.phase==='night'){clientNight({night:NET.night,alive:NET.alive,partners:NET.roles.HOST==='mafia'?NET.alive.filter(x=>x!=='HOST'&&NET.roles[x]==='mafia').map(pname):[],nightTime:NET.nightTime,dead:!NET.alive.includes('HOST')});}
+      else if(NET.phase==='morning')showAnnounce('🌅','Утро после ночи '+NET.night,morningHTML(NET.phaseMeta?.deaths||[]),()=>hostStartDay());
+      else if(NET.phase==='day')clientDay(NET.dayDeadline);
+      else if(NET.phase==='vote')clientVote(NET.alive,NET.secondRound,NET.secondCandidates);
+      else if(NET.phase==='over')clientOver(NET.phaseMeta||{winner:'good',reveal:[],nights:NET.night});
+      haptic('success');
     });
-    NET.peer.on('open', () => { $('lb-code').textContent = code; renderLobby(); show('s-lobby'); haptic('success'); });
-    NET.peer.on('connection', c => { c.on('data', d => hostOnData(c, d)); c.on('close', () => hostOnLeave(c.peer)); });
-    NET.peer.on('error', e => { err('Ошибка восстановления: ' + e.type); });
-  } else {
-    $('oe-name').value = tgUser?.first_name || '';
-    $('oe-code').value = code;
+    NET.peer.on('connection',c=>{NET.conns.set(c.peer,c);c.on('data',d=>hostOnData(c,d));c.on('close',()=>hostOnLeave(c.peer));});
+    NET.peer.on('error',e=>err('Ошибка восстановления: '+e.type));
+  }else{
+    $('oe-name').value=tgUser?.first_name||'';
+    $('oe-code').value=code;
     onlineJoin();
   }
 }
@@ -1028,7 +1070,9 @@ chatMessages:[],readyPlayers:new Set(),scenario:'classic',
 necroUsed:false,necroTarget:null,ghostVoted:false,ghostVoteId:null,
 detectiveCheck:null,journalistUsed:false,
 secondRound:false,secondCandidates:[],secondVotes:{},
-roomCode:null,isPlayer:false,visibility:'public',roomCreatedAt:null};
+roomCode:null,isPlayer:false,visibility:'public',roomCreatedAt:null,
+phase:'menu',phaseStartedAt:null,phaseEndsAt:null,phaseMeta:null,stateVersion:0,lastStateAt:null,
+hostId:'HOST',playerKey:null,nightDeadline:null,dayDeadline:null,voteStartedAt:null,voteEndsAt:null};
 
 function pname(id){const p=NET.players.find(p=>p.id===id);return p?p.name:'?';}
 
@@ -1053,13 +1097,15 @@ function onlineCreate(){
   
   NET.myName=name;
   NET.isHost=true;
-  NET.myId='HOST';
-  NET.players=[{id:'HOST',name}];
+  NET.isPlayer=false;
+  NET.myId='HOST'; NET.hostId='HOST'; NET.playerKey=getPlayerKey();
+  NET.players=[{id:'HOST',name,playerKey:NET.playerKey}];
   NET.createRetries=0;
   NET.visibility = currentRoomVisibility;
   NET.roomCreatedAt = Date.now();
   const code=genCode();
   NET.roomCode = code;
+  setOnlinePhase('lobby',null,{visibility:NET.visibility});
   
   const peerId = ROOM_PREFIX + code;
   console.log('📝 Код комнаты:', code);
@@ -1166,12 +1212,38 @@ function hostOnLeave(id){
   if(!NET.started) renderLobby();
 }
 
+function sendFullSyncToPlayer(id){
+  const c=NET.conns.get(id); if(!c)return;
+  const role=NET.roles[id];
+  const partners=role==='mafia'?NET.alive.filter(x=>x!==id&&NET.roles[x]==='mafia').map(pname):[];
+  try{
+    c.send({type:'m-sync',phase:NET.phase,alive:NET.alive.slice(),players:NET.players,
+      night:NET.night,deadline:NET.phaseEndsAt,voteEndsAt:NET.voteEndsAt,
+      secondRound:NET.secondRound,secondCandidates:NET.secondCandidates||[],
+      chatMessages:(NET.chatMessages||[]).slice(-30),role,partners});
+  }catch(e){}
+}
 function hostOnData(c,d){
 if(d.type==='join'){
-  if(NET.started){ c.send({type:'error',msg:'Игра уже идёт'}); setTimeout(()=>c.close(),500); return; }
-  NET.conns.set(c.peer,c); NET.players.push({id:c.peer,name:String(d.name).slice(0,16)});
+  const key=String(d.playerKey||'');
+  const existing=key?NET.players.find(p=>p.playerKey===key):null;
+  if(NET.started){
+    if(!existing){ c.send({type:'error',msg:'Игра уже идёт. Переподключиться может только игрок этой партии.'}); setTimeout(()=>c.close(),500); return; }
+    const oldId=existing.id; existing.id=c.peer; existing.name=String(d.name||existing.name).slice(0,16);
+    NET.conns.delete(oldId); NET.conns.set(c.peer,c);
+    if(NET.roles[oldId]!==undefined){NET.roles[c.peer]=NET.roles[oldId];delete NET.roles[oldId];}
+    NET.alive=NET.alive.map(x=>x===oldId?c.peer:x);
+    if(NET.ghostVoteId===oldId)NET.ghostVoteId=c.peer;
+    if(NET.firstDeath===oldId)NET.firstDeath=c.peer;
+    if(NET.lawyerProtect===oldId)NET.lawyerProtect=c.peer;
+    if(NET.docPick===oldId)NET.docPick=c.peer;
+    if(NET.docLast===oldId)NET.docLast=c.peer;
+    sendFullSyncToPlayer(c.peer); saveRoomToCloud(); return;
+  }
+  NET.conns.set(c.peer,c);
+  NET.players.push({id:c.peer,name:String(d.name).slice(0,16),playerKey:key});
   broadcast({type:'lobby',players:NET.players}); renderLobby(); saveRoomToCloud();
-  if(NET.visibility === 'public' && NET.roomCode) db.ref('rooms/' + NET.roomCode).update({players: NET.players.length});
+  if(NET.visibility === 'public' && NET.roomCode) db.ref('rooms/' + NET.roomCode).update({players:NET.players.length});
 }
 else if(d.type==='m-act')hostNightAct(c.peer,d);
 else if(d.type==='m-vote-cast'){if(NET.alive.includes(c.peer)||NET.ghostVoteId===c.peer){NET.votes[c.peer]=d.target;hostCheckVotes();}}
@@ -1190,6 +1262,7 @@ function onlineJoin(){
   NET.myName=name;
   NET.isHost=false;
   NET.isPlayer=true;
+  NET.playerKey=getPlayerKey();
   NET.roomCode=code;
   
   show('s-on-wait');
@@ -1225,7 +1298,7 @@ function onlineJoin(){
     NET.hostConn.on('open', () => { 
       console.log('✅ Подключено к хосту!');
       clearTimeout(connTimeout);
-      NET.hostConn.send({type:'join', name}); 
+      NET.hostConn.send({type:'join', name, playerKey:NET.playerKey}); 
       try { saveSessionToCloud(); } catch(e) { console.log('CloudStorage не доступен'); }
       $('ow-text').textContent = 'Подключено! Ждём начала игры...';
     });
@@ -1272,6 +1345,11 @@ function onlineJoin(){
 function peerOnData(d){
 switch(d.type){
 case'error':err(d.msg);break;
+case'm-sync':
+  NET.phase=d.phase||NET.phase;NET.alive=d.alive||NET.alive;NET.players=d.players||NET.players;NET.night=d.night||NET.night;
+  NET.phaseEndsAt=d.deadline||NET.phaseEndsAt;NET.voteEndsAt=d.voteEndsAt||NET.voteEndsAt;NET.secondRound=!!d.secondRound;
+  NET.secondCandidates=d.secondCandidates||[];NET.chatMessages=d.chatMessages||NET.chatMessages;
+  if(d.role)NET.myRole=d.role;NET.partners=d.partners||[];NET.started=!['menu','lobby'].includes(NET.phase);renderChat();break;
 case'kicked':err(d.reason || 'Вас исключили из комнаты');break;
 case'lobby':NET.players=d.players;renderLobby();if(!NET.started)show('s-lobby');break;
 case'm-kick':if(d.id===NET.myId)err('Вас исключили из комнаты');break;
@@ -1323,7 +1401,7 @@ function hostStart(){
 if(!NET.isHost){ alert('Только создатель комнаты может начать игру!'); return; }
 if(NET.players.length<4)return;
 if(NET.visibility === 'public' && NET.roomCode) removeOpenRoom(NET.roomCode);
-NET.started=true;NET.over=false;NET.night=1;
+NET.started=true;NET.over=false;NET.night=1;setOnlinePhase('role',null,{step:'role-reveal'});
 if(NET.scenario==='custom'){NET.cfg={commissar:$('lbc-com').checked,doctor:$('lbc-doc').checked,maniac:$('lbc-man').checked&&NET.players.length>=6,journalist:$('lbc-jour').checked&&NET.players.length>=5,lawyer:$('lbc-law').checked&&NET.players.length>=6,bullet:$('lbc-bull').checked&&NET.players.length>=5,detective:$('lbc-det').checked&&NET.players.length>=6,necromancer:$('lbc-nec').checked&&NET.players.length>=7,ghost:$('lbc-ghost').checked&&NET.players.length>=5};}
 else if(NET.scenario==='classic'){NET.cfg={commissar:true,doctor:true,maniac:false,journalist:false,lawyer:false,bullet:false,detective:false,necromancer:false,ghost:false};}
 else if(NET.scenario==='chaos'){NET.cfg={commissar:true,doctor:true,maniac:NET.players.length>=6,journalist:NET.players.length>=5,lawyer:NET.players.length>=6,bullet:NET.players.length>=5,detective:NET.players.length>=6,necromancer:NET.players.length>=7,ghost:NET.players.length>=5};}
@@ -1347,6 +1425,7 @@ function hostStartNight(){
 NET.mafiaPicks={};NET.maniacPick=null;NET.docPick=null;NET.savedFlag=false;
 NET.lawyerProtect=null;NET.necroTarget=null;
 NET.nightDeadline=NET.nightTime>0?Date.now()+NET.nightTime*1000:null;
+setOnlinePhase('night',NET.nightDeadline,{night:NET.night});
 NET.players.forEach(p=>{
 if(!NET.alive.includes(p.id)&&NET.roles[p.id]!=='ghost')return;
 const partners=NET.roles[p.id]==='mafia'?NET.alive.filter(id=>id!==p.id&&NET.roles[id]==='mafia').map(id=>pname(id)):[];
@@ -1438,7 +1517,9 @@ if(role==='bullet'){const killer=mTarget===id?(NET.mafiaPicks[id]||null):NET.man
 const names=deaths.map(id=>pname(id));
 const win=checkWin(NET.alive.map(id=>NET.roles[id]));
 if(win){hostGameOver(win);return;}
+setOnlinePhase('morning',null,{deaths:names});
 broadcast({type:'m-morning',night:NET.night,deaths:names});
+saveRoomToCloud();
 if(NET.isHost)showAnnounce('🌅','Утро после ночи '+NET.night,morningHTML(names),()=>hostStartDay());
 }
 
@@ -1447,7 +1528,9 @@ function showAnnounce(emoji,title,bodyHTML,nextFn){$('ona-emoji').textContent=em
 
 function hostStartDay(){
 NET.dayDeadline=Date.now()+NET.dayTime*1000;
+setOnlinePhase('day',NET.dayDeadline,{day:NET.night});
 broadcast({type:'m-day',alive:NET.alive.slice(),deadline:NET.dayDeadline});
+saveRoomToCloud();
 clientDay(NET.dayDeadline);
 }
 
@@ -1468,7 +1551,9 @@ function renderAliveChips(elId){const g=$(elId);g.innerHTML='';NET.players.forEa
 function hostStartVote(){
 clearInterval(NET.timerId);NET.timerId=null;
 NET.votes={};NET.voteTallied=false;NET.secondRound=false;NET.secondCandidates=[];NET.secondVotes={};
+NET.voteStartedAt=Date.now();NET.voteEndsAt=Date.now()+60000;setOnlinePhase('vote',NET.voteEndsAt,{secondRound:false});
 broadcast({type:'m-vote',alive:NET.alive.slice(),secondRound:false});
+saveRoomToCloud();
 clientVote(NET.alive,false,[]);
 NET.voteDeadline=setTimeout(()=>{if(!NET.voteTallied)hostTallyVote();},60000);
 }
@@ -1692,3 +1777,4 @@ setInterval(() => {
 </script>
 </body>
 </html>
+
